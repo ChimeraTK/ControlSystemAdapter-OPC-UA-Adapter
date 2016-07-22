@@ -83,9 +83,7 @@ endif()
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
 ##########################################################################################################
 
-add_custom_command(OUTPUT   ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist_FullNS0.txt
-                            ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist.txt
-                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
+add_custom_command(OUTPUT   ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
                             ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/open62541_MacroHelper.py
                             ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_builtin_types.py
                             ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_constants.py
