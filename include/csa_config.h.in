@@ -1,0 +1,7 @@
+#ifndef HAVE_CONFIG_H_
+#define HAVE_CONFIG_H_
+
+/* Example parameter expansion:
+ * #define ENABLE_BUILDMODEL "${ENABLE_BUILDMODEL}"
+ */
+#endif
