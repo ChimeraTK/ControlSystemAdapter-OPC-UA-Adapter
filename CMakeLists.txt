@@ -22,6 +22,12 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                   ${CMAKE_SOURCE_DIR}/src/ipc_managed_object.cpp
                   ${CMAKE_SOURCE_DIR}/src/ipc_manager.cpp
                   ${CMAKE_SOURCE_DIR}/src/ipc_task.cpp
+                  ${CMAKE_SOURCE_DIR}/src/ControlSystemAdapterOPCUA.cpp
+                  ${CMAKE_SOURCE_DIR}/src/mtca_processvariable.cpp
+                  ${CMAKE_SOURCE_DIR}/src/mtca_processscalar.cpp
+                  ${CMAKE_SOURCE_DIR}/src/mtca_processarray.cpp
+                  ${CMAKE_SOURCE_DIR}/src/mtca_uaadapter.cpp
+                  ${CMAKE_SOURCE_DIR}/src/mtca_timestamp.cpp
 )
 
 # Create the target directory for model initializers, open62541 and ControlSystemAdapter libraries/headers
@@ -132,6 +138,20 @@ add_library(mtca_objects OBJECT ${objectSources})
 add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/src/ControlSystem_OPCUA_Sample_Adapter.cpp $<TARGET_OBJECTS:mtca_objects> )
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapter)
+
+## Boost Komponente suchen und hinzufügen
+find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
+  ${Boost_CHRONO_LIBRARY}
+)
+
+## Create shared lib
+add_library(ControlSystemAdapterOPCUA SHARED src/ControlSystemAdapterOPCUA.cpp)
+
 if(ENABLE_LINTING)
 add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
                     PRE_BUILD
