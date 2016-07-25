@@ -1,11 +1,11 @@
 ###########################
 # UaModeler Project File  #
-# Generated at 01.07.2016 #
+# Generated at 06.07.2016 #
 ###########################
 
 PROJECTNAME = templatemodel
 
-TEMPLATESET = ($TEMPLATES)/ansi_c/v1_4/t2/ansi_c.tt2set
+TEMPLATESET = ($TEMPLATES)/ansi_c/v1_4/t4/ansi_c.tt2set
 
 MODELS += ($MODELS)/Opc.Ua.NodeSet2.ua \
     templatemodel.ua
@@ -16,7 +16,7 @@ COLORS = ($MODELS)/Opc.Ua.NodeSet2.ua: #0000ff\
 PROJECTVARIABLES += ProviderName = templatemodel \
     alarmAndEvents = false
 
-OUTPUTPATH = ../../../../../work/svn/working_copies/open62541/tools/schema
+OUTPUTPATH = ../../../../../../../../../home/januil/Schreibtisch
 
 GENERATE += templatemodel.ua
 
