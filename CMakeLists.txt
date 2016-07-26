@@ -3,13 +3,29 @@ cmake_minimum_required(VERSION 2.8.0)
 project(ControlSystem-OPCUA_Adapter)
 
 ##########################################################################################################
+## Hard package dependencies
+##########################################################################################################
+
+find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
+find_package(PythonInterp REQUIRED)
+
+##########################################################################################################
+## Compiler specific stuff
+##########################################################################################################
+
+if(CMAKE_COMPILER_IS_GNUCC OR "x${CMAKE_C_COMPILER_ID}" STREQUAL "xClang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+  add_definitions(-fPIC)
+endif()
+  
+##########################################################################################################
 ## Includes, Link dirs und Quellcode
 ##########################################################################################################
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -86,17 +102,36 @@ if(BUILD_STATIC_ANALYSIS)
 endif()
 
 ##########################################################################################################
+## Object and shared library compilation required by tests and examples
+##########################################################################################################
+
+## Config File
+configure_file (
+  "${PROJECT_SOURCE_DIR}/include/csa_config.h.in"
+  "${PROJECT_BINARY_DIR}/src_generated/csa_config.h"
+  )
+
+## Object Files
+add_library(mtca_objects OBJECT ${objectSources})
+
+## Early declaration due to the requirement to run the dependencies update prior to building
+## Create shared lib
+add_library(ControlSystemAdapterOPCUA SHARED $<TARGET_OBJECTS:mtca_objects>)
+target_link_libraries(ControlSystemAdapterOPCUA open62541)
+target_link_libraries(ControlSystemAdapterOPCUA pthread)
+target_link_libraries(ControlSystemAdapterOPCUA dl)
+target_link_libraries(ControlSystemAdapterOPCUA
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
+  ${Boost_CHRONO_LIBRARY}
+)
+
+##########################################################################################################
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
 ##########################################################################################################
 
-add_custom_command(OUTPUT   ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
-                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/open62541_MacroHelper.py
-                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_builtin_types.py
-                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_constants.py
-                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_namespace.py
-                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_node_types.py
-                            ${PROJECT_SOURCE_DIR}/lib/libopen62541.so
-                            ${PROJECT_SOURCE_DIR}/include/open62541/open62541.h
+add_custom_command(TARGET ControlSystemAdapterOPCUA
                    PRE_BUILD
                    COMMAND /bin/bash ${PROJECT_SOURCE_DIR}/tools/buildDependencies.sh ${PROJECT_SOURCE_DIR}
                    DEPENDS ${PROJECT_SOURCE_DIR}/tools/buildDependencies.sh)
@@ -123,34 +158,23 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit
 
                            
 ##########################################################################################################
-##    Build-Abschnitt
+##  Tests and executables
 ##########################################################################################################
-## Config File
-configure_file (
-  "${PROJECT_SOURCE_DIR}/include/csa_config.h.in"
-  "${PROJECT_BINARY_DIR}/src_generated/csa_config.h"
-  )
- 
-## Object Files
-add_library(mtca_objects OBJECT ${objectSources})
+
+link_directories(${CMAKE_BINARY_DIR})
 
 ## Binary: ControlSystem-OPCUA_Sample_Adapter
-add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/src/ControlSystem_OPCUA_Sample_Adapter.cpp $<TARGET_OBJECTS:mtca_objects> )
+add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/ControlSystem_OPCUA_Sample_Adapter.cpp)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapterOPCUA)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapter)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapter)
-
-## Boost Komponente suchen und hinzufügen
-find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
   ${Boost_CHRONO_LIBRARY}
 )
-
-## Create shared lib
-add_library(ControlSystemAdapterOPCUA SHARED src/ControlSystemAdapterOPCUA.cpp)
 
 if(ENABLE_LINTING)
 add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter

@@ -1,5 +1,5 @@
 /*
- * Copyright (c)
+ * Copyright (c) 2016 Julian Rahm <Julian.Rahm@tu-dresden.de>
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,9 +28,7 @@
 #define CONTROLSYSTEMADAPTER_OPCUA_H
 
 #include <vector>
-
 #include <ua_mapped_class.h>
-
 #include <ipc_managed_object.h>
 
 #include <mtca_uaadapter.h>
@@ -40,26 +38,27 @@
 #include <mtca_timestamp.h>
 
 #include <ControlSystemPVManager.h>
-  
+ 
 class ControlSystemAdapterOPCUA {
-	private:
-		ipc_manager  *mgr;
-		mtca_uaadapter *adapter;
+  private:
+    ipc_manager    *mgr;
+    mtca_uaadapter *adapter;
 
-		boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager;
-		uint16_t opcuaPort;
-		
-		void ControlSystemAdapterOPCUA_InitServer(uint16_t opcuaPort);
-		void ControlSystemAdapterOPCUA_InitVarMapping(boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager);
-		
-		
-		
-	public:
-		ControlSystemAdapterOPCUA(uint16_t opcuaPort, boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager);
-		~ControlSystemAdapterOPCUA();
-		
-		boost::shared_ptr<mtca4u::ControlSystemPVManager> const & getControlSystemPVManager() const;
-		ipc_manager* getIPCManager();
+    boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager;
+    uint16_t opcuaPort;
+    
+    void ControlSystemAdapterOPCUA_InitServer(uint16_t opcuaPort);
+    void ControlSystemAdapterOPCUA_InitVarMapping(boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager);
+    
+  public:
+    ControlSystemAdapterOPCUA(uint16_t opcuaPort, boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager);
+    ~ControlSystemAdapterOPCUA();
+    
+    boost::shared_ptr<mtca4u::ControlSystemPVManager> const & getControlSystemPVManager() const;
+    void start();
+    void stop();
+    void terminate();
+    bool isRunning();
 };
 
 #endif // CONTROLSYSTEMADAPTER_H
