@@ -57,11 +57,7 @@ ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(uint16_t opcuaPort, boost::
 
 // Init the OPCUA server
 void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(uint16_t opcuaPort) {
-<<<<<<< HEAD
   this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
-=======
-	this->mgr = new ipc_manager(); 
->>>>>>> bfaeba34260b392356202a28260142e43768367b
 
   // Create new server adapter
   this->adapter = new mtca_uaadapter(opcuaPort);

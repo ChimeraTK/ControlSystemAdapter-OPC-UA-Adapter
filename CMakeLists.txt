@@ -128,7 +128,15 @@ target_link_libraries(ControlSystemAdapterOPCUA
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
 ##########################################################################################################
 
-add_custom_command(TARGET ControlSystemAdapterOPCUA
+add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
+                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/open62541_MacroHelper.py
+                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_builtin_types.py
+                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_constants.py
+                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_namespace.py
+                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_node_types.py
+                           ${PROJECT_SOURCE_DIR}/lib/libopen62541.so
+                           ${PROJECT_SOURCE_DIR}/lib/libControlSystemAdapter.so
+                           ${PROJECT_SOURCE_DIR}/include/open62541/open62541.h
                    PRE_BUILD
                    COMMAND /bin/bash ${PROJECT_SOURCE_DIR}/tools/buildDependencies.sh ${PROJECT_SOURCE_DIR}
                    DEPENDS ${PROJECT_SOURCE_DIR}/tools/buildDependencies.sh)
@@ -160,10 +168,6 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit
 
 link_directories(${CMAKE_BINARY_DIR})
 
-## Create shared lib
-#add_library(ControlSystemAdapterOPCUA SHARED ${objectSources})$<TARGET_OBJECTS:mtca_objects>
-add_library(ControlSystemAdapterOPCUA SHARED $<TARGET_OBJECTS:mtca_objects>)
-
 ## Binary: ControlSystem-OPCUA_Sample_Adapter
 add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/ControlSystem_OPCUA_Sample_Adapter.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapterOPCUA)
@@ -178,7 +182,7 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
 )
 
 if(ENABLE_LINTING)
-add_custom_command( TARGET exapleApplicationOPCUA
+add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
                     PRE_BUILD
                     COMMAND /usr/bin/cppcheck --std=c++11 --inline-suppr --enable=all ${objectSources}
                     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -187,5 +191,5 @@ endif()
 ## Ends binary ControlSystem-OPCUA_Sample_Adapter
 
 
-install(TARGETS exapleApplicationOPCUA RUNTIME DESTINATION bin)
+install(TARGETS ControlSystem-OPCUA_Sample_Adapter RUNTIME DESTINATION bin)
   
