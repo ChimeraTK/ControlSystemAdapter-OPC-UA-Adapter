@@ -28,7 +28,6 @@
 
 extern "C" {
 #include "unistd.h"
-#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
 
 #include "ControlSystemAdapterOPCUA.h"
@@ -46,13 +45,23 @@ extern "C" {
 
 #include "ControlSystemPVManager.h"
 
+/**
+ * This class provide the two parts of the OPCUA Adapter. First of all the OPCUA server starts with a random port number (recommended 16664),
+ * following the mapping process start. For this, the ProcessVariable from ControlSystemPVManager will be mapped to the OPCUA Model 
+ * 
+ */ 
 ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(uint16_t opcuaPort, boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager) {
   this->ControlSystemAdapterOPCUA_InitServer(opcuaPort);
   this->ControlSystemAdapterOPCUA_InitVarMapping(csManager);
 }
 
+// Init the OPCUA server
 void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(uint16_t opcuaPort) {
+<<<<<<< HEAD
   this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
+=======
+	this->mgr = new ipc_manager(); 
+>>>>>>> bfaeba34260b392356202a28260142e43768367b
 
   // Create new server adapter
   this->adapter = new mtca_uaadapter(opcuaPort);
@@ -63,6 +72,7 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(uint16_t op
   
 }
 
+// Mapping the ProcessVariables to the server
 void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager) {
   // Get all ProcessVariables
   vector<ProcessVariable::SharedPtr> allProcessVariables = csManager->getAllProcessVariables();
@@ -98,6 +108,7 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(boost::
 }
     
 
+// Maybe needed, return the ControlSystemPVManager
 boost::shared_ptr<mtca4u::ControlSystemPVManager> const & ControlSystemAdapterOPCUA::getControlSystemPVManager() const {
   return this->csManager;
 }

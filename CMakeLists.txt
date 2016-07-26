@@ -50,9 +50,6 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/src_generated")
 include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 
-set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/ua_mapped_class.cpp APPEND PROPERTY OBJECT_DEPENDS ${PROJECT_SOURCE_DIR}/lib/libopen62541.so)
-set_property(SOURCE ${PROJECT_SOURCE_DIR}/src/ControlSystem_OPCUA_Sample_Adapter.cpp APPEND PROPERTY OBJECT_DEPENDS ${PROJECT_SOURCE_DIR}/lib/libopen62541.so)
-
 ##########################################################################################################
 ## Optionen
 ##########################################################################################################
@@ -163,6 +160,10 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit
 
 link_directories(${CMAKE_BINARY_DIR})
 
+## Create shared lib
+#add_library(ControlSystemAdapterOPCUA SHARED ${objectSources})$<TARGET_OBJECTS:mtca_objects>
+add_library(ControlSystemAdapterOPCUA SHARED $<TARGET_OBJECTS:mtca_objects>)
+
 ## Binary: ControlSystem-OPCUA_Sample_Adapter
 add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/ControlSystem_OPCUA_Sample_Adapter.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapterOPCUA)
@@ -177,7 +178,7 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
 )
 
 if(ENABLE_LINTING)
-add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
+add_custom_command( TARGET exapleApplicationOPCUA
                     PRE_BUILD
                     COMMAND /usr/bin/cppcheck --std=c++11 --inline-suppr --enable=all ${objectSources}
                     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -186,5 +187,5 @@ endif()
 ## Ends binary ControlSystem-OPCUA_Sample_Adapter
 
 
-install(TARGETS ControlSystem-OPCUA_Sample_Adapter RUNTIME DESTINATION bin)
+install(TARGETS exapleApplicationOPCUA RUNTIME DESTINATION bin)
   

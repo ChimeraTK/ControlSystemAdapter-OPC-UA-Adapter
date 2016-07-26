@@ -1,5 +1,3 @@
-
-
 extern "C" {
 	#include <unistd.h>
 	#include <signal.h>
@@ -8,15 +6,14 @@ extern "C" {
 #include <iostream>
 
 #include "open62541.h"
+#include "ipc_manager.h"
+
 #include "ControlSystemAdapterOPCUA.h"
 
 #include "ControlSystemSynchronizationUtility.h"
 #include "ControlSystemPVManager.h"
 #include "DevicePVManager.h"
 #include "PVManager.h"
-#include <ipc_manager.h>
-//#include <DeviceSynchronizationUtility.h>
-
 
 using std::cout;
 using std::endl;
@@ -24,7 +21,6 @@ using namespace mtca4u;
 
 /* GLOBAL VAR */
 ControlSystemAdapterOPCUA *csaOPCUA;
-
 
 
 /* FUNCTIONS */
@@ -39,14 +35,11 @@ int main() {
 	
 	signal(SIGINT,  SigHandler_Int); // Registriert CTRL-C/SIGINT
 	signal(SIGTERM, SigHandler_Int); // Registriert SIGTERM
-  
-  
-    std::cout << "Hello World" << std::endl;
-    
+      
 	// Create the managers
 	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers = createPVManager();
 	
-		boost::shared_ptr<DevicePVManager> devManager = pvManagers.second;
+	boost::shared_ptr<DevicePVManager> devManager = pvManagers.second;
 	boost::shared_ptr<ControlSystemPVManager> csManager = pvManagers.first;
 	
 	ControlSystemSynchronizationUtility syncUtil(csManager);
@@ -62,7 +55,7 @@ int main() {
 		
 	ProcessScalar<int>::SharedPtr targetVoltage = csManager->getProcessScalar<int>("TARGET_VOLTAGE");
 	ProcessScalar<int>::SharedPtr monitorVoltage = csManager->getProcessScalar<int>("MONITOR_VOLTAGE");    
-     
+	
 	//intAdev->set(25);
 	//targetVoltage->set(42);
 	//monitorVoltage->set(23);
