@@ -70,37 +70,92 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(uint16_t op
 
 // Mapping the ProcessVariables to the server
 void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager) {
-  // Get all ProcessVariables
-  vector<ProcessVariable::SharedPtr> allProcessVariables = csManager->getAllProcessVariables();
+	// Get all ProcessVariables
+	vector<ProcessVariable::SharedPtr> allProcessVariables = csManager->getAllProcessVariables();
   
-  std::cout << "Start mapping..." << std::endl;
+	std::cout << "Start mapping..." << std::endl;
   
   
-  /*
-   * FIXME: Derzeit werden nur <int> Datentypen unterstützt. Mittels Factory und Template sollten alle nötigen unterstützt werden.
-   */
-  for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables){
-    try  {
-    // Map to ProcessScalar
-      if(!oneProcessVariable->isArray()) {
-        adapter->addVariable(oneProcessVariable->getName(), std::to_string(csManager->getProcessScalar<int>(oneProcessVariable->getName())->get()), oneProcessVariable->getValueType(), oneProcessVariable->getTimeStamp());
-        std::cout << "Scalar: " << oneProcessVariable->getName() << std::endl;
-      }
-      // Map to ProcessScalar
-      if(oneProcessVariable->isArray()) {
-        std::vector<int32_t> processVector (csManager->getProcessArray<int>(oneProcessVariable->getName())->get().size());
-        // get array values from ProcessVariable
-        for(int i=0; i< csManager->getProcessArray<int>(oneProcessVariable->getName())->get().size(); i++) { 
-          processVector.at(i) = csManager->getProcessArray<int>(oneProcessVariable->getName())->get().at(i);
-        }
-        adapter->addVariable(oneProcessVariable->getName(), processVector, oneProcessVariable->getValueType(), oneProcessVariable->getTimeStamp());
-        std::cout << "Array: " << oneProcessVariable->getName() << std::endl;
-      }
-    }
-    catch (std::bad_cast& bc) {
-      std::cerr << "bad_cast caught: " << bc.what() << '\n';
-    }
-  }
+	/*
+	* FIXME: Derzeit werden nur <int> Datentypen unterstützt. Mittels Factory und Template sollten alle nötigen unterstützt werden.
+	*/
+	for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables){
+		try  {
+		// Map to ProcessScalar
+			std::type_info const & valueType = oneProcessVariable->getValueType();
+			if(!oneProcessVariable->isArray()) {
+				std::string value;
+				// cast the correct processVariable type
+				if (valueType == typeid(int8_t)) {
+					value = std::to_string(csManager->getProcessScalar<int8_t>(oneProcessVariable->getName())->get());
+				} else if (valueType == typeid(uint8_t)) {
+					value = std::to_string(csManager->getProcessScalar<uint8_t>(oneProcessVariable->getName())->get());
+				} else if (valueType == typeid(int16_t)) {
+					value = std::to_string(csManager->getProcessScalar<int16_t>(oneProcessVariable->getName())->get());
+				} else if (valueType == typeid(uint16_t)) {
+					value = std::to_string(csManager->getProcessScalar<uint16_t>(oneProcessVariable->getName())->get());
+				} else if (valueType == typeid(int32_t)) {
+					value = std::to_string(csManager->getProcessScalar<int32_t>(oneProcessVariable->getName())->get());
+				} else if (valueType == typeid(uint32_t)) {
+					value = std::to_string(csManager->getProcessScalar<u_int32_t>(oneProcessVariable->getName())->get());
+				} else if (valueType == typeid(float)) {
+					value = std::to_string(csManager->getProcessScalar<float>(oneProcessVariable->getName())->get());
+				} else if (valueType == typeid(double)) {
+					value = std::to_string(csManager->getProcessScalar<double>(oneProcessVariable->getName())->get());
+				} else {
+					throw std::invalid_argument("unsupported value type");
+				}
+				adapter->addVariable(oneProcessVariable->getName(), value, valueType, oneProcessVariable->getTimeStamp());
+				std::cout << "Scalar: " << oneProcessVariable->getName() << std::endl;
+			}
+			// Map to ProcessScalar
+			if(oneProcessVariable->isArray()) {
+				std::vector<std::string> valueVector;
+				// get array values from ProcessVariable
+				if (valueType == typeid(int8_t)) {
+					for(int i=0; i< csManager->getProcessArray<int8_t>(oneProcessVariable->getName())->get().size(); i++) { 
+						valueVector.push_back(std::to_string(csManager->getProcessArray<int8_t>(oneProcessVariable->getName())->get().at(i)));
+					}
+				} else if (valueType == typeid(uint8_t)) {
+					for(int i=0; i< csManager->getProcessArray<u_int8_t>(oneProcessVariable->getName())->get().size(); i++) { 
+						valueVector.push_back(std::to_string(csManager->getProcessArray<u_int8_t>(oneProcessVariable->getName())->get().at(i)));
+					}
+				} else if (valueType == typeid(int16_t)) {
+					for(int i=0; i< csManager->getProcessArray<int16_t>(oneProcessVariable->getName())->get().size(); i++) { 
+						valueVector.push_back(std::to_string(csManager->getProcessArray<int16_t>(oneProcessVariable->getName())->get().at(i)));
+					}
+				} else if (valueType == typeid(uint16_t)) {
+					for(int i=0; i< csManager->getProcessArray<u_int16_t>(oneProcessVariable->getName())->get().size(); i++) { 
+						valueVector.push_back(std::to_string(csManager->getProcessArray<uint16_t>(oneProcessVariable->getName())->get().at(i)));
+					}
+				} else if (valueType == typeid(int32_t)) {
+					for(int i=0; i< csManager->getProcessArray<int32_t>(oneProcessVariable->getName())->get().size(); i++) { 
+						valueVector.push_back(std::to_string(csManager->getProcessArray<int32_t>(oneProcessVariable->getName())->get().at(i)));
+					}
+				} else if (valueType == typeid(uint32_t)) {
+					for(int i=0; i< csManager->getProcessArray<u_int32_t>(oneProcessVariable->getName())->get().size(); i++) { 
+						valueVector.push_back(std::to_string(csManager->getProcessArray<uint32_t>(oneProcessVariable->getName())->get().at(i)));
+					}
+				} else if (valueType == typeid(float)) {
+					for(int i=0; i< csManager->getProcessArray<float>(oneProcessVariable->getName())->get().size(); i++) { 
+						valueVector.push_back(std::to_string(csManager->getProcessArray<float>(oneProcessVariable->getName())->get().at(i)));
+					}
+				} else if (valueType == typeid(double)) {
+					for(int i=0; i< csManager->getProcessArray<double>(oneProcessVariable->getName())->get().size(); i++) { 
+						valueVector.push_back(std::to_string(csManager->getProcessArray<double>(oneProcessVariable->getName())->get().at(i)));
+					}
+				} else {
+					throw std::invalid_argument("unsupported value type");
+				}
+				
+				adapter->addVariable(oneProcessVariable->getName(), valueVector, valueType, oneProcessVariable->getTimeStamp());
+				std::cout << "Array: " << oneProcessVariable->getName() << std::endl;
+			}
+		}
+		catch (std::bad_cast& bc) {
+			std::cerr << "bad_cast caught: " << bc.what() << '\n';
+		}
+	}
 }
     
 

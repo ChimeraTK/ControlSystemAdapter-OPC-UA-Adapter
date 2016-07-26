@@ -100,7 +100,7 @@ void mtca_uaadapter::addVariable(std::string varName, std::string varValue, std:
 	this->variables.scalar.push_back(new mtca_processscalar(this->mappedServer, UA_NODEID_NUMERIC(2, 5003), varName, varValue, valueType, varTimeStamp));
 }
 
-void mtca_uaadapter::addVariable(std::string varName, std::vector<int32_t> varValue, std::type_info const &valueType,  mtca4u::TimeStamp varTimeStamp) {
+void mtca_uaadapter::addVariable(std::string varName, std::vector<std::string> varValue, std::type_info const &valueType,  mtca4u::TimeStamp varTimeStamp) {
 	this->variables.array.push_back(new mtca_processarray(this->mappedServer, UA_NODEID_NUMERIC(2, 5004), varName, varValue, valueType, varTimeStamp));
 }
 

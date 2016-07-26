@@ -69,7 +69,7 @@ class mtca_uaadapter : ua_mapped_class, public ipc_managed_object {
 		
 		
 		void addVariable(std::string name, std::string value, std::type_info const &type, mtca4u::TimeStamp timestamp);
-		void addVariable(std::string name, std::vector<int32_t> value, std::type_info const &type, mtca4u::TimeStamp timestamp);
+		void addVariable(std::string name, std::vector<std::string> value, std::type_info const &type, mtca4u::TimeStamp timestamp);
 		void addConstant(std::string name, std::string value, std::type_info const &type, mtca4u::TimeStamp timestamp);
 		
 		void workerThread();

@@ -32,7 +32,7 @@ extern "C" {
 #include <vector>
 
 
-mtca_processarray::mtca_processarray(UA_Server *server, UA_NodeId baseNodeId, std::string name, std::vector<int32_t> value, std::type_info const &valueType, mtca4u::TimeStamp timeStamp):ua_mapped_class(server, baseNodeId)
+mtca_processarray::mtca_processarray(UA_Server *server, UA_NodeId baseNodeId, std::string name, std::vector<std::string> value, std::type_info const &valueType, mtca4u::TimeStamp timeStamp):ua_mapped_class(server, baseNodeId)
 {
   // maybe use templating to create a more generalized class?
   this->mtca_processvariable_globalinit(name, value,  valueType, timeStamp);
@@ -43,7 +43,7 @@ mtca_processarray::~mtca_processarray()
   // Our ua_mapped_class destructor will take care of deleting our opcua footprint as long as all variables are mapped in this->ownedNodes
 }
 
-void mtca_processarray::mtca_processvariable_globalinit(std::string name, std::vector<int32_t> value, std::type_info const &valueType, mtca4u::TimeStamp timeStamp)
+void mtca_processarray::mtca_processvariable_globalinit(std::string name, std::vector<std::string> value, std::type_info const &valueType, mtca4u::TimeStamp timeStamp)
 {
 	this->name = name;
   
@@ -98,11 +98,11 @@ void mtca_processarray::setType(std::string valueType) {
 }
 // Value
 //UA_RDPROXY_STRING_ARRAY(mtca_processarray, getValue)
-std::vector<int32_t> mtca_processarray::getValue() {
+std::vector<std::string> mtca_processarray::getValue() {
   return this->value;
 }
 //UA_WRPROXY_STRING_ARRAY(mtca_processarray, setValue)
-void mtca_processarray::setValue(std::vector<int32_t> varValue) {
+void mtca_processarray::setValue(std::vector<std::string> varValue) {
   this->value = varValue;
 }
 // TimeStamp
