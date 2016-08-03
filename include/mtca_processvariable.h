@@ -28,6 +28,7 @@
 #define MTCA_PROCESSVARIABLE_H
 
 #include "ua_mapped_class.h"
+#include "ControlSystemPVManager.h"
 
 typedef enum { PROCESSVARIABLE_TYPE_VOID,
   PROCESSVARIABLE_TYPE_INT32,
@@ -35,33 +36,47 @@ typedef enum { PROCESSVARIABLE_TYPE_VOID,
   PROCESSVARIABLE_TYPE_STRING
 } variableType;
 
+typedef boost::shared_ptr<mtca4u::ControlSystemPVManager> shCSysPVManager;
+
 class mtca_processvariable :  ua_mapped_class
 {
 private:
-  std::string name;
-  std::string value;
-  std::string type;
-  uint32_t timeStamp;
-  
-  //variableType type; // unused
-  
-  UA_StatusCode mapSelfToNamespace();
-  void mtca_processvariable_globalinit(std::string name, std::string type, std::string value, uint32_t timeStamp);
+    std::string name;
+    boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager;
+
+    //variableType type; // unused
+
+    UA_StatusCode mapSelfToNamespace();
 public:
-  mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, std::string name, std::string value, std::string type, uint32_t timeStamp);
-  ~mtca_processvariable();
-  
-  void setName(std::string name);
-  std::string getName();
-  
-  void setType(std::string type);
-  std::string getType();
-  
-  void setValue(std::string value);
-  std::string getValue();
-  
-  void setTimeStamp(uint32_t timeStamp);
-  uint32_t getTimeStamp();
+    mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, std::string name, shCSysPVManager csManager);
+    ~mtca_processvariable();
+
+    void setName(std::string name);
+    std::string getName();
+
+    void setType(std::string type);
+    std::string getType();
+
+    void setValue_int8_t(int8_t value);
+    void setValue_uint8_t(uint8_t value);
+    void setValue_int16_t(int16_t value);
+    void setValue_uint16_t(uint16_t value);
+    void setValue_int32_t(int32_t value);
+    void setValue_uint32_t(uint32_t value);
+    void setValue_float(float value);
+    void setValue_double(double value);
+    
+    int8_t    getValue_int8_t();
+    uint8_t   getValue_uint8_t();
+    int16_t   getValue_int16_t();
+    uint16_t  getValue_uint16_t();
+    int32_t   getValue_int32_t();
+    uint32_t  getValue_uint32_t();
+    float     getValue_float();
+    double    getValue_double();
+    
+    void setTimeStamp(uint32_t timeStamp);
+    uint32_t getTimeStamp();
 };
 
 #endif // MTCA_PROCESSVARIABLE_H

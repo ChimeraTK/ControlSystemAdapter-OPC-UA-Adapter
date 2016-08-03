@@ -38,7 +38,7 @@
 #include <mtca_timestamp.h>
 
 #include <ControlSystemPVManager.h>
- 
+
 class ControlSystemAdapterOPCUA {
   private:
     ipc_manager    *mgr;
