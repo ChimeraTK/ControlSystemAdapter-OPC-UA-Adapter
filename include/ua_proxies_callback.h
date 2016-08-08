@@ -132,12 +132,12 @@ UA_RDPROXY_TAIL()
 
 #define UA_RDPROXY_INT8(_p_class, _p_method) \
 UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, int8_t, UA_TYPES_INT8); \
+UA_RDPROXY_SIMPLEBODY(_p_method, int8_t, UA_TYPES_SBYTE); \
 UA_RDPROXY_TAIL()
 
 #define UA_RDPROXY_UINT8(_p_class, _p_method) \
 UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, uint8_t, UA_TYPES_UINT8); \
+UA_RDPROXY_SIMPLEBODY(_p_method, uint8_t, UA_TYPES_BYTE); \
 UA_RDPROXY_TAIL()
 
 #define UA_RDPROXY_BOOL(_p_class, _p_method) \

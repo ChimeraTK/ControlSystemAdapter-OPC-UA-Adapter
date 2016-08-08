@@ -47,32 +47,32 @@ typedef struct variablesTypes {
     std::list<mtca_processarray *> array;
   } variableTypes;
   
-  
+typedef boost::shared_ptr<mtca4u::ControlSystemPVManager> shCSysPVManager;
+
 class mtca_uaadapter : ua_mapped_class, public ipc_managed_object {
-	private:
-		UA_ServerConfig       	server_config;
-		UA_ServerNetworkLayer 	server_nl;
-		UA_Logger             	logger;
-		UA_NodeId             	scalarsListId;
-		UA_NodeId				arraysListId;
-		UA_NodeId             	constantsListId;
-		
-		variablesTypes variables;
-		std::list<mtca_processvariable *> constants;
-				
-		void mtca_uaadapter_constructserver(uint16_t opcuaPort);
-		UA_StatusCode mapSelfToNamespace() ;
-		
-	public:
-		mtca_uaadapter(uint16_t opcuaPort);
-		~mtca_uaadapter();
-		
-		
-		void addVariable(std::string name, std::string value, std::type_info const &type, mtca4u::TimeStamp timestamp);
-		void addVariable(std::string name, std::vector<std::string> value, std::type_info const &type, mtca4u::TimeStamp timestamp);
-		void addConstant(std::string name, std::string value, std::type_info const &type, mtca4u::TimeStamp timestamp);
-		
-		void workerThread();
+private:
+    UA_ServerConfig          server_config;
+    UA_ServerNetworkLayer    server_nl;
+    UA_Logger                logger;
+    
+    UA_NodeId                variablesListId;
+    UA_NodeId                constantsListId;
+    
+    std::list<mtca_processvariable *> variables;
+    std::list<mtca_processvariable *> constants;
+            
+    void mtca_uaadapter_constructserver(uint16_t opcuaPort);
+    UA_StatusCode mapSelfToNamespace() ;
+    
+public:
+    mtca_uaadapter(uint16_t opcuaPort);
+    ~mtca_uaadapter();
+    
+    
+    void addVariable(std::string name, shCSysPVManager mgr);
+    void addConstant(std::string name, shCSysPVManager mgr);
+    
+    void workerThread();
 };
 
 #endif // MTCA_UAADAPTER_H

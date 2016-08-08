@@ -101,15 +101,18 @@ void mtca_processscalar::setType(std::string valueType) {
 std::string mtca_processscalar::getValue() {
   return this->value;
 }
+
 UA_WRPROXY_STRING(mtca_processscalar, setValue)
 void mtca_processscalar::setValue(std::string varValue) {
   this->value = varValue;
 }
+
 // TimeStamp
 //UA_RDPROXY_UINT32(mtca_processscalar, getTimeStamp)
  mtca4u::TimeStamp mtca_processscalar::getTimeStamp() {
   return this->timeStamp;
 }
+
 //UA_WRPROXY_UINT32(mtca_processscalar, setTimeStamp)
 void mtca_processscalar::setTimeStamp( mtca4u::TimeStamp timeStamp) {
   this->timeStamp = timeStamp;
