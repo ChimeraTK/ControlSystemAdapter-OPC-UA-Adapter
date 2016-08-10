@@ -68,6 +68,8 @@ void mtca_processarray::mtca_processvariable_globalinit(std::string name, std::v
         throw std::invalid_argument("unsupported value type");    
     }
     
+    
+    
     this->value = value;
     this->timeStamp = timeStamp;
     this->mapSelfToNamespace();
@@ -107,13 +109,16 @@ void mtca_processarray::setType(std::string valueType)
 //UA_RDPROXY_STRING_ARRAY(mtca_processarray, getValue)
 std::vector<std::string> mtca_processarray::getValue() 
 {
-  return this->value;
+	return this->value;
 }
 
 //UA_WRPROXY_STRING_ARRAY(mtca_processarray, setValue)
 void mtca_processarray::setValue(std::vector<std::string> varValue) 
 {
-  this->value = varValue;
+	//void * UA_Array_new(size_t size, const UA_DataType *type);
+	//UA_Array_copy(const void *src, size_t size, void **dst,
+           //   const UA_DataType *type);
+	this->value = varValue;
 }
 
 // TimeStamp

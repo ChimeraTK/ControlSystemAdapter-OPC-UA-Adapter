@@ -42,6 +42,7 @@ extern "C" {
 #include "DevicePVManager.h"
 #include "PVManager.h"
 #include <ipc_manager.h>
+#include <IndependentControlCore.h>
 
 using std::cout;
 using std::endl;
@@ -69,24 +70,41 @@ int main() {
     boost::shared_ptr<ControlSystemPVManager> csManager = pvManagers.first;
     
     ControlSystemSynchronizationUtility syncUtil(csManager);
+	
+	IndependentControlCore controlCore(devManager);
+
     
     /*
     * Generate dummy data
-    * TODO: create additional testcases
     */
-    ProcessScalar<int32_t>::SharedPtr intAdev = devManager->createProcessScalar<int32_t>(deviceToControlSystem, "intA");
-    ProcessScalar<int32_t>::SharedPtr intBdev = devManager->createProcessScalar<int32_t>(deviceToControlSystem, "intB");
-    ProcessArray<int32_t>::SharedPtr intCdev = devManager->createProcessArray<int32_t>(deviceToControlSystem, "intC", 10);
-    ProcessScalar<int32_t>::SharedPtr intDdev = devManager->createProcessScalar<int32_t>(deviceToControlSystem, "intD");
-        
-    ProcessScalar<int>::SharedPtr targetVoltage = csManager->getProcessScalar<int>("TARGET_VOLTAGE");
-    ProcessScalar<int>::SharedPtr monitorVoltage = csManager->getProcessScalar<int>("MONITOR_VOLTAGE");    
-     
-    //intAdev->set(25);
-    //targetVoltage->set(42);
-    //monitorVoltage->set(23);
-    //targetVoltage->send();
-    
+	ProcessScalar<int32_t>::SharedPtr intAdev = devManager->createProcessScalar<int32_t>(deviceToControlSystem, "intA");
+	ProcessScalar<uint32_t>::SharedPtr intBdev = devManager->createProcessScalar<uint32_t>(controlSystemToDevice, "intB");
+	
+	ProcessArray<int32_t>::SharedPtr intC1dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intC1", 15);
+	ProcessArray<int32_t>::SharedPtr intC2dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intC2", 10);
+	ProcessArray<int32_t>::SharedPtr intC3dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intC3", 5);
+	
+	ProcessScalar<int16_t>::SharedPtr intDdev = devManager->createProcessScalar<int16_t>(deviceToControlSystem, "intD");
+	ProcessScalar<uint16_t>::SharedPtr intEdev = devManager->createProcessScalar<uint16_t>(deviceToControlSystem, "intE");
+	ProcessScalar<int8_t>::SharedPtr intFdev = devManager->createProcessScalar<int8_t>(deviceToControlSystem, "intF");
+	ProcessScalar<uint8_t>::SharedPtr intGdev = devManager->createProcessScalar<uint8_t>(deviceToControlSystem, "intG");
+	ProcessScalar<double>::SharedPtr intHdev = devManager->createProcessScalar<double>(deviceToControlSystem, "intH");
+		
+	ProcessScalar<int>::SharedPtr targetVoltage = csManager->getProcessScalar<int>("TARGET_VOLTAGE");
+	ProcessScalar<int>::SharedPtr monitorVoltage = csManager->getProcessScalar<int>("MONITOR_VOLTAGE");
+		
+	*targetVoltage = 42;
+	targetVoltage->send();
+
+	csManager->getProcessArray<int32_t>("intC1")->get().at(0) = 21;
+	csManager->getProcessArray<int32_t>("intC1")->get().at(1) = 22;
+	csManager->getProcessArray<int32_t>("intC1")->get().at(2) = 23;
+
+	int x[5] = {1, 2, 3, 4, 5};
+	std::vector<int> v(x, x + sizeof x / sizeof x[0]);
+ 	
+	csManager->getProcessArray<int32_t>("intC3")->set(v);	
+	
     std::cout << "Dummy Daten geschrieben..." << std::endl;
     
     csaOPCUA = new ControlSystemAdapterOPCUA(16664, csManager);

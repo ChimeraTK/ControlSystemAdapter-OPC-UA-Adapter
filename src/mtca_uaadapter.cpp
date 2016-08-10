@@ -94,8 +94,6 @@ void mtca_uaadapter::workerThread() {
     delete serverThread;
 }
 
-
-// Feste Node_ID sind wahrscheinlich bescheiden
 void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
     this->variables.push_back(new mtca_processvariable(this->mappedServer, this->variablesListId, varName, mgr));
 }

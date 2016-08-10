@@ -32,12 +32,6 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/include/open62541/)
 include_directories(${CMAKE_SOURCE_DIR}/include/ControlSystemAdapter/)
 link_directories(${CMAKE_SOURCE_DIR}/lib)
-
-
-
-## Search rekursivly file tree and add to
-##FILE(GLOB objectSources ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp 
-##						${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
  
                     
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp

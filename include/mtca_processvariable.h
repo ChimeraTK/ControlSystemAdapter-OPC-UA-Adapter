@@ -65,6 +65,11 @@ public:
     void setValue_uint32_t(uint32_t value);
     void setValue_float(float value);
     void setValue_double(double value);
+	// Array
+	void setValue_Array_int32_t(std::vector<int32_t> value);
+	
+	void setValue_Array_int32_t(int32_t *test);
+	
     
     int8_t    getValue_int8_t();
     uint8_t   getValue_uint8_t();
@@ -74,6 +79,8 @@ public:
     uint32_t  getValue_uint32_t();
     float     getValue_float();
     double    getValue_double();
+	// Array
+	std::vector<int32_t> getValue_Array_int32_t();
     
     void setTimeStamp(uint32_t timeStamp);
     uint32_t getTimeStamp();

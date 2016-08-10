@@ -160,6 +160,19 @@ UA_RDPROXY_HEAD(_p_class, _p_method) \
 UA_RDPROXY_SIMPLEBODY(_p_method, long long int, UA_TYPES_DATETIME); \
 UA_RDPROXY_TAIL()
 
+#define UA_RDPROXY_ARRAY_INT32(_p_class, _p_method) \
+UA_RDPROXY_HEAD(_p_class, _p_method) \
+std::cout << "Test in der Read" << std::endl; \
+for(int i=0; i < thisObj->_p_method().size(); i++) { \
+	std::cout << "Wert: " << thisObj->_p_method().at(i) << " : " << i << std::endl; \
+	thisObj->_p_method().at(i) = 100-i; \
+	std::cout << "Wert: " << thisObj->_p_method().at(i) << " : " << i << std::endl; \
+}\
+std::cout << "Ende Read" << std::endl; \
+UA_Variant_setArrayCopy(&value->value, thisObj->_p_method().data(), thisObj->_p_method().size(), &UA_TYPES[UA_TYPES_INT32]); \
+UA_RDPROXY_TAIL()
+
+
 
 // Writeproxies:
 
@@ -213,6 +226,19 @@ UA_WRPROXY_TAIL()
 #define UA_WRPROXY_DOUBLE(_p_class, _p_method) \
 UA_WRPROXY_HEAD(_p_class, _p_method) \
 UA_WRPROXY_SIMPLEBODY(_p_method, double); \
+UA_WRPROXY_TAIL()
+
+#define UA_WRPROXY_ARRAY_INT32(_p_class, _p_method) \
+UA_WRPROXY_HEAD(_p_class, _p_method) \
+int32_t* v = (int32_t*) data->data; \
+std::vector<int32_t> vector(data->arrayLength); \
+std::cout << "Test in der Writer" << std::endl; \
+for(int i=0; i < vector.size(); i++) { \
+	vector.at(i) = v[i]; \
+	std::cout << "Werte:" << v[i] << " : Vector -" << vector.at(i) << "Last: " << ((int32_t*)data->data)[i]  << std::endl; \
+}\
+std::cout << "Ende Writer" << std::endl; \
+theClass->_p_method(vector); \
 UA_WRPROXY_TAIL()
 
 #endif //HAVE_UA_PROXIES_CALLBACK_H

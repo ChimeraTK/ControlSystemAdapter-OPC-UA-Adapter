@@ -35,6 +35,10 @@ private:
     std::string valueType;
     std::vector<std::string> value;
     mtca4u::TimeStamp timeStamp;
+	
+	struct UA_DataType;
+	typedef struct UA_DataType UA_DataType;
+	
         
 public:
     ~mtca_processarray();
