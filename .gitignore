@@ -1,0 +1,5 @@
+lib/*
+include/open62541
+include/ControlSystemAdapter
+build
+*~
