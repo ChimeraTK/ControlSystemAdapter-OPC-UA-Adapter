@@ -22,6 +22,7 @@ install)
   log "Installing headers"
   cp -rLf "$SUBPROJECT_BUILD_DIRERCTORY"/../include/ControlSystemAdapter "$CMAKE_PROJECT_DIRECTORY"/include 
   log "Installing libraries"
+  mkdir -p "$CMAKE_PROJECT_DIRECTORY/lib"
   cp "$SUBPROJECT_BUILD_DIRERCTORY"/libControlSystemAdapter* "$CMAKE_PROJECT_DIRECTORY/lib"
   ;;
 uninstall)

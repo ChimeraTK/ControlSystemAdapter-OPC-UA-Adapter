@@ -3,3 +3,5 @@ include/open62541
 include/ControlSystemAdapter
 build
 *~
+tools/dependencies/
+tools/pyUANamespace/
