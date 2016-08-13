@@ -46,7 +46,7 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_uaadapter.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_timestamp.cpp
                    ## test class
-                   ${CMAKE_SOURCE_DIR}/tests/test_mtca_processscalar.cpp
+                   #${CMAKE_SOURCE_DIR}/tests/test_mtca_processscalar.cpp
 )
 
 # Create the target directory for model initializers, open62541 and ControlSystemAdapter libraries/headers
