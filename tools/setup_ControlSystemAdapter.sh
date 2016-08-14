@@ -26,8 +26,8 @@ install)
   cp "$SUBPROJECT_BUILD_DIRERCTORY"/libChimeraTK* "$CMAKE_PROJECT_DIRECTORY/lib"
   ;;
 uninstall)
-  rm -r ControlSystemAdapter "$CMAKE_PROJECT_DIRECTORY"/include/ChimeraTK
-  rm -r ControlSystemAdapter "$CMAKE_PROJECT_DIRECTORY"/lib/libChimeraTK*
+  rm -r "$CMAKE_PROJECT_DIRECTORY"/include/ChimeraTK
+  rm -r "$CMAKE_PROJECT_DIRECTORY"/lib/libChimeraTK*
 ;;
 *) 
   echo "Invalid script command \"$1\""
