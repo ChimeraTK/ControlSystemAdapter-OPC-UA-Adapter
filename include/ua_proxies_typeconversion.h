@@ -39,12 +39,20 @@ strncpy(ua_str_tmp, (char *) ua_url->data, ua_url->length); \
 free(ua_str_tmp); \
 } while(0); \
 
+/* UASTRING_TO_CPPSTRING(UA_String s_ua, char *s_c)
+ * 
+ * Create a new buffer s_c that will contain s_ua
+ */
 #define UASTRING_AS_CSTRING(_p_uastring, _p_strbuffer) { \
 _p_strbuffer = (char *) malloc(_p_uastring.length + 1); \
 memset(_p_strbuffer, 0, _p_uastring.length + 1); \
 memcpy(_p_strbuffer, _p_uastring.data,_p_uastring.length); \
 }
 
+/* UASTRING_TO_CPPSTRING(UA_String s_ua, std::string s_cpp)
+ * 
+ * Copy contents of s_ua into s_cpp
+ */
 #define UASTRING_TO_CPPSTRING(_p_uastring, _p_cppstring) do { \
 char *s;\
 UASTRING_AS_CSTRING(_p_uastring, s) \
@@ -52,6 +60,16 @@ _p_cppstring = s;\
 free(s);\
 } while(0);
 
+/* CPPSTRING_TO_UASTRING(UA_String s_ua, std::string s_cpp)
+ * 
+ * Copy contents of s_cpp into s_ua
+ */
+#define CPPSTRING_TO_UASTRING(_p_uastring, _p_cppstring) {\
+const char *s  = _p_cppstring.c_str(); \
+_p_uastring.length = _p_cppstring.length(); \
+_p_uastring.data = (UA_Byte *) malloc(_p_uastring.length); \
+memcpy(_p_uastring.data, s, _p_uastring.length); \
+}
 
 #define NODE_BROWSENAME_AS_STRING(_p_server, _p_nodeid, _p_strbuffer) { \
 UA_QualifiedName _p_tmpName; \
@@ -71,11 +89,6 @@ UA_Server_readDisplayName(_p_server, _p_nodeid, &_p_tmpName); \
 UASTRING_AS_STRING(_p_tmpName.text,  _p_strbuffer); \
 }
 
-#define CPPSTRING_TO_UASTRING(_p_uastring, _p_cppstring) {\
-const char *s  = _p_cppstring.c_str(); \
-_p_uastring.length = _p_cppstring.length(); \
-_p_uastring.data = (UA_Byte *) malloc(_p_uastring.length); \
-memcpy(_p_uastring.data, s, ua_val.length); \
-}
+
 
 #endif //#ifndef HAVE_UA_PROXIES_TYPECONVERSION_H
