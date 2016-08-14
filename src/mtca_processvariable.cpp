@@ -105,16 +105,33 @@ _p_type    mtca_processvariable::getValue_##_p_type() { \
 
 #define CREATE_READ_FUNCTION_ARRAY(_p_type) \
 std::vector<_p_type>    mtca_processvariable::getValue_Array_##_p_type() { \
-	std::vector<_p_type> v; \
+    std::vector<_p_type> v; \
     if (this->csManager->getProcessVariable(this->name)->getValueType() != typeid(_p_type)) return v; \
-	if (!this->csManager->getProcessVariable(this->name)->isArray()) return v; \
-	v = this->csManager->getProcessArray<_p_type>(this->name)->get(); \
-	std::cout << "get" << std::endl; \
-	for(int i=0; i < v.size(); i++) { \
-			std::cout << v.at(i) << std::endl; \
-		} \
+    if (!this->csManager->getProcessVariable(this->name)->isArray()) return v; \
+    v = this->csManager->getProcessArray<_p_type>(this->name)->get(); \
     return v; \
 } \
+
+#define CREATE_WRITE_FUNCTION(_p_type) \
+void mtca_processvariable::setValue_##_p_type(_p_type value) { \
+    if (this->csManager->getProcessVariable(this->name)->getValueType() != typeid(_p_type)) return; \
+    if (this->csManager->getProcessVariable(this->name)->isArray()) return;   \
+    if (this->csManager->getProcessVariable(this->name)->isSender()) { \
+        this->csManager->getProcessScalar<_p_type>(this->name)->set(value);   \
+        this->csManager->getProcessScalar<_p_type>(this->name)->send();       \
+    }\
+    return; \
+}
+
+#define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
+void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
+    if (this->csManager->getProcessVariable(this->name)->getValueType() != typeid(_p_type)) return; \
+    if (!this->csManager->getProcessVariable(this->name)->isArray())    return; \
+    if (this->csManager->getProcessVariable(this->name)->isSender()) { \
+        this->csManager->getProcessArray<_p_type>(this->name)->set(value); \
+    } \
+    return; \
+}
 
 UA_RDPROXY_INT8(mtca_processvariable, getValue_int8_t);
 CREATE_READ_FUNCTION(int8_t)
@@ -132,49 +149,6 @@ UA_RDPROXY_FLOAT(mtca_processvariable, getValue_float);
 CREATE_READ_FUNCTION(float)
 UA_RDPROXY_DOUBLE(mtca_processvariable, getValue_double);
 CREATE_READ_FUNCTION(double)
-// Array
-/*
-UA_RDPROXY_ARRAY_INT32(mtca_processvariable, getValue_Array_int8_t);
-CREATE_READ_FUNCTION_ARRAY(int8_t)
-UA_RDPROXY_ARRAY_INT32(mtca_processvariable, getValue_Array_uint8_t);
-CREATE_READ_FUNCTION_ARRAY(int8_t)
-UA_RDPROXY_ARRAY_INT32(mtca_processvariable, getValue_Array_int16_t);
-CREATE_READ_FUNCTION_ARRAY(int16_t)
-UA_RDPROXY_ARRAY_INT32(mtca_processvariable, getValue_Array_uint16_t);
-CREATE_READ_FUNCTION_ARRAY(uint16_t)
-*/
-UA_RDPROXY_ARRAY_INT32(mtca_processvariable, getValue_Array_int32_t);
-CREATE_READ_FUNCTION_ARRAY(int32_t)
-/*
-UA_RDPROXY_ARRAY_INT32(mtca_processvariable, getValue_Array_uint32_t);
-CREATE_READ_FUNCTION_ARRAY(uint32_t)
-UA_RDPROXY_ARRAY_INT32(mtca_processvariable, getValue_Array_float);
-CREATE_READ_FUNCTION_ARRAY(float)
-UA_RDPROXY_ARRAY_INT32(mtca_processvariable, getValue_Array_double);
-CREATE_READ_FUNCTION_ARRAY(double)
-*/
-
-#define CREATE_WRITE_FUNCTION(_p_type) \
-void mtca_processvariable::setValue_##_p_type(_p_type value) { \
-    if (this->csManager->getProcessVariable(this->name)->getValueType() != typeid(_p_type)) return; \
-    if (this->csManager->getProcessVariable(this->name)->isArray()) return;   \
-    if (this->csManager->getProcessVariable(this->name)->isSender()) { \
-        this->csManager->getProcessScalar<_p_type>(this->name)->set(value);   \
-        this->csManager->getProcessScalar<_p_type>(this->name)->send();       \
-    }\
-    return; \
-}
-
-#define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
-void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
-    if (this->csManager->getProcessVariable(this->name)->getValueType() != typeid(_p_type)) return; \
-    if (!this->csManager->getProcessVariable(this->name)->isArray())	return; \
-	if (this->csManager->getProcessVariable(this->name)->isSender()) { \
-		std::cout << "set" << std::endl; \
-		this->csManager->getProcessArray<_p_type>(this->name)->set(value); \
-    } \
-    return; \
-}
 
 UA_WRPROXY_INT8(mtca_processvariable, setValue_int8_t);
 CREATE_WRITE_FUNCTION(int8_t)
@@ -192,40 +166,57 @@ UA_WRPROXY_FLOAT(mtca_processvariable, setValue_float);
 CREATE_WRITE_FUNCTION(float)
 UA_WRPROXY_DOUBLE(mtca_processvariable, setValue_double);
 CREATE_WRITE_FUNCTION(double)
+
 // Array
-/*
-UA_WRPROXY_ARRAY_INT32(mtca_processvariable, setValue_Array_int8_t);
+UA_RDPROXY_ARRAY_INT8(mtca_processvariable, getValue_Array_int8_t);
+CREATE_READ_FUNCTION_ARRAY(int8_t)
+UA_RDPROXY_ARRAY_UINT8(mtca_processvariable, getValue_Array_uint8_t);
+CREATE_READ_FUNCTION_ARRAY(uint8_t)
+UA_RDPROXY_ARRAY_INT16(mtca_processvariable, getValue_Array_int16_t);
+CREATE_READ_FUNCTION_ARRAY(int16_t)
+UA_RDPROXY_ARRAY_UINT16(mtca_processvariable, getValue_Array_uint16_t);
+CREATE_READ_FUNCTION_ARRAY(uint16_t)
+UA_RDPROXY_ARRAY_INT32(mtca_processvariable, getValue_Array_int32_t);
+CREATE_READ_FUNCTION_ARRAY(int32_t)
+UA_RDPROXY_ARRAY_UINT32(mtca_processvariable, getValue_Array_uint32_t);
+CREATE_READ_FUNCTION_ARRAY(uint32_t)
+UA_RDPROXY_ARRAY_FLOAT(mtca_processvariable, getValue_Array_float);
+CREATE_READ_FUNCTION_ARRAY(float)
+UA_RDPROXY_ARRAY_DOUBLE(mtca_processvariable, getValue_Array_double);
+CREATE_READ_FUNCTION_ARRAY(double)
+
+UA_WRPROXY_ARRAY_INT8(mtca_processvariable, setValue_Array_int8_t);
 CREATE_WRITE_FUNCTION_ARRAY(int8_t)
-UA_WRPROXY_ARRAY_INT32(mtca_processvariable, setValue_Array_uint8_t);
+UA_WRPROXY_ARRAY_UINT8(mtca_processvariable, setValue_Array_uint8_t);
 CREATE_WRITE_FUNCTION_ARRAY(uint8_t)
-UA_WRPROXY_ARRAY_INT32(mtca_processvariable, setValue_Array_int16_t);
+UA_WRPROXY_ARRAY_INT16(mtca_processvariable, setValue_Array_int16_t);
 CREATE_WRITE_FUNCTION_ARRAY(int16_t)
-UA_WRPROXY_ARRAY_INT32(mtca_processvariable, setValue_Array_uint16_t);
+UA_WRPROXY_ARRAY_UINT16(mtca_processvariable, setValue_Array_uint16_t);
 CREATE_WRITE_FUNCTION_ARRAY(uint16_t)
-*/
 UA_WRPROXY_ARRAY_INT32(mtca_processvariable, setValue_Array_int32_t);
 CREATE_WRITE_FUNCTION_ARRAY(int32_t)
-/*
-UA_WRPROXY_ARRAY_INT32(mtca_processvariable, setValue_Array_uint32_t);
+UA_WRPROXY_ARRAY_UINT32(mtca_processvariable, setValue_Array_uint32_t);
 CREATE_WRITE_FUNCTION_ARRAY(uint32_t)
-UA_WRPROXY_ARRAY_INT32(mtca_processvariable, setValue_Array_float);
+UA_WRPROXY_ARRAY_FLOAT(mtca_processvariable, setValue_Array_float);
 CREATE_WRITE_FUNCTION_ARRAY(float)
-UA_WRPROXY_ARRAY_INT32(mtca_processvariable, setValue_Array_double);
+UA_WRPROXY_ARRAY_DOUBLE(mtca_processvariable, setValue_Array_double);
 CREATE_WRITE_FUNCTION_ARRAY(double)
-*/
+
 
 /**/
 
 // Just a macro to easy pushing different types of dataSources
 // ... and make sure we lock down writing to receivers in this stage already
-#define PUSH_RDVALUE_TYPE(_p_typeName) \
-if(this->csManager->getProcessScalar<_p_typeName>(this->name)->isSender())	{ mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
-	else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); }
+#define PUSH_RDVALUE_TYPE(_p_typeName) { \
+if(this->csManager->getProcessScalar<_p_typeName>(this->name)->isSender())    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
+    else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); }\
+}
    
-	
-#define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) \
+    
+#define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) { \
 if(this->csManager->getProcessArray<_p_typeName>(this->name)->isSender()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \
-	else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } 
+    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \
+}
 
 UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
@@ -251,6 +242,7 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
     UA_DataSource_Map mapDs;
     //     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue)});
+    // FIXME: We should not be using std::cout here... Where's our logger?
     if (! this->csManager->getProcessVariable(this->name)->isArray()) {
         std::type_info const & valueType = this->csManager->getProcessVariable(this->name)->getValueType();
         if (valueType == typeid(int8_t))          PUSH_RDVALUE_TYPE(int8_t)
@@ -261,10 +253,19 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
         else if (valueType == typeid(uint32_t))   PUSH_RDVALUE_TYPE(uint32_t)
         else if (valueType == typeid(float))      PUSH_RDVALUE_TYPE(float)
         else if (valueType == typeid(double))     PUSH_RDVALUE_TYPE(double)
+        else std::cout << "Cannot proxy unknown type " << typeid(valueType).name()  << std::endl;
     }
     else {
-        // FIXME: If Array, this is also readable, but we are currently missing some Proxies for arrays
-		PUSH_RDVALUE_ARRAY_TYPE(int32_t)
+        std::type_info const & valueType = this->csManager->getProcessVariable(this->name)->getValueType();
+        if (valueType == typeid(int8_t))          PUSH_RDVALUE_ARRAY_TYPE(int8_t)
+        else if (valueType == typeid(uint8_t))    PUSH_RDVALUE_ARRAY_TYPE(uint8_t)
+        else if (valueType == typeid(int16_t))    PUSH_RDVALUE_ARRAY_TYPE(int16_t)
+        else if (valueType == typeid(uint16_t))   PUSH_RDVALUE_ARRAY_TYPE(uint16_t)
+        else if (valueType == typeid(int32_t))    PUSH_RDVALUE_ARRAY_TYPE(int32_t)
+        else if (valueType == typeid(uint32_t))   PUSH_RDVALUE_ARRAY_TYPE(uint32_t)
+        else if (valueType == typeid(float))      PUSH_RDVALUE_ARRAY_TYPE(float)
+        else if (valueType == typeid(double))     PUSH_RDVALUE_ARRAY_TYPE(double)
+        else std::cout << "Cannot proxy unknown array type " << typeid(valueType).name() << std::endl;
     }
 
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName), .write=UA_WRPROXY_NAME(mtca_processvariable, setName)});
