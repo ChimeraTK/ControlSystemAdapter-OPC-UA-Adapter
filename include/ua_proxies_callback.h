@@ -169,6 +169,11 @@ UA_RDPROXY_HEAD(_p_class, _p_method) \
 UA_RDPROXY_SIMPLEBODY(_p_method, long long int, UA_TYPES_DATETIME); \
 UA_RDPROXY_TAIL()
 
+#define UA_RDPROXY_NODEID(_p_class, _p_method) \
+UA_RDPROXY_HEAD(_p_class, _p_method) \
+UA_RDPROXY_SIMPLEBODY(_p_method, UA_NodeId, UA_TYPES_NODEID); \
+UA_RDPROXY_TAIL()
+
 #define UA_RDPROXY_ARRAY_INT8(_p_class, _p_method) \
 UA_RDPROXY_HEAD(_p_class, _p_method) \
 UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, int8_t, UA_TYPES_SBYTE) \
@@ -260,6 +265,16 @@ UA_WRPROXY_TAIL()
 #define UA_WRPROXY_DOUBLE(_p_class, _p_method) \
 UA_WRPROXY_HEAD(_p_class, _p_method) \
 UA_WRPROXY_SIMPLEBODY(_p_method, double); \
+UA_WRPROXY_TAIL()
+
+#define UA_WRPROXY_DATETIME(_p_class, _p_method) \
+UA_WRPROXY_HEAD(_p_class, _p_method) \
+UA_WRPROXY_SIMPLEBODY(_p_method, UA_DateTime); \
+UA_WRPROXY_TAIL()
+
+#define UA_WRPROXY_NODEID(_p_class, _p_method) \
+UA_WRPROXY_HEAD(_p_class, _p_method) \
+UA_WRPROXY_SIMPLEBODY(_p_method, UA_NodeId); \
 UA_WRPROXY_TAIL()
 
 #define UA_WRPROXY_ARRAY_INT8(_p_class, _p_method) \
