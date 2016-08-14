@@ -29,25 +29,25 @@
 
 #include <vector>
 
-#include <ua_mapped_class.h>
+#include "ua_mapped_class.h"
 
 #include "ipc_managed_object.h"
 
-#include <mtca_processvariable.h>
-#include <mtca_processscalar.h>
-#include <mtca_processarray.h>
-#include <mtca_timestamp.h>
+#include "mtca_processvariable.h"
+#include "mtca_processscalar.h"
+#include "mtca_processarray.h"
+#include "mtca_timestamp.h"
 
-#include <ControlSystemPVManager.h>
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
-using namespace mtca4u;
+using namespace ChimeraTK;
 
 typedef struct variablesTypes {
     std::list<mtca_processscalar *> scalar;
     std::list<mtca_processarray *> array;
   } variableTypes;
   
-typedef boost::shared_ptr<mtca4u::ControlSystemPVManager> shCSysPVManager;
+typedef boost::shared_ptr<ChimeraTK::ControlSystemPVManager> shCSysPVManager;
 
 class mtca_uaadapter : ua_mapped_class, public ipc_managed_object {
 private:

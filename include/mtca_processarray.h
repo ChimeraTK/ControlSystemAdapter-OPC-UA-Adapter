@@ -20,21 +20,21 @@
 #ifndef MTCA_PROCESSARRAY_H
 #define MTCA_PROCESSARRAY_H
 
-#include <ua_mapped_class.h>
-#include <mtca_processvariable.h>
+#include "ua_mapped_class.h"
+#include "mtca_processvariable.h"
+#include "ChimeraTK/ControlSystemAdapter/TimeStamp.h"
 
 #include <iostream>
 #include <vector>
 #include <string>
 
-#include <TimeStamp.h>
 class mtca_processarray : ua_mapped_class
 {
 private:
     std::string name;
     std::string valueType;
     std::vector<std::string> value;
-    mtca4u::TimeStamp timeStamp;
+    ChimeraTK::TimeStamp timeStamp;
 	
 	struct UA_DataType;
 	typedef struct UA_DataType UA_DataType;
@@ -42,7 +42,7 @@ private:
         
 public:
     ~mtca_processarray();
-    mtca_processarray(UA_Server *server, UA_NodeId baseNodeId, std::string name, std::vector<std::string> value, std::type_info const &valueType, mtca4u::TimeStamp timeStamp);
+    mtca_processarray(UA_Server *server, UA_NodeId baseNodeId, std::string name, std::vector<std::string> value, std::type_info const &valueType, ChimeraTK::TimeStamp timeStamp);
     
     void setName(std::string name);
     std::string getName();
@@ -53,11 +53,11 @@ public:
     void setValue(std::vector<std::string> value);
     std::vector<std::string> getValue();
   
-    void setTimeStamp(mtca4u::TimeStamp timeStamp);
-    mtca4u::TimeStamp getTimeStamp();
+    void setTimeStamp(ChimeraTK::TimeStamp timeStamp);
+    ChimeraTK::TimeStamp getTimeStamp();
     
     
-    void mtca_processvariable_globalinit(std::string name, std::vector<std::string> value, std::type_info const &valueType, mtca4u::TimeStamp timeStamp);
+    void mtca_processvariable_globalinit(std::string name, std::vector<std::string> value, std::type_info const &valueType, ChimeraTK::TimeStamp timeStamp);
     UA_StatusCode mapSelfToNamespace();
 };
 

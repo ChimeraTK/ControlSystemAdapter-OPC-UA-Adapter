@@ -28,33 +28,33 @@
 #define CONTROLSYSTEMADAPTER_OPCUA_H
 
 #include <vector>
-#include <ua_mapped_class.h>
-#include <ipc_managed_object.h>
+#include "ua_mapped_class.h"
+#include "ipc_managed_object.h"
 
-#include <mtca_uaadapter.h>
-#include <mtca_processvariable.h>
-#include <mtca_processscalar.h>
-#include <mtca_processarray.h>
-#include <mtca_timestamp.h>
+#include "mtca_uaadapter.h"
+#include "mtca_processvariable.h"
+#include "mtca_processscalar.h"
+#include "mtca_processarray.h"
+#include "mtca_timestamp.h"
 
-#include <ControlSystemPVManager.h>
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
 class ControlSystemAdapterOPCUA {
   private:
     ipc_manager    *mgr;
     mtca_uaadapter *adapter;
 
-    boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager;
+    boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager;
     uint16_t opcuaPort;
     
     void ControlSystemAdapterOPCUA_InitServer(uint16_t opcuaPort);
-    void ControlSystemAdapterOPCUA_InitVarMapping(boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager);
+    void ControlSystemAdapterOPCUA_InitVarMapping(boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
     
   public:
-    ControlSystemAdapterOPCUA(uint16_t opcuaPort, boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager);
+    ControlSystemAdapterOPCUA(uint16_t opcuaPort, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
     ~ControlSystemAdapterOPCUA();
     
-    boost::shared_ptr<mtca4u::ControlSystemPVManager> const & getControlSystemPVManager() const;
+    boost::shared_ptr<ChimeraTK::ControlSystemPVManager> const & getControlSystemPVManager() const;
     void start();
     void stop();
     void terminate();

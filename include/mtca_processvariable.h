@@ -28,7 +28,7 @@
 #define MTCA_PROCESSVARIABLE_H
 
 #include "ua_mapped_class.h"
-#include "ControlSystemPVManager.h"
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
 typedef enum { PROCESSVARIABLE_TYPE_VOID,
   PROCESSVARIABLE_TYPE_INT32,
@@ -36,13 +36,13 @@ typedef enum { PROCESSVARIABLE_TYPE_VOID,
   PROCESSVARIABLE_TYPE_STRING
 } variableType;
 
-typedef boost::shared_ptr<mtca4u::ControlSystemPVManager> shCSysPVManager;
+typedef boost::shared_ptr<ChimeraTK::ControlSystemPVManager> shCSysPVManager;
 
 class mtca_processvariable :  ua_mapped_class
 {
 private:
     std::string name;
-    boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager;
+    boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager;
 
     //variableType type; // unused
 

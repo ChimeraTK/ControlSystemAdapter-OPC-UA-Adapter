@@ -220,12 +220,12 @@ CREATE_WRITE_FUNCTION_ARRAY(double)
 // ... and make sure we lock down writing to receivers in this stage already
 #define PUSH_RDVALUE_TYPE(_p_typeName) \
 if(this->csManager->getProcessScalar<_p_typeName>(this->name)->isSender())	{ mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
-	else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
+	else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); }
    
 	
 #define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) \
 if(this->csManager->getProcessArray<_p_typeName>(this->name)->isSender()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \
-	else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \ 
+	else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } 
 
 UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
