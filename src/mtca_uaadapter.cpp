@@ -37,15 +37,15 @@ extern "C" {
 #include "mtca_processscalar.h"
 #include "mtca_processarray.h"
 
-#include "ProcessScalar.h"
-#include "ControlSystemPVManager.h"
-#include "ControlSystemSynchronizationUtility.h"
-#include <ControlSystemSynchronizationUtility.h>
-#include "PVManager.h"
-//#include "IndependentControlCore.h"
-#include "TimeStamp.h"
+#include "ChimeraTK/ControlSystemAdapter/ProcessScalar.h"
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
+#include "ChimeraTK/ControlSystemAdapter/PVManager.h"
+#include "ChimeraTK/ControlSystemAdapter/IndependentControlCore.h"
+#include "ChimeraTK/ControlSystemAdapter/TimeStamp.h"
 
-using namespace mtca4u;
+using namespace ChimeraTK;
 
 void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
     
@@ -94,8 +94,6 @@ void mtca_uaadapter::workerThread() {
     delete serverThread;
 }
 
-
-// Feste Node_ID sind wahrscheinlich bescheiden
 void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
     this->variables.push_back(new mtca_processvariable(this->mappedServer, this->variablesListId, varName, mgr));
 }

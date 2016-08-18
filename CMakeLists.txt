@@ -6,7 +6,7 @@ project(ControlSystem-OPCUA_Adapter)
 ## Hard package dependencies
 ##########################################################################################################
 
-find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
+find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framework REQUIRED)
 find_package(PythonInterp REQUIRED)
 
 ##########################################################################################################
@@ -30,20 +30,19 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/include/open62541/)
-include_directories(${CMAKE_SOURCE_DIR}/include/ControlSystemAdapter/)
+include_directories(${CMAKE_SOURCE_DIR}/include/ChimeraTK/)
 link_directories(${CMAKE_SOURCE_DIR}/lib)
-
+ 
+                    
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
-                  ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
-                  ${CMAKE_SOURCE_DIR}/src/ipc_managed_object.cpp
-                  ${CMAKE_SOURCE_DIR}/src/ipc_manager.cpp
-                  ${CMAKE_SOURCE_DIR}/src/ipc_task.cpp
-                  ${CMAKE_SOURCE_DIR}/src/ControlSystemAdapterOPCUA.cpp
-                  ${CMAKE_SOURCE_DIR}/src/mtca_processvariable.cpp
-                  ${CMAKE_SOURCE_DIR}/src/mtca_processscalar.cpp
-                  ${CMAKE_SOURCE_DIR}/src/mtca_processarray.cpp
-                  ${CMAKE_SOURCE_DIR}/src/mtca_uaadapter.cpp
-                  ${CMAKE_SOURCE_DIR}/src/mtca_timestamp.cpp
+                   ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
+                   ${CMAKE_SOURCE_DIR}/src/ipc_managed_object.cpp
+                   ${CMAKE_SOURCE_DIR}/src/ipc_manager.cpp
+                   ${CMAKE_SOURCE_DIR}/src/ipc_task.cpp
+                   ${CMAKE_SOURCE_DIR}/src/ControlSystemAdapterOPCUA.cpp
+                   ${CMAKE_SOURCE_DIR}/src/mtca_processvariable.cpp
+                   ${CMAKE_SOURCE_DIR}/src/mtca_uaadapter.cpp
+                   ${CMAKE_SOURCE_DIR}/src/mtca_timestamp.cpp
 )
 
 # Create the target directory for model initializers, open62541 and ControlSystemAdapter libraries/headers
@@ -64,7 +63,7 @@ option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prio
 option(ENABLE_UNIT_TESTS      "Compile and run unit tests." OFF)
 
 if(ENABLE_BUILDMODEL)
-  set(MTCA_MODEL_XML "templatemodel.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
+  set(MODEL_XML_FILE "templatemodel.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
   
   list(APPEND objectSources ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit_generated.c)
 else()
@@ -122,6 +121,7 @@ target_link_libraries(ControlSystemAdapterOPCUA
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
   ${Boost_CHRONO_LIBRARY}
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
 )
 
 ##########################################################################################################
@@ -148,10 +148,10 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit
                                                 -i ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist_FullNS0.txt
                                                 -b ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist.txt
                                                 ${PROJECT_SOURCE_DIR}/model/Opc.Ua.NodeSet2.xml
-                                                ${PROJECT_SOURCE_DIR}/model/${MTCA_MODEL_XML}
+                                                ${PROJECT_SOURCE_DIR}/model/${MODEL_XML_FILE}
                                                 ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit_generated
                    DEPENDS ${PROJECT_SOURCE_DIR}/model/Opc.Ua.NodeSet2.xml
-                           ${PROJECT_SOURCE_DIR}/model/${MTCA_MODEL_XML}
+                           ${PROJECT_SOURCE_DIR}/model/${MODEL_XML_FILE}
                            ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist_FullNS0.txt
                            ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist.txt
                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
@@ -169,9 +169,21 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit
 link_directories(${CMAKE_BINARY_DIR})
 
 ## Binary: ControlSystem-OPCUA_Sample_Adapter
+# add_executable(testcase ${CMAKE_SOURCE_DIR}/tests/test_mtca_processscalar.cpp)
+# target_link_libraries(testcase ControlSystemAdapterOPCUA)
+# target_link_libraries(testcase ChimeraTK-ControlSystemAdapter)
+# target_link_libraries(testcase open62541)
+# target_link_libraries(testcase pthread)
+# target_link_libraries(testcase
+#   ${Boost_FILESYSTEM_LIBRARY}
+#   ${Boost_SYSTEM_LIBRARY}
+#   ${Boost_THREAD_LIBRARY}
+#   ${Boost_CHRONO_LIBRARY}
+# )
+
 add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/ControlSystem_OPCUA_Sample_Adapter.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapterOPCUA)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapter)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ChimeraTK-ControlSystemAdapter)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter

@@ -14,20 +14,18 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
  */
 
 #ifndef MTCA_PROCESSSCALAR_H
 #define MTCA_PROCESSSCALAR_H
 
-#include <ua_mapped_class.h>
-#include <mtca_processvariable.h>
-#include <mtca_timestamp.h>
+#include "ChimeraTK/ControlSystemAdapter/TimeStamp.h"
+#include "ua_mapped_class.h"
+#include "mtca_processvariable.h"
+#include "mtca_timestamp.h"
 
 #include <iostream>
 #include <string>
-
-#include <TimeStamp.h>
 
 /*
  * TODO timeStamp should be from type mtca_timestamp
@@ -38,11 +36,11 @@ private:
 	std::string		name;
 	std::string		valueType;
 	std::string		value;
-	mtca4u::TimeStamp	timeStamp;
+	ChimeraTK::TimeStamp	timeStamp;
 	
 public:
 	~mtca_processscalar();
-	mtca_processscalar(UA_Server *server, UA_NodeId baseNodeId, std::string name, std::string value, std::type_info const &valueType, mtca4u::TimeStamp timeStamp);
+	mtca_processscalar(UA_Server *server, UA_NodeId baseNodeId, std::string name, std::string value, std::type_info const &valueType, ChimeraTK::TimeStamp timeStamp);
 	
 	void setName(std::string name);
 	std::string getName();
@@ -53,11 +51,11 @@ public:
 	void setValue(std::string value);
 	std::string getValue();
   
-	void setTimeStamp(mtca4u::TimeStamp timeStamp);
-	mtca4u::TimeStamp getTimeStamp();
+	void setTimeStamp(ChimeraTK::TimeStamp timeStamp);
+	ChimeraTK::TimeStamp getTimeStamp();
 
 	
-	void mtca_processvariable_globalinit(std::string name, std::string value, std::type_info const &valueType, mtca4u::TimeStamp  timeStamp);
+	void mtca_processvariable_globalinit(std::string name, std::string value, std::type_info const &valueType, ChimeraTK::TimeStamp  timeStamp);
 	UA_StatusCode mapSelfToNamespace();
 };
 #endif // MTCA_PROCESSSCALAR_H

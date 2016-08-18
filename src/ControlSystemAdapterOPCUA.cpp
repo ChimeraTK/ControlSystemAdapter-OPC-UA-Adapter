@@ -43,14 +43,14 @@ extern "C" {
 #include "mtca_processscalar.h"
 #include "mtca_processarray.h"
 
-#include "ControlSystemPVManager.h"
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
 /**
  * This class provide the two parts of the OPCUA Adapter. First of all the OPCUA server starts with a random port number (recommended 16664),
  * following the mapping process start. For this, the ProcessVariable from ControlSystemPVManager will be mapped to the OPCUA Model 
  * 
  */ 
-ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(uint16_t opcuaPort, boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager) {
+ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(uint16_t opcuaPort, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) {
     this->ControlSystemAdapterOPCUA_InitServer(opcuaPort);
     this->ControlSystemAdapterOPCUA_InitVarMapping(csManager);
 }
@@ -68,7 +68,7 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(uint16_t op
 }
 
 // Mapping the ProcessVariables to the server
-void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager) {
+void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) {
     // Get all ProcessVariables
     vector<ProcessVariable::SharedPtr> allProcessVariables = csManager->getAllProcessVariables();
   
@@ -81,7 +81,7 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(boost::
     
 
 // Maybe needed, return the ControlSystemPVManager
-boost::shared_ptr<mtca4u::ControlSystemPVManager> const & ControlSystemAdapterOPCUA::getControlSystemPVManager() const {
+boost::shared_ptr<ChimeraTK::ControlSystemPVManager> const & ControlSystemAdapterOPCUA::getControlSystemPVManager() const {
     return this->csManager;
 }
 

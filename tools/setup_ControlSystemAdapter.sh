@@ -20,14 +20,15 @@ fi
 case $SETUP_COMMAND in
 install)
   log "Installing headers"
-  cp -rLf "$SUBPROJECT_BUILD_DIRERCTORY"/../include/ControlSystemAdapter "$CMAKE_PROJECT_DIRECTORY"/include 
+  cp -rLf "$SUBPROJECT_BUILD_DIRERCTORY"/../include/ChimeraTK "$CMAKE_PROJECT_DIRECTORY"/include/
+  cp -rLf "$SUBPROJECT_BUILD_DIRERCTORY"/../examples/cosade/IndependentControlCore.h "$CMAKE_PROJECT_DIRECTORY"/include/ChimeraTK/ControlSystemAdapter
   log "Installing libraries"
   mkdir -p "$CMAKE_PROJECT_DIRECTORY/lib"
-  cp "$SUBPROJECT_BUILD_DIRERCTORY"/libControlSystemAdapter* "$CMAKE_PROJECT_DIRECTORY/lib"
+  cp "$SUBPROJECT_BUILD_DIRERCTORY"/libChimeraTK* "$CMAKE_PROJECT_DIRECTORY/lib"
   ;;
 uninstall)
-  rm -r ControlSystemAdapter "$CMAKE_PROJECT_DIRECTORY"/include/ControlSystemAdapter
-  rm -r ControlSystemAdapter "$CMAKE_PROJECT_DIRECTORY"/lib/libControlSystemAdapter*
+  rm -r "$CMAKE_PROJECT_DIRECTORY"/include/ChimeraTK
+  rm -r "$CMAKE_PROJECT_DIRECTORY"/lib/libChimeraTK*
 ;;
 *) 
   echo "Invalid script command \"$1\""

@@ -28,7 +28,7 @@
 #define MTCA_PROCESSVARIABLE_H
 
 #include "ua_mapped_class.h"
-#include "ControlSystemPVManager.h"
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
 typedef enum { PROCESSVARIABLE_TYPE_VOID,
   PROCESSVARIABLE_TYPE_INT32,
@@ -36,13 +36,13 @@ typedef enum { PROCESSVARIABLE_TYPE_VOID,
   PROCESSVARIABLE_TYPE_STRING
 } variableType;
 
-typedef boost::shared_ptr<mtca4u::ControlSystemPVManager> shCSysPVManager;
+typedef boost::shared_ptr<ChimeraTK::ControlSystemPVManager> shCSysPVManager;
 
 class mtca_processvariable :  ua_mapped_class
 {
 private:
     std::string name;
-    boost::shared_ptr<mtca4u::ControlSystemPVManager> csManager;
+    boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager;
 
     //variableType type; // unused
 
@@ -57,26 +57,49 @@ public:
     void setType(std::string type);
     std::string getType();
 
-    void setValue_int8_t(int8_t value);
-    void setValue_uint8_t(uint8_t value);
-    void setValue_int16_t(int16_t value);
-    void setValue_uint16_t(uint16_t value);
-    void setValue_int32_t(int32_t value);
-    void setValue_uint32_t(uint32_t value);
-    void setValue_float(float value);
-    void setValue_double(double value);
-    
-    int8_t    getValue_int8_t();
-    uint8_t   getValue_uint8_t();
-    int16_t   getValue_int16_t();
-    uint16_t  getValue_uint16_t();
-    int32_t   getValue_int32_t();
-    uint32_t  getValue_uint32_t();
-    float     getValue_float();
-    double    getValue_double();
-    
     void setTimeStamp(uint32_t timeStamp);
     uint32_t getTimeStamp();
+    
+#define CREATE_READ_FUNCTION_ARRAY_DEF(_p_type)  std::vector<_p_type>  getValue_Array_##_p_type();    
+#define CREATE_WRITE_FUNCTION_ARRAY_DEF(_p_type) void setValue_Array_##_p_type(std::vector<_p_type> value);
+#define CREATE_READ_FUNCTION_DEF(_p_type)  _p_type  getValue_##_p_type();    
+#define CREATE_WRITE_FUNCTION_DEF(_p_type) void setValue_##_p_type(_p_type value);
+
+    CREATE_WRITE_FUNCTION_DEF(int8_t)
+    CREATE_WRITE_FUNCTION_DEF(uint8_t)
+    CREATE_WRITE_FUNCTION_DEF(int16_t)
+    CREATE_WRITE_FUNCTION_DEF(uint16_t)
+    CREATE_WRITE_FUNCTION_DEF(int32_t)
+    CREATE_WRITE_FUNCTION_DEF(uint32_t)
+    CREATE_WRITE_FUNCTION_DEF(float)
+    CREATE_WRITE_FUNCTION_DEF(double)
+    
+    CREATE_READ_FUNCTION_DEF(int8_t)
+    CREATE_READ_FUNCTION_DEF(uint8_t)
+    CREATE_READ_FUNCTION_DEF(int16_t)
+    CREATE_READ_FUNCTION_DEF(uint16_t)
+    CREATE_READ_FUNCTION_DEF(int32_t)
+    CREATE_READ_FUNCTION_DEF(uint32_t)
+    CREATE_READ_FUNCTION_DEF(float)
+    CREATE_READ_FUNCTION_DEF(double)
+    
+    CREATE_WRITE_FUNCTION_ARRAY_DEF(int8_t)
+    CREATE_WRITE_FUNCTION_ARRAY_DEF(uint8_t)
+    CREATE_WRITE_FUNCTION_ARRAY_DEF(int16_t)
+    CREATE_WRITE_FUNCTION_ARRAY_DEF(uint16_t)
+    CREATE_WRITE_FUNCTION_ARRAY_DEF(int32_t)
+    CREATE_WRITE_FUNCTION_ARRAY_DEF(uint32_t)
+    CREATE_WRITE_FUNCTION_ARRAY_DEF(float)
+    CREATE_WRITE_FUNCTION_ARRAY_DEF(double)
+    
+    CREATE_READ_FUNCTION_ARRAY_DEF(int8_t)
+    CREATE_READ_FUNCTION_ARRAY_DEF(uint8_t)
+    CREATE_READ_FUNCTION_ARRAY_DEF(int16_t)
+    CREATE_READ_FUNCTION_ARRAY_DEF(uint16_t)
+    CREATE_READ_FUNCTION_ARRAY_DEF(int32_t)
+    CREATE_READ_FUNCTION_ARRAY_DEF(uint32_t)
+    CREATE_READ_FUNCTION_ARRAY_DEF(float)
+    CREATE_READ_FUNCTION_ARRAY_DEF(double)
 };
 
 #endif // MTCA_PROCESSVARIABLE_H
