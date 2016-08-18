@@ -1,6 +1,6 @@
 lib
 include/open62541
-include/ControlSystemAdapter
+include/ChimeraTK
 build
 *~
 tools/dependencies/
