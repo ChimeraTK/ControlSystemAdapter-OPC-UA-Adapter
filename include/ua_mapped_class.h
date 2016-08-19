@@ -36,8 +36,8 @@ extern "C"
 
 #include "ua_proxies.h"
 
-class ua_mapped_class
-{
+class ua_mapped_class {
+	
 protected:
   UA_Server *mappedServer;
   UA_Client *mappedClient;
@@ -54,6 +54,7 @@ public:
     UA_StatusCode ua_unmapSelfFromNamespace();
     UA_StatusCode ua_mapFunctions(void* srcClass, UA_FunctionCall_Map *map, UA_NodeId objectId);
     UA_StatusCode ua_mapDataSources(void* srcClass, UA_DataSource_Map* map);
+
 };
 
 #endif // UA_MAPPED_CLASS_H

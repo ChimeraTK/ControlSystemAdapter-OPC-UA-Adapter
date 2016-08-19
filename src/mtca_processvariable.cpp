@@ -33,15 +33,17 @@ extern "C" {
 
 #include "ua_proxies.h"
 #include "ua_proxies_callback.h"
+
 #include <iostream>
 
 
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, std::string name, shCSysPVManager csManager) : ua_mapped_class(server, basenodeid)
-{
-  this->name = name;
-  this->csManager = csManager;
+mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, std::string name, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
+	
+	// FIXME Check if name member of a csManager Parameter
+	this->name = name;
+	this->csManager = csManager;
   
-  this->mapSelfToNamespace();
+	this->mapSelfToNamespace();
 }
 
 mtca_processvariable::~mtca_processvariable()
@@ -56,7 +58,7 @@ std::string mtca_processvariable::getName() {
 }
 UA_WRPROXY_STRING(mtca_processvariable, setName)
 void mtca_processvariable::setName(std::string name) {
-  this->name = name;
+	return; // Change of name is not possible
 }
 
 // Type
@@ -81,16 +83,54 @@ void mtca_processvariable::setType(std::string type) {
 }
 
 // TimeStamp
-UA_RDPROXY_UINT32(mtca_processvariable, getTimeStamp)
-uint32_t mtca_processvariable::getTimeStamp() {
-    //FIXME: Disabled
-    return 0;
+//UA_RDPROXY_UINT32(mtca_processvariable, getTimeStamp)
+ChimeraTK::TimeStamp mtca_processvariable::getTimeStamp() {
+    return this->csManager->getProcessVariable(this->name)->getTimeStamp();
 }
 
-UA_WRPROXY_UINT32(mtca_processvariable, setTimeStamp)
-void mtca_processvariable::setTimeStamp(uint32_t timeStamp) {
-    //FIXME: Disabled
-    return;
+//UA_WRPROXY_UINT32(mtca_processvariable, setTimeStamp)
+void mtca_processvariable::setTimeStamp(ChimeraTK::TimeStamp timeStamp) {
+    return; // Change of TimeStamp is not possible
+}
+
+UA_WRPROXY_UINT32(mtca_processvariable, setTimeStampSeconds)
+void mtca_processvariable::setTimeStampSeconds(uint32_t seconds) {
+	return;
+}
+
+UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampSeconds)
+uint32_t mtca_processvariable::getTimeStampSeconds() {
+	return this->csManager->getProcessVariable(this->name)->getTimeStamp().seconds;
+}
+
+UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampNanoSeconds)
+uint32_t mtca_processvariable::getTimeStampNanoSeconds() {
+	return this->csManager->getProcessVariable(this->name)->getTimeStamp().nanoSeconds;
+}
+
+UA_WRPROXY_UINT32(mtca_processvariable, setTimeStampNanoSeconds)
+void mtca_processvariable::setTimeStampNanoSeconds(uint32_t indexNanoSeconds) {
+	return;
+}
+
+UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampIndex0)
+uint32_t mtca_processvariable::getTimeStampIndex0() {
+	return this->csManager->getProcessVariable(this->name)->getTimeStamp().index0;
+}
+
+UA_WRPROXY_UINT32(mtca_processvariable, setTimeStampIndex0)
+void mtca_processvariable::setTimeStampIndex0(uint32_t index0) {
+	return;
+}
+
+UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampIndex1)
+uint32_t mtca_processvariable::getTimeStampIndex1() {
+	return this->csManager->getProcessVariable(this->name)->getTimeStamp().index1;
+}
+
+UA_WRPROXY_UINT32(mtca_processvariable, setTimeStampIndex1)
+void mtca_processvariable::setTimeStampIndex1(uint32_t index1) {
+	return;
 }
 
 /* Multivariant Read Functions for Value (without template-Foo) */
@@ -101,7 +141,6 @@ _p_type    mtca_processvariable::getValue_##_p_type() { \
     _p_type v = this->csManager->getProcessScalar<_p_type>(this->name)->get(); \
     return v; \
 } \
-//*/ 
 
 #define CREATE_READ_FUNCTION_ARRAY(_p_type) \
 std::vector<_p_type>    mtca_processvariable::getValue_Array_##_p_type() { \
@@ -203,15 +242,12 @@ UA_WRPROXY_ARRAY_DOUBLE(mtca_processvariable, setValue_Array_double);
 CREATE_WRITE_FUNCTION_ARRAY(double)
 
 
-/**/
-
 // Just a macro to easy pushing different types of dataSources
 // ... and make sure we lock down writing to receivers in this stage already
 #define PUSH_RDVALUE_TYPE(_p_typeName) { \
 if(this->csManager->getProcessScalar<_p_typeName>(this->name)->isSender())    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); }\
 }
-   
     
 #define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) { \
 if(this->csManager->getProcessArray<_p_typeName>(this->name)->isSender()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \
@@ -241,7 +277,6 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     
     /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
     UA_DataSource_Map mapDs;
-    //     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue)});
     // FIXME: We should not be using std::cout here... Where's our logger?
     if (! this->csManager->getProcessVariable(this->name)->isArray()) {
         std::type_info const & valueType = this->csManager->getProcessVariable(this->name)->getValueType();
@@ -270,11 +305,12 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
 
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName), .write=UA_WRPROXY_NAME(mtca_processvariable, setName)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType), .write=UA_WRPROXY_NAME(mtca_processvariable, setType)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, 6013), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStamp), .write=UA_WRPROXY_NAME(mtca_processvariable, setTimeStamp)});
-    
-    ua_callProxy_mapDataSources(this->mappedServer, this->ownedNodes, &mapDs, (void *) this);
-    
-    // FIXME: Need to add a timestamp here!
-    
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_SECONDS), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampSeconds), .write=UA_WRPROXY_NAME(mtca_processvariable, setTimeStampSeconds)});
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_NANOSECONDS), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampNanoSeconds), .write=UA_WRPROXY_NAME(mtca_processvariable, setTimeStampNanoSeconds)});
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX0), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex0), .write=UA_WRPROXY_NAME(mtca_processvariable, setTimeStampIndex0)});
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX1), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex1), .write=UA_WRPROXY_NAME(mtca_processvariable, setTimeStampIndex1)});
+             	
+	ua_callProxy_mapDataSources(this->mappedServer, this->ownedNodes, &mapDs, (void *) this);
+	
     return UA_STATUSCODE_GOOD;
 }

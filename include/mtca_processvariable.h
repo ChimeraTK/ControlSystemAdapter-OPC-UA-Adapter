@@ -30,13 +30,7 @@
 #include "ua_mapped_class.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
-typedef enum { PROCESSVARIABLE_TYPE_VOID,
-  PROCESSVARIABLE_TYPE_INT32,
-  PROCESSVARIABLE_TYPE_UINT32,
-  PROCESSVARIABLE_TYPE_STRING
-} variableType;
-
-typedef boost::shared_ptr<ChimeraTK::ControlSystemPVManager> shCSysPVManager;
+//typedef boost::shared_ptr<ChimeraTK::ControlSystemPVManager> shCSysPVManager;
 
 class mtca_processvariable :  ua_mapped_class
 {
@@ -44,11 +38,10 @@ private:
     std::string name;
     boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager;
 
-    //variableType type; // unused
-
     UA_StatusCode mapSelfToNamespace();
+	
 public:
-    mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, std::string name, shCSysPVManager csManager);
+    mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, std::string name, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
     ~mtca_processvariable();
 
     void setName(std::string name);
@@ -57,8 +50,20 @@ public:
     void setType(std::string type);
     std::string getType();
 
-    void setTimeStamp(uint32_t timeStamp);
-    uint32_t getTimeStamp();
+    void setTimeStamp(ChimeraTK::TimeStamp timeStamp);
+    ChimeraTK::TimeStamp getTimeStamp();
+	
+	void setTimeStampSeconds(uint32_t seconds);
+	uint32_t getTimeStampSeconds();
+	
+	void setTimeStampNanoSeconds(uint32_t nanoSeconds);
+	uint32_t getTimeStampNanoSeconds();
+	
+	void setTimeStampIndex0(uint32_t index0);
+	uint32_t getTimeStampIndex0();
+	
+	void setTimeStampIndex1(uint32_t index1);
+	uint32_t getTimeStampIndex1();
     
 #define CREATE_READ_FUNCTION_ARRAY_DEF(_p_type)  std::vector<_p_type>  getValue_Array_##_p_type();    
 #define CREATE_WRITE_FUNCTION_ARRAY_DEF(_p_type) void setValue_Array_##_p_type(std::vector<_p_type> value);

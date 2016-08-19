@@ -40,8 +40,6 @@ extern "C" {
 
 #include "mtca_uaadapter.h"
 #include "mtca_processvariable.h"
-#include "mtca_processscalar.h"
-#include "mtca_processarray.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
@@ -50,7 +48,9 @@ extern "C" {
  * following the mapping process start. For this, the ProcessVariable from ControlSystemPVManager will be mapped to the OPCUA Model 
  * 
  */ 
-ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(uint16_t opcuaPort, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) {
+ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(uint16_t opcuaPort, shCSysPVManager csManager) {
+	this->opcuaPort = opcuaPort;
+	this->csManager = csManager;
     this->ControlSystemAdapterOPCUA_InitServer(opcuaPort);
     this->ControlSystemAdapterOPCUA_InitVarMapping(csManager);
 }
@@ -61,18 +61,15 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(uint16_t op
 
     // Create new server adapter
     this->adapter = new mtca_uaadapter(opcuaPort);
-    std::cout << "Server aktiv..." << std::endl;
   
     this->mgr->addObject(adapter);
     this->mgr->doStart(); // Implicit: Startet Worker-Threads aller ipc_managed_objects, die mit addObject registriert wurden  
 }
 
 // Mapping the ProcessVariables to the server
-void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) {
+void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(shCSysPVManager csManager) {
     // Get all ProcessVariables
     vector<ProcessVariable::SharedPtr> allProcessVariables = csManager->getAllProcessVariables();
-  
-    std::cout << "Start mapping..." << std::endl;
   
     for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
         adapter->addVariable(oneProcessVariable->getName(), csManager);
@@ -81,8 +78,12 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(boost::
     
 
 // Maybe needed, return the ControlSystemPVManager
-boost::shared_ptr<ChimeraTK::ControlSystemPVManager> const & ControlSystemAdapterOPCUA::getControlSystemPVManager() const {
+shCSysPVManager const & ControlSystemAdapterOPCUA::getControlSystemPVManager() const {
     return this->csManager;
+}
+// Maybe needed, return the OPCUA Portnumber
+uint32_t ControlSystemAdapterOPCUA::getOPCUAPort() {
+	return this->opcuaPort;
 }
 
 void ControlSystemAdapterOPCUA::start() {

@@ -34,15 +34,11 @@ extern "C" {
 
 #include "mtca_uaadapter.h"
 #include "mtca_processvariable.h"
-#include "mtca_processscalar.h"
-#include "mtca_processarray.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ProcessScalar.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/IndependentControlCore.h"
 #include "ChimeraTK/ControlSystemAdapter/TimeStamp.h"
 
 using namespace ChimeraTK;
