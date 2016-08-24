@@ -67,7 +67,6 @@ public:
   uint32_t getIpcId();
   bool isManaged();
   bool assignManager(ipc_manager *manager);
-  ipc_manager *getManager();
   virtual ipc_managed_object_type getManagedObjectType();
   
   bool taskRunningAttached();

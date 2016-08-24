@@ -29,9 +29,62 @@ class IPCManagerTest {
 void IPCManagerTest::testEmptySet(){ 
 	std::cout << "Enter IPCManagerTest" << std::endl;
 	
-	mtca_uaadapter *adapterOne = new mtca_uaadapter(16661);
-	mtca_uaadapter *adapterTwo = new mtca_uaadapter(16662);
+	ipc_manager *manager = new ipc_manager();
 	
+	mtca_uaadapter *adapterOne = new mtca_uaadapter(16661);
+	adapterOne->setIpcId(100);
+	mtca_uaadapter *adapterTwo = new mtca_uaadapter(16662);	
+	
+	manager->addObject(adapterOne);
+	manager->addObject(adapterTwo);
+	
+	BOOST_CHECK(adapterOne->isRunning() == true);
+	BOOST_CHECK(adapterTwo->isRunning() == true);
+	
+	BOOST_CHECK(adapterOne->isManaged() == true);
+	BOOST_CHECK(adapterTwo->isManaged() == true);
+	
+	std::cout << "test" << std::endl;
+	
+	//manager->startAll();
+	//BOOST_CHECK(manager->isRunning() == true);
+	//BOOST_CHECK(manager->isManaged() == true);
+	
+	//list<ipc_managed_object*> listOfManaedObjects = manager->getAllObjectsByType();
+	
+	/*
+	 * Currently not supported, mehtod returns a nullptr
+	 */
+	ipc_managed_object* adapter = manager->getObjectById(100);
+	BOOST_CHECK(adapter->getIpcId() == 100);
+	
+	//adapterOne->workerThread();
+	adapterOne->taskRunningAttached();
+	adapterOne->doStop();
+	std::cout << "test2" << std::endl;
+	//adapterTwo->terminate();
+	
+	/*
+	 * currently not supported
+	 */
+	//ipc_manager *mgr = adapterOne->getIpcManager();
+	
+	std::cout << "test4" << std::endl;
+	manager->deleteObject(100);
+	std::cout << "test5" << std::endl;
+	//manager->doStop();
+	
+	//ipc_manager *newManager = new ipc_manager();
+	//adapterOne->assignManager(newManager);
+	std::cout << "test6" << std::endl;
+	//adapterOne->terminate();
+	
+	//ipc_managed_object_type moType = adapterOne->getManagedObjectType();
+	
+	//manager->stopAll();
+	//manager->terminate();
+		
+	std::cout << "test7" << std::endl;
 	//ipc_managed_object managedObj = new ipc_managed_object();
 	//ipc_task *taskOne = new ipc_task();
 // 	taskOne->execute();
@@ -44,7 +97,7 @@ void IPCManagerTest::testEmptySet(){
 	//testTaskClass *taskOne = new testTaskClass();
 	
 
-	ipc_manager *manager = new ipc_manager();
+	
 	
  //	manager->addTask(taskOne);
 	

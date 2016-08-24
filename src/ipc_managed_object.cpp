@@ -132,11 +132,6 @@ int32_t ipc_managed_object::terminate()
   return 0;
 }
 
-ipc_manager *ipc_managed_object::getManager() 
-{
-  return this->manager;
-}
-
 ipc_managed_object_type ipc_managed_object::getManagedObjectType() {
   return IPC_MANAGED_OBJECT_TYPE_GENERICOBJECT;
 }
