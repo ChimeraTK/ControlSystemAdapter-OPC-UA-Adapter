@@ -1,0 +1,17 @@
+lib
+include/open62541
+include/ChimeraTK
+build
+*~
+tools/dependencies/
+tools/pyUANamespace/
+.kdev*
+.*
+ControlSystemAdapter-OPC-UA-Adapter.kdev4
+include/open62541/
+include/model_prebuilt/
+include/ChimeraTK/
+lib
+gcov.sh
+cov_htmp/
+app.info
