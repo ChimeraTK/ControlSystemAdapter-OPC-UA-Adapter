@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<uamapping>
+	<application name="LLRF">
+		<map sourceVarName="/app/dataCore/gain" ignoreSourceVariablePath="True">
+			<name>Gain_HF_Left</name>
+			<folderPath>/gain/stuff/north/left</folderPath>
+			<unrollPaths>True</unrollPaths>
+		</map>
+	</application>
+	<application name="LLRF-for-EPICS">
+		<map sourceVarName="Gain">
+			<name>Gain_HF_Left</name>
+			<unrollPaths/>
+		</map>
+	</application>
+</uamapping>

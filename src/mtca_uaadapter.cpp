@@ -73,7 +73,7 @@ void mtca_uaadapter::workerThread() {
     if (this->mappedServer == nullptr) {
         return;
     }
-  
+    
     UA_Boolean runUAServer = UA_TRUE;
     thread *serverThread = new std::thread(UA_Server_run, this->mappedServer, &runUAServer);
   
@@ -96,6 +96,14 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 
 void mtca_uaadapter::addConstant(std::string varName, shCSysPVManager mgr) {
     this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, mgr));
+}
+
+std::list<mtca_processvariable *> mtca_uaadapter::getVariables() {
+	return this->variables;
+}
+
+std::list<mtca_processvariable *> mtca_uaadapter::getConstants() {
+	return this->constants;
 }
 
 UA_StatusCode mtca_uaadapter::mapSelfToNamespace() {

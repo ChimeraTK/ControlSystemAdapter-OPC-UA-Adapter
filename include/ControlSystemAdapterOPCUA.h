@@ -53,9 +53,13 @@ class ControlSystemAdapterOPCUA {
     ControlSystemAdapterOPCUA(uint16_t opcuaPort, shCSysPVManager csManager);
     ~ControlSystemAdapterOPCUA();
     
-    shCSysPVManager const & getControlSystemPVManager() const;
+	shCSysPVManager const & getControlSystemPVManager() const;
+	mtca_uaadapter* getUAAdapter();
+	 
 	uint32_t getOPCUAPort();
+	void updateOPCUAValues();
 	
+	ipc_manager* getIPCManager();
     void start();
     void stop();
     void terminate();

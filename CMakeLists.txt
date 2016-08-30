@@ -7,6 +7,7 @@ project(ControlSystem-OPCUA_Adapter)
 ##########################################################################################################
 
 find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framework REQUIRED)
+find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 
 ##########################################################################################################
@@ -33,7 +34,12 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/include/open62541/)
 include_directories(${CMAKE_SOURCE_DIR}/include/ChimeraTK/)
+include_directories(${CMAKE_SOURCE_DIR}/examples/)
+#include_directories(${CMAKE_SOURCE_DIR}/include/libxml/)
+include_directories(${LIBXML2_INCLUDE_DIR})
 link_directories(${CMAKE_SOURCE_DIR}/lib)
+link_directories(${LIBXML2_LIBRARIES})
+
  
                     
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
@@ -42,8 +48,12 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ipc_manager.cpp
                    ${CMAKE_SOURCE_DIR}/src/ipc_task.cpp
                    ${CMAKE_SOURCE_DIR}/src/ControlSystemAdapterOPCUA.cpp
+                   ${CMAKE_SOURCE_DIR}/src/XMLFileHandler.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_processvariable.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_uaadapter.cpp
+                   
+                   # Example HelperClass
+                   ${CMAKE_SOURCE_DIR}/examples/runTimeValueGenerator.cpp
 )
 
 # Create the target directory for model initializers, open62541 and ControlSystemAdapter libraries/headers
@@ -55,7 +65,7 @@ include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 ##########################################################################################################
 
 ## Project specific options
-option(ENABLE_BUILDMODEL      "Create model from XML description"      ON)
+option(ENABLE_BUILDMODEL      "Create model from XML description"      OFF)
 
 ## Code quality control options
 option(ENABLE_COVERAGE        "Enable coverage stats for server build" ON)
@@ -107,6 +117,7 @@ configure_file (
 ## Object Files
 add_library(mtca_objects OBJECT ${objectSources})
 
+
 ## Early declaration due to the requirement to run the dependencies update prior to building
 ## Create shared lib
 add_library(ControlSystemAdapterOPCUA SHARED $<TARGET_OBJECTS:mtca_objects>)
@@ -120,6 +131,7 @@ target_link_libraries(ControlSystemAdapterOPCUA
   ${Boost_CHRONO_LIBRARY}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
 )
+target_link_libraries(ControlSystemAdapterOPCUA ${LIBXML2_LIBRARIES})
 
 ##########################################################################################################
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
@@ -176,6 +188,7 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_THREAD_LIBRARY}
   ${Boost_CHRONO_LIBRARY}
 )
+target_link_libraries(ControlSystemAdapterOPCUA ${LIBXML2_LIBRARIES})
 
 if(ENABLE_LINTING)
 add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter

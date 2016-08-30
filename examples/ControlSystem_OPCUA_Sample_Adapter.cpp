@@ -36,6 +36,7 @@ extern "C" {
 
 #include "open62541.h"
 #include "ControlSystemAdapterOPCUA.h"
+#include "XMLFileHandler.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
@@ -43,6 +44,8 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/IndependentControlCore.h"
 #include "ipc_manager.h"
+
+#include "runTimeValueGenerator.cpp"
 
 using std::cout;
 using std::endl;
@@ -77,18 +80,18 @@ int main() {
     /*
     * Generate dummy data
     */
-    ProcessScalar<int32_t>::SharedPtr intAdev = devManager->createProcessScalar<int32_t>(deviceToControlSystem, "intA");
-    ProcessScalar<uint32_t>::SharedPtr intBdev = devManager->createProcessScalar<uint32_t>(controlSystemToDevice, "intB");
+    ProcessScalar<int32_t>::SharedPtr intAdev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "intA");
+    ProcessScalar<int32_t>::SharedPtr intBdev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "intB");
     
     ProcessArray<int32_t>::SharedPtr intC1dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intC1", 15);
     ProcessArray<int32_t>::SharedPtr intC2dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intC2", 10);
     ProcessArray<int32_t>::SharedPtr intC3dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intC3", 5);
     
-    ProcessScalar<int16_t>::SharedPtr intDdev = devManager->createProcessScalar<int16_t>(deviceToControlSystem, "intD");
-    ProcessScalar<uint16_t>::SharedPtr intEdev = devManager->createProcessScalar<uint16_t>(deviceToControlSystem, "intE");
-    ProcessScalar<int8_t>::SharedPtr intFdev = devManager->createProcessScalar<int8_t>(deviceToControlSystem, "intF");
-    ProcessScalar<uint8_t>::SharedPtr intGdev = devManager->createProcessScalar<uint8_t>(deviceToControlSystem, "intG");
-    ProcessScalar<double>::SharedPtr intHdev = devManager->createProcessScalar<double>(deviceToControlSystem, "intH");
+    ProcessScalar<int16_t>::SharedPtr intDdev = devManager->createProcessScalar<int16_t>(controlSystemToDevice, "intD");
+    ProcessScalar<uint16_t>::SharedPtr intEdev = devManager->createProcessScalar<uint16_t>(controlSystemToDevice, "intE");
+    ProcessScalar<int8_t>::SharedPtr intFdev = devManager->createProcessScalar<int8_t>(controlSystemToDevice, "intF");
+    ProcessScalar<uint8_t>::SharedPtr intGdev = devManager->createProcessScalar<uint8_t>(controlSystemToDevice, "intG");
+    ProcessScalar<double>::SharedPtr intHdev = devManager->createProcessScalar<double>(controlSystemToDevice, "intH");
         
     ProcessScalar<int>::SharedPtr targetVoltage = csManager->getProcessScalar<int>("TARGET_VOLTAGE");
     ProcessScalar<int>::SharedPtr monitorVoltage = csManager->getProcessScalar<int>("MONITOR_VOLTAGE");
@@ -99,19 +102,47 @@ int main() {
     csManager->getProcessArray<int32_t>("intC1")->get().at(0) = 21;
     csManager->getProcessArray<int32_t>("intC1")->get().at(1) = 22;
     csManager->getProcessArray<int32_t>("intC1")->get().at(2) = 23;
-
+	
     int x[5] = {1, 2, 3, 4, 5};
     std::vector<int> v(x, x + sizeof x / sizeof x[0]);
-     
     csManager->getProcessArray<int32_t>("intC3")->set(v);    
-    
+	
+	    
     std::cout << "Dummy Daten geschrieben..." << std::endl;
-    
+	
+	// Only for ValueGenerator
+    ipc_manager *mgr;
     csaOPCUA = new ControlSystemAdapterOPCUA(16664, csManager);
-    
+	mgr = csaOPCUA->getIPCManager();
+	runTimeValueGenerator *valGen = new runTimeValueGenerator(csManager);
+	mgr->addObject(valGen);
+	mgr->doStart();
+	
+	// XML file handling for variable mapping, just an example...
+	XMLFileHandler *fileHandler = new XMLFileHandler("../uamapping.xml");
+	
+	xmlXPathObjectPtr result = fileHandler->getNodeSet("//application/@name");
+	xmlNodeSetPtr nodeset;
+	xmlChar *keyword;
+	
+	if (result) {
+		nodeset = result->nodesetval;
+		int32_t i;
+		for (i=0; i < nodeset->nodeNr; i++) {
+			keyword = xmlNodeListGetString(fileHandler->getDoc(), nodeset->nodeTab[i]->xmlChildrenNode, 1);
+			std::cout << "keyword: " << keyword << std::endl;
+			xmlFree(keyword);
+		}
+		xmlXPathFreeObject (result);
+	}
+	
+	fileHandler->~XMLFileHandler();
+	
+
     while(csaOPCUA->isRunning()) {
-        sleep(1);
-    }
+
+		sleep(100);
+	}
     
     return 0;
 }

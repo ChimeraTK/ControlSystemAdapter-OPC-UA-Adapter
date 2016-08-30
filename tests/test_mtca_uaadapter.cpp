@@ -58,6 +58,7 @@ void UAAdapterTest::testEmptySet(){
 	mtca_uaadapter *adapter = new mtca_uaadapter(tfInitManager.opcuaPort);
 	
 	// is Server running?
+	adapter->doStart();
 	BOOST_CHECK(adapter->isRunning() == true);
 	
 	adapter->doStop();

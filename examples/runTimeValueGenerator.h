@@ -24,49 +24,29 @@
  *
  */
 
-#ifndef MTCA_UAADAPTER_H
-#define MTCA_UAADAPTER_H
+#ifndef RUN_TIME_VALUE_GENERATOR_H
+#define RUN_TIME_VALUE_GENERATOR_H
 
-#include <vector>
-
-#include "ua_mapped_class.h"
-#include "ipc_managed_object.h"
-#include "mtca_processvariable.h"
-
+#include "ipc_task.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
 using namespace ChimeraTK;
 
-  
 typedef boost::shared_ptr<ControlSystemPVManager> shCSysPVManager;
 
-class mtca_uaadapter : ua_mapped_class, public ipc_managed_object {
-private:
-    UA_ServerConfig          server_config;
-    UA_ServerNetworkLayer    server_nl;
-    UA_Logger                logger;
-    
-    UA_NodeId                variablesListId;
-    UA_NodeId                constantsListId;
-    
-    std::list<mtca_processvariable *> variables;
-    std::list<mtca_processvariable *> constants;
-            
-    void mtca_uaadapter_constructserver(uint16_t opcuaPort);
-    UA_StatusCode mapSelfToNamespace() ;
+class runTimeValueGenerator : public ipc_managed_object {
+private:   
+	shCSysPVManager csManager;
+	
+    void runTimeValueGenerator_constructserver(shCSysPVManager csManager);
     
 public:
-    mtca_uaadapter(uint16_t opcuaPort);
-    ~mtca_uaadapter();
+    runTimeValueGenerator(shCSysPVManager csManager);
+	runTimeValueGenerator();
+    ~runTimeValueGenerator();
+	void workerThread();
+	static void generateValues(shCSysPVManager csManager);
     
-    
-    void addVariable(std::string name, shCSysPVManager mgr);
-    void addConstant(std::string name, shCSysPVManager mgr);
-	
-	std::list<mtca_processvariable *> getVariables();
-    std::list<mtca_processvariable *> getConstants();
-	
-    void workerThread();
 };
 
-#endif // MTCA_UAADAPTER_H
+#endif // RUN_TIME_VALUE_GENERATOR_H

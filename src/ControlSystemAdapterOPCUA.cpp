@@ -76,15 +76,34 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(shCSysP
     }
 }
     
+void ControlSystemAdapterOPCUA::updateOPCUAValues() {
+	for(mtca_processvariable *oneMTCA_ProcessVariable: this->adapter->getVariables()) {
+		for(ProcessVariable::SharedPtr oneProcessVariable: csManager->getAllProcessVariables()) {
+			if(oneProcessVariable->getName().compare(oneMTCA_ProcessVariable->getName()) == 0) {
+				std::cout << "Name: " << oneProcessVariable->getName() << std::endl;
+			}
+		}		
+	}	
+}
 
 // Maybe needed, return the ControlSystemPVManager
 shCSysPVManager const & ControlSystemAdapterOPCUA::getControlSystemPVManager() const {
     return this->csManager;
 }
+
+mtca_uaadapter* ControlSystemAdapterOPCUA::getUAAdapter() {
+	return this->adapter;
+}
+
 // Maybe needed, return the OPCUA Portnumber
 uint32_t ControlSystemAdapterOPCUA::getOPCUAPort() {
 	return this->opcuaPort;
 }
+
+ipc_manager* ControlSystemAdapterOPCUA::getIPCManager() {
+    return this->mgr;
+}
+
 
 void ControlSystemAdapterOPCUA::start() {
     this->mgr->startAll();
