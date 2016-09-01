@@ -8,10 +8,7 @@ tools/pyUANamespace/
 .kdev*
 .*
 ControlSystemAdapter-OPC-UA-Adapter.kdev4
-include/open62541/
-include/model_prebuilt/
-include/ChimeraTK/
-lib
 gcov.sh
 cov_htmp/
 app.info
+
