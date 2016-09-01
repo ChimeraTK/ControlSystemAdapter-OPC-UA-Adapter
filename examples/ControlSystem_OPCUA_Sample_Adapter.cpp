@@ -38,7 +38,6 @@ extern "C" {
 
 #include "open62541.h"
 #include "ControlSystemAdapterOPCUA.h"
-#include "XMLFileHandler.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"

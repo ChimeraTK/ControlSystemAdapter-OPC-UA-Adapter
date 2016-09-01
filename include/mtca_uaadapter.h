@@ -32,9 +32,7 @@
 #include "ua_mapped_class.h"
 #include "ipc_managed_object.h"
 #include "mtca_processvariable.h"
-
-#include <libxml2/libxml/xpath.h>
-#include "XMLFileHandler.h"
+#include "xml_file_handler.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 

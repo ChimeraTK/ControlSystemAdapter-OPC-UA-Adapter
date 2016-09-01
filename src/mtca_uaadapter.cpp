@@ -34,7 +34,7 @@ extern "C" {
 
 #include "mtca_uaadapter.h"
 #include "mtca_processvariable.h"
-#include "XMLFileHandler.h"
+#include "xml_file_handler.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ProcessScalar.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"

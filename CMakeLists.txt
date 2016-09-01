@@ -48,7 +48,7 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ipc_manager.cpp
                    ${CMAKE_SOURCE_DIR}/src/ipc_task.cpp
                    ${CMAKE_SOURCE_DIR}/src/ControlSystemAdapterOPCUA.cpp
-                   ${CMAKE_SOURCE_DIR}/src/XMLFileHandler.cpp
+                   ${CMAKE_SOURCE_DIR}/src/xml_file_handler.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_processvariable.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_uaadapter.cpp
                    
