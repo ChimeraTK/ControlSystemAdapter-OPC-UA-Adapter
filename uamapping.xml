@@ -1,16 +1,62 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <uamapping>
 	<application name="LLRF">
-		<map sourceVarName="/app/dataCore/gain" ignoreSourceVariablePath="True">
-			<name>Gain_HF_Left</name>
+		<map sourceVarName="/app/dataCore/intA" ignoreSourceVariablePath="True">
+			<name>intA</name>
 			<folderPath>/gain/stuff/north/left</folderPath>
 			<unrollPaths>True</unrollPaths>
 		</map>
+		<map sourceVarName="/app/dataCore/intA" ignoreSourceVariablePath="True">
+			<name>intB</name>
+			<folderPath>/gain/stuff/north</folderPath>
+			<unrollPaths>True</unrollPaths>
+		</map>
+		<map sourceVarName="/app/dataCore/intB" ignoreSourceVariablePath="True">
+			<name>intArray5</name>
+			<folderPath>/gain/stuff/north/left</folderPath>
+			<unrollPaths>True</unrollPaths>
+		</map>	
+		<map sourceVarName="/app/dataCore" ignoreSourceVariablePath="True">
+			<name>intArray10</name>
+			<folderPath>/gain/stuff/north/left</folderPath>
+			<unrollPaths>False</unrollPaths>
+		</map>	
+		<map sourceVarName="/app/dataCore" ignoreSourceVariablePath="False">
+			<name>intArray10</name>
+			<folderPath>/gain/stuff/north/left</folderPath>
+			<unrollPaths>False</unrollPaths>
+		</map>		
 	</application>
-	<application name="LLRF-for-EPICS">
+	<application name="LLRF-or-EPICS">
 		<map sourceVarName="Gain">
-			<name>Gain_HF_Left</name>
+			<name>intD</name>
+			<folderPath/>
 			<unrollPaths/>
 		</map>
+		<map sourceVarName="/app/dataCore/intB" ignoreSourceVariablePath="False">
+			<name>intF</name>
+			<folderPath>/gain/stuff/north/left</folderPath>
+			<unrollPaths>True</unrollPaths>
+		</map>	
+		<map sourceVarName="/app/dataCore/intB" ignoreSourceVariablePath="False">
+			<name>intC</name>
+			<folderPath>/gain/stuff/north/left</folderPath>
+			<unrollPaths>True</unrollPaths>
+		</map>		
+		<map sourceVarName="/test/dataCore/intB" ignoreSourceVariablePath="False">
+			<name>intE</name>
+			<folderPath>/gain/stuff/north/left</folderPath>
+			<unrollPaths>False</unrollPaths>
+		</map>	
+		<map sourceVarName="/test/dataCore/intB" ignoreSourceVariablePath="False">
+			<name>intG</name>
+			<folderPath>/gain/stuff/north/left</folderPath>
+			<unrollPaths>True</unrollPaths>
+		</map>	
+		<map sourceVarName="/app/dataCore/intA" ignoreSourceVariablePath="False">
+			<name>intH</name>
+			<folderPath>/gain/stuff/north/left</folderPath>
+			<unrollPaths>True</unrollPaths>
+		</map>	
 	</application>
 </uamapping>

@@ -89,7 +89,7 @@ void CSAOPCUATest::testEmptySet(){
 	std::cout << "Enter CSAOPCUATest with EmptySet" << std::endl;
 	TestFixtureEmptySet tfEmptySet;
 	 // Create the managers
-	ControlSystemAdapterOPCUA *csaOPCUA = new ControlSystemAdapterOPCUA(tfEmptySet.opcuaPort, tfEmptySet.csManager);
+	ControlSystemAdapterOPCUA *csaOPCUA = new ControlSystemAdapterOPCUA(tfEmptySet.opcuaPort, tfEmptySet.csManager, "../uamapping.xml");
 	// is Server running?
 	csaOPCUA->start();
 	BOOST_CHECK(csaOPCUA->isRunning() == true);
@@ -107,7 +107,7 @@ void CSAOPCUATest::testExampleSet(){
 	std::cout << "Enter CSAOPCUATest with ExampleSet" << std::endl;
 	TestFixtureExampleSet tfExampleSet;
 	 // Create the managers
-	ControlSystemAdapterOPCUA *csaOPCUA = new ControlSystemAdapterOPCUA(tfExampleSet.opcuaPort, tfExampleSet.csManager);
+	ControlSystemAdapterOPCUA *csaOPCUA = new ControlSystemAdapterOPCUA(tfExampleSet.opcuaPort, tfExampleSet.csManager, "../uamapping.xml");
 	// is Server running?
 	BOOST_CHECK(csaOPCUA->isRunning() == true);
 	
@@ -141,7 +141,7 @@ void UAAdapterTest::testEmptySet(){
 	std::cout << "Enter UAAdapterTest with EmptySet" << std::endl;
 	TestFixtureEmptySet tfEmptySet;
 	
-	mtca_uaadapter *adapter = new mtca_uaadapter(16664);
+	mtca_uaadapter *adapter = new mtca_uaadapter(16664, "../uamapping.xml");
   
 	mgr->addObject(adapter);
 
@@ -161,7 +161,7 @@ void UAAdapterTest::testExampleSet(){
 	std::cout << "Enter UAAdapterTest with ExampleSet" << std::endl;
 	TestFixtureExampleSet tfExampleSet;
   		
-	mtca_uaadapter *adapter = new mtca_uaadapter(16664);
+	mtca_uaadapter *adapter = new mtca_uaadapter(16664, "../uamapping.xml");
 	
 	mgr->addObject(adapter);
 	mgr->doStart();

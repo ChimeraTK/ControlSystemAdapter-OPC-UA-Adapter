@@ -74,7 +74,7 @@ void runTimeValueGenerator::generateValues(shCSysPVManager csManager) {
 		int32_t random_variable = rand()%101;
 		for(ProcessVariable::SharedPtr oneProcessVar : csManager->getAllProcessVariables()) {	
 			int32_t random_variable = rand()%101;
-			if(!oneProcessVar->isArray()) {
+			if(!oneProcessVar->isArray() && oneProcessVar->isSender()) {
 				std::type_info const & valueType = csManager->getProcessVariable(oneProcessVar->getName())->getValueType();
 				if (valueType == typeid(int8_t)) {
 					csManager->getProcessScalar<int8_t>(oneProcessVar->getName())->set(random_variable);
@@ -95,10 +95,10 @@ void runTimeValueGenerator::generateValues(shCSysPVManager csManager) {
 					csManager->getProcessScalar<uint32_t>(oneProcessVar->getName())->set(random_variable);
 				}
 				else if (valueType == typeid(float)) {
-					csManager->getProcessScalar<float>(oneProcessVar->getName())->set(random_variable);
+					csManager->getProcessScalar<float>(oneProcessVar->getName())->set(sin(random_variable));
 				}
 				else if (valueType == typeid(double)) {
-					csManager->getProcessScalar<double>(oneProcessVar->getName())->set(random_variable);
+					csManager->getProcessScalar<double>(oneProcessVar->getName())->set(sin(random_variable));
 				}
 				else 
 					std::cout << "Error occure" << std::endl;

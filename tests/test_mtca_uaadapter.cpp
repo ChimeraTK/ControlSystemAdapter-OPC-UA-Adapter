@@ -55,7 +55,7 @@ class UAAdapterTest {
    
 void UAAdapterTest::testEmptySet(){ 
 	TestFixtureInitManager tfInitManager;
-	mtca_uaadapter *adapter = new mtca_uaadapter(tfInitManager.opcuaPort);
+	mtca_uaadapter *adapter = new mtca_uaadapter(tfInitManager.opcuaPort, "../uamapping.xml");
 	
 	// is Server running?
 	adapter->doStart();

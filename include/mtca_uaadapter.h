@@ -33,6 +33,9 @@
 #include "ipc_managed_object.h"
 #include "mtca_processvariable.h"
 
+#include <libxml2/libxml/xpath.h>
+#include "XMLFileHandler.h"
+
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
 using namespace ChimeraTK;
@@ -40,33 +43,51 @@ using namespace ChimeraTK;
   
 typedef boost::shared_ptr<ControlSystemPVManager> shCSysPVManager;
 
+struct folderInfo {
+	std::string folderName;
+	UA_NodeId folderNodeId = UA_NODEID_NULL;
+	UA_NodeId nextFolderNodeId = UA_NODEID_NULL;
+	UA_NodeId prevFolderNodeId = UA_NODEID_NULL;
+};
+
 class mtca_uaadapter : ua_mapped_class, public ipc_managed_object {
 private:
-    UA_ServerConfig          server_config;
-    UA_ServerNetworkLayer    server_nl;
-    UA_Logger                logger;
-    
-    UA_NodeId                variablesListId;
-    UA_NodeId                constantsListId;
-    
-    std::list<mtca_processvariable *> variables;
-    std::list<mtca_processvariable *> constants;
-            
-    void mtca_uaadapter_constructserver(uint16_t opcuaPort);
-    UA_StatusCode mapSelfToNamespace() ;
-    
+	UA_ServerConfig          server_config;
+	UA_ServerNetworkLayer    server_nl;
+	UA_Logger                logger;
+	
+	UA_NodeId                variablesListId;
+	UA_NodeId                constantsListId;
+	
+	std::vector<folderInfo> folderVector;	
+	
+	UA_NodeId				ownNodeId;
+	
+	std::list<mtca_processvariable *> variables;
+	std::list<mtca_processvariable *> constants;
+	
+	XMLFileHandler *fileHandler;
+	
+	void mtca_uaadapter_constructserver(uint16_t opcuaPort);
+	UA_StatusCode mapSelfToNamespace();
+	UA_NodeId createUAFolder(UA_NodeId basenodeid, std::string folderName);
+	
 public:
-    mtca_uaadapter(uint16_t opcuaPort);
-    ~mtca_uaadapter();
-    
-    
-    void addVariable(std::string name, shCSysPVManager mgr);
-    void addConstant(std::string name, shCSysPVManager mgr);
+	mtca_uaadapter(uint16_t opcuaPort, std::string configPath);
+	~mtca_uaadapter();
 	
+	UA_NodeId createFolderPath(UA_NodeId basenodeid, std::string folderPath);
+	UA_NodeId existFolderPath(UA_NodeId basenodeid, std::string folderPath);
+	
+    
+	void addVariable(std::string name, shCSysPVManager mgr);
+	void addConstant(std::string name, shCSysPVManager mgr);
+	
+	UA_NodeId getOwnNodeId();
 	std::list<mtca_processvariable *> getVariables();
-    std::list<mtca_processvariable *> getConstants();
+	std::list<mtca_processvariable *> getConstants();
 	
-    void workerThread();
+	void workerThread();
 };
 
 #endif // MTCA_UAADAPTER_H

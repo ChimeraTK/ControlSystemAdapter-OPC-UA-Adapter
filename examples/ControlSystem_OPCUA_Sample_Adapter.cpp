@@ -30,7 +30,9 @@
 extern "C" {
     #include <unistd.h>
     #include <signal.h>
+	#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
+
 
 #include <iostream>
 
@@ -75,23 +77,24 @@ int main() {
     ControlSystemSynchronizationUtility syncUtil(csManager);
     
     IndependentControlCore controlCore(devManager);
-
     
     /*
     * Generate dummy data
     */
-    ProcessScalar<int32_t>::SharedPtr intAdev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "intA");
-    ProcessScalar<int32_t>::SharedPtr intBdev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "intB");
-    
-    ProcessArray<int32_t>::SharedPtr intC1dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intC1", 15);
-    ProcessArray<int32_t>::SharedPtr intC2dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intC2", 10);
-    ProcessArray<int32_t>::SharedPtr intC3dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intC3", 5);
-    
-    ProcessScalar<int16_t>::SharedPtr intDdev = devManager->createProcessScalar<int16_t>(controlSystemToDevice, "intD");
-    ProcessScalar<uint16_t>::SharedPtr intEdev = devManager->createProcessScalar<uint16_t>(controlSystemToDevice, "intE");
-    ProcessScalar<int8_t>::SharedPtr intFdev = devManager->createProcessScalar<int8_t>(controlSystemToDevice, "intF");
-    ProcessScalar<uint8_t>::SharedPtr intGdev = devManager->createProcessScalar<uint8_t>(controlSystemToDevice, "intG");
+    ProcessScalar<int8_t>::SharedPtr intAdev = devManager->createProcessScalar<int8_t>(controlSystemToDevice, "intA");
+    ProcessScalar<uint8_t>::SharedPtr intBdev = devManager->createProcessScalar<uint8_t>(deviceToControlSystem, "intB");
+	ProcessScalar<int16_t>::SharedPtr intCdev = devManager->createProcessScalar<int16_t>(controlSystemToDevice, "intC");
+	ProcessScalar<uint16_t>::SharedPtr intDdev = devManager->createProcessScalar<uint16_t>(controlSystemToDevice, "intD");
+    ProcessScalar<int32_t>::SharedPtr intEdev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "intE");
+    ProcessScalar<uint32_t>::SharedPtr intFdev = devManager->createProcessScalar<uint32_t>(controlSystemToDevice, "intF");
+    ProcessScalar<float>::SharedPtr intGdev = devManager->createProcessScalar<float>(controlSystemToDevice, "intG");
     ProcessScalar<double>::SharedPtr intHdev = devManager->createProcessScalar<double>(controlSystemToDevice, "intH");
+    
+    ProcessArray<int32_t>::SharedPtr intC1dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intArray15", 15);
+    ProcessArray<int32_t>::SharedPtr intC2dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intArray10", 10);
+    ProcessArray<int32_t>::SharedPtr intC3dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intArray5", 5);
+    
+
         
     ProcessScalar<int>::SharedPtr targetVoltage = csManager->getProcessScalar<int>("TARGET_VOLTAGE");
     ProcessScalar<int>::SharedPtr monitorVoltage = csManager->getProcessScalar<int>("MONITOR_VOLTAGE");
@@ -99,45 +102,24 @@ int main() {
     *targetVoltage = 42;
     targetVoltage->send();
 
-    csManager->getProcessArray<int32_t>("intC1")->get().at(0) = 21;
-    csManager->getProcessArray<int32_t>("intC1")->get().at(1) = 22;
-    csManager->getProcessArray<int32_t>("intC1")->get().at(2) = 23;
+    csManager->getProcessArray<int32_t>("intArray15")->get().at(0) = 21;
+    csManager->getProcessArray<int32_t>("intArray10")->get().at(1) = 22;
+    csManager->getProcessArray<int32_t>("intArray5")->get().at(2) = 23;
 	
     int x[5] = {1, 2, 3, 4, 5};
     std::vector<int> v(x, x + sizeof x / sizeof x[0]);
-    csManager->getProcessArray<int32_t>("intC3")->set(v);    
+    csManager->getProcessArray<int32_t>("intArray5")->set(v);    
 	
 	    
-    std::cout << "Dummy Daten geschrieben..." << std::endl;
+    std::cout << "Dummy Daten geschrieben..." << std::endl;	
 	
 	// Only for ValueGenerator
     ipc_manager *mgr;
-    csaOPCUA = new ControlSystemAdapterOPCUA(16664, csManager);
+    csaOPCUA = new ControlSystemAdapterOPCUA(16664, csManager, "../uamapping.xml");
 	mgr = csaOPCUA->getIPCManager();
 	runTimeValueGenerator *valGen = new runTimeValueGenerator(csManager);
 	mgr->addObject(valGen);
-	mgr->doStart();
-	
-	// XML file handling for variable mapping, just an example...
-	XMLFileHandler *fileHandler = new XMLFileHandler("../uamapping.xml");
-	
-	xmlXPathObjectPtr result = fileHandler->getNodeSet("//application/@name");
-	xmlNodeSetPtr nodeset;
-	xmlChar *keyword;
-	
-	if (result) {
-		nodeset = result->nodesetval;
-		int32_t i;
-		for (i=0; i < nodeset->nodeNr; i++) {
-			keyword = xmlNodeListGetString(fileHandler->getDoc(), nodeset->nodeTab[i]->xmlChildrenNode, 1);
-			std::cout << "keyword: " << keyword << std::endl;
-			xmlFree(keyword);
-		}
-		xmlXPathFreeObject (result);
-	}
-	
-	fileHandler->~XMLFileHandler();
-	
+	mgr->doStart();	
 
     while(csaOPCUA->isRunning()) {
 

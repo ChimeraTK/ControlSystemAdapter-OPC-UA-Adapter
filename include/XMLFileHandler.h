@@ -28,6 +28,9 @@
 #define XMLFILEHANDLER_H
 
 #include <iostream>
+#include <vector>
+
+#include <boost/tokenizer.hpp>
 
 #include <libxml2/libxml/xpath.h>
 #include <libxml2/libxml/xpathInternals.h>
@@ -44,6 +47,10 @@ public:
 	xmlXPathObjectPtr getNodeSet(std::string xPathString);
 	
 	xmlDocPtr getDoc();
+	
+	std::vector<std::string> praseVariablePath(std::string variablePath);
+	std::string getAttributeValueFromNode(xmlNode* node, std::string attributeName);
+	std::string getContentFromNode(xmlNode* node);
 
 	~XMLFileHandler();
 	

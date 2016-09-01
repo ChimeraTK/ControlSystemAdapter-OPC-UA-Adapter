@@ -46,21 +46,20 @@ extern "C" {
 /**
  * This class provide the two parts of the OPCUA Adapter. First of all the OPCUA server starts with a random port number (recommended 16664),
  * following the mapping process start. For this, the ProcessVariable from ControlSystemPVManager will be mapped to the OPCUA Model 
- * 
  */ 
-ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(uint16_t opcuaPort, shCSysPVManager csManager) {
+ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(uint16_t opcuaPort, shCSysPVManager csManager, std::string configFile) {
 	this->opcuaPort = opcuaPort;
 	this->csManager = csManager;
-    this->ControlSystemAdapterOPCUA_InitServer(opcuaPort);
+    this->ControlSystemAdapterOPCUA_InitServer(opcuaPort, configFile);
     this->ControlSystemAdapterOPCUA_InitVarMapping(csManager);
 }
 
 // Init the OPCUA server
-void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(uint16_t opcuaPort) {
+void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(uint16_t opcuaPort, std::string configFile) {
     this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
 
     // Create new server adapter
-    this->adapter = new mtca_uaadapter(opcuaPort);
+    this->adapter = new mtca_uaadapter(opcuaPort, configFile);
   
     this->mgr->addObject(adapter);
     this->mgr->doStart(); // Implicit: Startet Worker-Threads aller ipc_managed_objects, die mit addObject registriert wurden  
@@ -76,16 +75,6 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(shCSysP
     }
 }
     
-void ControlSystemAdapterOPCUA::updateOPCUAValues() {
-	for(mtca_processvariable *oneMTCA_ProcessVariable: this->adapter->getVariables()) {
-		for(ProcessVariable::SharedPtr oneProcessVariable: csManager->getAllProcessVariables()) {
-			if(oneProcessVariable->getName().compare(oneMTCA_ProcessVariable->getName()) == 0) {
-				std::cout << "Name: " << oneProcessVariable->getName() << std::endl;
-			}
-		}		
-	}	
-}
-
 // Maybe needed, return the ControlSystemPVManager
 shCSysPVManager const & ControlSystemAdapterOPCUA::getControlSystemPVManager() const {
     return this->csManager;

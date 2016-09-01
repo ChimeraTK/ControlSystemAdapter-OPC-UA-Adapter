@@ -245,13 +245,13 @@ CREATE_WRITE_FUNCTION_ARRAY(double)
 // Just a macro to easy pushing different types of dataSources
 // ... and make sure we lock down writing to receivers in this stage already
 #define PUSH_RDVALUE_TYPE(_p_typeName) { \
-if(this->csManager->getProcessScalar<_p_typeName>(this->name)->isSender())    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
-    else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); }\
+if(this->csManager->getProcessScalar<_p_typeName>(this->name)->isSender())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
+    else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName) }); }\
 }
     
 #define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) { \
 if(this->csManager->getProcessArray<_p_typeName>(this->name)->isSender()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \
-    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \
+    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName) }); } \
 }
 
 UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
@@ -265,6 +265,9 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     UA_ObjectAttributes oAttr; 
     oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", this->name.c_str());
     oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", "A process variable");
+	if (this->csManager->getProcessVariable(this->name)->isSender()) {
+		oAttr.userWriteMask = UA_ACCESSLEVELMASK_WRITE;
+	}
     
     UA_INSTATIATIONCALLBACK(icb);  
     UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
@@ -274,6 +277,9 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     /* Use a function map to map any local functioncalls to opcua methods (we do not own any methods) */
     UA_FunctionCall_Map mapThis;
     this->ua_mapFunctions(this, &mapThis, createdNodeId);
+	
+	// know your own nodeId
+	this->ownNodeId = createdNodeId;
     
     /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
     UA_DataSource_Map mapDs;
@@ -313,4 +319,8 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
 	ua_callProxy_mapDataSources(this->mappedServer, this->ownedNodes, &mapDs, (void *) this);
 	
     return UA_STATUSCODE_GOOD;
+}
+
+UA_NodeId mtca_processvariable::getOwnNodeId() {
+	return this->ownNodeId;
 }

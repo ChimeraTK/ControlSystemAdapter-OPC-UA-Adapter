@@ -31,9 +31,9 @@ void IPCManagerTest::testEmptySet(){
 	
 	ipc_manager *manager = new ipc_manager();
 	
-	mtca_uaadapter *adapterOne = new mtca_uaadapter(16661);
+	mtca_uaadapter *adapterOne = new mtca_uaadapter(16661, "../uamapping.xml");
 	adapterOne->setIpcId(100);
-	mtca_uaadapter *adapterTwo = new mtca_uaadapter(16662);	
+	mtca_uaadapter *adapterTwo = new mtca_uaadapter(16662, "../uamapping.xml");	
 	
 	manager->addObject(adapterOne);
 	manager->addObject(adapterTwo);

@@ -28,6 +28,8 @@
 
 #include <iostream>
 
+#include <boost/tokenizer.hpp>
+
 #include <libxml2/libxml/xpath.h>
 #include <libxml2/libxml/xpathInternals.h>
 #include <libxml2/libxml/tree.h>
@@ -45,7 +47,7 @@ xmlXPathObjectPtr XMLFileHandler::getNodeSet(std::string xPathString) {
 	xmlChar *xpath = (xmlChar*) xPathString.c_str();
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr result;
-
+	
 	context = xmlXPathNewContext(doc);
 	if (context == NULL) {
 		std::printf("Error in xmlXPathNewContext\n");
@@ -78,6 +80,37 @@ xmlDocPtr XMLFileHandler::createDoc(std::string filePath) {
 	return doc;
 }
 
+std::vector<std::string> XMLFileHandler::praseVariablePath(std::string variablePath) {
+
+	std::vector<std::string> pathList;
+    boost::char_separator<char> sep("/");
+    boost::tokenizer<boost::char_separator<char>> tokens(variablePath, sep);
+ 	for (const auto& t : tokens) {
+		pathList.push_back(t);
+ 	}
+	return pathList;
+}
+
+std::string XMLFileHandler::getAttributeValueFromNode(xmlNode* node, std::string attributeName) {
+	
+	xmlAttrPtr attr = xmlHasProp(node, (xmlChar*)attributeName.c_str());
+	if(!(attr == NULL)) {
+		std::string merker = (std::string)((char*)attr->children->content);
+		//xmlFree(attr);
+		return merker;
+	}
+	return "";
+}
+
+std::string XMLFileHandler::getContentFromNode(xmlNode* node) {
+	xmlChar* content = xmlNodeGetContent(node->xmlChildrenNode);
+	if(content != NULL) {
+		std::string merker = (std::string)((char*)content);
+		xmlFree(content);
+		return merker;
+	}
+	return "";
+}
 
 XMLFileHandler::~XMLFileHandler() {
 	xmlFreeDoc(this->doc);

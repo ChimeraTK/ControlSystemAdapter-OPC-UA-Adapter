@@ -36,6 +36,8 @@ class mtca_processvariable :  ua_mapped_class
 {
 private:
     std::string name;
+	UA_NodeId ownNodeId;
+	
     boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager;
 
     UA_StatusCode mapSelfToNamespace();
@@ -64,6 +66,8 @@ public:
 	
 	void setTimeStampIndex1(uint32_t index1);
 	uint32_t getTimeStampIndex1();
+	
+	UA_NodeId getOwnNodeId();
     
 #define CREATE_READ_FUNCTION_ARRAY_DEF(_p_type)  std::vector<_p_type>  getValue_Array_##_p_type();    
 #define CREATE_WRITE_FUNCTION_ARRAY_DEF(_p_type) void setValue_Array_##_p_type(std::vector<_p_type> value);

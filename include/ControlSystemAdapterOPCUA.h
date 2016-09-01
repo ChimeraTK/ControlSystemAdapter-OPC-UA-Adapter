@@ -46,18 +46,17 @@ class ControlSystemAdapterOPCUA {
     shCSysPVManager csManager;
     uint16_t opcuaPort;
     
-    void ControlSystemAdapterOPCUA_InitServer(uint16_t opcuaPort);
+    void ControlSystemAdapterOPCUA_InitServer(uint16_t opcuaPort, std::string configFile);
     void ControlSystemAdapterOPCUA_InitVarMapping(shCSysPVManager csManager);
     
   public:
-    ControlSystemAdapterOPCUA(uint16_t opcuaPort, shCSysPVManager csManager);
+    ControlSystemAdapterOPCUA(uint16_t opcuaPort, shCSysPVManager csManager, std::string configFile);
     ~ControlSystemAdapterOPCUA();
     
 	shCSysPVManager const & getControlSystemPVManager() const;
 	mtca_uaadapter* getUAAdapter();
 	 
 	uint32_t getOPCUAPort();
-	void updateOPCUAValues();
 	
 	ipc_manager* getIPCManager();
     void start();
