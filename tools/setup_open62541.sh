@@ -22,6 +22,7 @@ install)
   if [ ! -d "$CMAKE_PROJECT_DIRECTORY/include/open62541" ]; then
       mkdir "$CMAKE_PROJECT_DIRECTORY/include/open62541"
   fi
+  mkdir -p "$CMAKE_PROJECT_DIRECTORY/lib"
   
   log "Installing headers"
   cp "$SUBPROJECT_BUILD_DIRERCTORY"/open62541.h "$CMAKE_PROJECT_DIRECTORY/include/open62541"

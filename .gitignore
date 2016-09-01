@@ -1,0 +1,7 @@
+lib
+include/open62541
+include/ChimeraTK
+build
+*~
+tools/dependencies/
+tools/pyUANamespace/
