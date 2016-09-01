@@ -65,7 +65,7 @@ include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 ##########################################################################################################
 
 ## Project specific options
-option(ENABLE_BUILDMODEL      "Create model from XML description"      OFF)
+option(ENABLE_BUILDMODEL      "Create model from XML description"      ON)
 
 ## Code quality control options
 option(ENABLE_COVERAGE        "Enable coverage stats for server build" ON)
