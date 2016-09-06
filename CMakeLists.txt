@@ -53,7 +53,7 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_uaadapter.cpp
                    
                    # Example HelperClass
-                   ${CMAKE_SOURCE_DIR}/examples/runTimeValueGenerator.cpp
+                   ${CMAKE_SOURCE_DIR}/examples/runtimeValueGenerator.cpp
 )
 
 # Create the target directory for model initializers, open62541 and ControlSystemAdapter libraries/headers

@@ -30,11 +30,12 @@
 extern "C" {
     #include <unistd.h>
     #include <signal.h>
-	#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
+		#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
 
 
 #include <iostream>
+#include <math.h>
 
 #include "open62541.h"
 #include "ControlSystemAdapterOPCUA.h"
@@ -43,10 +44,9 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/IndependentControlCore.h"
 #include "ipc_manager.h"
 
-#include "runTimeValueGenerator.cpp"
+#include "runtimeValueGenerator.h"
 
 using std::cout;
 using std::endl;
@@ -75,54 +75,78 @@ int main() {
     
     ControlSystemSynchronizationUtility syncUtil(csManager);
     
-    IndependentControlCore controlCore(devManager);
-    
     /*
     * Generate dummy data
-    */
-    ProcessScalar<int8_t>::SharedPtr intAdev = devManager->createProcessScalar<int8_t>(controlSystemToDevice, "intA");
-    ProcessScalar<uint8_t>::SharedPtr intBdev = devManager->createProcessScalar<uint8_t>(deviceToControlSystem, "intB");
-	ProcessScalar<int16_t>::SharedPtr intCdev = devManager->createProcessScalar<int16_t>(controlSystemToDevice, "intC");
-	ProcessScalar<uint16_t>::SharedPtr intDdev = devManager->createProcessScalar<uint16_t>(controlSystemToDevice, "intD");
-    ProcessScalar<int32_t>::SharedPtr intEdev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "intE");
-    ProcessScalar<uint32_t>::SharedPtr intFdev = devManager->createProcessScalar<uint32_t>(controlSystemToDevice, "intF");
-    ProcessScalar<float>::SharedPtr intGdev = devManager->createProcessScalar<float>(controlSystemToDevice, "intG");
-    ProcessScalar<double>::SharedPtr intHdev = devManager->createProcessScalar<double>(controlSystemToDevice, "intH");
+    */	
+		ProcessScalar<int8_t>::SharedPtr intA8dev = devManager->createProcessScalar<int8_t>(controlSystemToDevice, "int8Scalar");
+		ProcessScalar<uint8_t>::SharedPtr intAu8dev = devManager->createProcessScalar<uint8_t>(deviceToControlSystem, "uint8Scalar");
+		ProcessScalar<int16_t>::SharedPtr intA16dev = devManager->createProcessScalar<int16_t>(deviceToControlSystem, "int16Scalar");
+		ProcessScalar<uint16_t>::SharedPtr intAu16dev = devManager->createProcessScalar<uint16_t>(controlSystemToDevice, "uint16Scalar");
+		ProcessScalar<int32_t>::SharedPtr intA32dev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "int32Scalar");
+		ProcessScalar<uint32_t>::SharedPtr intAu32dev = devManager->createProcessScalar<uint32_t>(controlSystemToDevice, "uint32Scalar");
+		ProcessScalar<float>::SharedPtr intAfdev = devManager->createProcessScalar<float>(controlSystemToDevice, "floatScalar");
+		ProcessScalar<double>::SharedPtr intAddev = devManager->createProcessScalar<double>(controlSystemToDevice, "doubleScalar");
     
-    ProcessArray<int32_t>::SharedPtr intC1dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intArray15", 15);
-    ProcessArray<int32_t>::SharedPtr intC2dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intArray10", 10);
-    ProcessArray<int32_t>::SharedPtr intC3dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "intArray5", 5);
-    
+		
+		ProcessArray<int8_t>::SharedPtr intB15A8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Array_s15", 15);
+		ProcessArray<uint8_t>::SharedPtr intB10Au8dev = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Array_s10", 10);
+		ProcessArray<int16_t>::SharedPtr intB15A16dev = devManager->createProcessArray<int16_t>(controlSystemToDevice, "int16Array_s15", 15);
+		ProcessArray<uint16_t>::SharedPtr intB10Au16dev = devManager->createProcessArray<uint16_t>(controlSystemToDevice, "uint16Array_s10", 10);
+		ProcessArray<int32_t>::SharedPtr intB15A32dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "int32Array_s15", 15);
+		ProcessArray<uint32_t>::SharedPtr intB10Au32dev = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "int32Array_s10", 10);
+		ProcessArray<double>::SharedPtr intB15Afdev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleArray_s15", 15);
+		ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s10", 10);
+		
+		
+		// data generation cycle time in ms
+		ProcessScalar<int32_t>::SharedPtr dtDev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "dt");
+		// time since server start in ms
+		ProcessScalar<int32_t>::SharedPtr tDev = devManager->createProcessScalar<int32_t>(deviceToControlSystem, "t");
+		
+		ProcessScalar<int32_t>::SharedPtr periodDev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "period");
+		ProcessScalar<double>::SharedPtr amplitudeDev = devManager->createProcessScalar<double>(controlSystemToDevice, "amplitude");
+		
+		ProcessScalar<double>::SharedPtr double_sineDev = devManager->createProcessScalar<double>(deviceToControlSystem, "double_sine");
+		ProcessScalar<int32_t>::SharedPtr int_sineDev = devManager->createProcessScalar<int32_t>(deviceToControlSystem, "int_sine");
+		//ProcessScalar<bool>::SharedPtr bool_sineDev = devManager->createProcessScalar<bool>(deviceToControlSystem, "bool_sine");
+		
+		// FIXME: strings currently not supported
+		
+		
+		// start values
+		int32_t microseconds = 1000000;
+		int32_t period = 3.141;
+		double amplitude = 10;
+		
+		// Set values
+		csManager->getProcessScalar<int32_t>("dt")->set(microseconds);
+		csManager->getProcessScalar<int32_t>("period")->set(period); 		
+		csManager->getProcessScalar<double>("amplitude")->set(amplitude); 		
 
-        
-    ProcessScalar<int>::SharedPtr targetVoltage = csManager->getProcessScalar<int>("TARGET_VOLTAGE");
-    ProcessScalar<int>::SharedPtr monitorVoltage = csManager->getProcessScalar<int>("MONITOR_VOLTAGE");
-        
-    *targetVoltage = 42;
-    targetVoltage->send();
-
-    csManager->getProcessArray<int32_t>("intArray15")->get().at(0) = 21;
-    csManager->getProcessArray<int32_t>("intArray10")->get().at(1) = 22;
-    csManager->getProcessArray<int32_t>("intArray5")->get().at(2) = 23;
-	
-    int x[5] = {1, 2, 3, 4, 5};
-    std::vector<int> v(x, x + sizeof x / sizeof x[0]);
-    csManager->getProcessArray<int32_t>("intArray5")->set(v);    
-	
-	    
+			    
     std::cout << "Dummy Daten geschrieben..." << std::endl;	
-	
+		
 	// Only for ValueGenerator
-    ipc_manager *mgr;
-    csaOPCUA = new ControlSystemAdapterOPCUA(16664, csManager, "../uamapping.xml");
+	ipc_manager *mgr;
+	csaOPCUA = new ControlSystemAdapterOPCUA(16664, csManager, "../uamapping.xml");
 	mgr = csaOPCUA->getIPCManager();
-	runTimeValueGenerator *valGen = new runTimeValueGenerator(csManager);
+	runtimeValueGenerator *valGen = new runtimeValueGenerator(csManager);
 	mgr->addObject(valGen);
 	mgr->doStart();	
 
-    while(csaOPCUA->isRunning()) {
-
-		sleep(100);
+	// Time meassureing
+	clock_t start, end;
+	start = clock();
+	end = clock();
+	csManager->getProcessScalar<int32_t>("t")->set(start);
+	
+	std::cout << "Server läuft..." << std::endl;	
+	while(csaOPCUA->isRunning()) {
+		// Set current clock timer
+		csManager->getProcessScalar<int32_t>("t")->set((end - start)/(CLOCKS_PER_SEC/1000));
+		
+		usleep(csManager->getProcessScalar<int32_t>("dt")->get());
+		end = clock();
 	}
     
     return 0;

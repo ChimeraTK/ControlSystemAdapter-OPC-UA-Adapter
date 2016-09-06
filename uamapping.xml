@@ -2,49 +2,49 @@
 <uamapping>
 	<application name="LLRF">
 		<map sourceVarName="/app/dataCore/intA" ignoreSourceVariablePath="True">
-			<name>intA</name>
+			<name>int8Array_s15</name>
 			<folderPath>/gain/stuff/north/left</folderPath>
 			<unrollPaths>True</unrollPaths>
 		</map>
 		<map sourceVarName="/app/dataCore/intA" ignoreSourceVariablePath="True">
-			<name>intB</name>
+			<name>uint8Array_s10</name>
 			<folderPath>/gain/stuff/north</folderPath>
 			<unrollPaths>True</unrollPaths>
 		</map>
 		<map sourceVarName="/app/dataCore/intB" ignoreSourceVariablePath="True">
-			<name>intArray5</name>
+			<name>int8Scalar</name>
 			<folderPath>/gain/stuff/north/left</folderPath>
 			<unrollPaths>True</unrollPaths>
 		</map>	
 		<map sourceVarName="/app/dataCore" ignoreSourceVariablePath="True">
-			<name>intArray10</name>
+			<name>int32Scalar</name>
 			<folderPath>/gain/stuff/north/left</folderPath>
 			<unrollPaths>False</unrollPaths>
 		</map>	
 		<map sourceVarName="/app/dataCore" ignoreSourceVariablePath="False">
-			<name>intArray10</name>
+			<name>floatScalar</name>
 			<folderPath>/gain/stuff/north/left</folderPath>
 			<unrollPaths>False</unrollPaths>
 		</map>		
 	</application>
 	<application name="LLRF-or-EPICS">
 		<map sourceVarName="Gain">
-			<name>intD</name>
+			<name>uint16Array_s10</name>
 			<folderPath/>
 			<unrollPaths/>
 		</map>
 		<map sourceVarName="/app/dataCore/intB" ignoreSourceVariablePath="False">
-			<name>intF</name>
+			<name>int8Scalar</name>
 			<folderPath>/gain/stuff/north/left</folderPath>
 			<unrollPaths>True</unrollPaths>
 		</map>	
 		<map sourceVarName="/app/dataCore/intB" ignoreSourceVariablePath="False">
-			<name>intC</name>
+			<name>floatScalar</name>
 			<folderPath>/gain/stuff/north/left</folderPath>
 			<unrollPaths>True</unrollPaths>
 		</map>		
 		<map sourceVarName="/test/dataCore/intB" ignoreSourceVariablePath="False">
-			<name>intE</name>
+			<name>doubleArray_s15</name>
 			<folderPath>/gain/stuff/north/left</folderPath>
 			<unrollPaths>False</unrollPaths>
 		</map>	
@@ -54,7 +54,7 @@
 			<unrollPaths>True</unrollPaths>
 		</map>	
 		<map sourceVarName="/app/dataCore/intA" ignoreSourceVariablePath="False">
-			<name>intH</name>
+			<name>int32Scalar</name>
 			<folderPath>/gain/stuff/north/left</folderPath>
 			<unrollPaths>True</unrollPaths>
 		</map>	

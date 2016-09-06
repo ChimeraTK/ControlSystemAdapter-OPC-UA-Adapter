@@ -51,6 +51,10 @@ void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
     this->server_config.logger = UA_Log_Stdout;
     this->server_config.networkLayers = &this->server_nl;
     this->server_config.networkLayersSize = 1;
+		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)"HZDR OPCUA Server for LLFR");
+		this->server_config.applicationDescription.gatewayServerUri = UA_STRING_ALLOC("GatewayURI");
+		this->server_config.applicationDescription.applicationUri = UA_STRING_ALLOC("localhost");
+		this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
   
     this->mappedServer = UA_Server_new(this->server_config);
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);

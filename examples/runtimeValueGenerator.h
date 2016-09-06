@@ -34,16 +34,16 @@ using namespace ChimeraTK;
 
 typedef boost::shared_ptr<ControlSystemPVManager> shCSysPVManager;
 
-class runTimeValueGenerator : public ipc_managed_object {
+class runtimeValueGenerator : public ipc_managed_object {
 private:   
 	shCSysPVManager csManager;
 	
-    void runTimeValueGenerator_constructserver(shCSysPVManager csManager);
+    void runtimeValueGenerator_constructserver(shCSysPVManager csManager);
     
 public:
-    runTimeValueGenerator(shCSysPVManager csManager);
-	runTimeValueGenerator();
-    ~runTimeValueGenerator();
+		runtimeValueGenerator(shCSysPVManager csManager);
+		runtimeValueGenerator();
+    ~runtimeValueGenerator();
 	void workerThread();
 	static void generateValues(shCSysPVManager csManager);
     
