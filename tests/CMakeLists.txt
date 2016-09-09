@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 2.8.0)
                     
 #link_directories(${CMAKE_BINARY_DIR})
 
-	aux_source_directory(${CMAKE_SOURCE_DIR}/tests/ testSources)
+include_directories(${CMAKE_SOURCE_DIR}/include/tests/include)
+
+	aux_source_directory(${CMAKE_SOURCE_DIR}/tests/src/ testSources)
 	foreach( testSourceFile ${testSources})
 		get_filename_component(executableName ${testSourceFile} NAME_WE)
 		add_executable(${executableName} ${testSourceFile} ${testAuxSources})

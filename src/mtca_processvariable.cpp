@@ -79,7 +79,7 @@ void mtca_processvariable::setName(std::string name) {
 UA_RDPROXY_STRING(mtca_processvariable, getType)
 std::string mtca_processvariable::getType() {
 		// only for test purpose
-		if(this->namePV == "int8Scalar") {
+		if(this->namePV == "int8Scalar" && (this->type4TestPurposes.compare("") > 0)) {
 				return this->type4TestPurposes;
 		}
 		

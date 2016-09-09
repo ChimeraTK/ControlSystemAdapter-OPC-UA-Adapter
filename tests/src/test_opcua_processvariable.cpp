@@ -289,7 +289,7 @@ void ProcessVariableTest::testClientSide(){
 	
 	// add set
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-		mtca_processvariable *test = new mtca_processvariable(serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(), pvSet.csManager); 
+		mtca_processvariable *test = new mtca_processvariable(serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(), "SomeName", pvSet.csManager); 
 	}
 	
 	// check server
@@ -739,17 +739,12 @@ void ProcessVariableTest::testClientSide(){
 	UA_BrowseResponse_deleteMembers(&bResp);
 };
 
-void ProcessVariableTest::testExampleSet(){ 
-	std::cout << "Enter ProcessVariableTest with ExampleSet" << std::endl;
-
-};
 
 class ProcessVariableTestSuite: public test_suite {
 	public:
 		ProcessVariableTestSuite() : test_suite("mtca_processvariable Test Suite") {
 			add(BOOST_TEST_CASE(&ProcessVariableTest::testEmptySet));
 			add(BOOST_TEST_CASE(&ProcessVariableTest::testClientSide));
-			add(BOOST_TEST_CASE(&ProcessVariableTest::testExampleSet));
     }
 };
 

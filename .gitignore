@@ -8,7 +8,7 @@ tools/pyUANamespace/
 .kdev*
 .*
 ControlSystemAdapter-OPC-UA-Adapter.kdev4
-gcov.sh
+starteTestAndGcov.sh
 cov_htmp/
 app.info
 

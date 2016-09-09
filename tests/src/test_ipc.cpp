@@ -12,8 +12,6 @@
 
 using namespace boost::unit_test_framework;
 
-ipc_manager  *mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
-
 struct TestFixtureEmptySet {
   
 
