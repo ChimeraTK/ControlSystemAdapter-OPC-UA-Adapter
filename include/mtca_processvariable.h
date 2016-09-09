@@ -35,15 +35,19 @@
 class mtca_processvariable :  ua_mapped_class
 {
 private:
-    std::string name;
+  std::string namePV;
+	std::string nameNew;
 	UA_NodeId ownNodeId;
+	std::string type4TestPurposes;
 	
     boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager;
 
     UA_StatusCode mapSelfToNamespace();
 	
 public:
-    mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, std::string name, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
+    mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, std::string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
+		mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, std::string namePV, std::string nameNew, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
+   
     ~mtca_processvariable();
 
     void setName(std::string name);

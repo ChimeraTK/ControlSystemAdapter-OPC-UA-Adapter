@@ -37,12 +37,23 @@ extern "C" {
 #include <iostream>
 
 
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, std::string name, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
+mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, std::string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
 	
 	// FIXME Check if name member of a csManager Parameter
-	this->name = name;
+	this->namePV = namePV;
+	this->nameNew = namePV;
 	this->csManager = csManager;
-  
+	
+	this->mapSelfToNamespace();
+}
+
+mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, std::string namePV, std::string nameNew, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
+	
+	// FIXME Check if name member of a csManager Parameter
+	this->namePV = namePV;
+	this->nameNew = nameNew;
+	this->csManager = csManager;
+	
 	this->mapSelfToNamespace();
 }
 
@@ -54,7 +65,7 @@ mtca_processvariable::~mtca_processvariable()
 // Name
 UA_RDPROXY_STRING(mtca_processvariable, getName)
 std::string mtca_processvariable::getName() {
-  return this->name;
+  return this->namePV;
 }
 
 /*
@@ -67,8 +78,13 @@ void mtca_processvariable::setName(std::string name) {
 // Type
 UA_RDPROXY_STRING(mtca_processvariable, getType)
 std::string mtca_processvariable::getType() {
+		// only for test purpose
+		if(this->namePV == "int8Scalar") {
+				return this->type4TestPurposes;
+		}
+		
     // Note: typeid().name() may return the name; may as well return the symbol's name from the binary though...
-    std::type_info const & valueType = this->csManager->getProcessVariable(this->name)->getValueType();
+    std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
     if (valueType == typeid(int8_t))        return "int8_t";
     else if (valueType == typeid(uint8_t))  return "uint8_t";
     else if (valueType == typeid(int16_t))  return "int16_t";
@@ -80,17 +96,19 @@ std::string mtca_processvariable::getType() {
     else                                    return "Unsupported type";
 }
 
-/*
+
 UA_WRPROXY_STRING(mtca_processvariable, setType)
 void mtca_processvariable::setType(std::string type) {
-    return; // Change of Type is not possible
+	// only for test purpose
+	this->type4TestPurposes = type;
+  //return; // Change of Type is not possible
 }
-*/
+
 
 // TimeStamp
 //UA_RDPROXY_UINT32(mtca_processvariable, getTimeStamp)
 ChimeraTK::TimeStamp mtca_processvariable::getTimeStamp() {
-    return this->csManager->getProcessVariable(this->name)->getTimeStamp();
+    return this->csManager->getProcessVariable(this->namePV)->getTimeStamp();
 }
 
 /*
@@ -109,12 +127,12 @@ void mtca_processvariable::setTimeStampSeconds(uint32_t seconds) {
 
 UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampSeconds)
 uint32_t mtca_processvariable::getTimeStampSeconds() {
-	return this->csManager->getProcessVariable(this->name)->getTimeStamp().seconds;
+	return this->csManager->getProcessVariable(this->namePV)->getTimeStamp().seconds;
 }
 
 UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampNanoSeconds)
 uint32_t mtca_processvariable::getTimeStampNanoSeconds() {
-	return this->csManager->getProcessVariable(this->name)->getTimeStamp().nanoSeconds;
+	return this->csManager->getProcessVariable(this->namePV)->getTimeStamp().nanoSeconds;
 }
 
 /*
@@ -126,7 +144,7 @@ void mtca_processvariable::setTimeStampNanoSeconds(uint32_t indexNanoSeconds) {
 
 UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampIndex0)
 uint32_t mtca_processvariable::getTimeStampIndex0() {
-	return this->csManager->getProcessVariable(this->name)->getTimeStamp().index0;
+	return this->csManager->getProcessVariable(this->namePV)->getTimeStamp().index0;
 }
 
 /*
@@ -138,7 +156,7 @@ void mtca_processvariable::setTimeStampIndex0(uint32_t index0) {
 
 UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampIndex1)
 uint32_t mtca_processvariable::getTimeStampIndex1() {
-	return this->csManager->getProcessVariable(this->name)->getTimeStamp().index1;
+	return this->csManager->getProcessVariable(this->namePV)->getTimeStamp().index1;
 }
 
 /*
@@ -151,38 +169,38 @@ void mtca_processvariable::setTimeStampIndex1(uint32_t index1) {
 /* Multivariant Read Functions for Value (without template-Foo) */
 #define CREATE_READ_FUNCTION(_p_type) \
 _p_type    mtca_processvariable::getValue_##_p_type() { \
-    if (this->csManager->getProcessVariable(this->name)->getValueType() != typeid(_p_type)) return 0; \
-    if (this->csManager->getProcessVariable(this->name)->isArray()) return 0; \
-    _p_type v = this->csManager->getProcessScalar<_p_type>(this->name)->get(); \
+    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return 0; \
+    if (this->csManager->getProcessVariable(this->namePV)->isArray()) return 0; \
+    _p_type v = this->csManager->getProcessScalar<_p_type>(this->namePV)->get(); \
     return v; \
 } \
 
 #define CREATE_READ_FUNCTION_ARRAY(_p_type) \
 std::vector<_p_type>    mtca_processvariable::getValue_Array_##_p_type() { \
     std::vector<_p_type> v; \
-    if (this->csManager->getProcessVariable(this->name)->getValueType() != typeid(_p_type)) return v; \
-    if (!this->csManager->getProcessVariable(this->name)->isArray()) return v; \
-    v = this->csManager->getProcessArray<_p_type>(this->name)->get(); \
+    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return v; \
+    if (!this->csManager->getProcessVariable(this->namePV)->isArray()) return v; \
+    v = this->csManager->getProcessArray<_p_type>(this->namePV)->get(); \
     return v; \
 } \
 
 #define CREATE_WRITE_FUNCTION(_p_type) \
 void mtca_processvariable::setValue_##_p_type(_p_type value) { \
-    if (this->csManager->getProcessVariable(this->name)->getValueType() != typeid(_p_type)) return; \
-    if (this->csManager->getProcessVariable(this->name)->isArray()) return;   \
-    if (this->csManager->getProcessVariable(this->name)->isSender()) { \
-        this->csManager->getProcessScalar<_p_type>(this->name)->set(value);   \
-        this->csManager->getProcessScalar<_p_type>(this->name)->send();       \
+    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
+    if (this->csManager->getProcessVariable(this->namePV)->isArray()) return;   \
+    if (this->csManager->getProcessVariable(this->namePV)->isSender()) { \
+        this->csManager->getProcessScalar<_p_type>(this->namePV)->set(value);   \
+        this->csManager->getProcessScalar<_p_type>(this->namePV)->send();       \
     }\
     return; \
 }
 
 #define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
 void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
-    if (this->csManager->getProcessVariable(this->name)->getValueType() != typeid(_p_type)) return; \
-    if (!this->csManager->getProcessVariable(this->name)->isArray())    return; \
-    if (this->csManager->getProcessVariable(this->name)->isSender()) { \
-        this->csManager->getProcessArray<_p_type>(this->name)->set(value); \
+    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
+    if (!this->csManager->getProcessVariable(this->namePV)->isArray())    return; \
+    if (this->csManager->getProcessVariable(this->namePV)->isSender()) { \
+        this->csManager->getProcessArray<_p_type>(this->namePV)->set(value); \
     } \
     return; \
 }
@@ -260,12 +278,12 @@ CREATE_WRITE_FUNCTION_ARRAY(double)
 // Just a macro to easy pushing different types of dataSources
 // ... and make sure we lock down writing to receivers in this stage already
 #define PUSH_RDVALUE_TYPE(_p_typeName) { \
-if(this->csManager->getProcessScalar<_p_typeName>(this->name)->isSender())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
+if(this->csManager->getProcessScalar<_p_typeName>(this->namePV)->isSender())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName) }); }\
 }
     
 #define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) { \
-if(this->csManager->getProcessArray<_p_typeName>(this->name)->isSender()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \
+if(this->csManager->getProcessArray<_p_typeName>(this->namePV)->isSender()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \
     else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName) }); } \
 }
 
@@ -280,10 +298,10 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     UA_ObjectAttributes oAttr; 
 		UA_ObjectAttributes_init(&oAttr);
 		
-    oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", this->name.c_str());
+    oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", this->nameNew.c_str());
     oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", "A process variable");
 		
-		if (this->csManager->getProcessVariable(this->name)->isSender()) {
+		if (this->csManager->getProcessVariable(this->namePV)->isSender()) {
 			oAttr.userWriteMask = UA_ACCESSLEVELMASK_WRITE;
 			oAttr.writeMask = UA_ACCESSLEVELMASK_WRITE;
 		}
@@ -291,7 +309,7 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     UA_INSTATIATIONCALLBACK(icb);  
     UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                            UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAPROCESSVARIABLE), oAttr, &icb, &createdNodeId);
+                            UA_QUALIFIEDNAME_ALLOC(1, this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAPROCESSVARIABLE), oAttr, &icb, &createdNodeId);
     
     /* Use a function map to map any local functioncalls to opcua methods (we do not own any methods) */
     UA_FunctionCall_Map mapThis;
@@ -303,8 +321,8 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
     UA_DataSource_Map mapDs;
     // FIXME: We should not be using std::cout here... Where's our logger?
-    if (! this->csManager->getProcessVariable(this->name)->isArray()) {
-        std::type_info const & valueType = this->csManager->getProcessVariable(this->name)->getValueType();
+    if (! this->csManager->getProcessVariable(this->namePV)->isArray()) {
+        std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
         if (valueType == typeid(int8_t))          PUSH_RDVALUE_TYPE(int8_t)
         else if (valueType == typeid(uint8_t))    PUSH_RDVALUE_TYPE(uint8_t)
         else if (valueType == typeid(int16_t))    PUSH_RDVALUE_TYPE(int16_t)
@@ -316,7 +334,7 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
         else std::cout << "Cannot proxy unknown type " << typeid(valueType).name()  << std::endl;
     }
     else {
-        std::type_info const & valueType = this->csManager->getProcessVariable(this->name)->getValueType();
+        std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
         if (valueType == typeid(int8_t))          PUSH_RDVALUE_ARRAY_TYPE(int8_t)
         else if (valueType == typeid(uint8_t))    PUSH_RDVALUE_ARRAY_TYPE(uint8_t)
         else if (valueType == typeid(int16_t))    PUSH_RDVALUE_ARRAY_TYPE(int16_t)
@@ -336,14 +354,14 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX1), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex1), .write=UA_WRPROXY_NAME(mtca_processvariable, setTimeStampIndex1)});
 */             
 		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType), .write=UA_WRPROXY_NAME(mtca_processvariable, setType)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_SECONDS), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampSeconds)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_NANOSECONDS), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampNanoSeconds)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX0), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex0)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX1), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex1)});
 
 	ua_callProxy_mapDataSources(this->mappedServer, this->ownedNodes, &mapDs, (void *) this);
-	
+
     return UA_STATUSCODE_GOOD;
 }
 
