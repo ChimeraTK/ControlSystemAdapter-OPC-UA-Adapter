@@ -45,17 +45,20 @@ extern "C" {
 using namespace ChimeraTK;
 
 void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
-    
+	
     this->server_config = UA_ServerConfig_standard;
     this->server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, opcuaPort);
     this->server_config.logger = UA_Log_Stdout;
     this->server_config.networkLayers = &this->server_nl;
     this->server_config.networkLayersSize = 1;
-		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)"HZDR OPCUA Server for LLFR");
-		this->server_config.applicationDescription.gatewayServerUri = UA_STRING_ALLOC("GatewayURI");
-		this->server_config.applicationDescription.applicationUri = UA_STRING_ALLOC("localhost");
+		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)"HZDR OPCUA Server");
+		this->server_config.applicationDescription.gatewayServerUri = UA_STRING("GatewayURI");
+		this->server_config.applicationDescription.applicationUri = UA_STRING("opc.tcp://localhost");
 		this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
-  
+		this->server_config.buildInfo.productName = UA_STRING("ControlSystemAdapterOPCUA");
+		this->server_config.buildInfo.productUri = UA_STRING("HZDR OPCUA Server");
+		this->server_config.buildInfo.manufacturerName = UA_STRING("TU Dresden");
+		
     this->mappedServer = UA_Server_new(this->server_config);
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
   
@@ -72,10 +75,11 @@ mtca_uaadapter::mtca_uaadapter(uint16_t opcuaPort, std::string configFile) : ua_
 }
 
 mtca_uaadapter::~mtca_uaadapter() {
-    if (this->isRunning()) {
-        this->doStop();
-    }
-    UA_Server_delete(this->mappedServer);
+	if (this->isRunning()) {
+		this->doStop();
+	}
+	
+	//UA_Server_delete(this->mappedServer);
 	this->fileHandler->~XMLFileHandler();
 }
 
@@ -183,12 +187,13 @@ UA_NodeId mtca_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folde
 	UA_StatusCode retval = UA_STATUSCODE_GOOD;
     UA_NodeId createdNodeId = UA_NODEID_NULL;
   
-    if (UA_NodeId_equal(&this->baseNodeId, &createdNodeId) == UA_TRUE) {
+    if (UA_NodeId_equal(&baseNodeId, &createdNodeId) == UA_TRUE) {
         return createdNodeId; // Something went UA_WRING (initializer should have set this!)
     }
     
     // Create our toplevel instance
     UA_ObjectAttributes oAttr; 
+		UA_ObjectAttributes_init(&oAttr);
     // Classcast to prevent Warnings
     oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)folderName.c_str());
     oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)folderName.c_str());    

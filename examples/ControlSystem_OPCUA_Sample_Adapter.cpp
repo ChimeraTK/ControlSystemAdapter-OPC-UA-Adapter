@@ -93,7 +93,7 @@ int main() {
 		ProcessArray<int16_t>::SharedPtr intB15A16dev = devManager->createProcessArray<int16_t>(controlSystemToDevice, "int16Array_s15", 15);
 		ProcessArray<uint16_t>::SharedPtr intB10Au16dev = devManager->createProcessArray<uint16_t>(controlSystemToDevice, "uint16Array_s10", 10);
 		ProcessArray<int32_t>::SharedPtr intB15A32dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "int32Array_s15", 15);
-		ProcessArray<uint32_t>::SharedPtr intB10Au32dev = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "int32Array_s10", 10);
+		ProcessArray<uint32_t>::SharedPtr intB10Au32dev = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "uint32Array_s10", 10);
 		ProcessArray<double>::SharedPtr intB15Afdev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleArray_s15", 15);
 		ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s10", 10);
 		
@@ -125,7 +125,7 @@ int main() {
 
 			    
     std::cout << "Dummy Daten geschrieben..." << std::endl;	
-		
+	
 	// Only for ValueGenerator
 	ipc_manager *mgr;
 	csaOPCUA = new ControlSystemAdapterOPCUA(16664, csManager, "../uamapping.xml");
@@ -148,6 +148,21 @@ int main() {
 		usleep(csManager->getProcessScalar<int32_t>("dt")->get());
 		end = clock();
 	}
+	/*
+	UA_Boolean running = true;
+	while(true) {
+		 UA_ServerConfig config = UA_ServerConfig_standard;
+    UA_ServerNetworkLayer nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, 16664);
+    config.networkLayers = &nl;
+    config.networkLayersSize = 1;
+    UA_Server *server = UA_Server_new(config);
+
+    UA_StatusCode retval = UA_Server_run(server, &running);
+    UA_Server_delete(server);
+    nl.deleteMembers(&nl);
+    return (int)retval;
+	}
     
+    */
     return 0;
 }

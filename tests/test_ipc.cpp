@@ -31,12 +31,14 @@ void IPCManagerTest::testEmptySet(){
 	
 	ipc_manager *manager = new ipc_manager();
 	
-	mtca_uaadapter *adapterOne = new mtca_uaadapter(16661, "../uamapping.xml");
+	mtca_uaadapter *adapterOne = new mtca_uaadapter(16660, "../../tests/uamapping_test.xml");
 	adapterOne->setIpcId(100);
-	mtca_uaadapter *adapterTwo = new mtca_uaadapter(16662, "../uamapping.xml");	
+	mtca_uaadapter *adapterTwo = new mtca_uaadapter(16661, "../../tests/uamapping_test.xml");	
 	
 	manager->addObject(adapterOne);
 	manager->addObject(adapterTwo);
+	
+	BOOST_CHECK(adapterTwo->getIpcId() != 0);
 	
 	BOOST_CHECK(adapterOne->isRunning() == true);
 	BOOST_CHECK(adapterTwo->isRunning() == true);
@@ -44,11 +46,13 @@ void IPCManagerTest::testEmptySet(){
 	BOOST_CHECK(adapterOne->isManaged() == true);
 	BOOST_CHECK(adapterTwo->isManaged() == true);
 	
-	std::cout << "test" << std::endl;
+	manager->stopAll();
+	BOOST_CHECK(adapterOne->isRunning() == false);
+	BOOST_CHECK(adapterTwo->isRunning() == false);
 	
-	//manager->startAll();
-	//BOOST_CHECK(manager->isRunning() == true);
-	//BOOST_CHECK(manager->isManaged() == true);
+	manager->startAll();
+	BOOST_CHECK(adapterOne->isRunning() == true);
+	BOOST_CHECK(adapterTwo->isRunning() == true);
 	
 	//list<ipc_managed_object*> listOfManaedObjects = manager->getAllObjectsByType();
 	
@@ -57,34 +61,26 @@ void IPCManagerTest::testEmptySet(){
 	 */
 	//ipc_managed_object* adapter = manager->getObjectById(100);
 	//BOOST_CHECK(adapter->getIpcId() == 100);
-	
-	//adapterOne->workerThread();
-	//adapterOne->taskRunningAttached();
-	//adapterOne->doStop();
-	std::cout << "test2" << std::endl;
-	//adapterTwo->terminate();
+
+	BOOST_CHECK(adapterOne->taskRunningAttached() == 1);
+	adapterOne->doStop();
+ 	BOOST_CHECK(adapterOne->terminate() == 0);
+ 	BOOST_CHECK(adapterTwo->terminate() == 0);
 	
 	/*
 	 * currently not supported
 	 */
-	//ipc_manager *mgr = adapterOne->getIpcManager();
+	ipc_manager *mgr = adapterOne->getIpcManager();
 	
-	std::cout << "test4" << std::endl;
-	//manager->deleteObject(100);
-	std::cout << "test5" << std::endl;
-	//manager->doStop();
+	manager->deleteObject(100);
 	
-	//ipc_manager *newManager = new ipc_manager();
-	//adapterOne->assignManager(newManager);
-	std::cout << "test6" << std::endl;
-	//adapterOne->terminate();
-	
-	//ipc_managed_object_type moType = adapterOne->getManagedObjectType();
-	
-	//manager->stopAll();
-	//manager->terminate();
+	ipc_manager *newManager = new ipc_manager();
+	BOOST_CHECK(adapterOne->assignManager(newManager) == true);
+	BOOST_CHECK(adapterOne->assignManager(nullptr) == false);
 		
-	std::cout << "test7" << std::endl;
+	
+	
+	
 	//ipc_managed_object managedObj = new ipc_managed_object();
 	//ipc_task *taskOne = new ipc_task();
 // 	taskOne->execute();
@@ -95,19 +91,15 @@ void IPCManagerTest::testEmptySet(){
 // 	ipc_task *taskTwo = new ipc_task();
 	
 	//testTaskClass *taskOne = new testTaskClass();
-	
-
-	
-	
  //	manager->addTask(taskOne);
 	
 	//taskOne->hasCompleted();
 	//taskOne->getIpcId();
 	//manager->addObject(taskOne);
 // 	manager->addTask(taskTwo);
-// 	
-	//manager.getAllObjectsByType();
-	
+
+
+	manager->~ipc_manager();
 };
 
 void IPCManagerTest::testExampleSet(){ 

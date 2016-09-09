@@ -38,14 +38,13 @@ extern "C" {
 #endif
 }
 
-ipc_manager::ipc_manager()
-{
+ipc_manager::ipc_manager() {
   this->nxtId = 0;
 }
 
-ipc_manager::~ipc_manager()
-{
-  // FIXME: Stop, then terminate managed objects.
+ipc_manager::~ipc_manager() {
+	this->stopAll();
+	this->doStop();
 }
 
 static void call_periodiclyKickWorkerThread(ipc_manager *mgr) {mgr->periodiclyKickWorkerThread();}
@@ -143,8 +142,11 @@ uint32_t ipc_manager::addTask(ipc_task *task) {
 }
 
 void ipc_manager::startAll() {
-  // FIXME: Start all managed tasks
-  return;
+	for (auto j : this->objects) {
+		j->doStart();
+	}
+	this->doStart();
+	return;
 }
 
 void ipc_manager::stopAll() {
@@ -164,8 +166,7 @@ void ipc_manager::stopAll() {
   return;
 }
 
-list<ipc_managed_object*> *ipc_manager::getAllObjectsByType(ipc_managed_object_type typeMask) 
-{
+list<ipc_managed_object*> *ipc_manager::getAllObjectsByType(ipc_managed_object_type typeMask) {
   list<ipc_managed_object*> *objLst = new list<ipc_managed_object*>;
   
   // cppcheck-suppress postfixOperator                REASON: List iterator cannot be prefixed
@@ -179,4 +180,4 @@ list<ipc_managed_object*> *ipc_manager::getAllObjectsByType(ipc_managed_object_t
   return objLst;
 }
 
-ipc_managed_object* ipc_manager::getObjectById(uint32_t id) {return nullptr; }
+//ipc_managed_object* ipc_manager::getObjectById(uint32_t id) {return nullptr; }

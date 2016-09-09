@@ -50,8 +50,8 @@ extern "C" {
 ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(uint16_t opcuaPort, shCSysPVManager csManager, std::string configFile) {
 	this->opcuaPort = opcuaPort;
 	this->csManager = csManager;
-    this->ControlSystemAdapterOPCUA_InitServer(opcuaPort, configFile);
-    this->ControlSystemAdapterOPCUA_InitVarMapping(csManager);
+	this->ControlSystemAdapterOPCUA_InitServer(opcuaPort, configFile);
+	this->ControlSystemAdapterOPCUA_InitVarMapping(csManager);
 }
 
 // Init the OPCUA server

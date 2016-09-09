@@ -107,9 +107,10 @@ uint32_t ipc_managed_object::doStop()
 {
   cout << "ipc_managed_object being stopped" << endl;
   this->thread_run = false;
-  if (this->threadTask->joinable()) {
-    this->threadTask->join();
-  }
+// Allways nullptr... so maybe we need the current repo from gitlab "UAUtilitiyclasses"
+//   if (this->threadTask->joinable()) {
+//     this->threadTask->join();
+//   }
   cout << "ipc_managed_object was stopped" << endl;
   return 0;
 }
@@ -127,8 +128,7 @@ uint32_t ipc_managed_object::doStart()
   return 0;
 }
 
-int32_t ipc_managed_object::terminate() 
-{
+int32_t ipc_managed_object::terminate() {
   return 0;
 }
 
