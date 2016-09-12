@@ -43,6 +43,7 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/TimeStamp.h"
 
 using namespace ChimeraTK;
+using namespace std;
 
 void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
 	
@@ -69,7 +70,7 @@ mtca_uaadapter::mtca_uaadapter(uint16_t opcuaPort, std::string configFile) : ua_
     this->mtca_uaadapter_constructserver(opcuaPort);
 	
 	// XML file handling for variable mapping, just an example...
-	this->fileHandler = new XMLFileHandler(configFile);
+	this->fileHandler = new xml_file_handler(configFile);
 	
     this->mapSelfToNamespace();
 }
@@ -80,7 +81,7 @@ mtca_uaadapter::~mtca_uaadapter() {
 	}
 	
 	//UA_Server_delete(this->mappedServer);
-	this->fileHandler->~XMLFileHandler();
+	this->fileHandler->~xml_file_handler();
 }
 
 void mtca_uaadapter::workerThread() {
@@ -106,24 +107,67 @@ void mtca_uaadapter::workerThread() {
 
 void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 	
-    this->variables.push_back(new mtca_processvariable(this->mappedServer, this->variablesListId, varName, mgr));
+	this->variables.push_back(new mtca_processvariable(this->mappedServer, this->variablesListId, varName, mgr));
 	
-	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//name");
+	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
 	xmlNodeSetPtr nodeset;
-	xmlChar *keyword;
-	std::string applicName = "";
+	string srcVarName = "";
+	string applicName = "";
 	
 	if(result) {
 		nodeset = result->nodesetval;
 		for (int32_t i=0; i < nodeset->nodeNr; i++) {
-			keyword = xmlNodeListGetString(this->fileHandler->getDoc(), nodeset->nodeTab[i]->xmlChildrenNode, 1);
-			if(varName.compare((std::string)((char*)keyword)) == 0) {
+			srcVarName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "sourceVariableName");
+			//keyword = xmlNodeListGetString(this->fileHandler->getDoc(), nodeset->nodeTab[i]->xmlChildrenNode, 1);
+			if(varName.compare(srcVarName) == 0) {
 				// get name attribute from <application>-tag
-				applicName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i]->parent->parent, "name");
-				//std::cout << "Variabe: '" << keyword << "' wird in Application Name: '" << applicName << "' eingetragen." << std::endl;
-				// Application Name have to be unique!!!
-				UA_NodeId merk = this->existFolderPath(this->ownNodeId, applicName);
+				applicName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i]->parent, "name");
+				// Check if "rename" is not empty
+				string renameVar = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "rename");
+				if(renameVar.compare("") == 0) {
+					renameVar = srcVarName;
+				}
 				
+				std::cout << "Variabe: '" << srcVarName << "' wird unter '" << renameVar << "' in Application Name: '" << applicName << "' eingetragen." << std::endl;
+				// Application Name have to be unique!!!
+				UA_NodeId appliFolderNodeId = this->existFolder(this->ownNodeId, applicName);
+				folderInfo newFolder;
+				if(UA_NodeId_isNull(&appliFolderNodeId)) {
+					newFolder.folderName = applicName;
+					newFolder.folderNodeId = this->createFolder(this->ownNodeId, applicName);
+					this->folderVector.push_back(newFolder);
+					appliFolderNodeId = newFolder.folderNodeId;
+				}
+				
+				
+				string xpath = "//map[@sourceVariableName='" + srcVarName + "']/unrollPath"; 
+				xmlXPathObjectPtr resultUnrollPath = this->fileHandler->getNodeSet(xpath);
+				vector<string> folderPathVector;
+				if(resultUnrollPath) {
+					xmlNodeSetPtr nsetUnrollPath = resultUnrollPath->nodesetval;
+					
+					string seperator = "";
+					for (int32_t m=0; m < nsetUnrollPath->nodeNr; m++) {
+						string shouldUnrollPath = this->fileHandler->getContentFromNode(nsetUnrollPath->nodeTab[m]);
+						cout << shouldUnrollPath << endl;
+						if(shouldUnrollPath.compare("True") == 0) {
+							seperator = seperator + this->fileHandler->getAttributeValueFromNode(nsetUnrollPath->nodeTab[m], "pathSep");
+						}	
+					}
+					
+					vector<string> newPathVector = this->fileHandler->praseVariablePath(srcVarName, seperator);
+					folderPathVector.insert(folderPathVector.end(), newPathVector.begin(), newPathVector.end());
+						
+				}
+				
+				if(folderPathVector.size() > 1) {
+					UA_NodeId newFolderNodeId = this->createFolderPath(appliFolderNodeId, folderPathVector);
+					new mtca_processvariable(this->mappedServer, newFolderNodeId, srcVarName, renameVar, mgr);
+				}
+				else {
+					new mtca_processvariable(this->mappedServer, appliFolderNodeId, srcVarName, renameVar, mgr);
+				}
+				/*
 				std::string ignoreSourceVarPath = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i]->parent, "ignoreSourceVariablePath");
 				std::string srcVarName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i]->parent, "sourceVarName");
 				// if application folder did not exist -> create one
@@ -160,14 +204,13 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
   					}
  					else {
   						new mtca_processvariable(this->mappedServer, merk, varName, mgr);
-  					}  					
+  					}  
+  					
+  			*/
  				}
-				xmlFree(keyword);
 			}
 		}
-		xmlXPathFreeObject (result);
-	}
-	
+	xmlXPathFreeObject (result);	
 }
 
 void mtca_uaadapter::addConstant(std::string varName, shCSysPVManager mgr) {
@@ -238,43 +281,47 @@ UA_NodeId mtca_uaadapter::getOwnNodeId() {
 	return this->ownNodeId;
 }
 
-UA_NodeId mtca_uaadapter::existFolderPath(UA_NodeId basenodeid, std::string folderPath) {
-	std::vector<std::string> prasedName = this->fileHandler->praseVariablePath(folderPath);
-	UA_NodeId lastNodeId = UA_NODEID_NULL;
-	for(int32_t i=0; i < this->folderVector.size(); i++) {
-		for(std::string t : prasedName) {
-// 			printf("%-16d \n", this->folderVector.at(i).prevFolderNodeId.identifier.numeric);
-// 			printf("%-16d \n", basenodeid.identifier.numeric);
-			if((this->folderVector.at(i).folderName.compare(t) == 0) && (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &basenodeid))) {
-				basenodeid = this->folderVector.at(i).folderNodeId;
-				//return this->folderVector.at(i).folderNodeId;		
-				lastNodeId = basenodeid;
-			}
+UA_NodeId mtca_uaadapter::existFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath) {
+	UA_NodeId lastNodeId = basenodeid;
+	for(std::string t : folderPath) {
+		lastNodeId = this->existFolder(lastNodeId, t);
+		if(UA_NodeId_isNull(&lastNodeId)) {
+			return UA_NODEID_NULL;
 		}
 	}
 	return lastNodeId;
 }
 
+UA_NodeId mtca_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
+	UA_NodeId lastNodeId = UA_NODEID_NULL;
+	for(int32_t i=0; i < this->folderVector.size(); i++) {
+// 			printf("%-16d \n", this->folderVector.at(i).prevFolderNodeId.identifier.numeric);
+// 			printf("%-16d \n", basenodeid.identifier.numeric);
+			if((this->folderVector.at(i).folderName.compare(folder) == 0) && (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &basenodeid))) {
+				return this->folderVector.at(i).folderNodeId;			
+		}
+	}
+	return UA_NODEID_NULL;
+}
+
 /*
  * 
  */
-UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::string folderPath) {
-	
-	std::vector<std::string>  prasedName = this->fileHandler->praseVariablePath(folderPath);
-	
+UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath) {
+		
 	// Check if path exist
 	UA_NodeId toCheckNodeId = existFolderPath(basenodeid, folderPath);
 	int32_t starter4Folder = 0;
 	UA_NodeId parrentFolderNodeId = UA_NODEID_NULL;
  	if(!UA_NodeId_isNull(&toCheckNodeId)) {
- 		basenodeid = toCheckNodeId;
+		basenodeid = toCheckNodeId;
 		for(const auto& oneFolderInfo : this->folderVector) {
 			if(UA_NodeId_equal(&oneFolderInfo.folderNodeId, &basenodeid)) {
 				// remeber on witch position the folder still exist
-				for(int32_t m=0; m < prasedName.size(); m++) {
-					if(prasedName.at(m).compare(oneFolderInfo.folderName) == 0) {
+				for(int32_t m=0; m < folderPath.size(); m++) {
+					if(folderPath.at(m).compare(oneFolderInfo.folderName) == 0) {
 						// start with the next folder, because the current folder on position m still exist
-						if((m+1) < prasedName.size()) {
+						if((m+1) < folderPath.size()) {
 							starter4Folder = m+1;
 						}
 						else {
@@ -285,16 +332,16 @@ UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::string fol
 				}
 			}
 		}
- 	}
+	}
 
 	UA_NodeId prevNodeId = basenodeid;
 	UA_NodeId nextNodeId = parrentFolderNodeId;
 	folderInfo newFolder;
 	// use the remembered position to start the loop
-	for(int32_t m=starter4Folder; m < prasedName.size(); m++) {
-		newFolder.folderName = prasedName.at(m);
+	for(int32_t m=starter4Folder; m < folderPath.size(); m++) {
+		newFolder.folderName = folderPath.at(m);
 		
-		newFolder.folderNodeId = this->createUAFolder(prevNodeId, prasedName.at(m));	
+		newFolder.folderNodeId = this->createUAFolder(prevNodeId, folderPath.at(m));	
 		newFolder.prevFolderNodeId = prevNodeId;
 		this->folderVector.push_back(newFolder);
  		prevNodeId = newFolder.folderNodeId;
@@ -302,4 +349,21 @@ UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::string fol
 	}
 	// return last created folder UA_NodeId
 	return newFolder.folderNodeId;
+}
+
+UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderPath) {
+		
+	// Check if path exist
+	UA_NodeId toCheckNodeId = existFolder(basenodeid, folderPath);
+	folderInfo newFolder;
+ 	if(UA_NodeId_isNull(&toCheckNodeId)) {
+		newFolder.folderName = folderPath;
+		newFolder.folderNodeId = this->createUAFolder(basenodeid, folderPath);	
+		newFolder.prevFolderNodeId = basenodeid;
+		this->folderVector.push_back(newFolder);
+		return newFolder.folderNodeId;
+	}
+
+	// return last created folder UA_NodeId
+	return UA_NODEID_NULL;
 }

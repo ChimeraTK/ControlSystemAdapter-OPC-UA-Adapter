@@ -1,4 +1,5 @@
 #include <mtca_uaadapter.h>
+#include <xml_file_handler.h>
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -94,6 +95,7 @@ void UAAdapterTest::testExampleSet(){
 	TestFixtureExampleSet tfExampleSet;
 	 // Create the managers
 	mtca_uaadapter *adapter = new mtca_uaadapter(tfExampleSet.opcuaPort, "../../tests/uamapping_test.xml");
+	xml_file_handler *xmlHandler = new xml_file_handler("../../tests/uamapping_test.xml");
 	
 	// is Server running?
 	adapter->doStart();
@@ -110,34 +112,34 @@ void UAAdapterTest::testExampleSet(){
 	BOOST_CHECK(!UA_NodeId_isNull(&ownNodeId));
 	
 	// Check folder functions
-	string path = "/test/test/";
+	vector<string> pathVector = xmlHandler->praseVariablePath("/test/test/");
 	// Check if path exist
-	UA_NodeId folderNodeId = adapter->existFolderPath(ownNodeId, path);
+	UA_NodeId folderNodeId = adapter->existFolderPath(ownNodeId, pathVector);
 	BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
 	
 	// create path
-	folderNodeId = adapter->createFolderPath(ownNodeId, path);
+	folderNodeId = adapter->createFolderPath(ownNodeId, pathVector);
 	BOOST_CHECK(!UA_NodeId_isNull(&folderNodeId));
 	// cheack if path exist now
-	folderNodeId = adapter->existFolderPath(ownNodeId, path);
+	folderNodeId = adapter->existFolderPath(ownNodeId, pathVector);
 	BOOST_CHECK(!UA_NodeId_isNull(&folderNodeId));
 	
 	// Check if path partly exist and create it 
-	path = "/test/test1/";
-	folderNodeId = adapter->createFolderPath(UA_NODEID_NULL, path);
+	pathVector = xmlHandler->praseVariablePath("/test/test1/");
+	folderNodeId = adapter->createFolderPath(UA_NODEID_NULL, pathVector);
 	BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
 	
-	folderNodeId = adapter->createFolderPath(ownNodeId, path);
+	folderNodeId = adapter->createFolderPath(ownNodeId, pathVector);
 	BOOST_CHECK(!UA_NodeId_isNull(&folderNodeId));
 	
-	folderNodeId = adapter->existFolderPath(ownNodeId, path);
+	folderNodeId = adapter->existFolderPath(ownNodeId, pathVector);
 	BOOST_CHECK(!UA_NodeId_isNull(&folderNodeId));
 	
 	// Double creation of folder, should be the same folder nodeid
-	UA_NodeId existingFolderNodeId = adapter->createFolderPath(ownNodeId, path);
+	UA_NodeId existingFolderNodeId = adapter->createFolderPath(ownNodeId, pathVector);
 	BOOST_CHECK(UA_NodeId_equal(&existingFolderNodeId, &folderNodeId));
 		
-	folderNodeId = adapter->existFolderPath(UA_NODEID_NULL, path);
+	folderNodeId = adapter->existFolderPath(UA_NODEID_NULL, pathVector);
 	BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
 	
 	

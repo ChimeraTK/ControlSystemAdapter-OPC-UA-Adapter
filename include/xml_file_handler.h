@@ -36,23 +36,23 @@
 #include <libxml2/libxml/xpathInternals.h>
 #include <libxml2/libxml/tree.h>
 
-class XMLFileHandler {
+class xml_file_handler {
 	
 public:
 	
 	
-	XMLFileHandler(std::string filePath);
+	xml_file_handler(std::string filePath);
 	
 	xmlDocPtr createDoc(std::string filePath);
 	xmlXPathObjectPtr getNodeSet(std::string xPathString);
 	
 	xmlDocPtr getDoc();
 	
-	std::vector<std::string> praseVariablePath(std::string variablePath);
+	std::vector<std::string> praseVariablePath(std::string variablePath, std::string seperator = "/");
 	std::string getAttributeValueFromNode(xmlNode* node, std::string attributeName);
 	std::string getContentFromNode(xmlNode* node);
 
-	~XMLFileHandler();
+	~xml_file_handler();
 	
 private:
 	FILE * stderr;

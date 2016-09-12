@@ -64,7 +64,7 @@ private:
 	std::list<mtca_processvariable *> variables;
 	std::list<mtca_processvariable *> constants;
 	
-	XMLFileHandler *fileHandler;
+	xml_file_handler *fileHandler;
 	
 	void mtca_uaadapter_constructserver(uint16_t opcuaPort);
 	UA_StatusCode mapSelfToNamespace();
@@ -74,8 +74,10 @@ public:
 	mtca_uaadapter(uint16_t opcuaPort, std::string configPath);
 	~mtca_uaadapter();
 	
-	UA_NodeId createFolderPath(UA_NodeId basenodeid, std::string folderPath);
-	UA_NodeId existFolderPath(UA_NodeId basenodeid, std::string folderPath);
+	UA_NodeId createFolderPath(UA_NodeId basenodeid, std::vector<string> folderPathVector);
+	UA_NodeId createFolder(UA_NodeId basenodeid, std::string folder);
+	UA_NodeId existFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath);
+	UA_NodeId existFolder(UA_NodeId basenodeid, std::string folder);
 	
     
 	void addVariable(std::string name, shCSysPVManager mgr);

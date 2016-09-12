@@ -35,16 +35,16 @@
 #include <libxml2/libxml/xpathInternals.h>
 #include <libxml2/libxml/tree.h>
 
-XMLFileHandler::XMLFileHandler(std::string filePath) {
+xml_file_handler::xml_file_handler(std::string filePath) {
 	
 	this->doc = this->createDoc(filePath);
 }
 
-xmlDocPtr XMLFileHandler::getDoc() {
+xmlDocPtr xml_file_handler::getDoc() {
 	return this->doc;
 }
 
-xmlXPathObjectPtr XMLFileHandler::getNodeSet(std::string xPathString) {
+xmlXPathObjectPtr xml_file_handler::getNodeSet(std::string xPathString) {
 	xmlChar *xpath = (xmlChar*) xPathString.c_str();
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr result;
@@ -69,7 +69,7 @@ xmlXPathObjectPtr XMLFileHandler::getNodeSet(std::string xPathString) {
 
 }
 
-xmlDocPtr XMLFileHandler::createDoc(std::string filePath) {
+xmlDocPtr xml_file_handler::createDoc(std::string filePath) {
 	xmlDocPtr doc;
 	doc = xmlParseFile(filePath.c_str());
 	
@@ -81,10 +81,11 @@ xmlDocPtr XMLFileHandler::createDoc(std::string filePath) {
 	return doc;
 }
 
-std::vector<std::string> XMLFileHandler::praseVariablePath(std::string variablePath) {
+// seperator can be a string of diffent seperators, like "_/:" and so on 
+std::vector<std::string> xml_file_handler::praseVariablePath(std::string variablePath, std::string seperator) {
 
 	std::vector<std::string> pathList;
-    boost::char_separator<char> sep("/");
+    boost::char_separator<char> sep(seperator.c_str());
     boost::tokenizer<boost::char_separator<char>> tokens(variablePath, sep);
  	for (const auto& t : tokens) {
 		pathList.push_back(t);
@@ -92,7 +93,7 @@ std::vector<std::string> XMLFileHandler::praseVariablePath(std::string variableP
 	return pathList;
 }
 
-std::string XMLFileHandler::getAttributeValueFromNode(xmlNode* node, std::string attributeName) {
+std::string xml_file_handler::getAttributeValueFromNode(xmlNode* node, std::string attributeName) {
 	
 	xmlAttrPtr attr = xmlHasProp(node, (xmlChar*)attributeName.c_str());
 	if(!(attr == NULL)) {
@@ -103,7 +104,7 @@ std::string XMLFileHandler::getAttributeValueFromNode(xmlNode* node, std::string
 	return "";
 }
 
-std::string XMLFileHandler::getContentFromNode(xmlNode* node) {
+std::string xml_file_handler::getContentFromNode(xmlNode* node) {
 	xmlChar* content = xmlNodeGetContent(node->xmlChildrenNode);
 	if(content != NULL) {
 		std::string merker = (std::string)((char*)content);
@@ -113,7 +114,8 @@ std::string XMLFileHandler::getContentFromNode(xmlNode* node) {
 	return "";
 }
 
-XMLFileHandler::~XMLFileHandler() {
+
+xml_file_handler::~xml_file_handler() {
 	xmlFreeDoc(this->doc);
 	xmlCleanupParser();
 }
