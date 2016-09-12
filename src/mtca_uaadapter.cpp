@@ -264,7 +264,6 @@ UA_NodeId mtca_uaadapter::existFolderPath(UA_NodeId basenodeid, std::vector<stri
 			return UA_NODEID_NULL;
 		}
 	}
-	cout << "Letzter bekannter Ordner: " << folderPath.at(folderPath.size()-1) << endl;
 	return lastNodeId;
 }
 
@@ -335,9 +334,7 @@ UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName) 
 		newFolder.folderNodeId = this->createUAFolder(basenodeid, folderName);	
 		newFolder.prevFolderNodeId = basenodeid;
 		this->folderVector.push_back(newFolder);
-		return newFolder.folderNodeId;
 	}
 
-	// return last created folder UA_NodeId
-	return UA_NODEID_NULL;
+	return newFolder.folderNodeId;
 }

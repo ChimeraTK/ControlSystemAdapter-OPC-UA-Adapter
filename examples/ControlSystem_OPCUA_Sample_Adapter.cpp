@@ -139,7 +139,7 @@ int main() {
 	start = clock();
 	end = clock();
 	csManager->getProcessScalar<int32_t>("t")->set(start);
-	
+		
 	std::cout << "Server läuft..." << std::endl;	
 	while(csaOPCUA->isRunning()) {
 		// Set current clock timer
