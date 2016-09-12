@@ -128,7 +128,7 @@ int main() {
 	
 	// Only for ValueGenerator
 	ipc_manager *mgr;
-	csaOPCUA = new ControlSystemAdapterOPCUA(16660, csManager, "../uamapping_new.xml");
+	csaOPCUA = new ControlSystemAdapterOPCUA(16660, csManager, "../uamapping.xml");
 	mgr = csaOPCUA->getIPCManager();
 	runtimeValueGenerator *valGen = new runtimeValueGenerator(csManager);
 	mgr->addObject(valGen);
