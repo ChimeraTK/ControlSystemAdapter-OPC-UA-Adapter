@@ -17,7 +17,7 @@ extern "C" {
 
 using namespace boost::unit_test_framework;
 
-ipc_manager  *mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
+thread *serverThread = 0;
 
 struct TestFixturePVSet {
   std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers;
@@ -31,7 +31,6 @@ struct TestFixturePVSet {
 		
 		ProcessScalar<int8_t>::SharedPtr intA8dev = devManager->createProcessScalar<int8_t>(controlSystemToDevice, "int8Scalar");
  		ProcessScalar<uint8_t>::SharedPtr intAu8dev = devManager->createProcessScalar<uint8_t>(controlSystemToDevice, "uint8Scalar");
-		/* NOT WRITEABLE "int16Scalar" */
  		ProcessScalar<int16_t>::SharedPtr intA16dev = devManager->createProcessScalar<int16_t>(controlSystemToDevice, "int16Scalar");
  		ProcessScalar<uint16_t>::SharedPtr intAu16dev = devManager->createProcessScalar<uint16_t>(controlSystemToDevice, "uint16Scalar");
 		ProcessScalar<int32_t>::SharedPtr intA32dev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "int32Scalar");
@@ -39,7 +38,7 @@ struct TestFixturePVSet {
  		ProcessScalar<float>::SharedPtr intAfdev = devManager->createProcessScalar<float>(controlSystemToDevice, "floatScalar");
  		ProcessScalar<double>::SharedPtr intAddev = devManager->createProcessScalar<double>(controlSystemToDevice, "doubleScalar");
     
-		
+		csManager->getProcessScalar<uint8_t>("uint8Scalar")->set(12);
 		ProcessArray<int8_t>::SharedPtr intB15A8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Array_s15", 15);
 		ProcessArray<uint8_t>::SharedPtr intB10Au8dev = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Array_s10", 10);
  		ProcessArray<int16_t>::SharedPtr intB15A16dev = devManager->createProcessArray<int16_t>(controlSystemToDevice, "int16Array_s15", 15);
@@ -90,14 +89,58 @@ class ProcessVariableTest {
 		static void testEmptySet();
 		static void testClientSide();
 		static void testExampleSet();
+		static UA_StatusCode readAttribueValue(UA_Client *client, const UA_NodeId nodeId, UA_Variant *outValue);
 };
+
+UA_StatusCode ProcessVariableTest::readAttribueValue(UA_Client *client, const UA_NodeId nodeId, UA_Variant *outValue) {
+	UA_ReadValueId item;
+	UA_ReadValueId_init(&item);
+	item.nodeId = nodeId;
+	item.attributeId = UA_ATTRIBUTEID_VALUE;
+	UA_ReadRequest requested;
+	UA_ReadRequest_init(&requested);
+	requested.nodesToRead = &item;
+	requested.nodesToReadSize = 1;
+	UA_ReadResponse responseed = UA_Client_Service_read(client, requested);
+	UA_StatusCode retval = responseed.responseHeader.serviceResult;
+	if(retval == UA_STATUSCODE_GOOD && responseed.resultsSize != 1)
+		retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
+	if(retval != UA_STATUSCODE_GOOD) {
+		UA_ReadResponse_deleteMembers(&responseed);
+		return retval;
+	}
+	UA_DataValue *res = responseed.results;
+	if(res->hasStatus != UA_STATUSCODE_GOOD)
+		retval = res->hasStatus;
+	else if(!res->hasValue) //|| !UA_Variant_isScalar(&res->value))
+		retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
+	if(retval != UA_STATUSCODE_GOOD) {
+		UA_ReadResponse_deleteMembers(&responseed);
+		return retval;
+	}
+									
+	if(UA_ATTRIBUTEID_VALUE == UA_ATTRIBUTEID_VALUE) {
+		memcpy(outValue, &res->value, sizeof(UA_Variant));
+		UA_Variant_init(&res->value);
+	} else if(UA_Variant_isScalar(&res->value) && res->value.type == &UA_TYPES[UA_TYPES_VARIANT]) {
+		memcpy(&outValue, res->value.data, res->value.type->memSize);
+		free(res->value.data);
+		res->value.data = NULL;
+	} else {
+		retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
+	}
+
+	UA_ReadResponse_deleteMembers(&responseed);
+	
+	return retval;	
+}
    
 void ProcessVariableTest::testEmptySet(){ 
 	std::cout << "Enter ProcessVariableTest with EmptySet" << std::endl;
 	TestFixtureServerSet serverSet;
 	TestFixturePVSet pvSet;
 	
-	thread *serverThread = new std::thread(UA_Server_run, serverSet.mappedServer, &serverSet.runUAServer);
+	serverThread = new std::thread(UA_Server_run, serverSet.mappedServer, &serverSet.runUAServer);
 	
 	// check server
 	if (serverSet.mappedServer == nullptr) {
@@ -132,7 +175,7 @@ void ProcessVariableTest::testEmptySet(){
 			}
 			else if (valueType == "uint8_t") {
 				BOOST_CHECK(valueType == "uint8_t");
-				BOOST_CHECK(test->getValue_uint8_t() == 0);
+				BOOST_CHECK(test->getValue_uint8_t() == 12);
 				test->setValue_uint8_t(111);
 				BOOST_CHECK(test->getValue_uint8_t() == 111);
 			}
@@ -274,9 +317,12 @@ void ProcessVariableTest::testEmptySet(){
 		BOOST_CHECK(test->getName() != "");
 		
   }  
-    
+  
 	UA_Server_run_shutdown(serverSet.mappedServer);
 	UA_Server_delete(serverSet.mappedServer);
+	
+	//delete serverThread;
+	//serverThread = nullptr;
 };
 
 void ProcessVariableTest::testClientSide(){ 
@@ -285,11 +331,11 @@ void ProcessVariableTest::testClientSide(){
 	TestFixtureServerSet serverSet;
 	TestFixturePVSet pvSet;
 	
-	thread *serverThread = new std::thread(UA_Server_run, serverSet.mappedServer, &serverSet.runUAServer);
+	serverThread = new std::thread(UA_Server_run, serverSet.mappedServer, &serverSet.runUAServer);
 	
 	// add set
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-		mtca_processvariable *test = new mtca_processvariable(serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(), "SomeName", pvSet.csManager); 
+		mtca_processvariable *test = new mtca_processvariable(serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(), pvSet.csManager); 
 	}
 	
 	// check server
@@ -304,6 +350,7 @@ void ProcessVariableTest::testClientSide(){
 		
 	if (retval != UA_STATUSCODE_GOOD) {
 		std::cout << "Failed to connect to server" << "opc.tcp://localhost:" << serverSet.opcuaPort << std::endl;
+		BOOST_CHECK(false);
 	}
 		
 	UA_BrowseRequest bReq;
@@ -457,7 +504,8 @@ void ProcessVariableTest::testClientSide(){
 					// Currently only scalar are suppored 
 									UA_Variant *valueToCheck = UA_Variant_new();
 									UA_Variant_init(valueToCheck);
-									UA_StatusCode retvalValue = UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+									//UA_StatusCode retvalValue = UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+									UA_StatusCode retvalValue = ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
 									if(retvalValue != UA_STATUSCODE_GOOD) {
 										BOOST_CHECK(false);
 									}
@@ -488,6 +536,7 @@ void ProcessVariableTest::testClientSide(){
 										string datatype = "";
 										string valName = "";
 											// i know, this part is perfecly for makro stuff... but common, for maintainability reason we should use simple code... 
+										if(valueToCheck->arrayLength < 1) {
 											switch(datatypeId.identifier.numeric -1) {
 												case UA_TYPES_SBYTE: {
 													// Check Datatype
@@ -527,7 +576,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(valName != "");
 													// Check Value
 													int8_t value = (int8_t) *((int8_t*) valueToCheck->data);
-													BOOST_CHECK(value == 0);
+													BOOST_CHECK(value == 12);
 													cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													int8_t newValue = 123;
@@ -717,26 +766,338 @@ void ProcessVariableTest::testClientSide(){
 												default: printf("Not define: %-16d\n", datatypeId.identifier.numeric);
 											}
 										}
+										else {
+											/*
+											* Begin array section
+											*/
+											switch(datatypeId.identifier.numeric -1) {
+												case UA_TYPES_SBYTE: {
+													// Check Datatype
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+													BOOST_CHECK(datatype == "int8_t");
+													// Check Name 
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+													BOOST_CHECK(valName == "int8Array_s15");
+													// Check Value							
+													size_t arrayLength = valueToCheck->arrayLength;
+													int8_t* value = (int8_t*) valueToCheck->data; 
+													for(int i=0; i < arrayLength; i++) {
+														BOOST_CHECK(value[i] == 0);
+													}
+													// set new value
+													int8_t varArray[arrayLength];
+													int8_t* newValue = varArray;
+													for(int i=0; i < arrayLength; i++) {
+														newValue[i] = i;
+													}
+													
+													valueToCheck = UA_Variant_new();
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT16]);													
+													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+													if(retvalNewVar == UA_STATUSCODE_GOOD) {
+														// get value from server
+														UA_Variant_init(valueToCheck);
+														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														value = (int8_t*) valueToCheck->data; 
+														for(int i=0; i < arrayLength; i++) {
+															BOOST_CHECK(value[i] == newValue[i]);
+														}
+													}										
+													break;
+												}
+												case UA_TYPES_BYTE: {
+													// Check Datatype
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+													BOOST_CHECK(datatype == "uint8_t");
+													// Check Name 
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+													BOOST_CHECK(valName != "");
+													// Check Value
+													size_t arrayLength = valueToCheck->arrayLength;
+													uint8_t* value = (uint8_t*) valueToCheck->data; 
+													for(int i=0; i < arrayLength; i++) {
+														BOOST_CHECK(value[i] == 0);
+													}
+													// set new value
+													uint8_t varArray[arrayLength];
+													uint8_t* newValue = varArray;
+													for(int i=0; i < arrayLength; i++) {
+														newValue[i] = i;
+													}
+													
+													valueToCheck = UA_Variant_new();
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT16]);													
+													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+													if(retvalNewVar == UA_STATUSCODE_GOOD) {
+														// get value from server
+														UA_Variant_init(valueToCheck);
+														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														value = (uint8_t*) valueToCheck->data; 
+														for(int i=0; i < arrayLength; i++) {
+															BOOST_CHECK(value[i] == newValue[i]);
+														}
+													}
+													else {
+														BOOST_CHECK(false);
+													}
+													break;
+												}
+												case UA_TYPES_INT16: {
+													// Check Datatype
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+													BOOST_CHECK(datatype == "int16_t");
+													// Check Name 
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+													BOOST_CHECK(valName != "int8Scalar");
+													// Check Value
+													size_t arrayLength = valueToCheck->arrayLength;
+													int16_t* value = (int16_t*) valueToCheck->data; 
+													for(int i=0; i < arrayLength; i++) {
+														BOOST_CHECK(value[i] == 0);
+													}
+													// set new value
+													value = (int16_t*) valueToCheck->data; 
+													for(int i=0; i < arrayLength; i++) {
+														BOOST_CHECK(value[i] == 0);
+													}
+													//cout << "Wert: " << std::to_string(value) << endl;
+													// set new value
+													int16_t varArray[arrayLength];
+													int16_t* newValue = varArray;
+													for(int i=0; i < arrayLength; i++) {
+														newValue[i] = i;
+													}
+													
+													valueToCheck = UA_Variant_new();
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_INT16]);													
+													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+													if(retvalNewVar == UA_STATUSCODE_GOOD) {
+														// get value from server
+														UA_Variant_init(valueToCheck);
+														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														value = (int16_t*) valueToCheck->data; 
+														for(int i=0; i < arrayLength; i++) {
+															BOOST_CHECK(value[i] == newValue[i]);
+														}
+													}
+													else {
+														BOOST_CHECK(false);
+													}
+													break;
+												}
+												case UA_TYPES_UINT16: {
+													// Check Datatype
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+													BOOST_CHECK(datatype == "uint16_t");
+													// Check Name 
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+													BOOST_CHECK(valName != "int8Scalar");
+													// Check Value
+													size_t arrayLength = valueToCheck->arrayLength;
+													uint16_t* value = (uint16_t*) valueToCheck->data; 
+													for(int i=0; i < arrayLength; i++) {
+														BOOST_CHECK(value[i] == 0);
+													}
+													// set new value
+													value = (uint16_t*) valueToCheck->data; 
+													for(int i=0; i < arrayLength; i++) {
+														BOOST_CHECK(value[i] == 0);
+													}
+													//cout << "Wert: " << std::to_string(value) << endl;
+													// set new value
+													uint16_t varArray[arrayLength];
+													uint16_t* newValue = varArray;
+													for(int i=0; i < arrayLength; i++) {
+														newValue[i] = i;
+													}
+													
+													valueToCheck = UA_Variant_new();
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT16]);													
+													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+													if(retvalNewVar == UA_STATUSCODE_GOOD) {
+														// get value from server
+														UA_Variant_init(valueToCheck);
+														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														value = (uint16_t*) valueToCheck->data; 
+														for(int i=0; i < arrayLength; i++) {
+															BOOST_CHECK(value[i] == newValue[i]);
+														}
+													}
+													else {
+														BOOST_CHECK(false);
+													}
+													break;
+												}
+												case UA_TYPES_INT32: {
+													// Check Datatype
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+													BOOST_CHECK(datatype == "int32_t");
+													// Check Name 
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+													BOOST_CHECK(valName != "int8Scalar");
+													// Check Value
+													size_t arrayLength = valueToCheck->arrayLength;
+													int32_t* value = (int32_t*) valueToCheck->data; 
+													for(int i=0; i < arrayLength; i++) {
+														BOOST_CHECK(value[i] == 0);
+													}													
+													// set new value
+													value = (int32_t*) valueToCheck->data; 
+													for(int i=0; i < arrayLength; i++) {
+														BOOST_CHECK(value[i] == 0);
+													}
+													//cout << "Wert: " << std::to_string(value) << endl;
+													// set new value
+													int32_t varArray[arrayLength];
+													int32_t* newValue = varArray;
+													for(int i=0; i < arrayLength; i++) {
+														newValue[i] = i;
+													}
+													
+													valueToCheck = UA_Variant_new();
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_INT32]);													
+													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+													if(retvalNewVar == UA_STATUSCODE_GOOD) {
+														// get value from server
+														UA_Variant_init(valueToCheck);
+														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														value = (int32_t*) valueToCheck->data; 
+														for(int i=0; i < arrayLength; i++) {
+															BOOST_CHECK(value[i] == newValue[i]);
+														}
+													}
+													else {
+														BOOST_CHECK(false);
+													}
+													break;
+												}
+												case UA_TYPES_UINT32: {
+													// Check Datatype
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+													BOOST_CHECK(datatype == "uint32_t");
+													// Check Name 
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+													BOOST_CHECK(valName != "int8Scalar");
+													// Check Value
+													size_t arrayLength = valueToCheck->arrayLength;
+													uint32_t* value = (uint32_t*) valueToCheck->data; 
+													for(int i=0; i < arrayLength; i++) {
+														BOOST_CHECK(value[i] == 0);
+													}
+													// set new value
+													uint32_t varArray[arrayLength];
+													uint32_t* newValue = varArray;
+													for(int i=0; i < arrayLength; i++) {
+														newValue[i] = i;
+													}
+													
+													valueToCheck = UA_Variant_new();
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT32]);													
+													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+													if(retvalNewVar == UA_STATUSCODE_GOOD) {
+														// get value from server
+														UA_Variant_init(valueToCheck);
+														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														value = (uint32_t*) valueToCheck->data; 
+														for(int i=0; i < arrayLength; i++) {
+															BOOST_CHECK(value[i] == newValue[i]);
+														}
+													}
+													else {
+														BOOST_CHECK(false);
+													}
+													break;
+												}
+												case UA_TYPES_DOUBLE: {
+													// Check Datatype
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+													BOOST_CHECK(datatype == "double");
+													// Check Name 
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+													BOOST_CHECK(valName != "int8Scalar");
+													// Check Value
+													size_t arrayLength = valueToCheck->arrayLength;
+													double* value = (double*) valueToCheck->data; 
+													for(int i=0; i < arrayLength; i++) {
+														BOOST_CHECK(value[i] == 0);
+													}
+													//cout << "Wert: " << std::to_string(value) << endl;
+													// set new value
+													double varArray[arrayLength];
+													double* newValue = varArray;
+													for(int i=0; i < arrayLength; i++) {
+														newValue[i] = i*0.5;
+													}
+													
+													valueToCheck = UA_Variant_new();
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_DOUBLE]);													
+													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+													if(retvalNewVar == UA_STATUSCODE_GOOD) {
+														// get value from server
+														UA_Variant_init(valueToCheck);
+														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														value = (double*) valueToCheck->data; 
+														for(int i=0; i < arrayLength; i++) {
+															BOOST_CHECK(((int32_t)(value[i]*100)) == ((int32_t)(newValue[i]*100)));
+														}
+													}
+													else {
+														BOOST_CHECK(false);
+													}
+													break;
+												}
+												case UA_TYPES_FLOAT: {
+													// Check Datatype
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+													BOOST_CHECK(datatype == "float");
+													// Check Name 
+													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+													BOOST_CHECK(valName != "int8Scalar");
+													// Check Value
+													size_t arrayLength = valueToCheck->arrayLength;
+													float* value = (float*) valueToCheck->data; 
+													for(int i=0; i < arrayLength; i++) {
+														BOOST_CHECK(value[i] == 0);
+													}
+													//cout << "Wert: " << std::to_string(value) << endl;
+													// set new value
+													float varArray[arrayLength];
+													float* newValue = varArray;
+													for(int i=0; i < arrayLength; i++) {
+														newValue[i] = i*0.5;
+													}
+													
+													valueToCheck = UA_Variant_new();
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_FLOAT]);													
+													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+													if(retvalNewVar == UA_STATUSCODE_GOOD) {
+														// get value from server
+														UA_Variant_init(valueToCheck);
+														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														value = (float*) valueToCheck->data; 
+														for(int i=0; i < arrayLength; i++) {
+															BOOST_CHECK(((int32_t)(value[i]*100)) == ((int32_t)(newValue[i]*100)));
+														}
+													}
+													else {
+														BOOST_CHECK(false);
+													}
+													break;
+												}
+												default: printf("Not define: %-16d\n", datatypeId.identifier.numeric);
+											}
+										}
+									}
+			
 									UA_Variant_delete(valueToCheck);
 					}
-								
-										/* 
-										 * Array support should be tested 
-										 * I think this is not yet supported by openHauMichTot
-										 *
-										 */
-										/*
-										UA_Int32 *outArrayDimensions;
-										size_t outArrayDimensionsSize;
-										UA_Client_readArrayDimensionsAttribute(client, refe->nodeId.nodeId, &outArrayDimensions, &outArrayDimensionsSize);
-										cout << "Dim: " << outArrayDimensions << " - Size: " << outArrayDimensionsSize << endl;
-									*/
-							
-								}
+					}
 		}
 	}
+
 	UA_BrowseRequest_deleteMembers(&bReq);
 	UA_BrowseResponse_deleteMembers(&bResp);
+
 };
 
 

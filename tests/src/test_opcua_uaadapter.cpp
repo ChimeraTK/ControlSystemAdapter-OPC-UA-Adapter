@@ -22,7 +22,7 @@ struct TestFixtureEmptySet {
 
   TestFixtureEmptySet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second), csSyncUtil(csManager) {
 		csSyncUtil.receiveAll();
-		opcuaPort = 16660;
+		opcuaPort = 16661;
 	}
 };
 
@@ -38,7 +38,7 @@ struct TestFixtureExampleSet {
 	
   TestFixtureExampleSet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second), csSyncUtil(csManager) {
 		csSyncUtil.receiveAll();
-		opcuaPort = 16661;
+		opcuaPort = 16660;
 		
 		ProcessScalar<int8_t>::SharedPtr intA8dev = devManager->createProcessScalar<int8_t>(controlSystemToDevice, "int8Scalar");
 		ProcessScalar<uint8_t>::SharedPtr intAu8dev = devManager->createProcessScalar<uint8_t>(deviceToControlSystem, "uint8Scalar");
@@ -88,6 +88,9 @@ void UAAdapterTest::testEmptySet(){
 	UA_NodeId nodeId = adapter->getOwnNodeId();
 	BOOST_CHECK(!UA_NodeId_isNull(&nodeId));
 	
+	adapter->doStop();
+	BOOST_CHECK(adapter->isRunning() != true);
+	
 };
 
 void UAAdapterTest::testExampleSet(){ 
@@ -113,6 +116,7 @@ void UAAdapterTest::testExampleSet(){
 	
 	// Check folder functions
 	vector<string> pathVector = xmlHandler->praseVariablePath("/test/test/");
+	//vector<string> pathVector = {"tee", "tea"};
 	// Check if path exist
 	UA_NodeId folderNodeId = adapter->existFolderPath(ownNodeId, pathVector);
 	BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
@@ -142,17 +146,16 @@ void UAAdapterTest::testExampleSet(){
 	folderNodeId = adapter->existFolderPath(UA_NODEID_NULL, pathVector);
 	BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
 	
-	
 	adapter->addConstant("int8Scalar", tfExampleSet.csManager);
 	adapter->addVariable("int32Array_s15", tfExampleSet.csManager);
 	adapter->addVariable("uint8Array_s10", tfExampleSet.csManager);
 	adapter->addVariable("uint16Array_s10", tfExampleSet.csManager);
 	adapter->addVariable("int8Array_s15", tfExampleSet.csManager);
 	adapter->addVariable("floatScalar", tfExampleSet.csManager);
-	
+
 	BOOST_CHECK(adapter->getConstants().size() > 0);
 	BOOST_CHECK(adapter->getVariables().size() > 0);
-	
+		
 	adapter->~mtca_uaadapter();
 		
 };

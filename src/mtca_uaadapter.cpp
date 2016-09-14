@@ -158,7 +158,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 						
 				}
 				// assumption last element is naem of variable, hence noch folder for name is needed
-				varPathVector.pop_back();
+				//varPathVector.pop_back();
 				
 				xpath = "//application[@name='" + applicName + "']//map[@sourceVariableName='" + srcVarName + "']/folder"; 
 				xmlXPathObjectPtr resultFolder = this->fileHandler->getNodeSet(xpath);
@@ -203,11 +203,11 @@ std::list<mtca_processvariable *> mtca_uaadapter::getConstants() {
 UA_NodeId mtca_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderName) {
 	// FIXME: Check if folder name a possible name or should it be escaped (?!"§%-:, etc)
 	UA_StatusCode retval = UA_STATUSCODE_GOOD;
-    UA_NodeId createdNodeId = UA_NODEID_NULL;
+	UA_NodeId createdNodeId = UA_NODEID_NULL;
   
-    if (UA_NodeId_equal(&baseNodeId, &createdNodeId) == UA_TRUE) {
-        return createdNodeId; // Something went UA_WRING (initializer should have set this!)
-    }
+	if(UA_NodeId_equal(&baseNodeId, &createdNodeId) == UA_TRUE) {
+		return createdNodeId; // Something went UA_WRING (initializer should have set this!)
+	}
     
     // Create our toplevel instance
     UA_ObjectAttributes oAttr; 
@@ -284,28 +284,30 @@ UA_NodeId mtca_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
  * 
  */
 UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath) {
+	
+ 	if(UA_NodeId_isNull(&basenodeid)){
+ 		return UA_NODEID_NULL;
+ 	}
+	
 	// Check if path exist
 	UA_NodeId toCheckNodeId = existFolderPath(basenodeid, folderPath);
 	int32_t starter4Folder = 0;
 	UA_NodeId nextNodeId = basenodeid;
+	UA_NodeId startNodeId = basenodeid;
+	bool setted = false;
  	if(UA_NodeId_isNull(&toCheckNodeId)) {
 		// Check if path exist partly 
-		for(const auto& oneFolderInfo : this->folderVector) {
-			for(int32_t m=0; m < folderPath.size(); m++) {
+		for(int32_t m=0; m < folderPath.size(); m++) {
+			for(const auto& oneFolderInfo : this->folderVector) {
 				// get correct folder NodeId from first folderPath element
-				if(folderPath.at(m).compare(oneFolderInfo.folderName) == 0) {				
-					if(UA_NodeId_equal(&oneFolderInfo.prevFolderNodeId, &nextNodeId)) {
-						nextNodeId = oneFolderInfo.folderNodeId;
-						// remeber on witch position the folder still exist
-						if((m+1) < folderPath.size()) {
-							starter4Folder = m+1;
-							// start with the next folder, because the current folder on position m still exist
-							nextNodeId = oneFolderInfo.folderNodeId;
-						}
-						else {
-							break;
-						}
-					}
+				if(!setted && (folderPath.at(m).compare(oneFolderInfo.folderName) == 0) && (UA_NodeId_equal(&oneFolderInfo.prevFolderNodeId, &nextNodeId)) && ((m+1) < folderPath.size())) {
+					// remeber on witch position the folder still exist
+					setted = true;
+					starter4Folder = m+1;
+					nextNodeId = oneFolderInfo.folderNodeId;
+				}
+				else {
+					break;
 				}
 			}
 		}
@@ -325,7 +327,11 @@ UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<str
 }
 
 UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName) {
-		
+	
+	if(UA_NodeId_isNull(&basenodeid)){
+		return UA_NODEID_NULL;
+	}
+	
 	// Check if path exist
 	UA_NodeId toCheckNodeId = existFolder(basenodeid, folderName);
 	folderInfo newFolder;
@@ -334,6 +340,10 @@ UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName) 
 		newFolder.folderNodeId = this->createUAFolder(basenodeid, folderName);	
 		newFolder.prevFolderNodeId = basenodeid;
 		this->folderVector.push_back(newFolder);
+	}
+	//cout << "Bereits vorhanden: " << endl;
+	for(const auto& oneFolderInfo : this->folderVector) {
+		//cout << oneFolderInfo.folderName << " : " << oneFolderInfo.folderNodeId.identifier.numeric << "Vorgänger: " << oneFolderInfo.prevFolderNodeId.identifier.numeric << endl;
 	}
 
 	return newFolder.folderNodeId;
