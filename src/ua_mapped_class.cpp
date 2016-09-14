@@ -37,11 +37,13 @@ ua_mapped_class::ua_mapped_class()
   this->mappedServer = nullptr;
 }
 
+/*
 ua_mapped_class::ua_mapped_class(UA_Server *server, UA_NodeId *baseNodeId)
 { 
   UA_NodeId_copy(baseNodeId, &this->baseNodeId);
   this->mappedServer = server;
 }
+*/
 
 ua_mapped_class::ua_mapped_class(UA_Server *server, UA_NodeId baseNodeId)
 {

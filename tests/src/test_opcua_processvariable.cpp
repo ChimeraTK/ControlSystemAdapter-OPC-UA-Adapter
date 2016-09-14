@@ -165,6 +165,10 @@ void ProcessVariableTest::testEmptySet(){
 		BOOST_CHECK(test->getTimeStampNanoSeconds() == 0);
 		BOOST_CHECK(test->getTimeStampSeconds() == 0);
 		
+		BOOST_CHECK(test->getEngineeringUnit() == "");
+		test->setEngineeringUnit("test");
+		BOOST_CHECK(test->getEngineeringUnit() == "test");
+		
 		std::string valueType = test->getType();
 		if(!oneProcessVariable->isArray()) {
 			if (valueType == "int8_t") {
@@ -383,6 +387,7 @@ void ProcessVariableTest::testClientSide(){
 			UA_NodeId valueNodeId = UA_NODEID_NULL;
 			UA_NodeId typeNodeId = UA_NODEID_NULL;
 			UA_NodeId nameNodeId = UA_NODEID_NULL;
+			UA_NodeId engineeringUnitNodeId = UA_NODEID_NULL;
 			string name = "";
 			
 					UA_ReferenceDescription *refe;
@@ -407,6 +412,12 @@ void ProcessVariableTest::testClientSide(){
 									name = browseNameFound;
 									cout << "Checking ProcessVariable: " <<  name << endl;
 								}
+								
+								if(browseNameFound2 == "EngineeringUnit") {
+									engineeringUnitNodeId = refe->nodeId.nodeId;
+								}
+								
+								
 								
 								/* timeStamp Begin */
 								if(browseNameFound2 == "timeStamp") {
@@ -523,6 +534,13 @@ void ProcessVariableTest::testClientSide(){
 									if(retvalValueName != UA_STATUSCODE_GOOD) {
 										BOOST_CHECK(false);
 									}
+									
+									UA_Variant *euToCheck = UA_Variant_new();
+									UA_Variant_init(euToCheck);
+									UA_StatusCode retvalValueEu = UA_Client_readValueAttribute(client, engineeringUnitNodeId, euToCheck);
+									if(retvalValueEu != UA_STATUSCODE_GOOD) {
+										BOOST_CHECK(false);
+									}
 
 									UA_NodeId datatypeId;
 									if(retvalValue == UA_STATUSCODE_GOOD) {
@@ -530,12 +548,17 @@ void ProcessVariableTest::testClientSide(){
 										if(retvalDatatype != UA_STATUSCODE_GOOD) {
 											BOOST_CHECK(false);
 										}
-									}
+									}	
 									
 									if(retvalValue == UA_STATUSCODE_GOOD) {
 										string datatype = "";
 										string valName = "";
-											// i know, this part is perfecly for makro stuff... but common, for maintainability reason we should use simple code... 
+										
+										// Check EngineeringUnit -> for all the same
+										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), valName);
+										BOOST_CHECK(valName == "");
+										
+										// i know, this part is perfecly for makro stuff... but common, for maintainability reason we should use simple code... 
 										if(valueToCheck->arrayLength < 1) {
 											switch(datatypeId.identifier.numeric -1) {
 												case UA_TYPES_SBYTE: {
