@@ -40,10 +40,6 @@ xml_file_handler::xml_file_handler(std::string filePath) {
 	this->doc = this->createDoc(filePath);
 }
 
-xmlDocPtr xml_file_handler::getDoc() {
-	return this->doc;
-}
-
 xmlXPathObjectPtr xml_file_handler::getNodeSet(std::string xPathString) {
 	xmlChar *xpath = (xmlChar*) xPathString.c_str();
 	xmlXPathContextPtr context;

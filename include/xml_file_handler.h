@@ -46,8 +46,6 @@ public:
 	xmlDocPtr createDoc(std::string filePath);
 	xmlXPathObjectPtr getNodeSet(std::string xPathString);
 	
-	xmlDocPtr getDoc();
-	
 	std::vector<std::string> praseVariablePath(std::string variablePath, std::string seperator = "/");
 	std::string getAttributeValueFromNode(xmlNode* node, std::string attributeName);
 	std::string getContentFromNode(xmlNode* node);

@@ -32,11 +32,11 @@
 
 //typedef boost::shared_ptr<ChimeraTK::ControlSystemPVManager> shCSysPVManager;
 
-class mtca_processvariable :  ua_mapped_class
-{
+class mtca_processvariable :  ua_mapped_class {
 private:
   std::string namePV;
 	std::string nameNew;
+	std::string engineeringUnit;
 	UA_NodeId ownNodeId;
 	std::string type4TestPurposes;
 	
@@ -55,6 +55,9 @@ public:
 
     void setType(std::string type);
     std::string getType();
+		
+		void setEngineeringUnit(std::string engineeringUnit);
+		std::string getEngineeringUnit();
 
     void setTimeStamp(ChimeraTK::TimeStamp timeStamp);
     ChimeraTK::TimeStamp getTimeStamp();
