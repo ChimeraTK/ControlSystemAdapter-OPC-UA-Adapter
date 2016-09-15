@@ -124,11 +124,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 				applicName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i]->parent, "name");
 				// Check if "rename" is not empty
 				string renameVar = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "rename");
-				if(renameVar.compare("") == 0) {
-					renameVar = srcVarName;
-				}
-				
-				std::cout << "Variabe: '" << srcVarName << "' wird unter '" << renameVar << "' in Application Name: '" << applicName << "' eingetragen." << std::endl;
+			
 				// Application Name have to be unique!!!
 				UA_NodeId appliFolderNodeId = this->existFolder(this->ownNodeId, applicName);
 				folderInfo newFolder;
@@ -139,37 +135,49 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 					appliFolderNodeId = newFolder.folderNodeId;
 				}
 				
-				string xpath = "//application[@name='" + applicName + "']//map[@sourceVariableName='" + srcVarName + "']/unrollPath"; 
-				xmlXPathObjectPtr resultUnrollPath = this->fileHandler->getNodeSet(xpath);
-				vector<string> varPathVector;
-				if(resultUnrollPath) {
-					xmlNodeSetPtr nsetUnrollPath = resultUnrollPath->nodesetval;
-					
+				
+				
+				//this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i]->parent, "name");
+				
+				
+// 				string xpath = "//application[@name='" + applicName + "']//map[@sourceVariableName='" + srcVarName + "']/unrollPath"; 
+// 				xmlXPathObjectPtr resultUnrollPath = this->fileHandler->getNodeSet(xpath);
+// 				vector<string> varPathVector;
+// 				if(resultUnrollPath) {
+// 					xmlNodeSetPtr nsetUnrollPath = resultUnrollPath->nodesetval;
+					vector<string> varPathVector;
+					vector<xmlNodePtr> nodeVectorUnrollPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "unrollPath");
 					string seperator = "";
-					for (int32_t m=0; m < nsetUnrollPath->nodeNr; m++) {
-						string shouldUnrollPath = this->fileHandler->getContentFromNode(nsetUnrollPath->nodeTab[m]);
+					for(auto nodeUnrollPath: nodeVectorUnrollPath) {
+						string shouldUnrollPath = this->fileHandler->getContentFromNode(nodeUnrollPath);
 						if(shouldUnrollPath.compare("True") == 0) {
-							seperator = seperator + this->fileHandler->getAttributeValueFromNode(nsetUnrollPath->nodeTab[m], "pathSep");
+							seperator = seperator + this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
 						}	
 					}
 					
 					vector<string> newPathVector = this->fileHandler->praseVariablePath(srcVarName, seperator);
 					varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
 						
-				}
+			
 				// assumption last element is naem of variable, hence noch folder for name is needed
 				//varPathVector.pop_back();
+				if(renameVar.compare("") == 0) {
+					renameVar = srcVarName;
+				}
+				else {
+					renameVar = varPathVector.at(varPathVector.size()-1);
+					varPathVector.pop_back();
+				}
 				
-				xpath = "//application[@name='" + applicName + "']//map[@sourceVariableName='" + srcVarName + "']/folder"; 
-				xmlXPathObjectPtr resultFolder = this->fileHandler->getNodeSet(xpath);
+				std::cout << "Variabe: '" << srcVarName << "' wird unter '" << renameVar << "' in Application Name: '" << applicName << "' eingetragen." << std::endl;
+				
+				nodeVectorUnrollPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "folder");
 				vector<string> folderPathVector;
-				if(resultFolder) {
-					xmlNodeSetPtr nsetUnrollPath = resultFolder->nodesetval;
-					for (int32_t b=0; b < nsetUnrollPath->nodeNr; b++) {
+				for(auto nodeUnrollPath: nodeVectorUnrollPath) {
 						
-						string folderPath = this->fileHandler->getContentFromNode(nsetUnrollPath->nodeTab[b]);					
+						string folderPath = this->fileHandler->getContentFromNode(nodeUnrollPath);					
 						vector<string> folderPathVector = this->fileHandler->praseVariablePath(folderPath);
-						
+							
 						// Create folders
 						UA_NodeId newFolderNodeId = appliFolderNodeId;
 						if(folderPathVector.size() > 0) {
@@ -180,8 +188,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 						}
 						new mtca_processvariable(this->mappedServer, newFolderNodeId, srcVarName, renameVar, mgr);
-					}
-				}		
+					}	
  			}
 		}
 	}

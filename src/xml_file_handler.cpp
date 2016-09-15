@@ -40,6 +40,18 @@ xml_file_handler::xml_file_handler(std::string filePath) {
 	this->doc = this->createDoc(filePath);
 }
 
+std::vector<xmlNodePtr> xml_file_handler::getNodesByName(xmlNodePtr startNode, std::string nodeName) {
+	std::vector<xmlNodePtr> nodeVector;
+	while (startNode != NULL) {
+		if ((!xmlStrcmp(startNode->name, (const xmlChar *)nodeName.c_str()))) {
+			nodeVector.push_back(startNode);
+		}
+		startNode = startNode->next;
+	}
+	
+	return nodeVector;
+}
+
 xmlXPathObjectPtr xml_file_handler::getNodeSet(std::string xPathString) {
 	xmlChar *xpath = (xmlChar*) xPathString.c_str();
 	xmlXPathContextPtr context;
