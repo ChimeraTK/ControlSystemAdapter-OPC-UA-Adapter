@@ -63,11 +63,11 @@ public:
   virtual ~ipc_managed_object();
   
   ipc_manager *getIpcManager();
-  void setIpcId(uint32_t ipc_id);
   uint32_t getIpcId();
+	void setIpcId(uint32_t ipc_id);
   bool isManaged();
   bool assignManager(ipc_manager *manager);
-  virtual ipc_managed_object_type getManagedObjectType();
+  //virtual ipc_managed_object_type getManagedObjectType();
   
   bool taskRunningAttached();
   bool isRunning();

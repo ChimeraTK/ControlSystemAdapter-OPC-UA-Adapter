@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.0)
                     
 #link_directories(${CMAKE_BINARY_DIR})
 
-include_directories(${CMAKE_SOURCE_DIR}/include/tests/include)
+include_directories(${CMAKE_SOURCE_DIR}/tests/include)
 
 	aux_source_directory(${CMAKE_SOURCE_DIR}/tests/src/ testSources)
 	foreach( testSourceFile ${testSources})

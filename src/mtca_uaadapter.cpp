@@ -114,6 +114,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 	string srcVarName = "";
 	string applicName = "";
 	
+	// TODO. What happen if application name are not unique?
 	if(result) {
 		nodeset = result->nodesetval;
 		for (int32_t i=0; i < nodeset->nodeNr; i++) {
@@ -135,16 +136,6 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 					appliFolderNodeId = newFolder.folderNodeId;
 				}
 				
-				
-				
-				//this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i]->parent, "name");
-				
-				
-// 				string xpath = "//application[@name='" + applicName + "']//map[@sourceVariableName='" + srcVarName + "']/unrollPath"; 
-// 				xmlXPathObjectPtr resultUnrollPath = this->fileHandler->getNodeSet(xpath);
-// 				vector<string> varPathVector;
-// 				if(resultUnrollPath) {
-// 					xmlNodeSetPtr nsetUnrollPath = resultUnrollPath->nodesetval;
 					vector<string> varPathVector;
 					vector<xmlNodePtr> nodeVectorUnrollPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "unrollPath");
 					string seperator = "";

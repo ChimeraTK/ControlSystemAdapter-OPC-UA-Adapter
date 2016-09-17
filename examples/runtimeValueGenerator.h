@@ -27,7 +27,7 @@
 #ifndef RUN_TIME_VALUE_GENERATOR_H
 #define RUN_TIME_VALUE_GENERATOR_H
 
-#include "ipc_task.h"
+#include "ipc_managed_object.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
 using namespace ChimeraTK;
@@ -38,12 +38,12 @@ class runtimeValueGenerator : public ipc_managed_object {
 private:   
 	shCSysPVManager csManager;
 	
-    void runtimeValueGenerator_constructserver(shCSysPVManager csManager);
+	void runtimeValueGenerator_constructserver(shCSysPVManager csManager);
     
 public:
-		runtimeValueGenerator(shCSysPVManager csManager);
-		runtimeValueGenerator();
-    ~runtimeValueGenerator();
+	runtimeValueGenerator(shCSysPVManager csManager);
+	runtimeValueGenerator();
+	~runtimeValueGenerator();
 	void workerThread();
 	static void generateValues(shCSysPVManager csManager);
     

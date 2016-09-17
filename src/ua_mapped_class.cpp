@@ -35,6 +35,8 @@ ua_mapped_class::ua_mapped_class()
 {
   this->baseNodeId = UA_NODEID_NUMERIC(0,0);
   this->mappedServer = nullptr;
+	
+	this->ua_mapSelfToNamespace();
 }
 
 /*

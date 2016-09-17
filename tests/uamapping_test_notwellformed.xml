@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<uamapping>
+	<application name="WinAA">
+		<map sourceVariableName="int8Array_s15" rename="GainPV">
+			<unrollPath pathSep="_">True</unrollPath>
+			<unrollPath pathSep="8">True</unrollPath>
+		        <folder>NorthSideLINAC/partB</folder>
+        	</map>
+	</application>
+	<application name="WinBB">
+		<map sourceVariableName="uint8Array_s10" rename="">
+			<unrollPath pathSep="_">True</unrollPath>
+		        <folder>NorthSideLINAC/partA</folder>
+        	</map>
+		<map sourceVariableName="int16Array_s15">
+			<unrollPath pathSep="_">False</unrollPath>
+		        <folder>SouthSide/LINAC/partA</folder>
+			<folder>SouthSide/LINAC/partB</folder>
+        	</map>
+	</application>
+	<application name="WinCC">
+		<map sourceVariableName="uint8Array_s10" rename="">
+			<unrollPath pathSep="_">True</unrollPath>
+		        <folder>NorthSideLINAC/partA</folder>
+        	</map>
+		<map sourceVariableName="int16Array_s15">
+			<unrollPath pathSep="_">False</unrollPath>
+		        <folder>NorthSideLINAC/partB</folder>
+        	</map>
+	</application>
+	<application name="EPICS">
+		<map sourceVariableName="uint32Scalar" rename="">
+			<unrollPath pathSep="_">True</unrollPath>
+			<unrollPath pathSep="a">True</unrollPath>
+		        <folder>EastSideLINAC/partA</folder>
+        	</map>
+		<map sourceVariableName="int32Scalar">
+			<unrollPath pathSep="_">False</unrollPath>
+		        <folder>EastSideLINAC/partA</folder>
+        	</ma>
+	</application>
+</uamapping>

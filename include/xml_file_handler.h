@@ -58,6 +58,8 @@ private:
 	
 	xmlDocPtr doc;
 	xmlNodePtr cur;    
+	
+	bool isDocSetted();
 
 };
 

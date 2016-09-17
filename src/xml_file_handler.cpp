@@ -30,14 +30,18 @@
 #include <iostream>
 
 #include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <libxml2/libxml/xpath.h>
 #include <libxml2/libxml/xpathInternals.h>
 #include <libxml2/libxml/tree.h>
 
 xml_file_handler::xml_file_handler(std::string filePath) {
-	
+	// FIXME: Add some check routine if file realy exist
 	this->doc = this->createDoc(filePath);
+	if(!isDocSetted()) {
+		std::cout << "Fehler, Datei existiert nicht" << std::endl;
+	}
 }
 
 std::vector<xmlNodePtr> xml_file_handler::getNodesByName(xmlNodePtr startNode, std::string nodeName) {
@@ -57,7 +61,10 @@ xmlXPathObjectPtr xml_file_handler::getNodeSet(std::string xPathString) {
 	xmlXPathContextPtr context;
 	xmlXPathObjectPtr result;
 	
-	context = xmlXPathNewContext(doc);
+	if(!isDocSetted()) {
+		return NULL;
+	}
+	context = xmlXPathNewContext(this->doc);
 	if (context == NULL) {
 		std::printf("Error in xmlXPathNewContext\n");
 		return NULL;
@@ -77,14 +84,26 @@ xmlXPathObjectPtr xml_file_handler::getNodeSet(std::string xPathString) {
 
 }
 
+bool xml_file_handler::isDocSetted() {
+		if(this->doc != NULL) {
+			return true;
+		}
+		return false;
+}
+
 xmlDocPtr xml_file_handler::createDoc(std::string filePath) {
+
+	if(filePath.empty()) {
+		return NULL;
+	}
+	
 	xmlDocPtr doc;
 	doc = xmlParseFile(filePath.c_str());
 	
-	if (doc == NULL ) {
-		std::fprintf(stderr,"Document not parsed successfully. \n");
-		return NULL;
-	}
+ 	if (doc == NULL ) {
+		std::cout << "Document not parsed successfully." << std::endl;
+ 		return NULL;
+ 	}
 
 	return doc;
 }
@@ -106,17 +125,20 @@ std::string xml_file_handler::getAttributeValueFromNode(xmlNode* node, std::stri
 	xmlAttrPtr attr = xmlHasProp(node, (xmlChar*)attributeName.c_str());
 	if(!(attr == NULL)) {
 		std::string merker = (std::string)((char*)attr->children->content);
-		//xmlFree(attr);
 		return merker;
 	}
 	return "";
 }
 
 std::string xml_file_handler::getContentFromNode(xmlNode* node) {
+	if(node == NULL) {
+		return "";
+	}
 	xmlChar* content = xmlNodeGetContent(node->xmlChildrenNode);
 	if(content != NULL) {
 		std::string merker = (std::string)((char*)content);
 		xmlFree(content);
+		boost::trim(merker);
 		return merker;
 	}
 	return "";

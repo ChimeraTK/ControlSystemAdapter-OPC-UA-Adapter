@@ -48,14 +48,14 @@ ipc_managed_object::ipc_managed_object()
   this->thread_run = false;
 }
 
-ipc_managed_object::ipc_managed_object(uint32_t ipc_id)
+/*ipc_managed_object::ipc_managed_object(uint32_t ipc_id)
 {
   this->ipc_id = ipc_id;
   this->threadTask = nullptr;
   this->manager    = nullptr;
   this->thread_run = false;
 }
-
+*/
 ipc_managed_object::~ipc_managed_object()
 {
   if (this->isRunning()) 
@@ -132,6 +132,8 @@ int32_t ipc_managed_object::terminate() {
   return 0;
 }
 
+/*
 ipc_managed_object_type ipc_managed_object::getManagedObjectType() {
   return IPC_MANAGED_OBJECT_TYPE_GENERICOBJECT;
 }
+*/

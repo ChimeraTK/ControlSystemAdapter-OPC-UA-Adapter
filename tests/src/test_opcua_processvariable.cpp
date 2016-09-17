@@ -1,6 +1,8 @@
 #include <mtca_uaadapter.h>
 #include <ControlSystemAdapterOPCUA.h>
-#include "ipc_manager.h"
+#include <ipc_manager.h>
+
+#include <test_sample_data.h>
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -19,67 +21,6 @@ using namespace boost::unit_test_framework;
 
 thread *serverThread = 0;
 
-struct TestFixturePVSet {
-  std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers;
-  boost::shared_ptr<ControlSystemPVManager> csManager;
-  boost::shared_ptr<DevicePVManager> devManager;
-    
-  ControlSystemSynchronizationUtility csSyncUtil;
-
-  TestFixturePVSet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second), csSyncUtil(csManager) {
-		csSyncUtil.receiveAll();
-		
-		ProcessScalar<int8_t>::SharedPtr intA8dev = devManager->createProcessScalar<int8_t>(controlSystemToDevice, "int8Scalar");
- 		ProcessScalar<uint8_t>::SharedPtr intAu8dev = devManager->createProcessScalar<uint8_t>(controlSystemToDevice, "uint8Scalar");
- 		ProcessScalar<int16_t>::SharedPtr intA16dev = devManager->createProcessScalar<int16_t>(controlSystemToDevice, "int16Scalar");
- 		ProcessScalar<uint16_t>::SharedPtr intAu16dev = devManager->createProcessScalar<uint16_t>(controlSystemToDevice, "uint16Scalar");
-		ProcessScalar<int32_t>::SharedPtr intA32dev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "int32Scalar");
- 		ProcessScalar<uint32_t>::SharedPtr intAu32dev = devManager->createProcessScalar<uint32_t>(controlSystemToDevice, "uint32Scalar");
- 		ProcessScalar<float>::SharedPtr intAfdev = devManager->createProcessScalar<float>(controlSystemToDevice, "floatScalar");
- 		ProcessScalar<double>::SharedPtr intAddev = devManager->createProcessScalar<double>(controlSystemToDevice, "doubleScalar");
-    
-		csManager->getProcessScalar<uint8_t>("uint8Scalar")->set(12);
-		ProcessArray<int8_t>::SharedPtr intB15A8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Array_s15", 15);
-		ProcessArray<uint8_t>::SharedPtr intB10Au8dev = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Array_s10", 10);
- 		ProcessArray<int16_t>::SharedPtr intB15A16dev = devManager->createProcessArray<int16_t>(controlSystemToDevice, "int16Array_s15", 15);
- 		ProcessArray<uint16_t>::SharedPtr intB10Au16dev = devManager->createProcessArray<uint16_t>(controlSystemToDevice, "uint16Array_s10", 10);
- 		ProcessArray<int32_t>::SharedPtr intB15A32dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "int32Array_s15", 15);
- 		ProcessArray<uint32_t>::SharedPtr intB10Au32dev = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "uint32Array_s10", 10);
-		ProcessArray<double>::SharedPtr intB15Afdev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleArray_s15", 15);
- 		ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s10", 10);
-		
-	}
-};
-
-struct TestFixtureServerSet {
-	
-	uint32_t opcuaPort;
-	/* Create new Server */
-	UA_ServerConfig       server_config;
-	UA_ServerNetworkLayer server_nl;
-	UA_Server *mappedServer;
-	UA_NodeId baseNodeId;
-	UA_Boolean runUAServer;
-	
-	TestFixtureServerSet() {
-		
-		opcuaPort = 16660;
-		
-		server_config = UA_ServerConfig_standard;
-		server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, opcuaPort);
-		server_config.logger = UA_Log_Stdout;
-		server_config.networkLayers = &server_nl;
-		server_config.networkLayersSize = 1;
-		
-		runUAServer = UA_TRUE;
-		
-		mappedServer = UA_Server_new(server_config);
-    baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-		
-		mtca_namespaceinit_generated(mappedServer);
-	}
-};
-
 /*
  * ProcessVariableTest
  * 
@@ -91,49 +32,6 @@ class ProcessVariableTest {
 		static void testExampleSet();
 		static UA_StatusCode readAttribueValue(UA_Client *client, const UA_NodeId nodeId, UA_Variant *outValue);
 };
-
-UA_StatusCode ProcessVariableTest::readAttribueValue(UA_Client *client, const UA_NodeId nodeId, UA_Variant *outValue) {
-	UA_ReadValueId item;
-	UA_ReadValueId_init(&item);
-	item.nodeId = nodeId;
-	item.attributeId = UA_ATTRIBUTEID_VALUE;
-	UA_ReadRequest requested;
-	UA_ReadRequest_init(&requested);
-	requested.nodesToRead = &item;
-	requested.nodesToReadSize = 1;
-	UA_ReadResponse responseed = UA_Client_Service_read(client, requested);
-	UA_StatusCode retval = responseed.responseHeader.serviceResult;
-	if(retval == UA_STATUSCODE_GOOD && responseed.resultsSize != 1)
-		retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
-	if(retval != UA_STATUSCODE_GOOD) {
-		UA_ReadResponse_deleteMembers(&responseed);
-		return retval;
-	}
-	UA_DataValue *res = responseed.results;
-	if(res->hasStatus != UA_STATUSCODE_GOOD)
-		retval = res->hasStatus;
-	else if(!res->hasValue) //|| !UA_Variant_isScalar(&res->value))
-		retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
-	if(retval != UA_STATUSCODE_GOOD) {
-		UA_ReadResponse_deleteMembers(&responseed);
-		return retval;
-	}
-									
-	if(UA_ATTRIBUTEID_VALUE == UA_ATTRIBUTEID_VALUE) {
-		memcpy(outValue, &res->value, sizeof(UA_Variant));
-		UA_Variant_init(&res->value);
-	} else if(UA_Variant_isScalar(&res->value) && res->value.type == &UA_TYPES[UA_TYPES_VARIANT]) {
-		memcpy(&outValue, res->value.data, res->value.type->memSize);
-		free(res->value.data);
-		res->value.data = NULL;
-	} else {
-		retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
-	}
-
-	UA_ReadResponse_deleteMembers(&responseed);
-	
-	return retval;	
-}
    
 void ProcessVariableTest::testEmptySet(){ 
 	std::cout << "Enter ProcessVariableTest with EmptySet" << std::endl;
@@ -516,7 +414,7 @@ void ProcessVariableTest::testClientSide(){
 									UA_Variant *valueToCheck = UA_Variant_new();
 									UA_Variant_init(valueToCheck);
 									//UA_StatusCode retvalValue = UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-									UA_StatusCode retvalValue = ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+									UA_StatusCode retvalValue = UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 									if(retvalValue != UA_STATUSCODE_GOOD) {
 										BOOST_CHECK(false);
 									}
@@ -820,7 +718,7 @@ void ProcessVariableTest::testClientSide(){
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
 														UA_Variant_init(valueToCheck);
-														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (int8_t*) valueToCheck->data; 
 														for(int i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
@@ -854,7 +752,7 @@ void ProcessVariableTest::testClientSide(){
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
 														UA_Variant_init(valueToCheck);
-														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (uint8_t*) valueToCheck->data; 
 														for(int i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
@@ -897,7 +795,7 @@ void ProcessVariableTest::testClientSide(){
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
 														UA_Variant_init(valueToCheck);
-														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (int16_t*) valueToCheck->data; 
 														for(int i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
@@ -940,7 +838,7 @@ void ProcessVariableTest::testClientSide(){
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
 														UA_Variant_init(valueToCheck);
-														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (uint16_t*) valueToCheck->data; 
 														for(int i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
@@ -983,7 +881,7 @@ void ProcessVariableTest::testClientSide(){
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
 														UA_Variant_init(valueToCheck);
-														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (int32_t*) valueToCheck->data; 
 														for(int i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
@@ -1020,7 +918,7 @@ void ProcessVariableTest::testClientSide(){
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
 														UA_Variant_init(valueToCheck);
-														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (uint32_t*) valueToCheck->data; 
 														for(int i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
@@ -1058,7 +956,7 @@ void ProcessVariableTest::testClientSide(){
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
 														UA_Variant_init(valueToCheck);
-														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (double*) valueToCheck->data; 
 														for(int i=0; i < arrayLength; i++) {
 															BOOST_CHECK(((int32_t)(value[i]*100)) == ((int32_t)(newValue[i]*100)));
@@ -1096,7 +994,7 @@ void ProcessVariableTest::testClientSide(){
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
 														UA_Variant_init(valueToCheck);
-														ProcessVariableTest::readAttribueValue(client, valueNodeId, valueToCheck);
+														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (float*) valueToCheck->data; 
 														for(int i=0; i < arrayLength; i++) {
 															BOOST_CHECK(((int32_t)(value[i]*100)) == ((int32_t)(newValue[i]*100)));

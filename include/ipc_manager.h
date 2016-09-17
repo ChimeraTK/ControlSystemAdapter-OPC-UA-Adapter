@@ -31,8 +31,8 @@
 
 #include "stdint.h"
 #include <list>
-#include "ipc_task.h"
 #include <condition_variable>
+#include <ipc_managed_object.h>
 
 class ipc_managed_object;
 
@@ -41,7 +41,6 @@ class ipc_manager : public ipc_managed_object
 {
 private:
   list<ipc_managed_object*> objects;
-  std::list<ipc_task*>      taskList;
   uint32_t nxtId;
   std::condition_variable   notifier;
 
@@ -53,7 +52,6 @@ public:
   uint32_t addObject(ipc_managed_object *object) ;
   uint32_t deleteObject(uint32_t rpc_id);
   
-  uint32_t addTask(ipc_task *task);
   bool hasTaskCompleted(uint32_t ipc_id);
   uint32_t getUniqueIpcId() ;
   

@@ -67,14 +67,6 @@ void ipc_manager::workerThread()
     this->notifier.wait(lock);
     
     // Check Tasks
-    
-    for (std::list<ipc_task*>::reverse_iterator i = this->taskList.rbegin(); i != this->taskList.rend(); ++i) {
-      if((*(i))->hasCompleted()) 
-        this->taskList.remove((*(i)));
-      else 
-        if (! (*(i))->isRunning())
-          (*(i))->doStart();
-    }
   }
   if (kicker.joinable())
     kicker.join();
@@ -86,8 +78,8 @@ uint32_t ipc_manager::addObject(ipc_managed_object *object)
   std::unique_lock<std::mutex> lock(this->mtx_threadOperations);
   
   if (object==nullptr) return 0; //Used to kick the worker thread for shutdown;
-  
-  object->setIpcId(this->getUniqueIpcId());
+
+	object->setIpcId(this->getUniqueIpcId());
   object->assignManager(this);
   this->objects.push_back(object);
   object->doStart();
@@ -100,9 +92,9 @@ uint32_t ipc_manager::addObject(ipc_managed_object *object)
 uint32_t ipc_manager::deleteObject(uint32_t rpc_id) 
 {
   std::list<ipc_managed_object *> deleteThese;
-  
   for(list<ipc_managed_object*>::iterator j = this->objects.begin(); j != this->objects.end(); j++) {
     ipc_managed_object *obj = *j;
+		
     if (obj->getIpcId() == rpc_id) {
       deleteThese.push_back(obj);
     }
@@ -124,21 +116,6 @@ uint32_t ipc_manager::deleteObject(uint32_t rpc_id)
 uint32_t ipc_manager::getUniqueIpcId() 
 {
   return ++nxtId;
-}
-
-uint32_t ipc_manager::addTask(ipc_task *task) {
-  std::unique_lock<std::mutex> lock(this->mtx_threadOperations);
-  
-  if (task == NULL)
-    return 0;
-  task->setIpcId(this->getUniqueIpcId());
-  task->assignManager(this);
-  this->taskList.push_back(task);
-  task->doStart();
-  
-  this->notifier.notify_all();
-  
-  return task->getIpcId();
 }
 
 void ipc_manager::startAll() {
@@ -166,6 +143,7 @@ void ipc_manager::stopAll() {
   return;
 }
 
+/*
 list<ipc_managed_object*> *ipc_manager::getAllObjectsByType(ipc_managed_object_type typeMask) {
   list<ipc_managed_object*> *objLst = new list<ipc_managed_object*>;
   
@@ -179,5 +157,5 @@ list<ipc_managed_object*> *ipc_manager::getAllObjectsByType(ipc_managed_object_t
   
   return objLst;
 }
-
+*/
 //ipc_managed_object* ipc_manager::getObjectById(uint32_t id) {return nullptr; }
