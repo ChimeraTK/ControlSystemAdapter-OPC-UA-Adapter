@@ -10,6 +10,10 @@ find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framewor
 find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 
+find_package(ChimeraTK-ControlSystemAdapter 0.2 REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
+link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
+
 ##########################################################################################################
 ## Compiler specific stuff
 ##########################################################################################################
@@ -24,7 +28,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR "x${CMAKE_C_COMPILER_ID}" STREQUAL "xClang")
   add_definitions(-fprofile-arcs)
   add_definitions(-ftest-coverage)
 endif()
-  
+
+
 ##########################################################################################################
 ## Includes, Link dirs und Quellcode
 ##########################################################################################################
@@ -32,11 +37,10 @@ endif()
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
-include_directories(${CMAKE_SOURCE_DIR}/include/open62541/)
-include_directories(${CMAKE_SOURCE_DIR}/include/ChimeraTK/)
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/include/open62541/)
+include_directories(SYSTEM ${ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/examples/)
-#include_directories(${CMAKE_SOURCE_DIR}/include/libxml/)
-include_directories(${LIBXML2_INCLUDE_DIR})
+include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR})
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 link_directories(${LIBXML2_LIBRARIES})
 
@@ -122,6 +126,7 @@ add_library(mtca_objects OBJECT ${objectSources})
 ## Create shared lib
 add_library(ControlSystemAdapterOPCUA SHARED $<TARGET_OBJECTS:mtca_objects>)
 target_link_libraries(ControlSystemAdapterOPCUA open62541)
+target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
 target_link_libraries(ControlSystemAdapterOPCUA pthread)
 target_link_libraries(ControlSystemAdapterOPCUA dl)
 target_link_libraries(ControlSystemAdapterOPCUA
@@ -144,7 +149,6 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_ope
                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_namespace.py
                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_node_types.py
                            ${PROJECT_SOURCE_DIR}/lib/libopen62541.so
-                           ${PROJECT_SOURCE_DIR}/lib/libControlSystemAdapter.so
                            ${PROJECT_SOURCE_DIR}/include/open62541/open62541.h
                    PRE_BUILD
                    COMMAND /bin/bash ${PROJECT_SOURCE_DIR}/tools/buildDependencies.sh ${PROJECT_SOURCE_DIR}
@@ -179,7 +183,6 @@ link_directories(${CMAKE_BINARY_DIR})
 
 add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/ControlSystem_OPCUA_Sample_Adapter.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapterOPCUA)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ChimeraTK-ControlSystemAdapter)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
