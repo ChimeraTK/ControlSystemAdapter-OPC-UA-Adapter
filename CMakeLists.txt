@@ -20,6 +20,8 @@ if( NOT ChimeraTK-ControlSystemAdapter_FOUND )
   message("You will not be able to make a proper installation of the OPCUA_Adapter. Only use this for testing and development.\n")
   ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
     GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
+    #When creationg a tag, base it on a tag of the ControlSystemAdapter so it stays stable
+    #GIT_TAG "00.02.00"
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK"
     )
   #FIXME: Find a better name for this variable
@@ -147,7 +149,6 @@ configure_file (
 ## Object Files
 add_library(mtca_objects OBJECT ${objectSources})
 if(USE_SELFINSTALLED_ControlSystemAdapter)
-  message("adding dependency mtca_objects external-ChimeraTK-ControlSystemAdapter")
   ADD_DEPENDENCIES(mtca_objects external-ChimeraTK-ControlSystemAdapter) 
 endif()
 
