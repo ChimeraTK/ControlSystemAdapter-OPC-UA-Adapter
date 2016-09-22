@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.0)
 
 project(ControlSystem-OPCUA_Adapter)
 
+include(ExternalProject)
 ##########################################################################################################
 ## Hard package dependencies
 ##########################################################################################################
@@ -10,7 +11,32 @@ find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framewor
 find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 
-find_package(ChimeraTK-ControlSystemAdapter 0.2 REQUIRED)
+#Do not put the ControlSystemAdapter as required. We will install it if it is not found.
+find_package(ChimeraTK-ControlSystemAdapter 0.2)
+
+#Install the ControlSystemAdapter if it is not pre-installed
+if( NOT ChimeraTK-ControlSystemAdapter_FOUND )
+  message("Installing ChimeraTK-ControlSystemAdapter as external dependency inside the build directory.")
+  message("You will not be able to make a proper installation of the OPCUA_Adapter. Only use this for testing and development.\n")
+  ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
+    GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
+    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK"
+    )
+  #FIXME: Find a better name for this variable
+  set(USE_SELFINSTALLED_ControlSystemAdapter TRUE)
+  #As the external project is only condifured in the build step, we have to cheat the
+  #configuration here which otherwise is provided by find_package.
+  #Attention: This is a hack and can become inconsistent with the read config.
+  #
+  #ChimeraTK-ControlSystemAdapter_CXX_FLAGS currently only provides C++11, which is used anyway
+  #ChimeraTK-ControlSystemAdapter_LINKER_FLAGS provides the rpath, not needed for testing
+  #
+  #We leave out the boost flags as the OPCUA_Adapter uses them itself
+  set(ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/include)
+  set(ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/lib)
+  set(ChimeraTK-ControlSystemAdapter_LIBRARIES ChimeraTK-ControlSystemAdapter)
+endif()
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
 link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
 
@@ -120,7 +146,10 @@ configure_file (
 
 ## Object Files
 add_library(mtca_objects OBJECT ${objectSources})
-
+if(USE_SELFINSTALLED_ControlSystemAdapter)
+  message("adding dependency mtca_objects external-ChimeraTK-ControlSystemAdapter")
+  ADD_DEPENDENCIES(mtca_objects external-ChimeraTK-ControlSystemAdapter) 
+endif()
 
 ## Early declaration due to the requirement to run the dependencies update prior to building
 ## Create shared lib
