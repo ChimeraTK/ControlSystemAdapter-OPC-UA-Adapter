@@ -31,12 +31,11 @@
 
 using namespace std;
 
-ua_mapped_class::ua_mapped_class()
-{
+ua_mapped_class::ua_mapped_class() {
   this->baseNodeId = UA_NODEID_NUMERIC(0,0);
   this->mappedServer = nullptr;
 	
-	this->ua_mapSelfToNamespace();
+	ua_mapSelfToNamespace();
 }
 
 /*
@@ -51,6 +50,8 @@ ua_mapped_class::ua_mapped_class(UA_Server *server, UA_NodeId baseNodeId)
 {
   UA_NodeId_copy(&baseNodeId, &this->baseNodeId);
   this->mappedServer = server;
+	
+	ua_mapSelfToNamespace();
 }
 
 ua_mapped_class::~ua_mapped_class()
@@ -62,16 +63,15 @@ ua_mapped_class::~ua_mapped_class()
   cout << "unmapped" << endl;
 }
 
-UA_StatusCode ua_mapped_class::ua_mapSelfToNamespace()
-{
-  UA_StatusCode retval = UA_STATUSCODE_GOOD;
-  UA_NodeId nullId = UA_NODEID_NULL;
-  if (UA_NodeId_equal(&this->baseNodeId, &UA_NODEID_NULL))
-    return -1;
-  if (this->mappedServer == nullptr)
-    return -2;
-  
-  return retval;
+UA_StatusCode ua_mapped_class::ua_mapSelfToNamespace() {
+   UA_StatusCode retval = UA_STATUSCODE_GOOD;
+   UA_NodeId nullId = UA_NODEID_NULL;
+   if (UA_NodeId_equal(&this->baseNodeId, &UA_NODEID_NULL))
+     return -1;
+   if (this->mappedServer == nullptr)
+     return -2;
+   
+   return retval;
 }
 
 UA_StatusCode ua_mapped_class::ua_unmapSelfFromNamespace()
@@ -84,12 +84,11 @@ UA_StatusCode ua_mapped_class::ua_unmapSelfFromNamespace()
   return UA_STATUSCODE_GOOD;
 }
 
-UA_StatusCode ua_mapped_class::ua_mapFunctions(void* srcClass, UA_FunctionCall_Map* map, UA_NodeId objectId)
-{
-  return ua_callProxy_mapFunctions(this->mappedServer, objectId, map, srcClass, false);
+UA_StatusCode ua_mapped_class::ua_mapFunctions(void* srcClass, UA_FunctionCall_Map* map, UA_NodeId objectId) {
+	return ua_callProxy_mapFunctions(this->mappedServer, objectId, map, srcClass, false);
 }
 
-UA_StatusCode ua_mapped_class::ua_mapDataSources(void* srcClass, UA_DataSource_Map *map) 
-{
+
+UA_StatusCode ua_mapped_class::ua_mapDataSources(void* srcClass, UA_DataSource_Map *map) {
   return ua_callProxy_mapDataSources(this->mappedServer, this->ownedNodes, map, srcClass);
 }

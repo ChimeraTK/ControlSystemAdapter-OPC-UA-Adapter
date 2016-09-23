@@ -50,7 +50,7 @@ public:
     ua_mapped_class();
     ~ua_mapped_class();
     
-    UA_StatusCode ua_mapSelfToNamespace();
+		UA_StatusCode ua_mapSelfToNamespace();
     UA_StatusCode ua_unmapSelfFromNamespace();
     UA_StatusCode ua_mapFunctions(void* srcClass, UA_FunctionCall_Map *map, UA_NodeId objectId);
     UA_StatusCode ua_mapDataSources(void* srcClass, UA_DataSource_Map* map);

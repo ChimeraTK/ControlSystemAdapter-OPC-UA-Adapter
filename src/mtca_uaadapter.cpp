@@ -80,6 +80,8 @@ mtca_uaadapter::~mtca_uaadapter() {
 		this->doStop();
 	}
 	
+	this->~ipc_managed_object();
+	
 	//UA_Server_delete(this->mappedServer);
 	this->fileHandler->~xml_file_handler();
 }
@@ -215,7 +217,7 @@ UA_NodeId mtca_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folde
     oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)folderName.c_str());    
 	
     UA_INSTATIATIONCALLBACK(icb);
-     UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
+    UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
                              basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
                              UA_QUALIFIEDNAME(1, (char*)folderName.c_str()), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr, &icb, &createdNodeId);
     

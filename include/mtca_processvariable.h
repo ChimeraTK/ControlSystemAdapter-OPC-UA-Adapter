@@ -32,7 +32,7 @@
 
 //typedef boost::shared_ptr<ChimeraTK::ControlSystemPVManager> shCSysPVManager;
 
-class mtca_processvariable :  ua_mapped_class {
+class mtca_processvariable : ua_mapped_class {
 private:
   std::string namePV;
 	std::string nameNew;

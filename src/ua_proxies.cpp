@@ -29,6 +29,8 @@
 extern "C" 
 {
   #include "open62541.h"
+#include <open62541.h>
+#include <open62541.h>
 }
 
 #include "ua_proxies.h"
@@ -48,6 +50,7 @@ UA_NodeId *nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId r
   return local;
 }
 
+
 UA_NodeId *nodePairList_getSourceIdByTargetId(nodePairList pairList, UA_NodeId targetId) {
   UA_NodeId *local = nullptr;
   // cppcheck-suppress postfixOperator                  REASON: List iterator cannot be prefixed
@@ -58,6 +61,7 @@ UA_NodeId *nodePairList_getSourceIdByTargetId(nodePairList pairList, UA_NodeId t
     }
   return local;
 }
+
 
 UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void *handle) {
   nodePairList *lst = static_cast<nodePairList*>(handle);

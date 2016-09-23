@@ -109,9 +109,7 @@ void UAAdapterTest::testExampleSet(){
 	BOOST_CHECK(adapter->getVariables().size() > 0);
 		
 	adapter->~mtca_uaadapter();
-		
 };
-
 
 /**
    * The boost test suite which executes the ProcessVariableTest.

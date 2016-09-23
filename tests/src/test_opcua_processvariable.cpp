@@ -77,7 +77,7 @@ void ProcessVariableTest::testEmptySet(){
 			}
 			else if (valueType == "uint8_t") {
 				BOOST_CHECK(valueType == "uint8_t");
-				BOOST_CHECK(test->getValue_uint8_t() == 12);
+				BOOST_CHECK(test->getValue_uint8_t() == 0);
 				test->setValue_uint8_t(111);
 				BOOST_CHECK(test->getValue_uint8_t() == 111);
 			}
@@ -223,8 +223,6 @@ void ProcessVariableTest::testEmptySet(){
 	UA_Server_run_shutdown(serverSet.mappedServer);
 	UA_Server_delete(serverSet.mappedServer);
 	
-	//delete serverThread;
-	//serverThread = nullptr;
 };
 
 void ProcessVariableTest::testClientSide(){ 
@@ -314,8 +312,6 @@ void ProcessVariableTest::testClientSide(){
 								if(browseNameFound2 == "EngineeringUnit") {
 									engineeringUnitNodeId = refe->nodeId.nodeId;
 								}
-								
-								
 								
 								/* timeStamp Begin */
 								if(browseNameFound2 == "timeStamp") {
@@ -456,6 +452,20 @@ void ProcessVariableTest::testClientSide(){
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), valName);
 										BOOST_CHECK(valName == "");
 										
+										// Write new engineering unit
+										UA_String newEU;
+										UA_String_init(&newEU);
+										std::string merker = "mHensel/Iatrou";
+										CPPSTRING_TO_UASTRING(newEU, merker);
+										UA_Variant_init(euToCheck);
+										UA_Variant_setScalarCopy(euToCheck, &newEU, &UA_TYPES[UA_TYPES_STRING]);
+										UA_StatusCode retvalNewEU = UA_Client_writeValueAttribute(client, engineeringUnitNodeId, euToCheck);
+										UA_String_deleteMembers(&newEU);
+										
+										
+										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), valName);
+										BOOST_CHECK(valName == "mHensel/Iatrou");
+										
 										// i know, this part is perfecly for makro stuff... but common, for maintainability reason we should use simple code... 
 										if(valueToCheck->arrayLength < 1) {
 											switch(datatypeId.identifier.numeric -1) {
@@ -497,10 +507,10 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(valName != "");
 													// Check Value
 													int8_t value = (int8_t) *((int8_t*) valueToCheck->data);
-													BOOST_CHECK(value == 12);
+													BOOST_CHECK(value == 0);
 													cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
-													int8_t newValue = 123;
+													int8_t newValue = 122;
 													valueToCheck = UA_Variant_new();
 													UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_BYTE]);
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
@@ -1018,6 +1028,8 @@ void ProcessVariableTest::testClientSide(){
 
 	UA_BrowseRequest_deleteMembers(&bReq);
 	UA_BrowseResponse_deleteMembers(&bResp);
+	
+	
 
 };
 

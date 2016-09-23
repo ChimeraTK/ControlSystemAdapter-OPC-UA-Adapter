@@ -37,7 +37,6 @@ extern "C" {
 #include <typeinfo>       // std::bad_cast
 
 #include "ipc_manager.h"
-
 #include "mtca_uaadapter.h"
 #include "mtca_processvariable.h"
 
@@ -74,7 +73,15 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(shCSysP
         adapter->addVariable(oneProcessVariable->getName(), csManager);
     }
 }
-    
+
+ControlSystemAdapterOPCUA::~ControlSystemAdapterOPCUA() {
+	this->mgr->~ipc_manager();
+	free(this->mgr);
+	this->adapter->~mtca_uaadapter();
+	free(this->adapter);
+}
+
+
 // Maybe needed, return the ControlSystemPVManager
 shCSysPVManager const & ControlSystemAdapterOPCUA::getControlSystemPVManager() const {
     return this->csManager;

@@ -66,18 +66,18 @@ xmlXPathObjectPtr xml_file_handler::getNodeSet(std::string xPathString) {
 	}
 	context = xmlXPathNewContext(this->doc);
 	if (context == NULL) {
-		std::printf("Error in xmlXPathNewContext\n");
+		//std::cout("Error in xmlXPathNewContext\n");
 		return NULL;
 	}
 	result = xmlXPathEvalExpression(xpath, context);
 	xmlXPathFreeContext(context);
 	if (result == NULL) {
-		std::printf("Error in xmlXPathEvalExpression\n");
+		//std::cout("Error in xmlXPathEvalExpression\n");
 		return NULL;
 	}
 	if(xmlXPathNodeSetIsEmpty(result->nodesetval)){
 		xmlXPathFreeObject(result);
-        std::printf("No result\n");
+		//std::cout("No result\n");
 		return NULL;
 	}
 	return result;

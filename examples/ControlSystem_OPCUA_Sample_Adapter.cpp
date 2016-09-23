@@ -97,6 +97,11 @@ int main() {
 		ProcessArray<double>::SharedPtr intB15Afdev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleArray_s15", 15);
 		ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s10", 10);
 		
+		csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(0) = 12;
+		csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(1) = 13;
+		csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(2) = 14;
+		csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(3) = 15;
+		csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(4) = 16;
 		
 		// data generation cycle time in ms
 		ProcessScalar<int32_t>::SharedPtr dtDev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "dt");

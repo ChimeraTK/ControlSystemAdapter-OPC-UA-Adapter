@@ -60,7 +60,11 @@ void IPCManagerTest::testManagerConection(){
 	ipc_manager *newManager = new ipc_manager();
 	BOOST_CHECK(adapterOne->assignManager(newManager) == true);
  	BOOST_CHECK(adapterOne->assignManager(nullptr) == false);
-		
+	
+	mtca_uaadapter *adapterThree = new mtca_uaadapter(16662, "../../tests/uamapping_test.xml");
+	manager->addObject(adapterThree);
+	
+	manager->~ipc_manager();
 };
 
 

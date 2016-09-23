@@ -204,12 +204,22 @@ void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) 
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
     if (!this->csManager->getProcessVariable(this->namePV)->isArray())    return; \
     if (this->csManager->getProcessVariable(this->namePV)->isSender()) { \
-				int32_t valueSize = this->csManager->getProcessArray<_p_type>(this->namePV)->get().size(); \
-				value.resize(valueSize); \
-        this->csManager->getProcessArray<_p_type>(this->namePV)->set(value); \
+        this->csManager->getProcessArray<_p_type>(this->namePV)->set(value);	\
     } \
     return; \
 }
+
+// #define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
+// void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
+//     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
+//     if (!this->csManager->getProcessVariable(this->namePV)->isArray())    return; \
+//     if (this->csManager->getProcessVariable(this->namePV)->isSender()) { \
+// 				int32_t valueSize = this->csManager->getProcessArray<_p_type>(this->namePV)->get().size(); \
+// 				value.resize(valueSize); \
+//         this->csManager->getProcessArray<_p_type>(this->namePV)->set(value); \
+//     } \
+//     return; \
+// }
 
 UA_RDPROXY_INT8(mtca_processvariable, getValue_int8_t);
 CREATE_READ_FUNCTION(int8_t)
@@ -351,14 +361,8 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
         else if (valueType == typeid(double))     PUSH_RDVALUE_ARRAY_TYPE(double)
         else std::cout << "Cannot proxy unknown array type " << typeid(valueType).name() << std::endl;
     }
-/*
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName), .write=UA_WRPROXY_NAME(mtca_processvariable, setName)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType), .write=UA_WRPROXY_NAME(mtca_processvariable, setType)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_SECONDS), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampSeconds), .write=UA_WRPROXY_NAME(mtca_processvariable, setTimeStampSeconds)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_NANOSECONDS), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampNanoSeconds), .write=UA_WRPROXY_NAME(mtca_processvariable, setTimeStampNanoSeconds)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX0), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex0), .write=UA_WRPROXY_NAME(mtca_processvariable, setTimeStampIndex0)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX1), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex1), .write=UA_WRPROXY_NAME(mtca_processvariable, setTimeStampIndex1)});
-*/             
+    
+    
 		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), .read=UA_RDPROXY_NAME(mtca_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(mtca_processvariable, setEngineeringUnit)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});
@@ -367,9 +371,9 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX0), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex0)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX1), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex1)});
 
-	ua_callProxy_mapDataSources(this->mappedServer, this->ownedNodes, &mapDs, (void *) this);
-
-    return UA_STATUSCODE_GOOD;
+	this->ua_mapDataSources((void *) this, &mapDs);
+	
+	return UA_STATUSCODE_GOOD;
 }
 
 UA_NodeId mtca_processvariable::getOwnNodeId() {

@@ -28,7 +28,6 @@
 #define CONTROLSYSTEMADAPTER_OPCUA_H
 
 #include <vector>
-#include "ua_mapped_class.h"
 #include "ipc_managed_object.h"
 
 #include "mtca_uaadapter.h"

@@ -39,6 +39,8 @@ void CSAOPCUATest::testWithoutPVSet(){
 	csaOPCUA->stop();
 	csaOPCUA->terminate();
 	BOOST_CHECK(csaOPCUA->isRunning() != true);
+	
+	csaOPCUA->~ControlSystemAdapterOPCUA(); 
 };
 
 void CSAOPCUATest::testWithPVSet(){ 
@@ -61,6 +63,8 @@ void CSAOPCUATest::testWithPVSet(){
 	csaOPCUA->stop();
 	csaOPCUA->terminate();
 	BOOST_CHECK(csaOPCUA->isRunning() != true);
+	
+	csaOPCUA->~ControlSystemAdapterOPCUA();
 };
 
 
