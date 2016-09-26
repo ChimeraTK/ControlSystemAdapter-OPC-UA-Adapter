@@ -420,7 +420,7 @@ attr.displayName = UA_LOCALIZEDTEXT("", "Value");
 attr.description = UA_LOCALIZEDTEXT("", "");
 attr.accessLevel = 3;
 attr.userAccessLevel = 3;
-attr.valueRank = -2;
+attr.valueRank = -3;
 UA_String *opcua_node_variable_t_ns_2_i_6010_variant_DataContents =  UA_String_new();
 *opcua_node_variable_t_ns_2_i_6010_variant_DataContents = UA_STRING_ALLOC("");
 UA_Variant_setScalar( &attr.value, opcua_node_variable_t_ns_2_i_6010_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
