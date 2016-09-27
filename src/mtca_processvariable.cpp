@@ -204,6 +204,10 @@ void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) 
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
     if (!this->csManager->getProcessVariable(this->namePV)->isArray())    return; \
     if (this->csManager->getProcessVariable(this->namePV)->isSender()) { \
+				for(auto merk: value) { \
+					std::cout << merk; \
+					std::cout << "test";\
+				} \
         this->csManager->getProcessArray<_p_type>(this->namePV)->set(value);	\
     } \
     return; \
