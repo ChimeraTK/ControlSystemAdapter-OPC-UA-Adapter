@@ -36,6 +36,7 @@ extern "C" {
 
 #include <iostream>
 
+using namespace std;
 
 mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, std::string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
 	
@@ -188,6 +189,18 @@ std::vector<_p_type>    mtca_processvariable::getValue_Array_##_p_type() { \
     return v; \
 } \
 
+std::vector<double> mtca_processvariable::getValue_Array_double() {
+    std::vector<double> v; 
+    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(double)) return v;
+    if (!this->csManager->getProcessVariable(this->namePV)->isArray()) return v;
+    v = this->csManager->getProcessArray<double>(this->namePV)->get();
+		for(auto merk: v) {
+			cout << "Read: " << merk << endl;
+		} 
+		
+    return v;
+}
+
 #define CREATE_WRITE_FUNCTION(_p_type) \
 void mtca_processvariable::setValue_##_p_type(_p_type value) { \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
@@ -204,14 +217,23 @@ void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) 
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
     if (!this->csManager->getProcessVariable(this->namePV)->isArray())    return; \
     if (this->csManager->getProcessVariable(this->namePV)->isSender()) { \
-				for(auto merk: value) { \
-					std::cout << merk; \
-					std::cout << "test";\
-				} \
         this->csManager->getProcessArray<_p_type>(this->namePV)->set(value);	\
     } \
     return; \
 }
+
+void mtca_processvariable::setValue_Array_double(std::vector<double> value) {
+    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(double)) return;
+    if (!this->csManager->getProcessVariable(this->namePV)->isArray())    return;
+    if (this->csManager->getProcessVariable(this->namePV)->isSender()) {
+				for(auto merk: value) {
+					cout << "Write: " << merk << endl;
+				} 
+        this->csManager->getProcessArray<double>(this->namePV)->set(value);
+    } 
+    return; 
+}
+
 
 // #define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
 // void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
@@ -275,7 +297,7 @@ CREATE_READ_FUNCTION_ARRAY(uint32_t)
 UA_RDPROXY_ARRAY_FLOAT(mtca_processvariable, getValue_Array_float);
 CREATE_READ_FUNCTION_ARRAY(float)
 UA_RDPROXY_ARRAY_DOUBLE(mtca_processvariable, getValue_Array_double);
-CREATE_READ_FUNCTION_ARRAY(double)
+//CREATE_READ_FUNCTION_ARRAY(double)
 
 UA_WRPROXY_ARRAY_INT8(mtca_processvariable, setValue_Array_int8_t);
 CREATE_WRITE_FUNCTION_ARRAY(int8_t)
@@ -292,7 +314,7 @@ CREATE_WRITE_FUNCTION_ARRAY(uint32_t)
 UA_WRPROXY_ARRAY_FLOAT(mtca_processvariable, setValue_Array_float);
 CREATE_WRITE_FUNCTION_ARRAY(float)
 UA_WRPROXY_ARRAY_DOUBLE(mtca_processvariable, setValue_Array_double);
-CREATE_WRITE_FUNCTION_ARRAY(double)
+//CREATE_WRITE_FUNCTION_ARRAY(double)
 
 
 // Just a macro to easy pushing different types of dataSources

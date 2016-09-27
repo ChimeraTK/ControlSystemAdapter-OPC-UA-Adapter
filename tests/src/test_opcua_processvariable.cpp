@@ -723,6 +723,11 @@ void ProcessVariableTest::testClientSide(){
 													}
 													
 													valueToCheck = UA_Variant_new();
+													
+													//valueToCheck->arrayDimensionsSize = 1;
+													//UA_UInt32 array = (UA_UInt32)arrayLength;		
+													//valueToCheck->arrayDimensions = &array;
+													
 													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT16]);													
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -1030,7 +1035,7 @@ void ProcessVariableTest::testClientSide(){
 	UA_BrowseResponse_deleteMembers(&bResp);
 	
 	
-
+	while(true){}
 };
 
 
