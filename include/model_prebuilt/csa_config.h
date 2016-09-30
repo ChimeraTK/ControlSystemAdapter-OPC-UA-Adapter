@@ -2,7 +2,7 @@
 #define HAVE_CONFIG_H_
 
 /* Example parameter expansion:
- * #define ENABLE_BUILDMODEL "ON"
+ * #define ENABLE_BUILDMODEL "OFF"
  */
  
 // Namespace ID for UA Information Model

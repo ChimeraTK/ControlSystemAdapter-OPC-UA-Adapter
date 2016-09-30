@@ -108,6 +108,12 @@ theClass->_p_method(vectorizedValue); \
 
 #define UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, _p_ctype, _p_uatype) \
 UA_Variant_setArrayCopy(&value->value, (_p_ctype *) thisObj->_p_method().data(), thisObj->_p_method().size(), &UA_TYPES[_p_uatype]); \
+UA_NumericRange arrayRange; \
+arrayRange.dimensionsSize = 1; \
+UA_NumericRangeDimension scalarThisDimension = (UA_NumericRangeDimension){.min = 0, .max = (unsigned)thisObj->_p_method().size()}; \
+arrayRange.dimensions = &scalarThisDimension; \
+UA_Variant_setRangeCopy(&value->value, (_p_ctype *) thisObj->_p_method().data(), thisObj->_p_method().size(), arrayRange); \
+
 
 // Typed Function Protoypes with datatype specific stuff
 // Readproxies:

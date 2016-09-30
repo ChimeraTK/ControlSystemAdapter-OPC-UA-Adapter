@@ -1,6 +1,7 @@
 #include <mtca_uaadapter.h>
 #include <ControlSystemAdapterOPCUA.h>
 #include <ipc_manager.h>
+#include <open62541.h>
 
 #include <test_sample_data.h>
 
@@ -442,7 +443,8 @@ void ProcessVariableTest::testClientSide(){
 										if(retvalDatatype != UA_STATUSCODE_GOOD) {
 											BOOST_CHECK(false);
 										}
-									}	
+									}
+									
 									
 									if(retvalValue == UA_STATUSCODE_GOOD) {
 										string datatype = "";
@@ -468,7 +470,7 @@ void ProcessVariableTest::testClientSide(){
 										
 										// i know, this part is perfecly for makro stuff... but common, for maintainability reason we should use simple code... 
 										if(valueToCheck->arrayLength < 1) {
-											switch(datatypeId.identifier.numeric -1) {
+											switch(valueToCheck->type->typeId.identifier.numeric -1) {
 												case UA_TYPES_SBYTE: {
 													// Check Datatype
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
@@ -511,7 +513,7 @@ void ProcessVariableTest::testClientSide(){
 													cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													int8_t newValue = 122;
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_BYTE]);
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -539,7 +541,7 @@ void ProcessVariableTest::testClientSide(){
 													cout << "Wert: " << std::to_string(value) << endl;
 													// set new value, should be wrong
 													int16_t newValue = 123;
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_INT16]);
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -567,7 +569,7 @@ void ProcessVariableTest::testClientSide(){
 													cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 												uint16_t newValue = 123;
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_UINT16]);
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -595,7 +597,7 @@ void ProcessVariableTest::testClientSide(){
 													cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													int32_t newValue = 123;
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_INT32]);
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -623,7 +625,7 @@ void ProcessVariableTest::testClientSide(){
 													cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													uint32_t newValue = 123;
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_UINT32]);
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -651,7 +653,7 @@ void ProcessVariableTest::testClientSide(){
 													cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													double newValue = 123.123;
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_DOUBLE]);
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -679,7 +681,7 @@ void ProcessVariableTest::testClientSide(){
 													cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													float newValue = 123.123;
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_FLOAT]);
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -694,14 +696,17 @@ void ProcessVariableTest::testClientSide(){
 													}
 													break;
 												}
-												default: printf("Not define: %-16d\n", datatypeId.identifier.numeric);
+												default: {
+													printf("Not define: %-16d\n", datatypeId.identifier.numeric);
+													BOOST_CHECK(false);
+												}
 											}
 										}
 										else {
 											/*
 											* Begin array section
 											*/
-											switch(datatypeId.identifier.numeric -1) {
+											switch(valueToCheck->type->typeId.identifier.numeric -1) {
 												case UA_TYPES_SBYTE: {
 													// Check Datatype
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
@@ -722,11 +727,14 @@ void ProcessVariableTest::testClientSide(){
 														newValue[i] = i;
 													}
 													
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													
-													//valueToCheck->arrayDimensionsSize = 1;
-													//UA_UInt32 array = (UA_UInt32)arrayLength;		
-													//valueToCheck->arrayDimensions = &array;
+													/** Mybe it work...
+													 * 
+													 */
+													valueToCheck->arrayDimensionsSize = 1;
+													UA_UInt32 array = (UA_UInt32)arrayLength;		
+													valueToCheck->arrayDimensions = &array;
 													
 													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT16]);													
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
@@ -761,7 +769,7 @@ void ProcessVariableTest::testClientSide(){
 														newValue[i] = i;
 													}
 													
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT16]);													
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -804,7 +812,7 @@ void ProcessVariableTest::testClientSide(){
 														newValue[i] = i;
 													}
 													
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_INT16]);													
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -847,7 +855,7 @@ void ProcessVariableTest::testClientSide(){
 														newValue[i] = i;
 													}
 													
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT16]);													
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -890,7 +898,7 @@ void ProcessVariableTest::testClientSide(){
 														newValue[i] = i;
 													}
 													
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_INT32]);													
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -927,7 +935,7 @@ void ProcessVariableTest::testClientSide(){
 														newValue[i] = i;
 													}
 													
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT32]);													
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -965,8 +973,28 @@ void ProcessVariableTest::testClientSide(){
 														newValue[i] = i*0.5;
 													}
 													
-													valueToCheck = UA_Variant_new();
-													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_DOUBLE]);													
+													UA_Variant_init(valueToCheck);
+													
+													
+													
+													UA_NumericRange arrayRange;
+													arrayRange.dimensionsSize = 1;
+													UA_NumericRangeDimension scalarThisDimension = (UA_NumericRangeDimension){.min = 0, .max = (unsigned int)arrayLength};
+													arrayRange.dimensions = &scalarThisDimension; \
+													UA_Variant_setRangeCopy(valueToCheck, newValue, arrayLength, arrayRange);
+													
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_DOUBLE]);	
+/*												
+													UA_Client_readArrayDimensionsAttribute(UA_Client *client, const UA_NodeId nodeId,
+                                       UA_Int32 **outArrayDimensions,
+                                       size_t *outArrayDimensionsSize);
+
+													UA_Client_readValueRankAttribute(UA_Client *client, const UA_NodeId nodeId,
+                                 UA_Int32 *outValueRank) {
+    return __UA_Client_readAttribute(client, &nodeId, UA_ATTRIBUTEID_VALUERANK,
+                                     outValueRank, &UA_TYPES[UA_TYPES_INT32]);
+}*/
+
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
@@ -1003,7 +1031,7 @@ void ProcessVariableTest::testClientSide(){
 														newValue[i] = i*0.5;
 													}
 													
-													valueToCheck = UA_Variant_new();
+													UA_Variant_init(valueToCheck);
 													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_FLOAT]);													
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
@@ -1020,22 +1048,21 @@ void ProcessVariableTest::testClientSide(){
 													}
 													break;
 												}
-												default: printf("Not define: %-16d\n", datatypeId.identifier.numeric);
+												default: { 
+													printf("Not define: %-16d\n", datatypeId.identifier.numeric);
+													BOOST_CHECK(false);
+												}
 											}
 										}
 									}
-			
 									UA_Variant_delete(valueToCheck);
-					}
+						}
 					}
 		}
 	}
 
 	UA_BrowseRequest_deleteMembers(&bReq);
 	UA_BrowseResponse_deleteMembers(&bResp);
-	
-	
-	while(true){}
 };
 
 
