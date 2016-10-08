@@ -4,7 +4,7 @@
  */
 #include "mtca_namespaceinit_generated.h"
 UA_INLINE void mtca_namespaceinit_generated(UA_Server *server) {
-UA_Server_addNamespace(server, "http://yourorganisation.org/templatemodel/Types.xsd");
+UA_Server_addNamespace(server, "http://yourorganisation.org/templatemodel/");
 
 do {
 // Referencing node found and declared as parent: i=63/BaseDataVariableType using i=45/HasSubtype
@@ -444,10 +444,7 @@ attr.displayName = UA_LOCALIZEDTEXT("", "Value");
 attr.description = UA_LOCALIZEDTEXT("", "");
 attr.accessLevel = 3;
 attr.userAccessLevel = 3;
-attr.valueRank = -3;
-UA_String *opcua_node_variable_t_ns_2_i_6010_variant_DataContents =  UA_String_new();
-*opcua_node_variable_t_ns_2_i_6010_variant_DataContents = UA_STRING_ALLOC("");
-UA_Variant_setScalar( &attr.value, opcua_node_variable_t_ns_2_i_6010_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
+attr.valueRank = -2;
 UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6010);
 UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
 UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);

@@ -14,7 +14,7 @@
     </Aliases>
     <Extensions>
         <Extension>
-            <ModelInfo Tool="UaModeler" Hash="+xCbi1U0ab2VT6MjzXj6TQ==" Version="1.4.4"/>
+            <ModelInfo Tool="UaModeler" Hash="xxcUG/f0zmWOlROr/bpPnA==" Version="1.4.4"/>
         </Extension>
     </Extensions>
     <UAVariableType NodeId="ns=1;i=2002" BrowseName="1:mtcaTimeStampVariableType">
@@ -115,8 +115,8 @@
         <DisplayName>EngineeringUnit</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
-            <Reference ReferenceType="HasModellingRule">i=78</Reference>
             <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
+            <Reference ReferenceType="HasModellingRule">i=78</Reference>
         </References>
     </UAVariable>
     <UAVariable DataType="String" ParentNodeId="ns=1;i=1001" NodeId="ns=1;i=6004" BrowseName="1:Name">
@@ -185,16 +185,13 @@
             <uax:String></uax:String>
         </Value>
     </UAVariable>
-    <UAVariable DataType="String" ParentNodeId="ns=1;i=1001" ValueRank="-3" NodeId="ns=1;i=6010" BrowseName="1:Value" UserAccessLevel="3" AccessLevel="3">
+    <UAVariable ParentNodeId="ns=1;i=1001" ValueRank="-2" NodeId="ns=1;i=6010" BrowseName="1:Value" UserAccessLevel="3" AccessLevel="3">
         <DisplayName>Value</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
             <Reference ReferenceType="HasModellingRule">i=78</Reference>
             <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
         </References>
-        <Value>
-            <uax:String></uax:String>
-        </Value>
     </UAVariable>
     <UAObjectType NodeId="ns=1;i=1004" BrowseName="1:mtcaTimeStamp">
         <DisplayName>mtcaTimeStamp</DisplayName>

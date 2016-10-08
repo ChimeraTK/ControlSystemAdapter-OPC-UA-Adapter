@@ -172,9 +172,41 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
     ds.read = ele->read;
     ds.write = ele->write;
     ds.handle = srcClass;
-    delete ele; // inhibit memleak warning during static analysis
+    delete ele; // inhibit memleak warning during static analysis		
     
     retval |= UA_Server_setVariableNode_dataSource(server, (const UA_NodeId) instantiatedId, ds);
+		
+		/* Ste the right Value Datatype */
+		UA_NodeId datatTypeNodeId = UA_NODEID_NULL;
+    retval = UA_Server_readDataType(server, instantiatedId, &datatTypeNodeId);
+		if(retval == UA_STATUSCODE_GOOD) {
+			const UA_NodeId basedatatype = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
+			UA_Variant variantVal;
+			UA_Variant_init(&variantVal);
+			retval = UA_Server_readValue(server, instantiatedId, &variantVal);
+			if(UA_NodeId_equal(&datatTypeNodeId, &basedatatype) && retval == UA_STATUSCODE_GOOD) {
+				retval = UA_Server_writeDataType(server, instantiatedId, variantVal.type->typeId);
+				
+				UA_Int32 valueRank = -2;				
+				if(variantVal.arrayDimensionsSize == 0 && UA_Variant_isScalar(&variantVal)) {
+					// Scalar
+					valueRank = -1;
+				}
+				else {
+					if(variantVal.arrayDimensionsSize == 1) {
+						// OneDimension
+						valueRank = 1;
+					}
+					else {
+						if(variantVal.arrayDimensionsSize > 1) {
+							// OneOrMoreDimensions
+							valueRank = 0;
+						}
+					}
+				}
+				UA_Server_writeValueRank(server, instantiatedId, valueRank);
+			}
+		}
   }
   
   return retval;
