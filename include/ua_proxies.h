@@ -41,9 +41,11 @@ typedef struct UA_NodeId_pair_t {
 } UA_NodeId_pair;
 typedef std::list<UA_NodeId_pair*> nodePairList; 
 
+// Lookup Table: Multiple instances of the object may exist, a lookup for their respecive Id must be performed
 typedef struct UA_FunctionCall_InstanceLookupTable_Element_t {
-  void              *classInstance;
-  UA_NodeId         classObjectId;
+    UA_Server         *server;            // Server instance the node lives in (might have multiple servers with the same object/methodId)
+    void              *classInstance;     // Object instance Id
+    UA_NodeId         classObjectId;      // Method Id
 } UA_FunctionCall_InstanceLookupTable_Element;
 typedef std::list<UA_FunctionCall_InstanceLookupTable_Element*> UA_FunctionCall_InstanceLookUpTable; 
 

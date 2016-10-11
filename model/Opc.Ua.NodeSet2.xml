@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<UANodeSet LastModified="2013-03-06T05:36:44.0862658Z" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd" xsi:schemaLocation="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd /home/ichrispa/tmp/UANodeSet.xsd">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UANodeSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.02" LastModified="2013-03-06T05:36:44.0862658Z" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
   <Aliases>
     <Alias Alias="Boolean">i=1</Alias>
     <Alias Alias="SByte">i=2</Alias>
@@ -54,7 +54,7 @@
   <UADataType NodeId="i=24" BrowseName="BaseDataType" IsAbstract="true">
     <DisplayName>BaseDataType</DisplayName>
     <Description>Describes a value that can have any valid DataType.</Description>
-    <References></References>
+    <References />
   </UADataType>
   <UADataType NodeId="i=26" BrowseName="Number" IsAbstract="true">
     <DisplayName>Number</DisplayName>
@@ -262,7 +262,7 @@
   <UAReferenceType NodeId="i=31" BrowseName="References" IsAbstract="true" Symmetric="true">
     <DisplayName>References</DisplayName>
     <Description>The abstract base type for all references.</Description>
-    <References></References>
+    <References />
     <InverseName>References</InverseName>
   </UAReferenceType>
   <UAReferenceType NodeId="i=32" BrowseName="NonHierarchicalReferences" IsAbstract="true">
@@ -452,7 +452,7 @@
   <UAObjectType NodeId="i=58" BrowseName="BaseObjectType">
     <DisplayName>BaseObjectType</DisplayName>
     <Description>The base type for all object nodes.</Description>
-    <References></References>
+    <References />
   </UAObjectType>
   <UAObjectType NodeId="i=61" BrowseName="FolderType">
     <DisplayName>FolderType</DisplayName>
@@ -464,7 +464,7 @@
   <UAVariableType NodeId="i=62" BrowseName="BaseVariableType" IsAbstract="true" ValueRank="-2">
     <DisplayName>BaseVariableType</DisplayName>
     <Description>The abstract base type for all variable nodes.</Description>
-    <References></References>
+    <References />
   </UAVariableType>
   <UAVariableType NodeId="i=63" BrowseName="BaseDataVariableType" ValueRank="-2">
     <DisplayName>BaseDataVariableType</DisplayName>
@@ -573,7 +573,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=120</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=7616</Identifier>
@@ -654,7 +654,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=77</Reference>
     </References>
     <Value>
-      <Int32>1</Int32>
+      <Int32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">1</Int32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=78" BrowseName="Mandatory" SymbolicName="ModellingRule_Mandatory">
@@ -673,7 +673,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=78</Reference>
     </References>
     <Value>
-      <Int32>1</Int32>
+      <Int32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">1</Int32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=80" BrowseName="Optional" SymbolicName="ModellingRule_Optional">
@@ -692,7 +692,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=80</Reference>
     </References>
     <Value>
-      <Int32>2</Int32>
+      <Int32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">2</Int32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=83" BrowseName="ExposesItsArray" SymbolicName="ModellingRule_ExposesItsArray">
@@ -711,7 +711,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=83</Reference>
     </References>
     <Value>
-      <Int32>3</Int32>
+      <Int32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">3</Int32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=79" BrowseName="MandatoryShared" SymbolicName="ModellingRule_MandatoryShared">
@@ -730,7 +730,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=79</Reference>
     </References>
     <Value>
-      <Int32>1</Int32>
+      <Int32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">1</Int32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=11508" BrowseName="OptionalPlaceholder" SymbolicName="ModellingRule_OptionalPlaceholder">
@@ -749,7 +749,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11508</Reference>
     </References>
     <Value>
-      <Int32>2</Int32>
+      <Int32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">2</Int32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=11510" BrowseName="MandatoryPlaceholder" SymbolicName="ModellingRule_MandatoryPlaceholder">
@@ -768,7 +768,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11510</Reference>
     </References>
     <Value>
-      <Int32>1</Int32>
+      <Int32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">1</Int32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=84" BrowseName="Root" SymbolicName="RootFolder">
@@ -1474,7 +1474,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11489</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -1486,8 +1486,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -1502,7 +1502,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11489</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -1514,8 +1514,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -1530,8 +1530,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3178,7 +3178,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11580</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3190,8 +3190,8 @@
                 <Identifier>i=3</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3206,7 +3206,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11580</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3218,8 +3218,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3242,7 +3242,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11583</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3254,8 +3254,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3279,7 +3279,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11585</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3291,8 +3291,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3307,8 +3307,8 @@
                 <Identifier>i=6</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3323,7 +3323,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11585</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3335,8 +3335,8 @@
                 <Identifier>i=15</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3359,7 +3359,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11588</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3371,8 +3371,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3387,8 +3387,8 @@
                 <Identifier>i=15</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3412,7 +3412,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11590</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3424,8 +3424,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3440,7 +3440,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11590</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3452,8 +3452,8 @@
                 <Identifier>i=9</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3476,7 +3476,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11593</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3488,8 +3488,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3504,8 +3504,8 @@
                 <Identifier>i=9</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3678,7 +3678,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11629</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3690,8 +3690,8 @@
                 <Identifier>i=3</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3706,7 +3706,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11629</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3718,8 +3718,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3742,7 +3742,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11632</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3754,8 +3754,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3779,7 +3779,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11634</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3791,8 +3791,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3807,8 +3807,8 @@
                 <Identifier>i=6</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3823,7 +3823,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11634</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3835,8 +3835,8 @@
                 <Identifier>i=15</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3859,7 +3859,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11637</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3871,8 +3871,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3887,8 +3887,8 @@
                 <Identifier>i=15</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3912,7 +3912,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11639</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3924,8 +3924,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3940,7 +3940,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11639</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3952,8 +3952,8 @@
                 <Identifier>i=9</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -3976,7 +3976,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11642</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -3988,8 +3988,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4004,8 +4004,8 @@
                 <Identifier>i=9</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4171,7 +4171,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11680</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -4183,8 +4183,8 @@
                 <Identifier>i=3</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4199,7 +4199,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11680</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -4211,8 +4211,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4235,7 +4235,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11683</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -4247,8 +4247,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4272,7 +4272,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11685</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -4284,8 +4284,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4300,8 +4300,8 @@
                 <Identifier>i=6</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4316,7 +4316,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11685</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -4328,8 +4328,8 @@
                 <Identifier>i=15</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4352,7 +4352,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11688</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -4364,8 +4364,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4380,8 +4380,8 @@
                 <Identifier>i=15</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4405,7 +4405,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11690</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -4417,8 +4417,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4433,7 +4433,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11690</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -4445,8 +4445,8 @@
                 <Identifier>i=9</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4469,7 +4469,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11693</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -4481,8 +4481,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -4497,8 +4497,8 @@
                 <Identifier>i=9</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -6954,7 +6954,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11492</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -6966,8 +6966,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -6981,7 +6981,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11492</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -6993,8 +6993,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -7009,8 +7009,8 @@
                 <Identifier>i=7</Identifier>
               </DataType>
               <ValueRank>1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
-              <Description ></Description>
+              <ArrayDimensions />
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </Argument>
           </Body>
         </ExtensionObject>
@@ -7485,10 +7485,10 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=29</Reference>
     </References>
     <Definition Name="OpenFileMode">
-      <Field Name="Read" Value="1"></Field>
-      <Field Name="Write" Value="2"></Field>
-      <Field Name="EraseExisiting" Value="4"></Field>
-      <Field Name="Append" Value="8"></Field>
+      <Field Name="Read" Value="1" />
+      <Field Name="Write" Value="2" />
+      <Field Name="EraseExisiting" Value="4" />
+      <Field Name="Append" Value="8" />
     </Definition>
   </UADataType>
   <UAVariable NodeId="i=11940" BrowseName="EnumValues" ParentNodeId="i=11939" DataType="i=7594" ValueRank="1">
@@ -7499,7 +7499,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11939</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=7616</Identifier>
@@ -7512,7 +7512,7 @@
                 </Locale>
                 <Text>Read</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -7528,7 +7528,7 @@
                 </Locale>
                 <Text>Write</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -7544,7 +7544,7 @@
                 </Locale>
                 <Text>EraseExisiting</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -7560,7 +7560,7 @@
                 </Locale>
                 <Text>Append</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -8125,7 +8125,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=9029</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -8137,7 +8137,7 @@
                 <Identifier>i=15</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
+              <ArrayDimensions />
               <Description>
                 <Locale>
                 </Locale>
@@ -8157,7 +8157,7 @@
                 <Identifier>i=21</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
+              <ArrayDimensions />
               <Description>
                 <Locale>
                 </Locale>
@@ -8186,7 +8186,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=3875</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -8198,7 +8198,7 @@
                 <Identifier>i=288</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
+              <ArrayDimensions />
               <Description>
                 <Locale>
                 </Locale>
@@ -8335,7 +8335,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=9069</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -8347,7 +8347,7 @@
                 <Identifier>i=6</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
+              <ArrayDimensions />
               <Description>
                 <Locale>
                 </Locale>
@@ -8460,7 +8460,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=9111</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -8472,7 +8472,7 @@
                 <Identifier>i=15</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
+              <ArrayDimensions />
               <Description>
                 <Locale>
                 </Locale>
@@ -8492,7 +8492,7 @@
                 <Identifier>i=21</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
+              <ArrayDimensions />
               <Description>
                 <Locale>
                 </Locale>
@@ -8521,7 +8521,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=9113</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -8533,7 +8533,7 @@
                 <Identifier>i=15</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
+              <ArrayDimensions />
               <Description>
                 <Locale>
                 </Locale>
@@ -8553,7 +8553,7 @@
                 <Identifier>i=21</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
+              <ArrayDimensions />
               <Description>
                 <Locale>
                 </Locale>
@@ -8777,7 +8777,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=9213</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -8789,7 +8789,7 @@
                 <Identifier>i=290</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
+              <ArrayDimensions />
               <Description>
                 <Locale>
                 </Locale>
@@ -9063,7 +9063,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2949</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=297</Identifier>
@@ -9075,7 +9075,7 @@
                 <Identifier>i=290</Identifier>
               </DataType>
               <ValueRank>-1</ValueRank>
-              <ArrayDimensions></ArrayDimensions>
+              <ArrayDimensions />
               <Description>
                 <Locale>
                 </Locale>
@@ -10037,7 +10037,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2400</Reference>
     </References>
     <Value>
-      <UInt32>1</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">1</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2402" BrowseName="Running" ParentNodeId="i=2391">
@@ -10062,7 +10062,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2402</Reference>
     </References>
     <Value>
-      <UInt32>2</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">2</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2404" BrowseName="Suspended" ParentNodeId="i=2391">
@@ -10086,7 +10086,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2404</Reference>
     </References>
     <Value>
-      <UInt32>3</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">3</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2406" BrowseName="Halted" ParentNodeId="i=2391">
@@ -10110,7 +10110,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2406</Reference>
     </References>
     <Value>
-      <UInt32>4</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">4</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2408" BrowseName="HaltedToReady" ParentNodeId="i=2391">
@@ -10133,7 +10133,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2408</Reference>
     </References>
     <Value>
-      <UInt32>1</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">1</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2410" BrowseName="ReadyToRunning" ParentNodeId="i=2391">
@@ -10156,7 +10156,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2410</Reference>
     </References>
     <Value>
-      <UInt32>2</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">2</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2412" BrowseName="RunningToHalted" ParentNodeId="i=2391">
@@ -10179,7 +10179,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2412</Reference>
     </References>
     <Value>
-      <UInt32>3</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">3</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2414" BrowseName="RunningToReady" ParentNodeId="i=2391">
@@ -10201,7 +10201,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2414</Reference>
     </References>
     <Value>
-      <UInt32>4</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">4</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2416" BrowseName="RunningToSuspended" ParentNodeId="i=2391">
@@ -10224,7 +10224,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2416</Reference>
     </References>
     <Value>
-      <UInt32>5</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">5</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2418" BrowseName="SuspendedToRunning" ParentNodeId="i=2391">
@@ -10247,7 +10247,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2418</Reference>
     </References>
     <Value>
-      <UInt32>6</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">6</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2420" BrowseName="SuspendedToHalted" ParentNodeId="i=2391">
@@ -10270,7 +10270,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2420</Reference>
     </References>
     <Value>
-      <UInt32>7</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">7</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2422" BrowseName="SuspendedToReady" ParentNodeId="i=2391">
@@ -10292,7 +10292,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2422</Reference>
     </References>
     <Value>
-      <UInt32>8</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">8</UInt32>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=2424" BrowseName="ReadyToHalted" ParentNodeId="i=2391">
@@ -10315,7 +10315,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=2424</Reference>
     </References>
     <Value>
-      <UInt32>9</UInt32>
+      <UInt32 xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">9</UInt32>
     </Value>
   </UAVariable>
   <UAMethod NodeId="i=2426" BrowseName="Start" ParentNodeId="i=2391">
@@ -11425,7 +11425,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=256</Reference>
     </References>
     <Value>
-      <ListOfLocalizedText>
+      <ListOfLocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <LocalizedText>
           <Locale>
           </Locale>
@@ -11494,7 +11494,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=257</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=7616</Identifier>
@@ -11747,8 +11747,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="TimeZoneDataType">
-      <Field Name="Offset" DataType="i=4"></Field>
-      <Field Name="DaylightSavingInOffset" DataType="i=1"></Field>
+      <Field Name="Offset" DataType="i=4" />
+      <Field Name="DaylightSavingInOffset" DataType="i=1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=288" BrowseName="IntegerId">
@@ -11788,7 +11788,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=307</Reference>
     </References>
     <Value>
-      <ListOfLocalizedText>
+      <ListOfLocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <LocalizedText>
           <Locale>
           </Locale>
@@ -11879,7 +11879,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=302</Reference>
     </References>
     <Value>
-      <ListOfLocalizedText>
+      <ListOfLocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <LocalizedText>
           <Locale>
           </Locale>
@@ -11933,7 +11933,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=303</Reference>
     </References>
     <Value>
-      <ListOfLocalizedText>
+      <ListOfLocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <LocalizedText>
           <Locale>
           </Locale>
@@ -12071,7 +12071,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=315</Reference>
     </References>
     <Value>
-      <ListOfLocalizedText>
+      <ListOfLocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <LocalizedText>
           <Locale>
           </Locale>
@@ -12285,7 +12285,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=348</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=7616</Identifier>
@@ -13112,7 +13112,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=347</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=7616</Identifier>
@@ -13617,15 +13617,15 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="EndpointConfiguration">
-      <Field Name="OperationTimeout" DataType="i=6"></Field>
-      <Field Name="UseBinaryEncoding" DataType="i=1"></Field>
-      <Field Name="MaxStringLength" DataType="i=6"></Field>
-      <Field Name="MaxByteStringLength" DataType="i=6"></Field>
-      <Field Name="MaxArrayLength" DataType="i=6"></Field>
-      <Field Name="MaxMessageSize" DataType="i=6"></Field>
-      <Field Name="MaxBufferSize" DataType="i=6"></Field>
-      <Field Name="ChannelLifetime" DataType="i=6"></Field>
-      <Field Name="SecurityTokenLifetime" DataType="i=6"></Field>
+      <Field Name="OperationTimeout" DataType="i=6" />
+      <Field Name="UseBinaryEncoding" DataType="i=1" />
+      <Field Name="MaxStringLength" DataType="i=6" />
+      <Field Name="MaxByteStringLength" DataType="i=6" />
+      <Field Name="MaxArrayLength" DataType="i=6" />
+      <Field Name="MaxMessageSize" DataType="i=6" />
+      <Field Name="MaxBufferSize" DataType="i=6" />
+      <Field Name="ChannelLifetime" DataType="i=6" />
+      <Field Name="SecurityTokenLifetime" DataType="i=6" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=334" BrowseName="ComplianceLevel">
@@ -13635,10 +13635,10 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=29</Reference>
     </References>
     <Definition Name="ComplianceLevel">
-      <Field Name="Untested" Value="0"></Field>
-      <Field Name="Partial" Value="1"></Field>
-      <Field Name="SelfTested" Value="2"></Field>
-      <Field Name="Certified" Value="3"></Field>
+      <Field Name="Untested" Value="0" />
+      <Field Name="Partial" Value="1" />
+      <Field Name="SelfTested" Value="2" />
+      <Field Name="Certified" Value="3" />
     </Definition>
   </UADataType>
   <UAVariable NodeId="i=7599" BrowseName="EnumStrings" ParentNodeId="i=334" DataType="LocalizedText" ValueRank="1">
@@ -13649,7 +13649,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=334</Reference>
     </References>
     <Value>
-      <ListOfLocalizedText>
+      <ListOfLocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <LocalizedText>
           <Locale>
           </Locale>
@@ -13679,12 +13679,12 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="SupportedProfile">
-      <Field Name="OrganizationUri" DataType="i=12"></Field>
-      <Field Name="ProfileId" DataType="i=12"></Field>
-      <Field Name="ComplianceTool" DataType="i=12"></Field>
-      <Field Name="ComplianceDate" DataType="i=294"></Field>
-      <Field Name="ComplianceLevel" DataType="i=334"></Field>
-      <Field Name="UnsupportedUnitIds" DataType="i=12" ValueRank="1"></Field>
+      <Field Name="OrganizationUri" DataType="i=12" />
+      <Field Name="ProfileId" DataType="i=12" />
+      <Field Name="ComplianceTool" DataType="i=12" />
+      <Field Name="ComplianceDate" DataType="i=294" />
+      <Field Name="ComplianceLevel" DataType="i=334" />
+      <Field Name="UnsupportedUnitIds" DataType="i=12" ValueRank="1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=341" BrowseName="SoftwareCertificate">
@@ -13693,16 +13693,16 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="SoftwareCertificate">
-      <Field Name="ProductName" DataType="i=12"></Field>
-      <Field Name="ProductUri" DataType="i=12"></Field>
-      <Field Name="VendorName" DataType="i=12"></Field>
-      <Field Name="VendorProductCertificate" DataType="i=15"></Field>
-      <Field Name="SoftwareVersion" DataType="i=12"></Field>
-      <Field Name="BuildNumber" DataType="i=12"></Field>
-      <Field Name="BuildDate" DataType="i=294"></Field>
-      <Field Name="IssuedBy" DataType="i=12"></Field>
-      <Field Name="IssueDate" DataType="i=13"></Field>
-      <Field Name="SupportedProfiles" DataType="i=335" ValueRank="1"></Field>
+      <Field Name="ProductName" DataType="i=12" />
+      <Field Name="ProductUri" DataType="i=12" />
+      <Field Name="VendorName" DataType="i=12" />
+      <Field Name="VendorProductCertificate" DataType="i=15" />
+      <Field Name="SoftwareVersion" DataType="i=12" />
+      <Field Name="BuildNumber" DataType="i=12" />
+      <Field Name="BuildDate" DataType="i=294" />
+      <Field Name="IssuedBy" DataType="i=12" />
+      <Field Name="IssueDate" DataType="i=13" />
+      <Field Name="SupportedProfiles" DataType="i=335" ValueRank="1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=576" BrowseName="FilterOperator">
@@ -13712,24 +13712,24 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=29</Reference>
     </References>
     <Definition Name="FilterOperator">
-      <Field Name="Equals" Value="0"></Field>
-      <Field Name="IsNull" Value="1"></Field>
-      <Field Name="GreaterThan" Value="2"></Field>
-      <Field Name="LessThan" Value="3"></Field>
-      <Field Name="GreaterThanOrEqual" Value="4"></Field>
-      <Field Name="LessThanOrEqual" Value="5"></Field>
-      <Field Name="Like" Value="6"></Field>
-      <Field Name="Not" Value="7"></Field>
-      <Field Name="Between" Value="8"></Field>
-      <Field Name="InList" Value="9"></Field>
-      <Field Name="And" Value="10"></Field>
-      <Field Name="Or" Value="11"></Field>
-      <Field Name="Cast" Value="12"></Field>
-      <Field Name="InView" Value="13"></Field>
-      <Field Name="OfType" Value="14"></Field>
-      <Field Name="RelatedTo" Value="15"></Field>
-      <Field Name="BitwiseAnd" Value="16"></Field>
-      <Field Name="BitwiseOr" Value="17"></Field>
+      <Field Name="Equals" Value="0" />
+      <Field Name="IsNull" Value="1" />
+      <Field Name="GreaterThan" Value="2" />
+      <Field Name="LessThan" Value="3" />
+      <Field Name="GreaterThanOrEqual" Value="4" />
+      <Field Name="LessThanOrEqual" Value="5" />
+      <Field Name="Like" Value="6" />
+      <Field Name="Not" Value="7" />
+      <Field Name="Between" Value="8" />
+      <Field Name="InList" Value="9" />
+      <Field Name="And" Value="10" />
+      <Field Name="Or" Value="11" />
+      <Field Name="Cast" Value="12" />
+      <Field Name="InView" Value="13" />
+      <Field Name="OfType" Value="14" />
+      <Field Name="RelatedTo" Value="15" />
+      <Field Name="BitwiseAnd" Value="16" />
+      <Field Name="BitwiseOr" Value="17" />
     </Definition>
   </UADataType>
   <UAVariable NodeId="i=7605" BrowseName="EnumStrings" ParentNodeId="i=576" DataType="LocalizedText" ValueRank="1">
@@ -13740,7 +13740,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=576</Reference>
     </References>
     <Value>
-      <ListOfLocalizedText>
+      <ListOfLocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <LocalizedText>
           <Locale>
           </Locale>
@@ -13840,8 +13840,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="ContentFilterElement">
-      <Field Name="FilterOperator" DataType="i=576"></Field>
-      <Field Name="FilterOperands" DataType="i=22" ValueRank="1"></Field>
+      <Field Name="FilterOperator" DataType="i=576" />
+      <Field Name="FilterOperands" DataType="i=22" ValueRank="1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=586" BrowseName="ContentFilter">
@@ -13850,7 +13850,7 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="ContentFilter">
-      <Field Name="Elements" DataType="i=583" ValueRank="1"></Field>
+      <Field Name="Elements" DataType="i=583" ValueRank="1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=589" BrowseName="FilterOperand">
@@ -13865,7 +13865,7 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=589</Reference>
     </References>
     <Definition Name="ElementOperand" BaseType="ElementOperand">
-      <Field Name="Index" DataType="i=7"></Field>
+      <Field Name="Index" DataType="i=7" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=595" BrowseName="LiteralOperand">
@@ -13874,7 +13874,7 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=589</Reference>
     </References>
     <Definition Name="LiteralOperand" BaseType="LiteralOperand">
-      <Field Name="Value"></Field>
+      <Field Name="Value" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=598" BrowseName="AttributeOperand">
@@ -13883,11 +13883,11 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=589</Reference>
     </References>
     <Definition Name="AttributeOperand" BaseType="AttributeOperand">
-      <Field Name="NodeId" DataType="i=17"></Field>
-      <Field Name="Alias" DataType="i=12"></Field>
-      <Field Name="BrowsePath" DataType="i=540"></Field>
-      <Field Name="AttributeId" DataType="i=288"></Field>
-      <Field Name="IndexRange" DataType="i=291"></Field>
+      <Field Name="NodeId" DataType="i=17" />
+      <Field Name="Alias" DataType="i=12" />
+      <Field Name="BrowsePath" DataType="i=540" />
+      <Field Name="AttributeId" DataType="i=288" />
+      <Field Name="IndexRange" DataType="i=291" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=601" BrowseName="SimpleAttributeOperand">
@@ -13896,10 +13896,10 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=589</Reference>
     </References>
     <Definition Name="SimpleAttributeOperand" BaseType="SimpleAttributeOperand">
-      <Field Name="TypeDefinitionId" DataType="i=17"></Field>
-      <Field Name="BrowsePath" DataType="i=20" ValueRank="1"></Field>
-      <Field Name="AttributeId" DataType="i=288"></Field>
-      <Field Name="IndexRange" DataType="i=291"></Field>
+      <Field Name="TypeDefinitionId" DataType="i=17" />
+      <Field Name="BrowsePath" DataType="i=20" ValueRank="1" />
+      <Field Name="AttributeId" DataType="i=288" />
+      <Field Name="IndexRange" DataType="i=291" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=659" BrowseName="HistoryEvent">
@@ -13908,7 +13908,7 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="HistoryEvent">
-      <Field Name="Events" DataType="i=920" ValueRank="1"></Field>
+      <Field Name="Events" DataType="i=920" ValueRank="1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=11234" BrowseName="HistoryUpdateType">
@@ -13918,10 +13918,10 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=29</Reference>
     </References>
     <Definition Name="HistoryUpdateType">
-      <Field Name="Insert" Value="1"></Field>
-      <Field Name="Replace" Value="2"></Field>
-      <Field Name="Update" Value="3"></Field>
-      <Field Name="Delete" Value="4"></Field>
+      <Field Name="Insert" Value="1" />
+      <Field Name="Replace" Value="2" />
+      <Field Name="Update" Value="3" />
+      <Field Name="Delete" Value="4" />
     </Definition>
   </UADataType>
   <UAVariable NodeId="i=11884" BrowseName="EnumValues" ParentNodeId="i=11234" DataType="i=7594" ValueRank="1">
@@ -13932,7 +13932,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11234</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=7616</Identifier>
@@ -13945,7 +13945,7 @@
                 </Locale>
                 <Text>Insert</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -13961,7 +13961,7 @@
                 </Locale>
                 <Text>Replace</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -13977,7 +13977,7 @@
                 </Locale>
                 <Text>Update</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -13993,7 +13993,7 @@
                 </Locale>
                 <Text>Delete</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -14007,10 +14007,10 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=29</Reference>
     </References>
     <Definition Name="PerformUpdateType">
-      <Field Name="Insert" Value="1"></Field>
-      <Field Name="Replace" Value="2"></Field>
-      <Field Name="Update" Value="3"></Field>
-      <Field Name="Remove" Value="4"></Field>
+      <Field Name="Insert" Value="1" />
+      <Field Name="Replace" Value="2" />
+      <Field Name="Update" Value="3" />
+      <Field Name="Remove" Value="4" />
     </Definition>
   </UADataType>
   <UAVariable NodeId="i=11885" BrowseName="EnumValues" ParentNodeId="i=11293" DataType="i=7594" ValueRank="1">
@@ -14021,7 +14021,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=11293</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=7616</Identifier>
@@ -14034,7 +14034,7 @@
                 </Locale>
                 <Text>Insert</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -14050,7 +14050,7 @@
                 </Locale>
                 <Text>Replace</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -14066,7 +14066,7 @@
                 </Locale>
                 <Text>Update</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -14082,7 +14082,7 @@
                 </Locale>
                 <Text>Remove</Text>
               </DisplayName>
-              <Description ></Description>
+              <Description p5:nil="true" xmlns:p5="http://www.w3.org/2001/XMLSchema-instance" />
             </EnumValueType>
           </Body>
         </ExtensionObject>
@@ -14101,8 +14101,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=719</Reference>
     </References>
     <Definition Name="EventFilter" BaseType="EventFilter">
-      <Field Name="SelectClauses" DataType="i=601" ValueRank="1"></Field>
-      <Field Name="WhereClause" DataType="i=586"></Field>
+      <Field Name="SelectClauses" DataType="i=601" ValueRank="1" />
+      <Field Name="WhereClause" DataType="i=586" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=948" BrowseName="AggregateConfiguration">
@@ -14111,11 +14111,11 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="AggregateConfiguration">
-      <Field Name="UseServerCapabilitiesDefaults" DataType="i=1"></Field>
-      <Field Name="TreatUncertainAsBad" DataType="i=1"></Field>
-      <Field Name="PercentDataBad" DataType="i=3"></Field>
-      <Field Name="PercentDataGood" DataType="i=3"></Field>
-      <Field Name="UseSlopedExtrapolation" DataType="i=1"></Field>
+      <Field Name="UseServerCapabilitiesDefaults" DataType="i=1" />
+      <Field Name="TreatUncertainAsBad" DataType="i=1" />
+      <Field Name="PercentDataBad" DataType="i=3" />
+      <Field Name="PercentDataGood" DataType="i=3" />
+      <Field Name="UseSlopedExtrapolation" DataType="i=1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=920" BrowseName="HistoryEventFieldList">
@@ -14124,7 +14124,7 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="HistoryEventFieldList">
-      <Field Name="EventFields" ValueRank="1"></Field>
+      <Field Name="EventFields" ValueRank="1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=398" BrowseName="EnumeratedTestType">
@@ -14154,7 +14154,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=398</Reference>
     </References>
     <Value>
-      <ListOfExtensionObject>
+      <ListOfExtensionObject xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <ExtensionObject>
           <TypeId>
             <Identifier>i=7616</Identifier>
@@ -14225,31 +14225,31 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="ScalarTestType">
-      <Field Name="Boolean" DataType="i=1"></Field>
-      <Field Name="SByte" DataType="i=2"></Field>
-      <Field Name="Byte" DataType="i=3"></Field>
-      <Field Name="Int16" DataType="i=4"></Field>
-      <Field Name="UInt16" DataType="i=5"></Field>
-      <Field Name="Int32" DataType="i=6"></Field>
-      <Field Name="UInt32" DataType="i=7"></Field>
-      <Field Name="Int64" DataType="i=8"></Field>
-      <Field Name="UInt64" DataType="i=9"></Field>
-      <Field Name="Float" DataType="i=10"></Field>
-      <Field Name="Double" DataType="i=11"></Field>
-      <Field Name="String" DataType="i=12"></Field>
-      <Field Name="DateTime" DataType="i=13"></Field>
-      <Field Name="Guid" DataType="i=14"></Field>
-      <Field Name="ByteString" DataType="i=15"></Field>
-      <Field Name="XmlElement" DataType="i=16"></Field>
-      <Field Name="NodeId" DataType="i=17"></Field>
-      <Field Name="ExpandedNodeId" DataType="i=18"></Field>
-      <Field Name="StatusCode" DataType="i=19"></Field>
-      <Field Name="DiagnosticInfo" DataType="i=25"></Field>
-      <Field Name="QualifiedName" DataType="i=20"></Field>
-      <Field Name="LocalizedText" DataType="i=21"></Field>
-      <Field Name="ExtensionObject" DataType="i=22"></Field>
-      <Field Name="DataValue" DataType="i=23"></Field>
-      <Field Name="EnumeratedValue" DataType="i=398"></Field>
+      <Field Name="Boolean" DataType="i=1" />
+      <Field Name="SByte" DataType="i=2" />
+      <Field Name="Byte" DataType="i=3" />
+      <Field Name="Int16" DataType="i=4" />
+      <Field Name="UInt16" DataType="i=5" />
+      <Field Name="Int32" DataType="i=6" />
+      <Field Name="UInt32" DataType="i=7" />
+      <Field Name="Int64" DataType="i=8" />
+      <Field Name="UInt64" DataType="i=9" />
+      <Field Name="Float" DataType="i=10" />
+      <Field Name="Double" DataType="i=11" />
+      <Field Name="String" DataType="i=12" />
+      <Field Name="DateTime" DataType="i=13" />
+      <Field Name="Guid" DataType="i=14" />
+      <Field Name="ByteString" DataType="i=15" />
+      <Field Name="XmlElement" DataType="i=16" />
+      <Field Name="NodeId" DataType="i=17" />
+      <Field Name="ExpandedNodeId" DataType="i=18" />
+      <Field Name="StatusCode" DataType="i=19" />
+      <Field Name="DiagnosticInfo" DataType="i=25" />
+      <Field Name="QualifiedName" DataType="i=20" />
+      <Field Name="LocalizedText" DataType="i=21" />
+      <Field Name="ExtensionObject" DataType="i=22" />
+      <Field Name="DataValue" DataType="i=23" />
+      <Field Name="EnumeratedValue" DataType="i=398" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=402" BrowseName="ArrayTestType">
@@ -14259,31 +14259,31 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="ArrayTestType">
-      <Field Name="Booleans" DataType="i=1" ValueRank="1"></Field>
-      <Field Name="SBytes" DataType="i=2" ValueRank="1"></Field>
-      <Field Name="Int16s" DataType="i=4" ValueRank="1"></Field>
-      <Field Name="UInt16s" DataType="i=5" ValueRank="1"></Field>
-      <Field Name="Int32s" DataType="i=6" ValueRank="1"></Field>
-      <Field Name="UInt32s" DataType="i=7" ValueRank="1"></Field>
-      <Field Name="Int64s" DataType="i=8" ValueRank="1"></Field>
-      <Field Name="UInt64s" DataType="i=9" ValueRank="1"></Field>
-      <Field Name="Floats" DataType="i=10" ValueRank="1"></Field>
-      <Field Name="Doubles" DataType="i=11" ValueRank="1"></Field>
-      <Field Name="Strings" DataType="i=12" ValueRank="1"></Field>
-      <Field Name="DateTimes" DataType="i=13" ValueRank="1"></Field>
-      <Field Name="Guids" DataType="i=14" ValueRank="1"></Field>
-      <Field Name="ByteStrings" DataType="i=15" ValueRank="1"></Field>
-      <Field Name="XmlElements" DataType="i=16" ValueRank="1"></Field>
-      <Field Name="NodeIds" DataType="i=17" ValueRank="1"></Field>
-      <Field Name="ExpandedNodeIds" DataType="i=18" ValueRank="1"></Field>
-      <Field Name="StatusCodes" DataType="i=19" ValueRank="1"></Field>
-      <Field Name="DiagnosticInfos" DataType="i=25" ValueRank="1"></Field>
-      <Field Name="QualifiedNames" DataType="i=20" ValueRank="1"></Field>
-      <Field Name="LocalizedTexts" DataType="i=21" ValueRank="1"></Field>
-      <Field Name="ExtensionObjects" DataType="i=22" ValueRank="1"></Field>
-      <Field Name="DataValues" DataType="i=23" ValueRank="1"></Field>
-      <Field Name="Variants" ValueRank="1"></Field>
-      <Field Name="EnumeratedValues" DataType="i=398" ValueRank="1"></Field>
+      <Field Name="Booleans" DataType="i=1" ValueRank="1" />
+      <Field Name="SBytes" DataType="i=2" ValueRank="1" />
+      <Field Name="Int16s" DataType="i=4" ValueRank="1" />
+      <Field Name="UInt16s" DataType="i=5" ValueRank="1" />
+      <Field Name="Int32s" DataType="i=6" ValueRank="1" />
+      <Field Name="UInt32s" DataType="i=7" ValueRank="1" />
+      <Field Name="Int64s" DataType="i=8" ValueRank="1" />
+      <Field Name="UInt64s" DataType="i=9" ValueRank="1" />
+      <Field Name="Floats" DataType="i=10" ValueRank="1" />
+      <Field Name="Doubles" DataType="i=11" ValueRank="1" />
+      <Field Name="Strings" DataType="i=12" ValueRank="1" />
+      <Field Name="DateTimes" DataType="i=13" ValueRank="1" />
+      <Field Name="Guids" DataType="i=14" ValueRank="1" />
+      <Field Name="ByteStrings" DataType="i=15" ValueRank="1" />
+      <Field Name="XmlElements" DataType="i=16" ValueRank="1" />
+      <Field Name="NodeIds" DataType="i=17" ValueRank="1" />
+      <Field Name="ExpandedNodeIds" DataType="i=18" ValueRank="1" />
+      <Field Name="StatusCodes" DataType="i=19" ValueRank="1" />
+      <Field Name="DiagnosticInfos" DataType="i=25" ValueRank="1" />
+      <Field Name="QualifiedNames" DataType="i=20" ValueRank="1" />
+      <Field Name="LocalizedTexts" DataType="i=21" ValueRank="1" />
+      <Field Name="ExtensionObjects" DataType="i=22" ValueRank="1" />
+      <Field Name="DataValues" DataType="i=23" ValueRank="1" />
+      <Field Name="Variants" ValueRank="1" />
+      <Field Name="EnumeratedValues" DataType="i=398" ValueRank="1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=405" BrowseName="CompositeTestType">
@@ -14292,8 +14292,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="CompositeTestType">
-      <Field Name="Field1" DataType="i=399"></Field>
-      <Field Name="Field2" DataType="i=402"></Field>
+      <Field Name="Field1" DataType="i=399" />
+      <Field Name="Field2" DataType="i=402" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=338" BrowseName="BuildInfo">
@@ -14302,12 +14302,12 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="BuildInfo">
-      <Field Name="ProductUri" DataType="i=12"></Field>
-      <Field Name="ManufacturerName" DataType="i=12"></Field>
-      <Field Name="ProductName" DataType="i=12"></Field>
-      <Field Name="SoftwareVersion" DataType="i=12"></Field>
-      <Field Name="BuildNumber" DataType="i=12"></Field>
-      <Field Name="BuildDate" DataType="i=294"></Field>
+      <Field Name="ProductUri" DataType="i=12" />
+      <Field Name="ManufacturerName" DataType="i=12" />
+      <Field Name="ProductName" DataType="i=12" />
+      <Field Name="SoftwareVersion" DataType="i=12" />
+      <Field Name="BuildNumber" DataType="i=12" />
+      <Field Name="BuildDate" DataType="i=294" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=851" BrowseName="RedundancySupport">
@@ -14317,12 +14317,12 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=29</Reference>
     </References>
     <Definition Name="RedundancySupport">
-      <Field Name="None" Value="0"></Field>
-      <Field Name="Cold" Value="1"></Field>
-      <Field Name="Warm" Value="2"></Field>
-      <Field Name="Hot" Value="3"></Field>
-      <Field Name="Transparent" Value="4"></Field>
-      <Field Name="HotAndMirrored" Value="5"></Field>
+      <Field Name="None" Value="0" />
+      <Field Name="Cold" Value="1" />
+      <Field Name="Warm" Value="2" />
+      <Field Name="Hot" Value="3" />
+      <Field Name="Transparent" Value="4" />
+      <Field Name="HotAndMirrored" Value="5" />
     </Definition>
   </UADataType>
   <UAVariable NodeId="i=7611" BrowseName="EnumStrings" ParentNodeId="i=851" DataType="LocalizedText" ValueRank="1">
@@ -14333,7 +14333,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=851</Reference>
     </References>
     <Value>
-      <ListOfLocalizedText>
+      <ListOfLocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <LocalizedText>
           <Locale>
           </Locale>
@@ -14374,14 +14374,14 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=29</Reference>
     </References>
     <Definition Name="ServerState">
-      <Field Name="Running" Value="0"></Field>
-      <Field Name="Failed" Value="1"></Field>
-      <Field Name="NoConfiguration" Value="2"></Field>
-      <Field Name="Suspended" Value="3"></Field>
-      <Field Name="Shutdown" Value="4"></Field>
-      <Field Name="Test" Value="5"></Field>
-      <Field Name="CommunicationFault" Value="6"></Field>
-      <Field Name="Unknown" Value="7"></Field>
+      <Field Name="Running" Value="0" />
+      <Field Name="Failed" Value="1" />
+      <Field Name="NoConfiguration" Value="2" />
+      <Field Name="Suspended" Value="3" />
+      <Field Name="Shutdown" Value="4" />
+      <Field Name="Test" Value="5" />
+      <Field Name="CommunicationFault" Value="6" />
+      <Field Name="Unknown" Value="7" />
     </Definition>
   </UADataType>
   <UAVariable NodeId="i=7612" BrowseName="EnumStrings" ParentNodeId="i=852" DataType="LocalizedText" ValueRank="1">
@@ -14392,7 +14392,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=852</Reference>
     </References>
     <Value>
-      <ListOfLocalizedText>
+      <ListOfLocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <LocalizedText>
           <Locale>
           </Locale>
@@ -14442,9 +14442,9 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="RedundantServerDataType">
-      <Field Name="ServerId" DataType="i=12"></Field>
-      <Field Name="ServiceLevel" DataType="i=3"></Field>
-      <Field Name="ServerState" DataType="i=852"></Field>
+      <Field Name="ServerId" DataType="i=12" />
+      <Field Name="ServiceLevel" DataType="i=3" />
+      <Field Name="ServerState" DataType="i=852" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=11943" BrowseName="EndpointUrlListDataType">
@@ -14453,7 +14453,7 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="EndpointUrlListDataType">
-      <Field Name="EndpointUrlList" DataType="i=12" ValueRank="1"></Field>
+      <Field Name="EndpointUrlList" DataType="i=12" ValueRank="1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=11944" BrowseName="NetworkGroupDataType">
@@ -14462,8 +14462,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="NetworkGroupDataType">
-      <Field Name="ServerUri" DataType="i=12"></Field>
-      <Field Name="NetworkPaths" DataType="i=11943" ValueRank="1"></Field>
+      <Field Name="ServerUri" DataType="i=12" />
+      <Field Name="NetworkPaths" DataType="i=11943" ValueRank="1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=856" BrowseName="SamplingIntervalDiagnosticsDataType">
@@ -14472,10 +14472,10 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="SamplingIntervalDiagnosticsDataType">
-      <Field Name="SamplingInterval" DataType="i=290"></Field>
-      <Field Name="MonitoredItemCount" DataType="i=7"></Field>
-      <Field Name="MaxMonitoredItemCount" DataType="i=7"></Field>
-      <Field Name="DisabledMonitoredItemCount" DataType="i=7"></Field>
+      <Field Name="SamplingInterval" DataType="i=290" />
+      <Field Name="MonitoredItemCount" DataType="i=7" />
+      <Field Name="MaxMonitoredItemCount" DataType="i=7" />
+      <Field Name="DisabledMonitoredItemCount" DataType="i=7" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=859" BrowseName="ServerDiagnosticsSummaryDataType">
@@ -14484,18 +14484,18 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="ServerDiagnosticsSummaryDataType">
-      <Field Name="ServerViewCount" DataType="i=7"></Field>
-      <Field Name="CurrentSessionCount" DataType="i=7"></Field>
-      <Field Name="CumulatedSessionCount" DataType="i=7"></Field>
-      <Field Name="SecurityRejectedSessionCount" DataType="i=7"></Field>
-      <Field Name="RejectedSessionCount" DataType="i=7"></Field>
-      <Field Name="SessionTimeoutCount" DataType="i=7"></Field>
-      <Field Name="SessionAbortCount" DataType="i=7"></Field>
-      <Field Name="CurrentSubscriptionCount" DataType="i=7"></Field>
-      <Field Name="CumulatedSubscriptionCount" DataType="i=7"></Field>
-      <Field Name="PublishingIntervalCount" DataType="i=7"></Field>
-      <Field Name="SecurityRejectedRequestsCount" DataType="i=7"></Field>
-      <Field Name="RejectedRequestsCount" DataType="i=7"></Field>
+      <Field Name="ServerViewCount" DataType="i=7" />
+      <Field Name="CurrentSessionCount" DataType="i=7" />
+      <Field Name="CumulatedSessionCount" DataType="i=7" />
+      <Field Name="SecurityRejectedSessionCount" DataType="i=7" />
+      <Field Name="RejectedSessionCount" DataType="i=7" />
+      <Field Name="SessionTimeoutCount" DataType="i=7" />
+      <Field Name="SessionAbortCount" DataType="i=7" />
+      <Field Name="CurrentSubscriptionCount" DataType="i=7" />
+      <Field Name="CumulatedSubscriptionCount" DataType="i=7" />
+      <Field Name="PublishingIntervalCount" DataType="i=7" />
+      <Field Name="SecurityRejectedRequestsCount" DataType="i=7" />
+      <Field Name="RejectedRequestsCount" DataType="i=7" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=862" BrowseName="ServerStatusDataType">
@@ -14504,12 +14504,12 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="ServerStatusDataType">
-      <Field Name="StartTime" DataType="i=294"></Field>
-      <Field Name="CurrentTime" DataType="i=294"></Field>
-      <Field Name="State" DataType="i=852"></Field>
-      <Field Name="BuildInfo" DataType="i=338"></Field>
-      <Field Name="SecondsTillShutdown" DataType="i=7"></Field>
-      <Field Name="ShutdownReason" DataType="i=21"></Field>
+      <Field Name="StartTime" DataType="i=294" />
+      <Field Name="CurrentTime" DataType="i=294" />
+      <Field Name="State" DataType="i=852" />
+      <Field Name="BuildInfo" DataType="i=338" />
+      <Field Name="SecondsTillShutdown" DataType="i=7" />
+      <Field Name="ShutdownReason" DataType="i=21" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=865" BrowseName="SessionDiagnosticsDataType">
@@ -14518,49 +14518,49 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="SessionDiagnosticsDataType">
-      <Field Name="SessionId" DataType="i=17"></Field>
-      <Field Name="SessionName" DataType="i=12"></Field>
-      <Field Name="ClientDescription" DataType="i=308"></Field>
-      <Field Name="ServerUri" DataType="i=12"></Field>
-      <Field Name="EndpointUrl" DataType="i=12"></Field>
-      <Field Name="LocaleIds" DataType="i=295" ValueRank="1"></Field>
-      <Field Name="ActualSessionTimeout" DataType="i=290"></Field>
-      <Field Name="MaxResponseMessageSize" DataType="i=7"></Field>
-      <Field Name="ClientConnectionTime" DataType="i=294"></Field>
-      <Field Name="ClientLastContactTime" DataType="i=294"></Field>
-      <Field Name="CurrentSubscriptionsCount" DataType="i=7"></Field>
-      <Field Name="CurrentMonitoredItemsCount" DataType="i=7"></Field>
-      <Field Name="CurrentPublishRequestsInQueue" DataType="i=7"></Field>
-      <Field Name="TotalRequestCount" DataType="i=871"></Field>
-      <Field Name="UnauthorizedRequestCount" DataType="i=7"></Field>
-      <Field Name="ReadCount" DataType="i=871"></Field>
-      <Field Name="HistoryReadCount" DataType="i=871"></Field>
-      <Field Name="WriteCount" DataType="i=871"></Field>
-      <Field Name="HistoryUpdateCount" DataType="i=871"></Field>
-      <Field Name="CallCount" DataType="i=871"></Field>
-      <Field Name="CreateMonitoredItemsCount" DataType="i=871"></Field>
-      <Field Name="ModifyMonitoredItemsCount" DataType="i=871"></Field>
-      <Field Name="SetMonitoringModeCount" DataType="i=871"></Field>
-      <Field Name="SetTriggeringCount" DataType="i=871"></Field>
-      <Field Name="DeleteMonitoredItemsCount" DataType="i=871"></Field>
-      <Field Name="CreateSubscriptionCount" DataType="i=871"></Field>
-      <Field Name="ModifySubscriptionCount" DataType="i=871"></Field>
-      <Field Name="SetPublishingModeCount" DataType="i=871"></Field>
-      <Field Name="PublishCount" DataType="i=871"></Field>
-      <Field Name="RepublishCount" DataType="i=871"></Field>
-      <Field Name="TransferSubscriptionsCount" DataType="i=871"></Field>
-      <Field Name="DeleteSubscriptionsCount" DataType="i=871"></Field>
-      <Field Name="AddNodesCount" DataType="i=871"></Field>
-      <Field Name="AddReferencesCount" DataType="i=871"></Field>
-      <Field Name="DeleteNodesCount" DataType="i=871"></Field>
-      <Field Name="DeleteReferencesCount" DataType="i=871"></Field>
-      <Field Name="BrowseCount" DataType="i=871"></Field>
-      <Field Name="BrowseNextCount" DataType="i=871"></Field>
-      <Field Name="TranslateBrowsePathsToNodeIdsCount" DataType="i=871"></Field>
-      <Field Name="QueryFirstCount" DataType="i=871"></Field>
-      <Field Name="QueryNextCount" DataType="i=871"></Field>
-      <Field Name="RegisterNodesCount" DataType="i=871"></Field>
-      <Field Name="UnregisterNodesCount" DataType="i=871"></Field>
+      <Field Name="SessionId" DataType="i=17" />
+      <Field Name="SessionName" DataType="i=12" />
+      <Field Name="ClientDescription" DataType="i=308" />
+      <Field Name="ServerUri" DataType="i=12" />
+      <Field Name="EndpointUrl" DataType="i=12" />
+      <Field Name="LocaleIds" DataType="i=295" ValueRank="1" />
+      <Field Name="ActualSessionTimeout" DataType="i=290" />
+      <Field Name="MaxResponseMessageSize" DataType="i=7" />
+      <Field Name="ClientConnectionTime" DataType="i=294" />
+      <Field Name="ClientLastContactTime" DataType="i=294" />
+      <Field Name="CurrentSubscriptionsCount" DataType="i=7" />
+      <Field Name="CurrentMonitoredItemsCount" DataType="i=7" />
+      <Field Name="CurrentPublishRequestsInQueue" DataType="i=7" />
+      <Field Name="TotalRequestCount" DataType="i=871" />
+      <Field Name="UnauthorizedRequestCount" DataType="i=7" />
+      <Field Name="ReadCount" DataType="i=871" />
+      <Field Name="HistoryReadCount" DataType="i=871" />
+      <Field Name="WriteCount" DataType="i=871" />
+      <Field Name="HistoryUpdateCount" DataType="i=871" />
+      <Field Name="CallCount" DataType="i=871" />
+      <Field Name="CreateMonitoredItemsCount" DataType="i=871" />
+      <Field Name="ModifyMonitoredItemsCount" DataType="i=871" />
+      <Field Name="SetMonitoringModeCount" DataType="i=871" />
+      <Field Name="SetTriggeringCount" DataType="i=871" />
+      <Field Name="DeleteMonitoredItemsCount" DataType="i=871" />
+      <Field Name="CreateSubscriptionCount" DataType="i=871" />
+      <Field Name="ModifySubscriptionCount" DataType="i=871" />
+      <Field Name="SetPublishingModeCount" DataType="i=871" />
+      <Field Name="PublishCount" DataType="i=871" />
+      <Field Name="RepublishCount" DataType="i=871" />
+      <Field Name="TransferSubscriptionsCount" DataType="i=871" />
+      <Field Name="DeleteSubscriptionsCount" DataType="i=871" />
+      <Field Name="AddNodesCount" DataType="i=871" />
+      <Field Name="AddReferencesCount" DataType="i=871" />
+      <Field Name="DeleteNodesCount" DataType="i=871" />
+      <Field Name="DeleteReferencesCount" DataType="i=871" />
+      <Field Name="BrowseCount" DataType="i=871" />
+      <Field Name="BrowseNextCount" DataType="i=871" />
+      <Field Name="TranslateBrowsePathsToNodeIdsCount" DataType="i=871" />
+      <Field Name="QueryFirstCount" DataType="i=871" />
+      <Field Name="QueryNextCount" DataType="i=871" />
+      <Field Name="RegisterNodesCount" DataType="i=871" />
+      <Field Name="UnregisterNodesCount" DataType="i=871" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=868" BrowseName="SessionSecurityDiagnosticsDataType">
@@ -14569,15 +14569,15 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="SessionSecurityDiagnosticsDataType">
-      <Field Name="SessionId" DataType="i=17"></Field>
-      <Field Name="ClientUserIdOfSession" DataType="i=12"></Field>
-      <Field Name="ClientUserIdHistory" DataType="i=12" ValueRank="1"></Field>
-      <Field Name="AuthenticationMechanism" DataType="i=12"></Field>
-      <Field Name="Encoding" DataType="i=12"></Field>
-      <Field Name="TransportProtocol" DataType="i=12"></Field>
-      <Field Name="SecurityMode" DataType="i=302"></Field>
-      <Field Name="SecurityPolicyUri" DataType="i=12"></Field>
-      <Field Name="ClientCertificate" DataType="i=15"></Field>
+      <Field Name="SessionId" DataType="i=17" />
+      <Field Name="ClientUserIdOfSession" DataType="i=12" />
+      <Field Name="ClientUserIdHistory" DataType="i=12" ValueRank="1" />
+      <Field Name="AuthenticationMechanism" DataType="i=12" />
+      <Field Name="Encoding" DataType="i=12" />
+      <Field Name="TransportProtocol" DataType="i=12" />
+      <Field Name="SecurityMode" DataType="i=302" />
+      <Field Name="SecurityPolicyUri" DataType="i=12" />
+      <Field Name="ClientCertificate" DataType="i=15" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=871" BrowseName="ServiceCounterDataType">
@@ -14586,8 +14586,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="ServiceCounterDataType">
-      <Field Name="TotalCount" DataType="i=7"></Field>
-      <Field Name="ErrorCount" DataType="i=7"></Field>
+      <Field Name="TotalCount" DataType="i=7" />
+      <Field Name="ErrorCount" DataType="i=7" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=299" BrowseName="StatusResult">
@@ -14596,8 +14596,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="StatusResult">
-      <Field Name="StatusCode" DataType="i=19"></Field>
-      <Field Name="DiagnosticInfo" DataType="i=25"></Field>
+      <Field Name="StatusCode" DataType="i=19" />
+      <Field Name="DiagnosticInfo" DataType="i=25" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=874" BrowseName="SubscriptionDiagnosticsDataType">
@@ -14606,37 +14606,37 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="SubscriptionDiagnosticsDataType">
-      <Field Name="SessionId" DataType="i=17"></Field>
-      <Field Name="SubscriptionId" DataType="i=7"></Field>
-      <Field Name="Priority" DataType="i=3"></Field>
-      <Field Name="PublishingInterval" DataType="i=11"></Field>
-      <Field Name="MaxKeepAliveCount" DataType="i=7"></Field>
-      <Field Name="MaxLifetimeCount" DataType="i=7"></Field>
-      <Field Name="MaxNotificationsPerPublish" DataType="i=7"></Field>
-      <Field Name="PublishingEnabled" DataType="i=1"></Field>
-      <Field Name="ModifyCount" DataType="i=7"></Field>
-      <Field Name="EnableCount" DataType="i=7"></Field>
-      <Field Name="DisableCount" DataType="i=7"></Field>
-      <Field Name="RepublishRequestCount" DataType="i=7"></Field>
-      <Field Name="RepublishMessageRequestCount" DataType="i=7"></Field>
-      <Field Name="RepublishMessageCount" DataType="i=7"></Field>
-      <Field Name="TransferRequestCount" DataType="i=7"></Field>
-      <Field Name="TransferredToAltClientCount" DataType="i=7"></Field>
-      <Field Name="TransferredToSameClientCount" DataType="i=7"></Field>
-      <Field Name="PublishRequestCount" DataType="i=7"></Field>
-      <Field Name="DataChangeNotificationsCount" DataType="i=7"></Field>
-      <Field Name="EventNotificationsCount" DataType="i=7"></Field>
-      <Field Name="NotificationsCount" DataType="i=7"></Field>
-      <Field Name="LatePublishRequestCount" DataType="i=7"></Field>
-      <Field Name="CurrentKeepAliveCount" DataType="i=7"></Field>
-      <Field Name="CurrentLifetimeCount" DataType="i=7"></Field>
-      <Field Name="UnacknowledgedMessageCount" DataType="i=7"></Field>
-      <Field Name="DiscardedMessageCount" DataType="i=7"></Field>
-      <Field Name="MonitoredItemCount" DataType="i=7"></Field>
-      <Field Name="DisabledMonitoredItemCount" DataType="i=7"></Field>
-      <Field Name="MonitoringQueueOverflowCount" DataType="i=7"></Field>
-      <Field Name="NextSequenceNumber" DataType="i=7"></Field>
-      <Field Name="EventQueueOverFlowCount" DataType="i=7"></Field>
+      <Field Name="SessionId" DataType="i=17" />
+      <Field Name="SubscriptionId" DataType="i=7" />
+      <Field Name="Priority" DataType="i=3" />
+      <Field Name="PublishingInterval" DataType="i=11" />
+      <Field Name="MaxKeepAliveCount" DataType="i=7" />
+      <Field Name="MaxLifetimeCount" DataType="i=7" />
+      <Field Name="MaxNotificationsPerPublish" DataType="i=7" />
+      <Field Name="PublishingEnabled" DataType="i=1" />
+      <Field Name="ModifyCount" DataType="i=7" />
+      <Field Name="EnableCount" DataType="i=7" />
+      <Field Name="DisableCount" DataType="i=7" />
+      <Field Name="RepublishRequestCount" DataType="i=7" />
+      <Field Name="RepublishMessageRequestCount" DataType="i=7" />
+      <Field Name="RepublishMessageCount" DataType="i=7" />
+      <Field Name="TransferRequestCount" DataType="i=7" />
+      <Field Name="TransferredToAltClientCount" DataType="i=7" />
+      <Field Name="TransferredToSameClientCount" DataType="i=7" />
+      <Field Name="PublishRequestCount" DataType="i=7" />
+      <Field Name="DataChangeNotificationsCount" DataType="i=7" />
+      <Field Name="EventNotificationsCount" DataType="i=7" />
+      <Field Name="NotificationsCount" DataType="i=7" />
+      <Field Name="LatePublishRequestCount" DataType="i=7" />
+      <Field Name="CurrentKeepAliveCount" DataType="i=7" />
+      <Field Name="CurrentLifetimeCount" DataType="i=7" />
+      <Field Name="UnacknowledgedMessageCount" DataType="i=7" />
+      <Field Name="DiscardedMessageCount" DataType="i=7" />
+      <Field Name="MonitoredItemCount" DataType="i=7" />
+      <Field Name="DisabledMonitoredItemCount" DataType="i=7" />
+      <Field Name="MonitoringQueueOverflowCount" DataType="i=7" />
+      <Field Name="NextSequenceNumber" DataType="i=7" />
+      <Field Name="EventQueueOverFlowCount" DataType="i=7" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=877" BrowseName="ModelChangeStructureDataType">
@@ -14645,9 +14645,9 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="ModelChangeStructureDataType">
-      <Field Name="Affected" DataType="i=17"></Field>
-      <Field Name="AffectedType" DataType="i=17"></Field>
-      <Field Name="Verb" DataType="i=3"></Field>
+      <Field Name="Affected" DataType="i=17" />
+      <Field Name="AffectedType" DataType="i=17" />
+      <Field Name="Verb" DataType="i=3" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=897" BrowseName="SemanticChangeStructureDataType">
@@ -14656,8 +14656,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="SemanticChangeStructureDataType">
-      <Field Name="Affected" DataType="i=17"></Field>
-      <Field Name="AffectedType" DataType="i=17"></Field>
+      <Field Name="Affected" DataType="i=17" />
+      <Field Name="AffectedType" DataType="i=17" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=884" BrowseName="Range">
@@ -14666,8 +14666,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="Range">
-      <Field Name="Low" DataType="i=11"></Field>
-      <Field Name="High" DataType="i=11"></Field>
+      <Field Name="Low" DataType="i=11" />
+      <Field Name="High" DataType="i=11" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=887" BrowseName="EUInformation">
@@ -14676,10 +14676,10 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="EUInformation">
-      <Field Name="NamespaceUri" DataType="i=12"></Field>
-      <Field Name="UnitId" DataType="i=6"></Field>
-      <Field Name="DisplayName" DataType="i=21"></Field>
-      <Field Name="Description" DataType="i=21"></Field>
+      <Field Name="NamespaceUri" DataType="i=12" />
+      <Field Name="UnitId" DataType="i=6" />
+      <Field Name="DisplayName" DataType="i=21" />
+      <Field Name="Description" DataType="i=21" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=12077" BrowseName="AxisScaleEnumeration">
@@ -14689,9 +14689,9 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=29</Reference>
     </References>
     <Definition Name="AxisScaleEnumeration">
-      <Field Name="Linear" Value="0"></Field>
-      <Field Name="Log" Value="1"></Field>
-      <Field Name="Ln" Value="2"></Field>
+      <Field Name="Linear" Value="0" />
+      <Field Name="Log" Value="1" />
+      <Field Name="Ln" Value="2" />
     </Definition>
   </UADataType>
   <UAVariable NodeId="i=12078" BrowseName="EnumStrings" ParentNodeId="i=12077" DataType="LocalizedText" ValueRank="1">
@@ -14702,7 +14702,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=12077</Reference>
     </References>
     <Value>
-      <ListOfLocalizedText>
+      <ListOfLocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <LocalizedText>
           <Locale>
           </Locale>
@@ -14727,8 +14727,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="ComplexNumberType">
-      <Field Name="Real" DataType="i=10"></Field>
-      <Field Name="Imaginary" DataType="i=10"></Field>
+      <Field Name="Real" DataType="i=10" />
+      <Field Name="Imaginary" DataType="i=10" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=12172" BrowseName="DoubleComplexNumberType">
@@ -14737,8 +14737,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="DoubleComplexNumberType">
-      <Field Name="Real" DataType="i=11"></Field>
-      <Field Name="Imaginary" DataType="i=11"></Field>
+      <Field Name="Real" DataType="i=11" />
+      <Field Name="Imaginary" DataType="i=11" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=12079" BrowseName="AxisInformation">
@@ -14747,11 +14747,11 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="AxisInformation">
-      <Field Name="EngineeringUnits" DataType="i=887"></Field>
-      <Field Name="EURange" DataType="i=884"></Field>
-      <Field Name="Title" DataType="i=21"></Field>
-      <Field Name="AxisScaleType" DataType="i=12077"></Field>
-      <Field Name="AxisSteps" DataType="i=11" ValueRank="1"></Field>
+      <Field Name="EngineeringUnits" DataType="i=887" />
+      <Field Name="EURange" DataType="i=884" />
+      <Field Name="Title" DataType="i=21" />
+      <Field Name="AxisScaleType" DataType="i=12077" />
+      <Field Name="AxisSteps" DataType="i=11" ValueRank="1" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=12080" BrowseName="XVType">
@@ -14760,8 +14760,8 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="XVType">
-      <Field Name="X" DataType="i=11"></Field>
-      <Field Name="Value" DataType="i=10"></Field>
+      <Field Name="X" DataType="i=11" />
+      <Field Name="Value" DataType="i=10" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=894" BrowseName="ProgramDiagnosticDataType">
@@ -14770,16 +14770,16 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="ProgramDiagnosticDataType">
-      <Field Name="CreateSessionId" DataType="i=17"></Field>
-      <Field Name="CreateClientName" DataType="i=12"></Field>
-      <Field Name="InvocationCreationTime" DataType="i=294"></Field>
-      <Field Name="LastTransitionTime" DataType="i=294"></Field>
-      <Field Name="LastMethodCall" DataType="i=12"></Field>
-      <Field Name="LastMethodSessionId" DataType="i=17"></Field>
-      <Field Name="LastMethodInputArguments" DataType="i=296" ValueRank="1"></Field>
-      <Field Name="LastMethodOutputArguments" DataType="i=296" ValueRank="1"></Field>
-      <Field Name="LastMethodCallTime" DataType="i=294"></Field>
-      <Field Name="LastMethodReturnStatus" DataType="i=299"></Field>
+      <Field Name="CreateSessionId" DataType="i=17" />
+      <Field Name="CreateClientName" DataType="i=12" />
+      <Field Name="InvocationCreationTime" DataType="i=294" />
+      <Field Name="LastTransitionTime" DataType="i=294" />
+      <Field Name="LastMethodCall" DataType="i=12" />
+      <Field Name="LastMethodSessionId" DataType="i=17" />
+      <Field Name="LastMethodInputArguments" DataType="i=296" ValueRank="1" />
+      <Field Name="LastMethodOutputArguments" DataType="i=296" ValueRank="1" />
+      <Field Name="LastMethodCallTime" DataType="i=294" />
+      <Field Name="LastMethodReturnStatus" DataType="i=299" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=891" BrowseName="Annotation">
@@ -14788,9 +14788,9 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=22</Reference>
     </References>
     <Definition Name="Annotation">
-      <Field Name="Message" DataType="i=12"></Field>
-      <Field Name="UserName" DataType="i=12"></Field>
-      <Field Name="AnnotationTime" DataType="i=294"></Field>
+      <Field Name="Message" DataType="i=12" />
+      <Field Name="UserName" DataType="i=12" />
+      <Field Name="AnnotationTime" DataType="i=294" />
     </Definition>
   </UADataType>
   <UADataType NodeId="i=890" BrowseName="ExceptionDeviationFormat">
@@ -14800,11 +14800,11 @@
       <Reference ReferenceType="HasSubtype" IsForward="false">i=29</Reference>
     </References>
     <Definition Name="ExceptionDeviationFormat">
-      <Field Name="AbsoluteValue" Value="0"></Field>
-      <Field Name="PercentOfRange" Value="1"></Field>
-      <Field Name="PercentOfValue" Value="2"></Field>
-      <Field Name="PercentOfEURange" Value="3"></Field>
-      <Field Name="Unknown" Value="4"></Field>
+      <Field Name="AbsoluteValue" Value="0" />
+      <Field Name="PercentOfRange" Value="1" />
+      <Field Name="PercentOfValue" Value="2" />
+      <Field Name="PercentOfEURange" Value="3" />
+      <Field Name="Unknown" Value="4" />
     </Definition>
   </UADataType>
   <UAVariable NodeId="i=7614" BrowseName="EnumStrings" ParentNodeId="i=890" DataType="LocalizedText" ValueRank="1">
@@ -14815,7 +14815,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=890</Reference>
     </References>
     <Value>
-      <ListOfLocalizedText>
+      <ListOfLocalizedText xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">
         <LocalizedText>
           <Locale>
           </Locale>
@@ -15365,7 +15365,7 @@
       <Reference ReferenceType="HasTypeDefinition">i=72</Reference>
     </References>
     <Value>
-      <ByteString></ByteString>
+      <ByteString xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd"></ByteString>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8254" BrowseName="NamespaceUri" ParentNodeId="i=8252" DataType="String">
@@ -15376,7 +15376,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>http://opcfoundation.org/UA/2008/02/Types.xsd</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://opcfoundation.org/UA/2008/02/Types.xsd</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8285" BrowseName="Argument" ParentNodeId="i=8252" DataType="String">
@@ -15386,7 +15386,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='Argument']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='Argument']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8291" BrowseName="EnumValueType" ParentNodeId="i=8252" DataType="String">
@@ -15396,7 +15396,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='EnumValueType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='EnumValueType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8918" BrowseName="TimeZoneDataType" ParentNodeId="i=8252" DataType="String">
@@ -15406,7 +15406,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='TimeZoneDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='TimeZoneDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8300" BrowseName="ApplicationDescription" ParentNodeId="i=8252" DataType="String">
@@ -15416,7 +15416,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ApplicationDescription']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ApplicationDescription']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8297" BrowseName="UserTokenPolicy" ParentNodeId="i=8252" DataType="String">
@@ -15426,7 +15426,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='UserTokenPolicy']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='UserTokenPolicy']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8303" BrowseName="EndpointDescription" ParentNodeId="i=8252" DataType="String">
@@ -15436,7 +15436,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='EndpointDescription']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='EndpointDescription']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8417" BrowseName="RegisteredServer" ParentNodeId="i=8252" DataType="String">
@@ -15446,7 +15446,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='RegisteredServer']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='RegisteredServer']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8333" BrowseName="SignedSoftwareCertificate" ParentNodeId="i=8252" DataType="String">
@@ -15456,7 +15456,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='SignedSoftwareCertificate']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='SignedSoftwareCertificate']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8306" BrowseName="UserIdentityToken" ParentNodeId="i=8252" DataType="String">
@@ -15466,7 +15466,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='UserIdentityToken']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='UserIdentityToken']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8309" BrowseName="AnonymousIdentityToken" ParentNodeId="i=8252" DataType="String">
@@ -15476,7 +15476,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='AnonymousIdentityToken']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='AnonymousIdentityToken']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8312" BrowseName="UserNameIdentityToken" ParentNodeId="i=8252" DataType="String">
@@ -15486,7 +15486,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='UserNameIdentityToken']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='UserNameIdentityToken']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8315" BrowseName="X509IdentityToken" ParentNodeId="i=8252" DataType="String">
@@ -15496,7 +15496,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='X509IdentityToken']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='X509IdentityToken']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8318" BrowseName="IssuedIdentityToken" ParentNodeId="i=8252" DataType="String">
@@ -15506,7 +15506,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='IssuedIdentityToken']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='IssuedIdentityToken']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8363" BrowseName="AddNodesItem" ParentNodeId="i=8252" DataType="String">
@@ -15516,7 +15516,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='AddNodesItem']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='AddNodesItem']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8366" BrowseName="AddReferencesItem" ParentNodeId="i=8252" DataType="String">
@@ -15526,7 +15526,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='AddReferencesItem']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='AddReferencesItem']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8369" BrowseName="DeleteNodesItem" ParentNodeId="i=8252" DataType="String">
@@ -15536,7 +15536,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='DeleteNodesItem']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='DeleteNodesItem']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8372" BrowseName="DeleteReferencesItem" ParentNodeId="i=8252" DataType="String">
@@ -15546,7 +15546,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='DeleteReferencesItem']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='DeleteReferencesItem']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8321" BrowseName="EndpointConfiguration" ParentNodeId="i=8252" DataType="String">
@@ -15556,7 +15556,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='EndpointConfiguration']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='EndpointConfiguration']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8324" BrowseName="SupportedProfile" ParentNodeId="i=8252" DataType="String">
@@ -15566,7 +15566,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='SupportedProfile']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='SupportedProfile']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8330" BrowseName="SoftwareCertificate" ParentNodeId="i=8252" DataType="String">
@@ -15576,7 +15576,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='SoftwareCertificate']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='SoftwareCertificate']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8564" BrowseName="ContentFilterElement" ParentNodeId="i=8252" DataType="String">
@@ -15586,7 +15586,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ContentFilterElement']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ContentFilterElement']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8567" BrowseName="ContentFilter" ParentNodeId="i=8252" DataType="String">
@@ -15596,7 +15596,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ContentFilter']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ContentFilter']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8570" BrowseName="FilterOperand" ParentNodeId="i=8252" DataType="String">
@@ -15606,7 +15606,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='FilterOperand']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='FilterOperand']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8573" BrowseName="ElementOperand" ParentNodeId="i=8252" DataType="String">
@@ -15616,7 +15616,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ElementOperand']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ElementOperand']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8576" BrowseName="LiteralOperand" ParentNodeId="i=8252" DataType="String">
@@ -15626,7 +15626,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='LiteralOperand']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='LiteralOperand']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8579" BrowseName="AttributeOperand" ParentNodeId="i=8252" DataType="String">
@@ -15636,7 +15636,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='AttributeOperand']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='AttributeOperand']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8582" BrowseName="SimpleAttributeOperand" ParentNodeId="i=8252" DataType="String">
@@ -15646,7 +15646,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='SimpleAttributeOperand']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='SimpleAttributeOperand']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8639" BrowseName="HistoryEvent" ParentNodeId="i=8252" DataType="String">
@@ -15656,7 +15656,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='HistoryEvent']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='HistoryEvent']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8702" BrowseName="MonitoringFilter" ParentNodeId="i=8252" DataType="String">
@@ -15666,7 +15666,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='MonitoringFilter']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='MonitoringFilter']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8708" BrowseName="EventFilter" ParentNodeId="i=8252" DataType="String">
@@ -15676,7 +15676,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='EventFilter']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='EventFilter']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8711" BrowseName="AggregateConfiguration" ParentNodeId="i=8252" DataType="String">
@@ -15686,7 +15686,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='AggregateConfiguration']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='AggregateConfiguration']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8807" BrowseName="HistoryEventFieldList" ParentNodeId="i=8252" DataType="String">
@@ -15696,7 +15696,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='HistoryEventFieldList']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='HistoryEventFieldList']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8384" BrowseName="ScalarTestType" ParentNodeId="i=8252" DataType="String">
@@ -15706,7 +15706,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ScalarTestType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ScalarTestType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8387" BrowseName="ArrayTestType" ParentNodeId="i=8252" DataType="String">
@@ -15716,7 +15716,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ArrayTestType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ArrayTestType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8390" BrowseName="CompositeTestType" ParentNodeId="i=8252" DataType="String">
@@ -15726,7 +15726,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='CompositeTestType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='CompositeTestType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8327" BrowseName="BuildInfo" ParentNodeId="i=8252" DataType="String">
@@ -15736,7 +15736,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='BuildInfo']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='BuildInfo']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8843" BrowseName="RedundantServerDataType" ParentNodeId="i=8252" DataType="String">
@@ -15746,7 +15746,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='RedundantServerDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='RedundantServerDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=11951" BrowseName="EndpointUrlListDataType" ParentNodeId="i=8252" DataType="String">
@@ -15756,7 +15756,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='EndpointUrlListDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='EndpointUrlListDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=11954" BrowseName="NetworkGroupDataType" ParentNodeId="i=8252" DataType="String">
@@ -15766,7 +15766,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='NetworkGroupDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='NetworkGroupDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8846" BrowseName="SamplingIntervalDiagnosticsDataType" ParentNodeId="i=8252" DataType="String">
@@ -15776,7 +15776,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='SamplingIntervalDiagnosticsDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='SamplingIntervalDiagnosticsDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8849" BrowseName="ServerDiagnosticsSummaryDataType" ParentNodeId="i=8252" DataType="String">
@@ -15786,7 +15786,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ServerDiagnosticsSummaryDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ServerDiagnosticsSummaryDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8852" BrowseName="ServerStatusDataType" ParentNodeId="i=8252" DataType="String">
@@ -15796,7 +15796,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ServerStatusDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ServerStatusDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8855" BrowseName="SessionDiagnosticsDataType" ParentNodeId="i=8252" DataType="String">
@@ -15806,7 +15806,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='SessionDiagnosticsDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='SessionDiagnosticsDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8858" BrowseName="SessionSecurityDiagnosticsDataType" ParentNodeId="i=8252" DataType="String">
@@ -15816,7 +15816,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='SessionSecurityDiagnosticsDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='SessionSecurityDiagnosticsDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8861" BrowseName="ServiceCounterDataType" ParentNodeId="i=8252" DataType="String">
@@ -15826,7 +15826,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ServiceCounterDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ServiceCounterDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8294" BrowseName="StatusResult" ParentNodeId="i=8252" DataType="String">
@@ -15836,7 +15836,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='StatusResult']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='StatusResult']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8864" BrowseName="SubscriptionDiagnosticsDataType" ParentNodeId="i=8252" DataType="String">
@@ -15846,7 +15846,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='SubscriptionDiagnosticsDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='SubscriptionDiagnosticsDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8867" BrowseName="ModelChangeStructureDataType" ParentNodeId="i=8252" DataType="String">
@@ -15856,7 +15856,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ModelChangeStructureDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ModelChangeStructureDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8870" BrowseName="SemanticChangeStructureDataType" ParentNodeId="i=8252" DataType="String">
@@ -15866,7 +15866,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='SemanticChangeStructureDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='SemanticChangeStructureDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8873" BrowseName="Range" ParentNodeId="i=8252" DataType="String">
@@ -15876,7 +15876,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='Range']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='Range']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8876" BrowseName="EUInformation" ParentNodeId="i=8252" DataType="String">
@@ -15886,7 +15886,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='EUInformation']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='EUInformation']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=12175" BrowseName="ComplexNumberType" ParentNodeId="i=8252" DataType="String">
@@ -15896,7 +15896,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ComplexNumberType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ComplexNumberType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=12178" BrowseName="DoubleComplexNumberType" ParentNodeId="i=8252" DataType="String">
@@ -15906,7 +15906,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='DoubleComplexNumberType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='DoubleComplexNumberType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=12083" BrowseName="AxisInformation" ParentNodeId="i=8252" DataType="String">
@@ -15916,7 +15916,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='AxisInformation']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='AxisInformation']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=12086" BrowseName="XVType" ParentNodeId="i=8252" DataType="String">
@@ -15926,7 +15926,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='XVType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='XVType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8882" BrowseName="ProgramDiagnosticDataType" ParentNodeId="i=8252" DataType="String">
@@ -15936,7 +15936,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='ProgramDiagnosticDataType']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='ProgramDiagnosticDataType']</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8879" BrowseName="Annotation" ParentNodeId="i=8252" DataType="String">
@@ -15946,7 +15946,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=8252</Reference>
     </References>
     <Value>
-      <String>//xs:element[@name='Annotation']</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">//xs:element[@name='Annotation']</String>
     </Value>
   </UAVariable>
   <UAObject NodeId="i=298" BrowseName="Default Binary" SymbolicName="DefaultBinary">
@@ -16470,7 +16470,7 @@
       <Reference ReferenceType="HasTypeDefinition">i=72</Reference>
     </References>
     <Value>
-      <ByteString></ByteString>
+      <ByteString xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd"></ByteString>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7619" BrowseName="NamespaceUri" ParentNodeId="i=7617" DataType="String">
@@ -16481,7 +16481,7 @@
       <Reference ReferenceType="HasProperty" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>http://opcfoundation.org/UA/</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">http://opcfoundation.org/UA/</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7650" BrowseName="Argument" ParentNodeId="i=7617" DataType="String">
@@ -16491,7 +16491,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>Argument</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">Argument</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7656" BrowseName="EnumValueType" ParentNodeId="i=7617" DataType="String">
@@ -16501,7 +16501,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>EnumValueType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">EnumValueType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8914" BrowseName="TimeZoneDataType" ParentNodeId="i=7617" DataType="String">
@@ -16511,7 +16511,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>TimeZoneDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">TimeZoneDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7665" BrowseName="ApplicationDescription" ParentNodeId="i=7617" DataType="String">
@@ -16521,7 +16521,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ApplicationDescription</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ApplicationDescription</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7662" BrowseName="UserTokenPolicy" ParentNodeId="i=7617" DataType="String">
@@ -16531,7 +16531,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>UserTokenPolicy</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">UserTokenPolicy</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7668" BrowseName="EndpointDescription" ParentNodeId="i=7617" DataType="String">
@@ -16541,7 +16541,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>EndpointDescription</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">EndpointDescription</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7782" BrowseName="RegisteredServer" ParentNodeId="i=7617" DataType="String">
@@ -16551,7 +16551,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>RegisteredServer</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">RegisteredServer</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7698" BrowseName="SignedSoftwareCertificate" ParentNodeId="i=7617" DataType="String">
@@ -16561,7 +16561,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>SignedSoftwareCertificate</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">SignedSoftwareCertificate</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7671" BrowseName="UserIdentityToken" ParentNodeId="i=7617" DataType="String">
@@ -16571,7 +16571,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>UserIdentityToken</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">UserIdentityToken</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7674" BrowseName="AnonymousIdentityToken" ParentNodeId="i=7617" DataType="String">
@@ -16581,7 +16581,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>AnonymousIdentityToken</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">AnonymousIdentityToken</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7677" BrowseName="UserNameIdentityToken" ParentNodeId="i=7617" DataType="String">
@@ -16591,7 +16591,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>UserNameIdentityToken</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">UserNameIdentityToken</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7680" BrowseName="X509IdentityToken" ParentNodeId="i=7617" DataType="String">
@@ -16601,7 +16601,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>X509IdentityToken</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">X509IdentityToken</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7683" BrowseName="IssuedIdentityToken" ParentNodeId="i=7617" DataType="String">
@@ -16611,7 +16611,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>IssuedIdentityToken</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">IssuedIdentityToken</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7728" BrowseName="AddNodesItem" ParentNodeId="i=7617" DataType="String">
@@ -16621,7 +16621,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>AddNodesItem</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">AddNodesItem</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7731" BrowseName="AddReferencesItem" ParentNodeId="i=7617" DataType="String">
@@ -16631,7 +16631,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>AddReferencesItem</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">AddReferencesItem</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7734" BrowseName="DeleteNodesItem" ParentNodeId="i=7617" DataType="String">
@@ -16641,7 +16641,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>DeleteNodesItem</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">DeleteNodesItem</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7737" BrowseName="DeleteReferencesItem" ParentNodeId="i=7617" DataType="String">
@@ -16651,7 +16651,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>DeleteReferencesItem</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">DeleteReferencesItem</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7686" BrowseName="EndpointConfiguration" ParentNodeId="i=7617" DataType="String">
@@ -16661,7 +16661,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>EndpointConfiguration</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">EndpointConfiguration</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7689" BrowseName="SupportedProfile" ParentNodeId="i=7617" DataType="String">
@@ -16671,7 +16671,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>SupportedProfile</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">SupportedProfile</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7695" BrowseName="SoftwareCertificate" ParentNodeId="i=7617" DataType="String">
@@ -16681,7 +16681,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>SoftwareCertificate</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">SoftwareCertificate</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7929" BrowseName="ContentFilterElement" ParentNodeId="i=7617" DataType="String">
@@ -16691,7 +16691,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ContentFilterElement</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ContentFilterElement</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7932" BrowseName="ContentFilter" ParentNodeId="i=7617" DataType="String">
@@ -16701,7 +16701,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ContentFilter</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ContentFilter</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7935" BrowseName="FilterOperand" ParentNodeId="i=7617" DataType="String">
@@ -16711,7 +16711,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>FilterOperand</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">FilterOperand</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7938" BrowseName="ElementOperand" ParentNodeId="i=7617" DataType="String">
@@ -16721,7 +16721,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ElementOperand</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ElementOperand</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7941" BrowseName="LiteralOperand" ParentNodeId="i=7617" DataType="String">
@@ -16731,7 +16731,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>LiteralOperand</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">LiteralOperand</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7944" BrowseName="AttributeOperand" ParentNodeId="i=7617" DataType="String">
@@ -16741,7 +16741,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>AttributeOperand</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">AttributeOperand</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7947" BrowseName="SimpleAttributeOperand" ParentNodeId="i=7617" DataType="String">
@@ -16751,7 +16751,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>SimpleAttributeOperand</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">SimpleAttributeOperand</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8004" BrowseName="HistoryEvent" ParentNodeId="i=7617" DataType="String">
@@ -16761,7 +16761,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>HistoryEvent</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">HistoryEvent</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8067" BrowseName="MonitoringFilter" ParentNodeId="i=7617" DataType="String">
@@ -16771,7 +16771,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>MonitoringFilter</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">MonitoringFilter</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8073" BrowseName="EventFilter" ParentNodeId="i=7617" DataType="String">
@@ -16781,7 +16781,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>EventFilter</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">EventFilter</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8076" BrowseName="AggregateConfiguration" ParentNodeId="i=7617" DataType="String">
@@ -16791,7 +16791,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>AggregateConfiguration</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">AggregateConfiguration</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8172" BrowseName="HistoryEventFieldList" ParentNodeId="i=7617" DataType="String">
@@ -16801,7 +16801,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>HistoryEventFieldList</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">HistoryEventFieldList</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7749" BrowseName="ScalarTestType" ParentNodeId="i=7617" DataType="String">
@@ -16811,7 +16811,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ScalarTestType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ScalarTestType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7752" BrowseName="ArrayTestType" ParentNodeId="i=7617" DataType="String">
@@ -16821,7 +16821,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ArrayTestType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ArrayTestType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7755" BrowseName="CompositeTestType" ParentNodeId="i=7617" DataType="String">
@@ -16831,7 +16831,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>CompositeTestType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">CompositeTestType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7692" BrowseName="BuildInfo" ParentNodeId="i=7617" DataType="String">
@@ -16841,7 +16841,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>BuildInfo</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">BuildInfo</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8208" BrowseName="RedundantServerDataType" ParentNodeId="i=7617" DataType="String">
@@ -16851,7 +16851,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>RedundantServerDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">RedundantServerDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=11959" BrowseName="EndpointUrlListDataType" ParentNodeId="i=7617" DataType="String">
@@ -16861,7 +16861,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>EndpointUrlListDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">EndpointUrlListDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=11962" BrowseName="NetworkGroupDataType" ParentNodeId="i=7617" DataType="String">
@@ -16871,7 +16871,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>NetworkGroupDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">NetworkGroupDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8211" BrowseName="SamplingIntervalDiagnosticsDataType" ParentNodeId="i=7617" DataType="String">
@@ -16881,7 +16881,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>SamplingIntervalDiagnosticsDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">SamplingIntervalDiagnosticsDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8214" BrowseName="ServerDiagnosticsSummaryDataType" ParentNodeId="i=7617" DataType="String">
@@ -16891,7 +16891,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ServerDiagnosticsSummaryDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ServerDiagnosticsSummaryDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8217" BrowseName="ServerStatusDataType" ParentNodeId="i=7617" DataType="String">
@@ -16901,7 +16901,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ServerStatusDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ServerStatusDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8220" BrowseName="SessionDiagnosticsDataType" ParentNodeId="i=7617" DataType="String">
@@ -16911,7 +16911,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>SessionDiagnosticsDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">SessionDiagnosticsDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8223" BrowseName="SessionSecurityDiagnosticsDataType" ParentNodeId="i=7617" DataType="String">
@@ -16921,7 +16921,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>SessionSecurityDiagnosticsDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">SessionSecurityDiagnosticsDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8226" BrowseName="ServiceCounterDataType" ParentNodeId="i=7617" DataType="String">
@@ -16931,7 +16931,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ServiceCounterDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ServiceCounterDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=7659" BrowseName="StatusResult" ParentNodeId="i=7617" DataType="String">
@@ -16941,7 +16941,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>StatusResult</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">StatusResult</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8229" BrowseName="SubscriptionDiagnosticsDataType" ParentNodeId="i=7617" DataType="String">
@@ -16951,7 +16951,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>SubscriptionDiagnosticsDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">SubscriptionDiagnosticsDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8232" BrowseName="ModelChangeStructureDataType" ParentNodeId="i=7617" DataType="String">
@@ -16961,7 +16961,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ModelChangeStructureDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ModelChangeStructureDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8235" BrowseName="SemanticChangeStructureDataType" ParentNodeId="i=7617" DataType="String">
@@ -16971,7 +16971,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>SemanticChangeStructureDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">SemanticChangeStructureDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8238" BrowseName="Range" ParentNodeId="i=7617" DataType="String">
@@ -16981,7 +16981,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>Range</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">Range</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8241" BrowseName="EUInformation" ParentNodeId="i=7617" DataType="String">
@@ -16991,7 +16991,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>EUInformation</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">EUInformation</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=12183" BrowseName="ComplexNumberType" ParentNodeId="i=7617" DataType="String">
@@ -17001,7 +17001,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ComplexNumberType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ComplexNumberType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=12186" BrowseName="DoubleComplexNumberType" ParentNodeId="i=7617" DataType="String">
@@ -17011,7 +17011,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>DoubleComplexNumberType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">DoubleComplexNumberType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=12091" BrowseName="AxisInformation" ParentNodeId="i=7617" DataType="String">
@@ -17021,7 +17021,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>AxisInformation</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">AxisInformation</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=12094" BrowseName="XVType" ParentNodeId="i=7617" DataType="String">
@@ -17031,7 +17031,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>XVType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">XVType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8247" BrowseName="ProgramDiagnosticDataType" ParentNodeId="i=7617" DataType="String">
@@ -17041,7 +17041,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>ProgramDiagnosticDataType</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">ProgramDiagnosticDataType</String>
     </Value>
   </UAVariable>
   <UAVariable NodeId="i=8244" BrowseName="Annotation" ParentNodeId="i=7617" DataType="String">
@@ -17051,7 +17051,7 @@
       <Reference ReferenceType="HasComponent" IsForward="false">i=7617</Reference>
     </References>
     <Value>
-      <String>Annotation</String>
+      <String xmlns="http://opcfoundation.org/UA/2008/02/Types.xsd">Annotation</String>
     </Value>
   </UAVariable>
 </UANodeSet>

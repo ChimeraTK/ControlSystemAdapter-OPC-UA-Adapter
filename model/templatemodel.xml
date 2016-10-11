@@ -14,68 +14,15 @@
     </Aliases>
     <Extensions>
         <Extension>
-            <ModelInfo Tool="UaModeler" Hash="xxcUG/f0zmWOlROr/bpPnA==" Version="1.4.4"/>
+            <ModelInfo Tool="UaModeler" Hash="lDP28/56ixJ8O3Jz8uxEOw==" Version="1.4.4"/>
         </Extension>
     </Extensions>
-    <UAVariableType NodeId="ns=1;i=2002" BrowseName="1:mtcaTimeStampVariableType">
-        <DisplayName>mtcaTimeStampVariableType</DisplayName>
-        <References>
-            <Reference ReferenceType="HasComponent">ns=1;i=6014</Reference>
-            <Reference ReferenceType="HasComponent">ns=1;i=6015</Reference>
-            <Reference ReferenceType="HasSubtype" IsForward="false">i=63</Reference>
-            <Reference ReferenceType="HasComponent">ns=1;i=6011</Reference>
-            <Reference ReferenceType="HasComponent">ns=1;i=6019</Reference>
-        </References>
-    </UAVariableType>
-    <UAVariable DataType="UInt32" ParentNodeId="ns=1;i=2002" NodeId="ns=1;i=6014" BrowseName="1:index0" UserAccessLevel="3" AccessLevel="3">
-        <DisplayName>index0</DisplayName>
-        <References>
-            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
-            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=2002</Reference>
-            <Reference ReferenceType="HasModellingRule">i=78</Reference>
-        </References>
-    </UAVariable>
-    <UAVariable DataType="UInt32" ParentNodeId="ns=1;i=2002" NodeId="ns=1;i=6015" BrowseName="1:index1" UserAccessLevel="3" AccessLevel="3">
-        <DisplayName>index1</DisplayName>
-        <References>
-            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
-            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=2002</Reference>
-            <Reference ReferenceType="HasModellingRule">i=78</Reference>
-        </References>
-    </UAVariable>
-    <UAVariable DataType="UInt32" ParentNodeId="ns=1;i=2002" NodeId="ns=1;i=6011" BrowseName="1:nanoseconds" UserAccessLevel="3" AccessLevel="3">
-        <DisplayName>nanoseconds</DisplayName>
-        <References>
-            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
-            <Reference ReferenceType="HasModellingRule">i=78</Reference>
-            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=2002</Reference>
-        </References>
-    </UAVariable>
-    <UAVariable DataType="UInt32" ParentNodeId="ns=1;i=2002" NodeId="ns=1;i=6019" BrowseName="1:seconds" UserAccessLevel="3" AccessLevel="3">
-        <DisplayName>seconds</DisplayName>
-        <References>
-            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
-            <Reference ReferenceType="HasModellingRule">i=78</Reference>
-            <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=2002</Reference>
-        </References>
-        <Value>
-            <uax:UInt32>0</uax:UInt32>
-        </Value>
-    </UAVariable>
     <UAVariable DataType="UInt32" ParentNodeId="i=11487" NodeId="ns=1;i=6017" BrowseName="1:seconds" UserAccessLevel="3" AccessLevel="3">
         <DisplayName>seconds</DisplayName>
         <References>
             <Reference ReferenceType="HasModellingRule">i=78</Reference>
             <Reference ReferenceType="HasTypeDefinition">i=68</Reference>
             <Reference ReferenceType="HasProperty" IsForward="false">i=11487</Reference>
-        </References>
-    </UAVariable>
-    <UAVariable DataType="Double" ParentNodeId="i=2137" NodeId="ns=1;i=6018" BrowseName="1:BaseDataVsdfgsdfgariable" UserAccessLevel="3" AccessLevel="3">
-        <DisplayName>BaseDataVsdfgsdfgariable</DisplayName>
-        <References>
-            <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
-            <Reference ReferenceType="HasModellingRule">i=78</Reference>
-            <Reference ReferenceType="HasComponent" IsForward="false">i=2137</Reference>
         </References>
     </UAVariable>
     <UAObjectType NodeId="ns=1;i=1002" BrowseName="1:mtcaModule">

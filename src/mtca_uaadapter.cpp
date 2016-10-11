@@ -46,20 +46,20 @@ using namespace ChimeraTK;
 using namespace std;
 
 void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
-	
+
     this->server_config = UA_ServerConfig_standard;
     this->server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, opcuaPort);
     this->server_config.logger = UA_Log_Stdout;
     this->server_config.networkLayers = &this->server_nl;
     this->server_config.networkLayersSize = 1;
-		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)"HZDR OPCUA Server");
+/*		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)"HZDR OPCUA Server");
 		this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
 		this->server_config.applicationDescription.applicationUri = UA_STRING((char*)"opc.tcp://localhost");
 		this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
 		this->server_config.buildInfo.productName = UA_STRING((char*)"ControlSystemAdapterOPCUA");
 		this->server_config.buildInfo.productUri = UA_STRING((char*)"HZDR OPCUA Server");
 		this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"TU Dresden");
-		
+*/		
     this->mappedServer = UA_Server_new(this->server_config);
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
   
@@ -67,12 +67,12 @@ void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
 }
 
 mtca_uaadapter::mtca_uaadapter(uint16_t opcuaPort, std::string configFile) : ua_mapped_class() {
-    this->mtca_uaadapter_constructserver(opcuaPort);
+	this->mtca_uaadapter_constructserver(opcuaPort);
 	
 	// XML file handling for variable mapping, just an example...
 	this->fileHandler = new xml_file_handler(configFile);
 	
-    this->mapSelfToNamespace();
+	this->mapSelfToNamespace();
 }
 
 mtca_uaadapter::~mtca_uaadapter() {
@@ -162,7 +162,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 					varPathVector.pop_back();
 				}
 				
-				std::cout << "Variabe: '" << srcVarName << "' wird unter '" << renameVar << "' in Application Name: '" << applicName << "' eingetragen." << std::endl;
+				std::cout << "Variable: '" << srcVarName << "' wird unter '" << renameVar << "' in Application Name: '" << applicName << "' eingetragen." << std::endl;
 				
 				nodeVectorUnrollPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "folder");
 				vector<string> folderPathVector;

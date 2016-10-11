@@ -114,7 +114,6 @@ UA_NumericRangeDimension scalarThisDimension = (UA_NumericRangeDimension){.min =
 arrayRange.dimensions = &scalarThisDimension; \
 UA_Variant_setRangeCopy(&value->value, (_p_ctype *) thisObj->_p_method().data(), thisObj->_p_method().size(), arrayRange); \
 
-
 // Typed Function Protoypes with datatype specific stuff
 // Readproxies:
 #define UA_RDPROXY_STRING(_p_class, _p_method) \
@@ -123,6 +122,18 @@ UA_String ua_val; \
 CPPSTRING_TO_UASTRING(ua_val, thisObj->_p_method()); \
 UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]); \
 UA_String_deleteMembers(&ua_val); \
+UA_RDPROXY_TAIL()
+
+#define UA_RDPROXY_LOCALIZEDTEXT(_p_class, _p_method) \
+UA_RDPROXY_HEAD(_p_class, _p_method) \
+UA_LocalizedText ua_val; \
+std::tuple<std::string, std::string> val = thisObj->_p_method(); \
+std::string locale = std::get<0>(val); \
+std::string text   = std::get<1>(val); \
+CPPSTRING_TO_UASTRING(ua_val.locale, locale); \
+CPPSTRING_TO_UASTRING(ua_val.text, text); \
+UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]); \
+UA_LocalizedText_deleteMembers(&ua_val); \
 UA_RDPROXY_TAIL()
 
 #define UA_RDPROXY_INT32(_p_class, _p_method) \
@@ -226,6 +237,15 @@ UA_WRPROXY_HEAD(_p_class, _p_method) \
 std::string cpps; \
 UASTRING_TO_CPPSTRING( ((UA_String) *((UA_String *) data->data)) , cpps); \
 theClass->_p_method(cpps); \
+UA_WRPROXY_TAIL()
+
+#define UA_WRPROXY_LOCALIZEDTEXT(_p_class, _p_method) \
+UA_WRPROXY_HEAD(_p_class, _p_method) \
+std::string locale; \
+UASTRING_TO_CPPSTRING( ((UA_String) *((UA_String *) &((UA_LocalizedText *) data->data)->locale)) , locale); \
+std::string text; \
+UASTRING_TO_CPPSTRING( ((UA_String) *((UA_String *) &((UA_LocalizedText *) data->data)->text)) , text); \
+theClass->_p_method(std::make_tuple(locale, text)); \
 UA_WRPROXY_TAIL()
 
 #define UA_WRPROXY_INT8(_p_class, _p_method) \

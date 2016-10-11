@@ -29,8 +29,6 @@
 extern "C" 
 {
   #include "open62541.h"
-#include <open62541.h>
-#include <open62541.h>
 }
 
 #include "ua_proxies.h"
@@ -50,7 +48,6 @@ UA_NodeId *nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId r
   return local;
 }
 
-
 UA_NodeId *nodePairList_getSourceIdByTargetId(nodePairList pairList, UA_NodeId targetId) {
   UA_NodeId *local = nullptr;
   // cppcheck-suppress postfixOperator                  REASON: List iterator cannot be prefixed
@@ -61,7 +58,6 @@ UA_NodeId *nodePairList_getSourceIdByTargetId(nodePairList pairList, UA_NodeId t
     }
   return local;
 }
-
 
 UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void *handle) {
   nodePairList *lst = static_cast<nodePairList*>(handle);
@@ -124,8 +120,9 @@ UA_StatusCode ua_callProxy_mapFunctions(UA_Server *server, UA_NodeId objectId, U
     UA_FunctionCall_InstanceLookupTable_Element *ntel = new UA_FunctionCall_InstanceLookupTable_Element;
     ntel->classInstance = srcClass;
     UA_NodeId_copy( &objectId, &ntel->classObjectId);
+    ntel->server = server;
     ele->lookupTable->push_back(ntel);
-
+    
     // I forgot what this was supposed to be doing - but it clearly was meant to ... eeee...?
     //     for (UA_FunctionCall_InstanceLookUpTable::iterator j=tbl->begin(); j != tbl->end(); j++) 
     //       if(UA_NodeId_equal(&(*(j))->classObjectId, &objectId)) {
@@ -133,10 +130,8 @@ UA_StatusCode ua_callProxy_mapFunctions(UA_Server *server, UA_NodeId objectId, U
     //         break;
     //       }
     
-    // Found a mapping, now register the callback
-    // FIXME: This is actually wrong: Of 5 simulators, only the last registrar would be called ! 
-    //        Needs a callback table mapping the objectId of the method to the class instance  !!
-    retval |= UA_Server_setMethodNode_callback(server, (const UA_NodeId) ele->typeTemplateId, ele->callback, srcClass);
+    // Found a mapping, now register the callback; pass the server along (instance and object are identified in the table)
+    retval |= UA_Server_setMethodNode_callback(server, (const UA_NodeId) ele->typeTemplateId, ele->callback, (void *) server);
   }
   
   return retval;
@@ -172,12 +167,12 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
     ds.read = ele->read;
     ds.write = ele->write;
     ds.handle = srcClass;
-    delete ele; // inhibit memleak warning during static analysis		
+    delete ele; // inhibit memleak warning during static analysis
     
     retval |= UA_Server_setVariableNode_dataSource(server, (const UA_NodeId) instantiatedId, ds);
-		
-		/* Ste the right Value Datatype */
-		UA_NodeId datatTypeNodeId = UA_NODEID_NULL;
+
+	/* Ste the right Value Datatype */
+	UA_NodeId datatTypeNodeId = UA_NODEID_NULL;
     retval = UA_Server_readDataType(server, instantiatedId, &datatTypeNodeId);
 		if(retval == UA_STATUSCODE_GOOD) {
 			const UA_NodeId basedatatype = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
@@ -207,7 +202,7 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
 				UA_Server_writeValueRank(server, instantiatedId, valueRank);
 			}
 		}
-  }
+	}
   
   return retval;
 }
