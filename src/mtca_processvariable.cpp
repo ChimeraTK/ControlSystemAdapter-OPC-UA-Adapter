@@ -200,6 +200,7 @@ void mtca_processvariable::setValue_##_p_type(_p_type value) { \
     return; \
 }
 
+/*
 #define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
 void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
@@ -209,18 +210,19 @@ void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) 
     } \
     return; \
 }
+*/
 
-// #define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
-// void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
-//     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
-//     if (!this->csManager->getProcessVariable(this->namePV)->isArray())    return; \
-//     if (this->csManager->getProcessVariable(this->namePV)->isSender()) { \
-// 				int32_t valueSize = this->csManager->getProcessArray<_p_type>(this->namePV)->get().size(); \
-// 				value.resize(valueSize); \
-//         this->csManager->getProcessArray<_p_type>(this->namePV)->set(value); \
-//     } \
-//     return; \
-// }
+#define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
+void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
+    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
+    if (!this->csManager->getProcessVariable(this->namePV)->isArray())    return; \
+    if (this->csManager->getProcessVariable(this->namePV)->isSender()) { \
+ 				int32_t valueSize = this->csManager->getProcessArray<_p_type>(this->namePV)->get().size(); \
+ 				value.resize(valueSize); \
+         this->csManager->getProcessArray<_p_type>(this->namePV)->set(value); \
+		} \
+	return; \
+}
 
 UA_RDPROXY_INT8(mtca_processvariable, getValue_int8_t);
 CREATE_READ_FUNCTION(int8_t)

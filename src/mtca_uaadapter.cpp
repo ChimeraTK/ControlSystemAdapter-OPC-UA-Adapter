@@ -52,14 +52,14 @@ void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
     this->server_config.logger = UA_Log_Stdout;
     this->server_config.networkLayers = &this->server_nl;
     this->server_config.networkLayersSize = 1;
-/*		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)"HZDR OPCUA Server");
+		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)"HZDR OPCUA Server");
 		this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
 		this->server_config.applicationDescription.applicationUri = UA_STRING((char*)"opc.tcp://localhost");
 		this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
 		this->server_config.buildInfo.productName = UA_STRING((char*)"ControlSystemAdapterOPCUA");
 		this->server_config.buildInfo.productUri = UA_STRING((char*)"HZDR OPCUA Server");
 		this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"TU Dresden");
-*/		
+		
     this->mappedServer = UA_Server_new(this->server_config);
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
   
