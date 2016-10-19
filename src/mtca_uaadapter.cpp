@@ -141,36 +141,49 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 					vector<string> varPathVector;
 					vector<xmlNodePtr> nodeVectorUnrollPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "unrollPath");
 					string seperator = "";
+					bool unrollPathIs = false;
 					for(auto nodeUnrollPath: nodeVectorUnrollPath) {
 						string shouldUnrollPath = this->fileHandler->getContentFromNode(nodeUnrollPath);
 						if(shouldUnrollPath.compare("True") == 0) {
 							seperator = seperator + this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
+							unrollPathIs = true;
 						}	
 					}
 					
-					vector<string> newPathVector = this->fileHandler->praseVariablePath(srcVarName, seperator);
-					varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
+					if(!seperator.empty()) {
+						vector<string> newPathVector = this->fileHandler->praseVariablePath(srcVarName, seperator);
+						varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
+					}
 						
 			
-				// assumption last element is naem of variable, hence noch folder for name is needed
-				//varPathVector.pop_back();
-				if(renameVar.compare("") == 0) {
+				// assumption last element is name of variable, hence no folder for name is needed
+				if(renameVar.compare("") == 0 && !unrollPathIs) {
 					renameVar = srcVarName;
 				}
 				else {
-					renameVar = varPathVector.at(varPathVector.size()-1);
-					varPathVector.pop_back();
+					if(unrollPathIs && renameVar.compare("") == 0) {
+						renameVar = varPathVector.at(varPathVector.size()-1);
+						varPathVector.pop_back();
+					}	
+					else {
+						if(varPathVector.size() > 0) {
+							varPathVector.pop_back();
+						}
+					}
 				}
-				
 				std::cout << "Variable: '" << srcVarName << "' wird unter '" << renameVar << "' in Application Name: '" << applicName << "' eingetragen." << std::endl;
 				
-				nodeVectorUnrollPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "folder");
+				vector<xmlNodePtr> nodeVectorFolderPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "folder");
 				vector<string> folderPathVector;
-				for(auto nodeUnrollPath: nodeVectorUnrollPath) {
+				bool createdVar = false;
+				for(auto nodeFolderPath: nodeVectorFolderPath) {
 						
-						string folderPath = this->fileHandler->getContentFromNode(nodeUnrollPath);					
-						vector<string> folderPathVector = this->fileHandler->praseVariablePath(folderPath);
-							
+						string folderPath = this->fileHandler->getContentFromNode(nodeFolderPath);
+						if(folderPath.empty() && unrollPathIs) {
+							break;
+						}
+			
+						folderPathVector = this->fileHandler->praseVariablePath(folderPath);
 						// Create folders
 						UA_NodeId newFolderNodeId = appliFolderNodeId;
 						if(folderPathVector.size() > 0) {
@@ -181,7 +194,18 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 						}
 						new mtca_processvariable(this->mappedServer, newFolderNodeId, srcVarName, renameVar, mgr);
-					}	
+						createdVar = true;
+				}	
+				
+				// in case no <folder> or <unrollpath> is set
+				if(!createdVar) {
+					UA_NodeId newFolderNodeId = appliFolderNodeId;
+					if(varPathVector.size() > 0) {
+						newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
+					}
+					
+					new mtca_processvariable(this->mappedServer, newFolderNodeId, srcVarName, renameVar, mgr);
+				}
  			}
 		}
 	}
@@ -271,9 +295,6 @@ UA_NodeId mtca_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
 	UA_NodeId lastNodeId = UA_NODEID_NULL;
 	for(int32_t i=0; i < this->folderVector.size(); i++) {
 		if((this->folderVector.at(i).folderName.compare(folder) == 0) && (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &basenodeid))) {
-			//cout << folder << " - exisitert bereits." << endl;
-			//printf("%-16d \n", this->folderVector.at(i).prevFolderNodeId.identifier.numeric);
-			//printf("%-16d \n", basenodeid.identifier.numeric);
 			return this->folderVector.at(i).folderNodeId;
 		}
 	}
@@ -284,7 +305,7 @@ UA_NodeId mtca_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
  * 
  */
 UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath) {
-	
+		
  	if(UA_NodeId_isNull(&basenodeid)){
  		return UA_NODEID_NULL;
  	}
@@ -298,18 +319,19 @@ UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<str
  	if(UA_NodeId_isNull(&toCheckNodeId)) {
 		// Check if path exist partly 
 		for(int32_t m=0; m < folderPath.size(); m++) {
-			for(const auto& oneFolderInfo : this->folderVector) {
+			for(int32_t i=0; i < this->folderVector.size(); i++) {
 				// get correct folder NodeId from first folderPath element
-				if(!setted && (folderPath.at(m).compare(oneFolderInfo.folderName) == 0) && (UA_NodeId_equal(&oneFolderInfo.prevFolderNodeId, &nextNodeId)) && ((m+1) < folderPath.size())) {
+				if(!setted && (folderPath.at(m).compare(this->folderVector.at(i).folderName) == 0) && (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &nextNodeId)) && ((m+1) < folderPath.size())) {
 					// remeber on witch position the folder still exist
 					setted = true;
 					starter4Folder = m+1;
-					nextNodeId = oneFolderInfo.folderNodeId;
+					nextNodeId = this->folderVector.at(i).folderNodeId;
 				}
-				else {
+				if(setted) {
 					break;
 				}
 			}
+			setted = false;
 		}
 	}
 	else {
@@ -340,10 +362,6 @@ UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName) 
 		newFolder.folderNodeId = this->createUAFolder(basenodeid, folderName);	
 		newFolder.prevFolderNodeId = basenodeid;
 		this->folderVector.push_back(newFolder);
-	}
-	//cout << "Bereits vorhanden: " << endl;
-	for(const auto& oneFolderInfo : this->folderVector) {
-		//cout << oneFolderInfo.folderName << " : " << oneFolderInfo.folderNodeId.identifier.numeric << "Vorgänger: " << oneFolderInfo.prevFolderNodeId.identifier.numeric << endl;
 	}
 
 	return newFolder.folderNodeId;

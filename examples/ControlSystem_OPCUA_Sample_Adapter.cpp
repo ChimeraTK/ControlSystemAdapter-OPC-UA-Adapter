@@ -123,6 +123,7 @@ int main() {
 		ProcessArray<uint8_t>::SharedPtr intB10Au8devMap2 = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "Unser/Name/ist_uint8Array_s10", 10);
 		ProcessScalar<uint32_t>::SharedPtr intAu32devMap = devManager->createProcessScalar<uint32_t>(controlSystemToDevice, "Ist/Name/dieser/uint32Scalar");
 		ProcessScalar<int32_t>::SharedPtr intA32devMap = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "Ist/Name/dieser/int32Scalar");
+		ProcessScalar<double>::SharedPtr doubledevMap = devManager->createProcessScalar<double>(controlSystemToDevice, "Ist/Name/dieser/doubleScalar");
 				
 		// start values
 		int32_t microseconds = 1000000;
