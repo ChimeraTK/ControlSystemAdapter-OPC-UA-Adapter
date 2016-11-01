@@ -20,8 +20,6 @@ extern "C" {
 
 using namespace boost::unit_test_framework;
 
-thread *serverThread = 0;
-
 /*
  * ProcessVariableTest
  * 
@@ -36,20 +34,21 @@ class ProcessVariableTest {
    
 void ProcessVariableTest::testEmptySet(){ 
 	std::cout << "Enter ProcessVariableTest with EmptySet" << std::endl;
-	TestFixtureServerSet serverSet;
+	TestFixtureServerSet *serverSet = new TestFixtureServerSet;
+		
 	TestFixturePVSet pvSet;
 	
-	serverThread = new std::thread(UA_Server_run, serverSet.mappedServer, &serverSet.runUAServer);
+	thread *serverThread = new std::thread(UA_Server_run, serverSet->mappedServer, &serverSet->runUAServer);
 	
 	// check server
-	if (serverSet.mappedServer == nullptr) {
+	if (serverSet->mappedServer == nullptr) {
 		BOOST_CHECK(false);
 	}
 	
 	//mtca_processvariable *test;
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
 		std::cout << "Checking ProcessVariable: " <<  oneProcessVariable->getName() << std::endl;
-		mtca_processvariable *test = new mtca_processvariable(serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(), pvSet.csManager);
+		mtca_processvariable *test = new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager);
 
 		BOOST_CHECK(test->getName() == oneProcessVariable->getName());
 		
@@ -221,36 +220,35 @@ void ProcessVariableTest::testEmptySet(){
 		
   }  
   
-	UA_Server_run_shutdown(serverSet.mappedServer);
-	UA_Server_delete(serverSet.mappedServer);
+	UA_Server_run_shutdown(serverSet->mappedServer);
 	
 };
 
 void ProcessVariableTest::testClientSide(){ 
 	std::cout << "Enter ProcessVariableTest with ExampleSet and ClientSide testing" << std::endl;
 	
-	TestFixtureServerSet serverSet;
+	TestFixtureServerSet *serverSet = new TestFixtureServerSet;	
 	TestFixturePVSet pvSet;
 	
-	serverThread = new std::thread(UA_Server_run, serverSet.mappedServer, &serverSet.runUAServer);
+	thread *serverThread = new std::thread(UA_Server_run, serverSet->mappedServer, &serverSet->runUAServer);
+	
+	// check server
+	if (serverSet->mappedServer == nullptr) {
+		BOOST_CHECK(false);
+	}
 	
 	// add set
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-		mtca_processvariable *test = new mtca_processvariable(serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(), pvSet.csManager); 
-	}
-	
-	// check server
-	if (serverSet.mappedServer == nullptr) {
-		BOOST_CHECK(false);
+		mtca_processvariable *test = new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager); 
 	}
 	
 	// Create client to connect to server
 	UA_Client *client = UA_Client_new(UA_ClientConfig_standard);
-	string endpointURL = "opc.tcp://localhost:" + to_string(serverSet.opcuaPort);
+	string endpointURL = "opc.tcp://localhost:" + to_string(serverSet->opcuaPort);
 	UA_StatusCode retval = UA_Client_connect(client, endpointURL.c_str());
 		
 	if (retval != UA_STATUSCODE_GOOD) {
-		std::cout << "Failed to connect to server" << "opc.tcp://localhost:" << serverSet.opcuaPort << std::endl;
+		std::cout << "Failed to connect to server" << "opc.tcp://localhost:" << serverSet->opcuaPort << std::endl;
 		BOOST_CHECK(false);
 	}
 		
@@ -407,10 +405,8 @@ void ProcessVariableTest::testClientSide(){
 					UA_BrowseResponse_deleteMembers(&bResp2);
 					
 					if(!UA_NodeId_isNull(&valueNodeId)) {
-					// Currently only scalar are suppored 
 									UA_Variant *valueToCheck = UA_Variant_new();
 									UA_Variant_init(valueToCheck);
-									//UA_StatusCode retvalValue = UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 									UA_StatusCode retvalValue = UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 									if(retvalValue != UA_STATUSCODE_GOOD) {
 										BOOST_CHECK(false);
@@ -445,13 +441,13 @@ void ProcessVariableTest::testClientSide(){
 										}
 									}
 									
-									
 									if(retvalValue == UA_STATUSCODE_GOOD) {
 										string datatype = "";
 										string valName = "";
 										
 										// Check EngineeringUnit -> for all the same
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), valName);
+										//cout << "EngineeringUnit: " << valName << endl;
 										BOOST_CHECK(valName == "");
 										
 										// Write new engineering unit
@@ -464,13 +460,12 @@ void ProcessVariableTest::testClientSide(){
 										UA_StatusCode retvalNewEU = UA_Client_writeValueAttribute(client, engineeringUnitNodeId, euToCheck);
 										UA_String_deleteMembers(&newEU);
 										
-										
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), valName);
 										BOOST_CHECK(valName == "mHensel/Iatrou");
 										
 										// i know, this part is perfecly for makro stuff... but common, for maintainability reason we should use simple code... 
 										if(valueToCheck->arrayLength < 1) {
-											switch(valueToCheck->type->typeId.identifier.numeric -1) {
+											switch(datatypeId.identifier.numeric -1) {
 												case UA_TYPES_SBYTE: {
 													// Check Datatype
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
@@ -481,7 +476,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													uint8_t value = (uint8_t) *((uint8_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
-													cout << "Wert: " << std::to_string(value) << endl;
+													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													uint8_t newValue = 123;
 													UA_Variant_init(valueToCheck);
@@ -510,7 +505,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													int8_t value = (int8_t) *((int8_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
-													cout << "Wert: " << std::to_string(value) << endl;
+													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													int8_t newValue = 122;
 													UA_Variant_init(valueToCheck);
@@ -538,7 +533,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													int16_t value = (int16_t) *((int16_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
-													cout << "Wert: " << std::to_string(value) << endl;
+													// cout << "Wert: " << std::to_string(value) << endl;
 													// set new value, should be wrong
 													int16_t newValue = 123;
 													UA_Variant_init(valueToCheck);
@@ -566,7 +561,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													uint16_t value = (uint16_t) *((uint16_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
-													cout << "Wert: " << std::to_string(value) << endl;
+													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 												uint16_t newValue = 123;
 													UA_Variant_init(valueToCheck);
@@ -594,7 +589,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													int32_t value = (int32_t) *((int32_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
-													cout << "Wert: " << std::to_string(value) << endl;
+													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													int32_t newValue = 123;
 													UA_Variant_init(valueToCheck);
@@ -622,7 +617,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													uint32_t value = (uint32_t) *((uint32_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
-													cout << "Wert: " << std::to_string(value) << endl;
+													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													uint32_t newValue = 123;
 													UA_Variant_init(valueToCheck);
@@ -650,7 +645,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													double value = (double) *((double*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
-													cout << "Wert: " << std::to_string(value) << endl;
+													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													double newValue = 123.123;
 													UA_Variant_init(valueToCheck);
@@ -678,7 +673,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													float value = (float) *((float*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
-													cout << "Wert: " << std::to_string(value) << endl;
+													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													float newValue = 123.123;
 													UA_Variant_init(valueToCheck);
@@ -706,7 +701,7 @@ void ProcessVariableTest::testClientSide(){
 											/*
 											* Begin array section
 											*/
-											switch(valueToCheck->type->typeId.identifier.numeric -1) {
+											switch(datatypeId.identifier.numeric -1) {
 												case UA_TYPES_SBYTE: {
 													// Check Datatype
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
@@ -727,26 +722,21 @@ void ProcessVariableTest::testClientSide(){
 														newValue[i] = i;
 													}
 													
-													UA_Variant_init(valueToCheck);
-													
-													/** Mybe it work...
-													 * 
-													 */
-													valueToCheck->arrayDimensionsSize = 1;
-													UA_UInt32 array = (UA_UInt32)arrayLength;		
-													valueToCheck->arrayDimensions = &array;
-													
-													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT16]);													
+													UA_Variant_init(valueToCheck);													
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_SBYTE]);													
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
-														// get value from server
+														// get value from server -> should be the new one
 														UA_Variant_init(valueToCheck);
 														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (int8_t*) valueToCheck->data; 
 														for(int i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
 														}
-													}										
+													}		
+													else {
+														BOOST_CHECK(false);
+													}
 													break;
 												}
 												case UA_TYPES_BYTE: {
@@ -770,11 +760,11 @@ void ProcessVariableTest::testClientSide(){
 													}
 													
 													UA_Variant_init(valueToCheck);
-													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT16]);													
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_BYTE]);													
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
-														UA_Variant_init(valueToCheck);
+														UA_Variant_init(valueToCheck); 
 														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (uint8_t*) valueToCheck->data; 
 														for(int i=0; i < arrayLength; i++) {
@@ -804,7 +794,6 @@ void ProcessVariableTest::testClientSide(){
 													for(int i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}
-													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													int16_t varArray[arrayLength];
 													int16_t* newValue = varArray;
@@ -974,27 +963,7 @@ void ProcessVariableTest::testClientSide(){
 													}
 													
 													UA_Variant_init(valueToCheck);
-													
-													
-													
-													UA_NumericRange arrayRange;
-													arrayRange.dimensionsSize = 1;
-													UA_NumericRangeDimension scalarThisDimension = (UA_NumericRangeDimension){.min = 0, .max = (unsigned int)arrayLength};
-													arrayRange.dimensions = &scalarThisDimension; \
-													UA_Variant_setRangeCopy(valueToCheck, newValue, arrayLength, arrayRange);
-													
 													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_DOUBLE]);	
-/*												
-													UA_Client_readArrayDimensionsAttribute(UA_Client *client, const UA_NodeId nodeId,
-                                       UA_Int32 **outArrayDimensions,
-                                       size_t *outArrayDimensionsSize);
-
-													UA_Client_readValueRankAttribute(UA_Client *client, const UA_NodeId nodeId,
-                                 UA_Int32 *outValueRank) {
-    return __UA_Client_readAttribute(client, &nodeId, UA_ATTRIBUTEID_VALUERANK,
-                                     outValueRank, &UA_TYPES[UA_TYPES_INT32]);
-}*/
-
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
@@ -1063,6 +1032,8 @@ void ProcessVariableTest::testClientSide(){
 
 	UA_BrowseRequest_deleteMembers(&bReq);
 	UA_BrowseResponse_deleteMembers(&bResp);
+	
+	UA_Server_run_shutdown(serverSet->mappedServer);	
 };
 
 
