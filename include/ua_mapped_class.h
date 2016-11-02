@@ -39,7 +39,7 @@ extern "C"
 class ua_mapped_class {
 	
 protected:
-  UA_Server *mappedServer;
+ 
   UA_Client *mappedClient;
   nodePairList ownedNodes;
   UA_NodeId baseNodeId;
@@ -50,6 +50,8 @@ public:
     ua_mapped_class();
     ~ua_mapped_class();
     
+		UA_Server *mappedServer;
+		 
 		UA_StatusCode ua_mapSelfToNamespace();
     UA_StatusCode ua_unmapSelfFromNamespace();
     UA_StatusCode ua_mapFunctions(void* srcClass, UA_FunctionCall_Map *map, UA_NodeId objectId);

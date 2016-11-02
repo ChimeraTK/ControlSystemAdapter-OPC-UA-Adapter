@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <uamapping>
+	<config root="TestFolder" description="Blub">
+		<serverConfig applicationName="OPCUAServer" port="16660" />
+		<login username="test" password="test123" /> 
+	</config>
+	
+	<additionalNodes name="" description="DescriptionOdConfigFolder">
+		<variable browseName="BrwoseName1" displayname="displayName1" description="myDescription1" type="String" value="1a" />
+		<variable browseName="BrwoseName2" displayname="displayName2" description="myDescription2" type="String" value="2a" />
+		<variable browseName="BrwoseName3" displayname="displayName3" description="myDescription3" type="String" value="3a" />
+		<variable browseName="BrwoseName4" displayname="displayName4" description="myDescription4" type="String" value="4a" />
+		<variable browseName="BrwoseName5" displayname="displayName5" description="myDescription5" type="String" value="5a" />
+		<variable browseName="BrwoseName6" displayname="displayName6" description="myDescription6" type="String" value="6a" />
+	</additionalNodes>
+	<additionalNodes name="ConfigFolder" description="DescriptionOdConfigFolder">
+		<variable browseName="1BrwoseName1" displayname="displayName1" description="myDescription1" type="String" value="1b" />
+		<variable browseName="1BrwoseName2" displayname="displayName2" description="myDescription2" type="String" value="2b" />
+		<variable browseName="2BrwoseName3" displayname="displayName3" description="myDescription3" type="String" value="3b" />
+		<variable browseName="2BrwoseName4" displayname="displayName4" description="myDescription4" type="String" value="4b" />
+		<variable browseName="3BrwoseName5" displayname="displayName5" description="myDescription5" type="String" value="5b" />
+		<variable browseName="3BrwoseName6" displayname="displayName6" description="myDescription6" type="String" value="6b" />
+	</additionalNodes>
+
+	
 	<application name="WinAA">
 		<map sourceVariableName="Mein/Name_ist#int8Array_s15" rename="Array_s15_int8">
 			<unrollPath pathSep="_">True</unrollPath>

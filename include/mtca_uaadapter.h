@@ -37,57 +37,73 @@
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
 using namespace ChimeraTK;
-
+using namespace std;
   
 typedef boost::shared_ptr<ControlSystemPVManager> shCSysPVManager;
 
-struct folderInfo {
-	std::string folderName;
+struct FolderInfo {
+	string folderName;
 	UA_NodeId folderNodeId = UA_NODEID_NULL;
 	UA_NodeId nextFolderNodeId = UA_NODEID_NULL;
 	UA_NodeId prevFolderNodeId = UA_NODEID_NULL;
 };
 
+struct ServerConfig {
+	string rootFolder = "DefaultRootFolder";
+	string descriptionFolder = "No description is set";
+	UA_Boolean	UsernamePasswordLogin = UA_FALSE;
+	string password	= "DefaultPassword";
+	string username = "DefaultUser";
+	string applicationName = "DefaultApplication";
+	uint16_t opcuaPort = 16660;
+};
+
 class mtca_uaadapter : ua_mapped_class, public ipc_managed_object {
 private:
-	UA_ServerConfig          server_config;
-	UA_ServerNetworkLayer    server_nl;
-	UA_Logger                logger;
+	UA_ServerConfig          	server_config;
+	UA_ServerNetworkLayer    	server_nl;
+	UA_Logger                	logger;
 	
-	UA_NodeId                variablesListId;
-	UA_NodeId                constantsListId;
+	UA_NodeId                	variablesListId;
+	UA_NodeId                	constantsListId;
 	
-	std::vector<folderInfo> folderVector;	
+	vector<FolderInfo> 				folderVector;	
 	
-	UA_NodeId				ownNodeId;
+	UA_NodeId									ownNodeId;
 	
-	std::list<mtca_processvariable *> variables;
-	std::list<mtca_processvariable *> constants;
+	ServerConfig 							serverConfig;
+	
+	list<mtca_processvariable *> variables;
+	list<mtca_processvariable *> constants;
 	
 	xml_file_handler *fileHandler;
 	
 	void mtca_uaadapter_constructserver(uint16_t opcuaPort);
 	UA_StatusCode mapSelfToNamespace();
-	UA_NodeId createUAFolder(UA_NodeId basenodeid, std::string folderName);
+	UA_NodeId createUAFolder(UA_NodeId basenodeid, string folderName, string description = "");
 	
 public:
-	mtca_uaadapter(uint16_t opcuaPort, std::string configPath);
+	mtca_uaadapter(uint16_t opcuaPort, string configPath);
 	~mtca_uaadapter();
 	
-	UA_NodeId createFolderPath(UA_NodeId basenodeid, std::vector<string> folderPathVector);
-	UA_NodeId createFolder(UA_NodeId basenodeid, std::string folder);
-	UA_NodeId existFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath);
-	UA_NodeId existFolder(UA_NodeId basenodeid, std::string folder);
+	UA_NodeId createFolderPath(UA_NodeId basenodeid, vector<string> folderPathVector);
+	UA_NodeId createFolder(UA_NodeId basenodeid, string folder, string description = "");
+	UA_NodeId existFolderPath(UA_NodeId basenodeid, vector<string> folderPath);
+	UA_NodeId existFolder(UA_NodeId basenodeid, string folder);
 	
     
-	void addVariable(std::string name, shCSysPVManager mgr);
-	void addConstant(std::string name, shCSysPVManager mgr);
+	void addVariable(string name, shCSysPVManager mgr);
+	void addConstant(string name, shCSysPVManager mgr);
 	
 	UA_NodeId getOwnNodeId();
-	std::list<mtca_processvariable *> getVariables();
-	std::list<mtca_processvariable *> getConstants();
+	list<mtca_processvariable *> getVariables();
+	list<mtca_processvariable *> getConstants();
 	
+	bool connectionState();
 	void workerThread();
+	
+	void readConfig();
+	void readAdditionalNodes();
 };
 
 #endif // MTCA_UAADAPTER_H

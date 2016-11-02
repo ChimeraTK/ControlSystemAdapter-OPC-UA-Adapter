@@ -27,10 +27,10 @@
 extern "C" {
 #include "unistd.h"
 #include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
+#include <stdio.h>
+#include <stdlib.h>
 }
 #include "csa_config.h"
-
-#include <list>
 
 #include "mtca_uaadapter.h"
 #include "mtca_processvariable.h"
@@ -45,14 +45,28 @@ extern "C" {
 using namespace ChimeraTK;
 using namespace std;
 
+/** @brief Ich bin ein Probekommentar
+ * 
+ */
 void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
 
     this->server_config = UA_ServerConfig_standard;
-    this->server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, opcuaPort);
+    this->server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, this->serverConfig.opcuaPort);
     this->server_config.logger = UA_Log_Stdout;
     this->server_config.networkLayers = &this->server_nl;
     this->server_config.networkLayersSize = 1;
-		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)"HZDR OPCUA Server");
+		
+		this->server_config.enableUsernamePasswordLogin = this->serverConfig.UsernamePasswordLogin;
+		this->server_config.enableAnonymousLogin = !this->serverConfig.UsernamePasswordLogin;
+		
+    UA_UsernamePasswordLogin* usernamePasswordLogins = new UA_UsernamePasswordLogin;
+		usernamePasswordLogins->password = UA_STRING((char*)this->serverConfig.password.c_str());
+		usernamePasswordLogins->username = UA_STRING((char*)this->serverConfig.username.c_str());
+		this->server_config.usernamePasswordLogins = usernamePasswordLogins;
+		this->server_config.usernamePasswordLoginsSize = (size_t)(usernamePasswordLogins->password.length + usernamePasswordLogins->username.length);
+		
+// 		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
+		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Test");
 		this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
 		this->server_config.applicationDescription.applicationUri = UA_STRING((char*)"opc.tcp://localhost");
 		this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
@@ -61,18 +75,23 @@ void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
 		this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"TU Dresden");
 		
     this->mappedServer = UA_Server_new(this->server_config);
+		
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
   
     mtca_namespaceinit_generated(this->mappedServer);
 }
 
 mtca_uaadapter::mtca_uaadapter(uint16_t opcuaPort, std::string configFile) : ua_mapped_class() {
-	this->mtca_uaadapter_constructserver(opcuaPort);
-	
 	// XML file handling for variable mapping, just an example...
 	this->fileHandler = new xml_file_handler(configFile);
 	
+	this->readConfig();
+	
+	this->mtca_uaadapter_constructserver(opcuaPort);
+	
 	this->mapSelfToNamespace();
+	
+	this->readAdditionalNodes();
 }
 
 mtca_uaadapter::~mtca_uaadapter() {
@@ -84,6 +103,102 @@ mtca_uaadapter::~mtca_uaadapter() {
 	
 	//UA_Server_delete(this->mappedServer);
 	this->fileHandler->~xml_file_handler();
+}
+
+void mtca_uaadapter::readConfig() {
+	
+	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//config");	
+	string placeHolder = "";
+	if(result) {
+		xmlNodeSetPtr nodeset = result->nodesetval;
+		
+		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "root");
+		if(!placeHolder.empty()) {
+			this->serverConfig.rootFolder = placeHolder;
+		}
+		
+		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "description");
+		if(!placeHolder.empty()) {
+			this->serverConfig.descriptionFolder = placeHolder;
+		}
+	}	
+	
+	result = this->fileHandler->getNodeSet("//config//login");	
+	if(result) {
+		xmlNodeSetPtr nodeset = result->nodesetval;
+		this->serverConfig.UsernamePasswordLogin = UA_TRUE;
+		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "password");
+		if(!placeHolder.empty()) {
+			this->serverConfig.password = placeHolder;
+		}
+		
+		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "username");
+		if(!placeHolder.empty()) {
+			this->serverConfig.username = placeHolder;
+		}
+	}
+	
+	result = this->fileHandler->getNodeSet("//config//serverConfig");	
+	if(result) {
+		xmlNodeSetPtr nodeset = result->nodesetval;
+		string opcuaPort = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "port");
+		if(!opcuaPort.empty()) {
+			this->serverConfig.opcuaPort = std::stoi(opcuaPort);
+		}
+		
+		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
+		if(!placeHolder.empty()) {
+			this->serverConfig.applicationName = placeHolder;
+		}
+	}
+}
+/*
+ * Function generate new VariableNodes
+ * 
+ * 
+ */
+void mtca_uaadapter::readAdditionalNodes() {
+	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//additionalNodes");	
+	string placeHolder = "";
+	if(result) {
+		xmlNodeSetPtr nodeset = result->nodesetval;
+		for (int32_t i=0; i < nodeset->nodeNr; i++) {
+			
+			string folderName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "name"); 
+			string folderDescription = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "description");
+			if(folderName.empty()) {
+				cout << "There is no folder name specified. Pleas set a name" << endl;
+			}
+			else {
+				UA_NodeId folderNodeId = this->createFolder(this->ownNodeId, folderName, folderDescription);
+					
+				vector<xmlNodePtr> variableNodeList = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "variable");
+				
+				for(auto variableNode: variableNodeList) {
+					UA_StatusCode retval = UA_STATUSCODE_GOOD;
+					UA_NodeId createdNodeId = UA_NODEID_NULL;
+						
+					UA_VariableAttributes vAttr; 
+					UA_VariableAttributes_init(&vAttr);
+					vAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->fileHandler->getAttributeValueFromNode(variableNode, "displayname").c_str());
+					vAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->fileHandler->getAttributeValueFromNode(variableNode, "description").c_str());
+					vAttr.valueRank = -1;
+					vAttr.writeMask = 0x01;
+					vAttr.userWriteMask = 0x01;
+					vAttr.accessLevel = UA_ACCESSLEVELMASK_READ;
+					vAttr.userAccessLevel= UA_ACCESSLEVELMASK_READ;
+					vAttr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
+					UA_String myInteger = UA_STRING((char*)this->fileHandler->getAttributeValueFromNode(variableNode, "value").c_str());
+					UA_Variant_setScalar(&vAttr.value, &myInteger, &UA_TYPES[UA_TYPES_STRING]);
+					// this->fileHandler->getAttributeValueFromNode(variableNode, "type");
+					UA_Server_addVariableNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
+																		folderNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
+																		UA_QUALIFIEDNAME(1, (char*)this->fileHandler->getAttributeValueFromNode(variableNode, "browseName").c_str()), 
+																		UA_NODEID_NULL, vAttr, NULL, &createdNodeId);    
+				}
+			}
+		}
+	}
 }
 
 void mtca_uaadapter::workerThread() {
@@ -130,7 +245,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 			
 				// Application Name have to be unique!!!
 				UA_NodeId appliFolderNodeId = this->existFolder(this->ownNodeId, applicName);
-				folderInfo newFolder;
+				FolderInfo newFolder;
 				if(UA_NodeId_isNull(&appliFolderNodeId)) {
 					newFolder.folderName = applicName;
 					newFolder.folderNodeId = this->createFolder(this->ownNodeId, applicName);
@@ -224,7 +339,7 @@ std::list<mtca_processvariable *> mtca_uaadapter::getConstants() {
 	return this->constants;
 }
 
-UA_NodeId mtca_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderName) {
+UA_NodeId mtca_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderName, std::string description) {
 	// FIXME: Check if folder name a possible name or should it be escaped (?!"§%-:, etc)
 	UA_StatusCode retval = UA_STATUSCODE_GOOD;
 	UA_NodeId createdNodeId = UA_NODEID_NULL;
@@ -238,7 +353,7 @@ UA_NodeId mtca_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folde
 		UA_ObjectAttributes_init(&oAttr);
     // Classcast to prevent Warnings
     oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)folderName.c_str());
-    oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)folderName.c_str());    
+    oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str());    
 	
     UA_INSTATIATIONCALLBACK(icb);
     UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
@@ -258,14 +373,15 @@ UA_StatusCode mtca_uaadapter::mapSelfToNamespace() {
 	
 	// Create our toplevel instance
 	UA_ObjectAttributes oAttr; 
+	UA_ObjectAttributes_init(&oAttr);
 	// Classcast to prevent Warnings
-	oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"MTCA4U Process Adapter");
-	oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"MTCA4U Process Adapter depicting current process variables");
+	oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.rootFolder.c_str());
+	oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.descriptionFolder.c_str());
     
 	UA_INSTATIATIONCALLBACK(icb);
 	UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
                             UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-                            UA_QUALIFIEDNAME(1, (char*)"MTCAUAAdapter"), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAMODULE), oAttr, &icb, &createdNodeId);
+                            UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAMODULE), oAttr, &icb, &createdNodeId);
     
 	
 	this->ownNodeId = createdNodeId;
@@ -348,7 +464,7 @@ UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<str
 	return prevNodeId;
 }
 
-UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName) {
+UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName, string description) {
 	
 	if(UA_NodeId_isNull(&basenodeid)){
 		return UA_NODEID_NULL;
@@ -356,7 +472,7 @@ UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName) 
 	
 	// Check if path exist
 	UA_NodeId toCheckNodeId = existFolder(basenodeid, folderName);
-	folderInfo newFolder;
+	FolderInfo newFolder;
  	if(UA_NodeId_isNull(&toCheckNodeId)) {
 		newFolder.folderName = folderName;
 		newFolder.folderNodeId = this->createUAFolder(basenodeid, folderName);	
@@ -365,4 +481,14 @@ UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName) 
 	}
 
 	return newFolder.folderNodeId;
+}
+
+bool mtca_uaadapter::connectionState() {
+//  	if(this->server_nl.start != 0) {
+//  			cout << "Error during binding. Please close all open connection by port." << endl;
+//  			exit(0);
+//  	}
+
+	return true;
+	
 }
