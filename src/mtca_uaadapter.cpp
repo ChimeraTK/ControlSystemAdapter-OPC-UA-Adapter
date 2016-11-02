@@ -159,7 +159,6 @@ void mtca_uaadapter::readConfig() {
  */
 void mtca_uaadapter::readAdditionalNodes() {
 	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//additionalNodes");	
-	string placeHolder = "";
 	if(result) {
 		xmlNodeSetPtr nodeset = result->nodesetval;
 		for (int32_t i=0; i < nodeset->nodeNr; i++) {
