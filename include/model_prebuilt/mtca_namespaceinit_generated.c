@@ -3,8 +3,10 @@
 
  */
 #include "mtca_namespaceinit_generated.h"
-UA_INLINE void mtca_namespaceinit_generated(UA_Server *server) {
-UA_Server_addNamespace(server, "http://yourorganisation.org/templatemodel/");
+UA_INLINE UA_StatusCode mtca_namespaceinit_generated(UA_Server *server) {
+UA_StatusCode retval = UA_STATUSCODE_GOOD; 
+if (UA_Server_addNamespace(server, "http://yourorganisation.org/templatemodel/") != 2)
+    return UA_STATUSCODE_BADUNEXPECTEDERROR;
 
 do {
 // Referencing node found and declared as parent: i=58/BaseObjectType using i=45/HasSubtype
@@ -429,4 +431,5 @@ UA_Server_deleteReference(server, nodeId, UA_NODEID_NUMERIC(0, 40), true, UA_EXP
 UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6013), UA_NODEID_NUMERIC(0, 40), UA_EXPANDEDNODEID_NUMERIC(0, 63), true);
 UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6013), UA_NODEID_NUMERIC(0, 37), UA_EXPANDEDNODEID_NUMERIC(0, 78), true);
 } while(0);
+return UA_STATUSCODE_GOOD;
 }
