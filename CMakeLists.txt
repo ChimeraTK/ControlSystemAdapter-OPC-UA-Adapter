@@ -103,6 +103,7 @@ option(ENABLE_COVERAGE        "Enable coverage stats for server build" ON)
 option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static code analysis using clangs analyzer." OFF)
 option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prior to compilation." OFF)
 option(ENABLE_UNIT_TESTS      "Compile and run unit tests." ON)
+option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" ON)
 
 if(ENABLE_BUILDMODEL)
   set(MODEL_XML_FILE "templatemodel.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
@@ -133,6 +134,20 @@ if(BUILD_STATIC_ANALYSIS)
   set(CMAKE_C_COMPILER   ccc-analyzer)
   set(CMAKE_CXX_COMPILER ccc-analyzer)
   add_definitions(-o ${PROJECT_BINARY_DIR}/static-analysis})
+endif()
+
+if(ENABLE_DOCUMENTATION)
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+  add_custom_target(doc ALL
+    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc/
+    COMMENT "Generating API documentation with Doxygen" VERBATIM
+    )
+else(DOXYGEN_FOUND)
+  message("Doxygen not found, documentation will not be build.")
+endif(DOXYGEN_FOUND)
 endif()
 
 ##########################################################################################################
@@ -231,6 +246,4 @@ add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
 endif()
 ## Ends binary ControlSystem-OPCUA_Sample_Adapter
 
-
 install(TARGETS ControlSystem-OPCUA_Sample_Adapter RUNTIME DESTINATION bin)
-  
