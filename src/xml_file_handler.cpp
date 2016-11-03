@@ -38,10 +38,7 @@
 
 xml_file_handler::xml_file_handler(std::string filePath) {
 	// FIXME: Add some check routine if file realy exist
-	this->doc = this->createDoc(filePath);
-	if(!isDocSetted()) {
-		std::cout << "Fehler, Datei existiert nicht" << std::endl;
-	}
+	this->createDoc(filePath);
 }
 
 std::vector<xmlNodePtr> xml_file_handler::getNodesByName(xmlNodePtr startNode, std::string nodeName) {
@@ -91,21 +88,21 @@ bool xml_file_handler::isDocSetted() {
 		return false;
 }
 
-xmlDocPtr xml_file_handler::createDoc(std::string filePath) {
-
+bool xml_file_handler::createDoc(std::string filePath) {
+	
 	if(filePath.empty()) {
-		return NULL;
+		this->doc = NULL;
+		return false;
 	}
 	
-	xmlDocPtr doc;
-	doc = xmlParseFile(filePath.c_str());
+	this->doc = xmlParseFile(filePath.c_str());
 	
- 	if (doc == NULL ) {
+ 	if(this->doc == NULL ) {
 		std::cout << "Document not parsed successfully." << std::endl;
- 		return NULL;
+		return false;
  	}
 
-	return doc;
+	return true;
 }
 
 // seperator can be a string of diffent seperators, like "_/:" and so on 
@@ -131,15 +128,14 @@ std::string xml_file_handler::getAttributeValueFromNode(xmlNode* node, std::stri
 }
 
 std::string xml_file_handler::getContentFromNode(xmlNode* node) {
-	if(node == NULL) {
-		return "";
-	}
-	xmlChar* content = xmlNodeGetContent(node->xmlChildrenNode);
-	if(content != NULL) {
-		std::string merker = (std::string)((char*)content);
-		xmlFree(content);
-		boost::trim(merker);
-		return merker;
+	if(node != NULL) {
+		xmlChar* content = xmlNodeGetContent(node->xmlChildrenNode);
+		if(content != NULL) {
+			std::string merker = (std::string)((char*)content);
+			xmlFree(content);
+			boost::trim(merker);
+			return merker;
+		}
 	}
 	return "";
 }

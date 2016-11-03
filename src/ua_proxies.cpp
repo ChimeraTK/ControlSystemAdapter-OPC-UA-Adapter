@@ -171,7 +171,9 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
     
     retval |= UA_Server_setVariableNode_dataSource(server, (const UA_NodeId) instantiatedId, ds);
 
-	/* Ste the right Value Datatype */
+	/* Set the right Value Datatype and ValueRank
+	 * -> This is a quickfix for subjective data handling by open62541
+	 */
 	UA_NodeId datatTypeNodeId = UA_NODEID_NULL;
     retval = UA_Server_readDataType(server, instantiatedId, &datatTypeNodeId);
 		if(retval == UA_STATUSCODE_GOOD) {
@@ -182,20 +184,21 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
 			if(UA_NodeId_equal(&datatTypeNodeId, &basedatatype) && retval == UA_STATUSCODE_GOOD) {
 				retval = UA_Server_writeDataType(server, instantiatedId, variantVal.type->typeId);
 				
+				// See IEC 62541-3: OPC Unified Architecture - Part 3: Address space model -> Page 75
 				UA_Int32 valueRank = -2;				
 				if(variantVal.arrayDimensionsSize == 0 && UA_Variant_isScalar(&variantVal)) {
 					// Scalar
 					valueRank = -1;
 				}
 				else {
-					if(variantVal.arrayDimensionsSize == 1) {
-						// OneDimension
-						valueRank = 1;
-					}
-					else {
-						if(variantVal.arrayDimensionsSize > 1) {
+					if(variantVal.arrayDimensionsSize > 1) {
 							// OneOrMoreDimensions
 							valueRank = 0;
+					}
+					else {
+						if(variantVal.arrayDimensionsSize == 1 || variantVal.arrayLength) {
+							// OneDimension
+							valueRank = 1;
 						}
 					}
 				}

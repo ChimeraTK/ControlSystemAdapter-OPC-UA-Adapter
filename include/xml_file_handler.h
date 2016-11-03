@@ -40,10 +40,10 @@ class xml_file_handler {
 	
 public:
 	
-	
 	xml_file_handler(std::string filePath);
+	bool createDoc(std::string filePath);
+	bool isDocSetted();
 	
-	xmlDocPtr createDoc(std::string filePath);
 	xmlXPathObjectPtr getNodeSet(std::string xPathString);
 	std::vector<xmlNodePtr> getNodesByName(xmlNodePtr startNode, std::string nodeName);
 	
@@ -58,9 +58,6 @@ private:
 	
 	xmlDocPtr doc;
 	xmlNodePtr cur;    
-	
-	bool isDocSetted();
-
 };
 
 #endif // XMLFILEHANDLER_H

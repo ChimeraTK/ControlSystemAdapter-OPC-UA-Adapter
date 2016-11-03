@@ -112,7 +112,7 @@ void mtca_uaadapter::readConfig() {
 	if(result) {
 		xmlNodeSetPtr nodeset = result->nodesetval;
 		
-		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "root");
+		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "rootFolder");
 		if(!placeHolder.empty()) {
 			this->serverConfig.rootFolder = placeHolder;
 		}
@@ -163,7 +163,7 @@ void mtca_uaadapter::readAdditionalNodes() {
 		xmlNodeSetPtr nodeset = result->nodesetval;
 		for (int32_t i=0; i < nodeset->nodeNr; i++) {
 			
-			string folderName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "name"); 
+			string folderName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "folderName"); 
 			string folderDescription = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "description");
 			if(folderName.empty()) {
 				cout << "There is no folder name specified. Pleas set a name" << endl;
@@ -189,6 +189,9 @@ void mtca_uaadapter::readAdditionalNodes() {
 					vAttr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
 					UA_String myInteger = UA_STRING((char*)this->fileHandler->getAttributeValueFromNode(variableNode, "value").c_str());
 					UA_Variant_setScalar(&vAttr.value, &myInteger, &UA_TYPES[UA_TYPES_STRING]);
+					/*
+					 * Mybe it is useful to set a specific type
+					 */
 					// this->fileHandler->getAttributeValueFromNode(variableNode, "type");
 					UA_Server_addVariableNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
 																		folderNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
