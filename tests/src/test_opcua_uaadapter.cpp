@@ -18,6 +18,7 @@ class UAAdapterTest {
 	public:
 		static void testEmptySet();
 		static void testExampleSet();
+		static void testConfigHandling();
 };
    
 void UAAdapterTest::testEmptySet(){ 
@@ -45,7 +46,7 @@ void UAAdapterTest::testEmptySet(){
 	
 };
 
-void UAAdapterTest::testExampleSet(){ 
+void UAAdapterTest::testExampleSet() { 
 	cout << "UAAdapterTest with ExampleSet started." << endl;
 	TestFixturePVSet tfExampleSet;
 	 // Create the managers
@@ -111,6 +112,13 @@ void UAAdapterTest::testExampleSet(){
 	adapter->~mtca_uaadapter();
 };
 
+void UAAdapterTest::testConfigHandling() {
+	
+	
+	
+};
+
+
 /**
    * The boost test suite which executes the ProcessVariableTest.
    */
@@ -119,6 +127,7 @@ class UAAdapterTestSuite: public test_suite {
 		UAAdapterTestSuite() : test_suite("mtca_uaadapter Test Suite") {
 			add(BOOST_TEST_CASE(&UAAdapterTest::testEmptySet));
 			add(BOOST_TEST_CASE(&UAAdapterTest::testExampleSet));
+			add(BOOST_TEST_CASE(&UAAdapterTest::testConfigHandling));
     }
 };
 

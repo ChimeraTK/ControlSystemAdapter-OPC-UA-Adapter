@@ -47,7 +47,7 @@ void ProcessVariableTest::testEmptySet(){
 	
 	//mtca_processvariable *test;
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-		std::cout << "Checking ProcessVariable: " <<  oneProcessVariable->getName() << std::endl;
+		//std::cout << "Checking ProcessVariable: " <<  oneProcessVariable->getName() << std::endl;
 		mtca_processvariable *test = new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager);
 
 		BOOST_CHECK(test->getName() == oneProcessVariable->getName());
@@ -305,7 +305,7 @@ void ProcessVariableTest::testClientSide(){
 								if(browseNameFound2 == "Value") {
 									valueNodeId = refe->nodeId.nodeId;
 									name = browseNameFound;
-									cout << "Checking ProcessVariable: " <<  name << endl;
+									//cout << "Checking ProcessVariable: " <<  name << endl;
 								}
 								
 								if(browseNameFound2 == "EngineeringUnit") {
@@ -1033,7 +1033,7 @@ void ProcessVariableTest::testClientSide(){
 	UA_BrowseRequest_deleteMembers(&bReq);
 	UA_BrowseResponse_deleteMembers(&bResp);
 	
-	UA_Server_run_shutdown(serverSet->mappedServer);	
+	//UA_Server_run_shutdown(serverSet->mappedServer);	
 };
 
 
