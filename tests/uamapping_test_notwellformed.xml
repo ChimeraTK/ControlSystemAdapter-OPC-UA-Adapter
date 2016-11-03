@@ -37,6 +37,6 @@
 		<map sourceVariableName="int32Scalar">
 			<unrollPath pathSep="_">False</unrollPath>
 		        <folder>EastSideLINAC/partA</folder>
-        	</ma>
+        	</mp>
 	</application>
 </uamapping>
