@@ -116,7 +116,6 @@ int main() {
 		//ProcessScalar<bool>::SharedPtr bool_sineDev = devManager->createProcessScalar<bool>(deviceToControlSystem, "bool_sine");
 		
 		// FIXME: strings currently not supported
-		
 		// example mapping variable
 		ProcessArray<int8_t>::SharedPtr intB15A8devMap = devManager->createProcessArray<int8_t>(controlSystemToDevice, "Mein/Name_ist#int8Array_s15", 15);
 		ProcessArray<uint8_t>::SharedPtr intB10Au8devMap1 = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "Der/ist/Name/uint8Array_s10", 10);
@@ -135,7 +134,6 @@ int main() {
 		csManager->getProcessScalar<int32_t>("period")->set(period); 		
 		csManager->getProcessScalar<double>("amplitude")->set(amplitude); 		
 
-			    
     std::cout << "Dummy Daten geschrieben..." << std::endl;	
 	
 	// Only for ValueGenerator
@@ -145,20 +143,10 @@ int main() {
 	runtimeValueGenerator *valGen = new runtimeValueGenerator(csManager);
 	mgr->addObject(valGen);
 	mgr->doStart();	
-
-	// Time meassureing
-	clock_t start, end;
-	start = clock();
-	end = clock();
-	csManager->getProcessScalar<int32_t>("t")->set(start);
 		
 	std::cout << "Server läuft..." << std::endl;	
 	while(csaOPCUA->isRunning()) {
-		// Set current clock timer
-		csManager->getProcessScalar<int32_t>("t")->set((end - start)/(CLOCKS_PER_SEC/1000));
-		
-		usleep(csManager->getProcessScalar<int32_t>("dt")->get());
-		end = clock();
+		// do something crazy shit
 	}
 	
 	return 0;

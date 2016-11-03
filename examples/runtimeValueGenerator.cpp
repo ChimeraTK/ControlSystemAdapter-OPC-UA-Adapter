@@ -33,7 +33,6 @@
 #include <sys/sysinfo.h> 
 #include <unistd.h>
 
-
 #include "open62541.h"
 #include "ControlSystemAdapterOPCUA.h"
 
@@ -58,23 +57,30 @@ runtimeValueGenerator::~runtimeValueGenerator() {
 }
 
 void runtimeValueGenerator::generateValues(shCSysPVManager csManager) {
-
+	// Time meassureing
+	clock_t start, end;
+	start = clock();
+	end = clock();
+	csManager->getProcessScalar<int32_t>("t")->set(start);
+	
 	while(true) {
-		// FIXME -Or maybe not: The Const M_PI from math.h generate senceless values, hence I use fix value 3.141
-// 		double double_sine = csManager->getProcessScalar<double>("amplitude")->get() * sin(((2*M_PI)/csManager->getProcessScalar<int32_t>("period")->get()) * csManager->getProcessScalar<int32_t>("t")->get());
+//  FIXME -Or maybe not: The Const M_PI from math.h generate senceless values, hence I use fix value 3.141
+// 	double double_sine = csManager->getProcessScalar<double>("amplitude")->get() * sin(((2*M_PI)/csManager->getProcessScalar<int32_t>("period")->get()) * csManager->getProcessScalar<int32_t>("t")->get());
 		double double_sine = csManager->getProcessScalar<double>("amplitude")->get() * sin((2*3.141)/csManager->getProcessScalar<int32_t>("period")->get() * csManager->getProcessScalar<int32_t>("t")->get());
 		int32_t int_sine = round(double_sine);
 		bool bool_sine = (double_sine > 0)? true : false;
 		
-// 		std::cout << "double_sine: " << double_sine << std::endl;
-// 		std::cout << "int_sine: " << int_sine << std::endl;
-// 		std::cout << "bool_sine: " << bool_sine << std::endl;
+// 	std::cout << "double_sine: " << double_sine << std::endl;
+// 	std::cout << "int_sine: " << int_sine << std::endl;
+// 	std::cout << "bool_sine: " << bool_sine << std::endl;
 			
 		csManager->getProcessScalar<double>("double_sine")->set(double_sine);
 		csManager->getProcessScalar<int32_t>("int_sine")->set(int_sine); 		
-// 		csManager->getProcessScalar<bool>("bool_sine")->set(bool_sine); 		
-
+// 	csManager->getProcessScalar<bool>("bool_sine")->set(bool_sine); 		
+		csManager->getProcessScalar<int32_t>("t")->set((end - start)/(CLOCKS_PER_SEC/1000));
+		
 		usleep(csManager->getProcessScalar<int32_t>("dt")->get());
+		end = clock();
 	}
 }
 
@@ -85,7 +91,7 @@ void runtimeValueGenerator::workerThread() {
 
     while (run == true) {
         if (! this->isRunning()) {
-            run = false;
+					run = false;
         }
         sleep(1);
     }
@@ -93,8 +99,7 @@ void runtimeValueGenerator::workerThread() {
     if (valueGeneratorThread->joinable()) {
 		valueGeneratorThread->join();
 	}
-   
-     delete valueGeneratorThread;
+	delete valueGeneratorThread;
 }
 
 

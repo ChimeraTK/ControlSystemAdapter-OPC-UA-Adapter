@@ -45,8 +45,49 @@ extern "C" {
 using namespace ChimeraTK;
 using namespace std;
 
-/** @brief Ich bin ein Probekommentar
+/** @brief Class which provide the server.
  * 
+ * This Class create and start the opcua server also it contain all variables of the server. 
+ * Especially it reads the config-file and add all Variables from 
+ * a pv-manager and additional variables. For config purpose, the 
+ * config-file parameter will parsed and are set to the right variable.
+ * 
+ */
+mtca_uaadapter::mtca_uaadapter(uint16_t opcuaPort, std::string configFile) : ua_mapped_class() {
+	// XML file handling for variable mapping, just an example...
+	this->fileHandler = new xml_file_handler(configFile);
+	
+	this->readConfig();
+	
+	this->mtca_uaadapter_constructserver(opcuaPort);
+	
+	this->mapSelfToNamespace();
+	
+	this->readAdditionalNodes();
+}
+
+/** @brief Destrructor of the class. 
+ * 
+ * It stop the server and delete the managed object.
+ * 
+ */
+mtca_uaadapter::~mtca_uaadapter() {
+	if (this->isRunning()) {
+		this->doStop();
+	}
+	
+	this->~ipc_managed_object();
+	
+	//UA_Server_delete(this->mappedServer);
+	this->fileHandler->~xml_file_handler();
+}
+
+/** @brief This Class contain all variables of the opcua server. 
+ * Especially it reads the config-file and add all Variables from 
+ * a pv-manager and additional variables. For config purpose the 
+ * config-file parameter will parsed and are set to the right variable.
+ * @param opcuaPort Beschreibung
+ * @return
  */
 void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
 
@@ -59,7 +100,7 @@ void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
 		this->server_config.enableUsernamePasswordLogin = this->serverConfig.UsernamePasswordLogin;
 		this->server_config.enableAnonymousLogin = !this->serverConfig.UsernamePasswordLogin;
 		
-    UA_UsernamePasswordLogin* usernamePasswordLogins = new UA_UsernamePasswordLogin;
+    UA_UsernamePasswordLogin* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
 		usernamePasswordLogins->password = UA_STRING((char*)this->serverConfig.password.c_str());
 		usernamePasswordLogins->username = UA_STRING((char*)this->serverConfig.username.c_str());
 		this->server_config.usernamePasswordLogins = usernamePasswordLogins;
@@ -79,30 +120,6 @@ void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
   
     mtca_namespaceinit_generated(this->mappedServer);
-}
-
-mtca_uaadapter::mtca_uaadapter(uint16_t opcuaPort, std::string configFile) : ua_mapped_class() {
-	// XML file handling for variable mapping, just an example...
-	this->fileHandler = new xml_file_handler(configFile);
-	
-	this->readConfig();
-	
-	this->mtca_uaadapter_constructserver(opcuaPort);
-	
-	this->mapSelfToNamespace();
-	
-	this->readAdditionalNodes();
-}
-
-mtca_uaadapter::~mtca_uaadapter() {
-	if (this->isRunning()) {
-		this->doStop();
-	}
-	
-	this->~ipc_managed_object();
-	
-	//UA_Server_delete(this->mappedServer);
-	this->fileHandler->~xml_file_handler();
 }
 
 void mtca_uaadapter::readConfig() {
