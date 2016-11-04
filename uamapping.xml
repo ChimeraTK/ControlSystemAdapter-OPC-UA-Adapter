@@ -18,7 +18,14 @@
 	</additionalNodes>
 
 	<application name="WinAA">
-		<map sourceVariableName="Mein/Name_ist#int8Array_s15" rename="Array_s15_int8">
+		<map sourceVariableName="Mein/Name_ist#int8Array" rename="Array_s15_int8">
+			<unrollPath pathSep="_">True</unrollPath>
+			<unrollPath pathSep="/">True</unrollPath>
+			<unrollPath pathSep="#">True</unrollPath>
+		  <folder>NorthSide/LINAC/partA</folder>
+			<folder>NorthSide/LINAC/partX</folder>
+  	</map>
+		<map sourceVariableName="Mein/Name_ist#int8Array_s15" rename="Array">
 			<unrollPath pathSep="_">True</unrollPath>
 			<unrollPath pathSep="/">True</unrollPath>
 			<unrollPath pathSep="#">True</unrollPath>

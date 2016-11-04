@@ -305,7 +305,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 						}
 					}
 				}
-				std::cout << "Variable: '" << srcVarName << "' wird unter '" << renameVar << "' in Application Name: '" << applicName << "' eingetragen." << std::endl;
+				std::cout << "Variable '" << srcVarName << "' wird unter '" << renameVar << "' in Application Name '" << applicName << "' eingetragen." << std::endl;
 				
 				vector<xmlNodePtr> nodeVectorFolderPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "folder");
 				vector<string> folderPathVector;
@@ -329,7 +329,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 						}
 						new mtca_processvariable(this->mappedServer, newFolderNodeId, srcVarName, renameVar, mgr);
 						createdVar = true;
-				}	
+				}
 				
 				// in case no <folder> or <unrollpath> is set
 				if(!createdVar) {
@@ -343,7 +343,22 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
  			}
 		}
 	}
-	xmlXPathFreeObject (result);	
+// 	for (int32_t i=0; i < nodeset->nodeNr; i++) {
+// 		bool notFound = true;
+// 		for(int32_t m=0; i < mappedVariables.size(); m++) {
+// 			if(mappedVariables.at(m).compare(this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "sourceVariableName"))) {
+// 				notFound = false;
+// 				mappedVariables.erase(mappedVariables.begin()+ m);
+// 				break;
+// 			}
+// 		}	
+// 	}		
+// 		
+// 	cout << "The following element cant be mapped: " << endl;
+// 	for(auto mappedVar:mappedVariables) {
+// 		cout << mappedVar << endl;
+// 	}
+	xmlXPathFreeObject (result);
 }
 
 void mtca_uaadapter::addConstant(std::string varName, shCSysPVManager mgr) {
@@ -402,7 +417,6 @@ UA_StatusCode mtca_uaadapter::mapSelfToNamespace() {
                             UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
                             UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAMODULE), oAttr, &icb, &createdNodeId);
     
-	
 	this->ownNodeId = createdNodeId;
 	// Nodes "Variables" and "Constants" where created on object instantiation, we need these IDs to add new process variables to them...
 	UA_NodeId_copy(nodePairList_getTargetIdBySourceId(this->ownedNodes, UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_CONSTANTS)), &this->constantsListId);
@@ -457,7 +471,7 @@ UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<str
 			for(int32_t i=0; i < this->folderVector.size(); i++) {
 				// get correct folder NodeId from first folderPath element
 				if(!setted && (folderPath.at(m).compare(this->folderVector.at(i).folderName) == 0) && (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &nextNodeId)) && ((m+1) < folderPath.size())) {
-					// remeber on witch position the folder still exist
+					// remember on witch position the folder still exist
 					setted = true;
 					starter4Folder = m+1;
 					nextNodeId = this->folderVector.at(i).folderNodeId;
@@ -470,7 +484,7 @@ UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<str
 		}
 	}
 	else {
-		// Path exist nothing to do except
+		// Path exist nothing to do
 		return toCheckNodeId;
 	}
 
