@@ -51,10 +51,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR "x${CMAKE_C_COMPILER_ID}" STREQUAL "xClang")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
+  
   add_definitions(-fPIC)
-  add_definitions(-fprofile-arcs)
-  add_definitions(-ftest-coverage)
 endif()
 
 
@@ -99,11 +97,11 @@ include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 option(ENABLE_BUILDMODEL      "Create model from XML description"      ON)
 
 ## Code quality control options
-option(ENABLE_COVERAGE        "Enable coverage stats for server build" ON)
+option(ENABLE_COVERAGE        "Enable coverage stats for server build" OFF)
 option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static code analysis using clangs analyzer." OFF)
 option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prior to compilation." OFF)
-option(ENABLE_UNIT_TESTS      "Compile and run unit tests." ON)
-option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" ON)
+option(ENABLE_UNIT_TESTS      "Compile and run unit tests." OFF)
+option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
 
 if(ENABLE_BUILDMODEL)
   set(MODEL_XML_FILE "templatemodel.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
@@ -123,6 +121,8 @@ if(ENABLE_COVERAGE)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
+  add_definitions(-ftest-coverage)
+  add_definitions(-fprofile-arcs)
 endif()
 
 if(ENABLE_UNIT_TESTS)
