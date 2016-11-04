@@ -51,10 +51,8 @@ if(CMAKE_COMPILER_IS_GNUCC OR "x${CMAKE_C_COMPILER_ID}" STREQUAL "xClang")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
+  
   add_definitions(-fPIC)
-  add_definitions(-fprofile-arcs)
-  add_definitions(-ftest-coverage)
 endif()
 
 
@@ -123,6 +121,8 @@ if(ENABLE_COVERAGE)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
+  add_definitions(-ftest-coverage)
+  add_definitions(-fprofile-arcs)
 endif()
 
 if(ENABLE_UNIT_TESTS)
