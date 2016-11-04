@@ -12,16 +12,17 @@ find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 
 #Do not put the ControlSystemAdapter as required. We will install it if it is not found.
-find_package(ChimeraTK-ControlSystemAdapter 0.2)
+find_package(ChimeraTK-ControlSystemAdapter)
 
 #Install the ControlSystemAdapter if it is not pre-installed
-if( NOT ChimeraTK-ControlSystemAdapter_FOUND )
+if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
   message("Installing ChimeraTK-ControlSystemAdapter as external dependency inside the build directory.")
   message("You will not be able to make a proper installation of the OPCUA_Adapter. Only use this for testing and development.\n")
   ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
     GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
     #When creationg a tag, base it on a tag of the ControlSystemAdapter so it stays stable
     #GIT_TAG "00.02.00"
+    GIT_TAG "master"
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK"
     )
   #FIXME: Find a better name for this variable

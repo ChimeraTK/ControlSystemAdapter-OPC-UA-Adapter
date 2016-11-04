@@ -62,8 +62,6 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(uint16_t op
   
     this->mgr->addObject(this->adapter);
     this->mgr->doStart(); // Implicit: Startet Worker-Threads aller ipc_managed_objects, die mit addObject registriert wurden  
-		
-		this->adapter->connectionState();
 }
 
 // Mapping the ProcessVariables to the server

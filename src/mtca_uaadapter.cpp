@@ -97,6 +97,13 @@ void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
     this->server_config.networkLayers = &this->server_nl;
     this->server_config.networkLayersSize = 1;
 		
+		// Check if network works well
+		UA_StatusCode retval = (*this->server_nl.start)(&this->server_nl, this->server_config.logger);
+		if(retval != UA_STATUSCODE_GOOD) {
+			cout << "Error during establishing the network interface." << endl;
+			exit(0);
+		}
+		
 		this->server_config.enableUsernamePasswordLogin = this->serverConfig.UsernamePasswordLogin;
 		this->server_config.enableAnonymousLogin = !this->serverConfig.UsernamePasswordLogin;
 		
@@ -106,8 +113,7 @@ void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
 		this->server_config.usernamePasswordLogins = usernamePasswordLogins;
 		this->server_config.usernamePasswordLoginsSize = (size_t)(usernamePasswordLogins->password.length + usernamePasswordLogins->username.length);
 		
-// 		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
-		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Test");
+		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
 		this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
 		this->server_config.applicationDescription.applicationUri = UA_STRING((char*)"opc.tcp://localhost");
 		this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
@@ -116,8 +122,7 @@ void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
 		this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"TU Dresden");
 		
     this->mappedServer = UA_Server_new(this->server_config);
-		
-    this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+		this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
   
     mtca_namespaceinit_generated(this->mappedServer);
 }
@@ -514,14 +519,4 @@ UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName, 
 	}
 
 	return newFolder.folderNodeId;
-}
-
-bool mtca_uaadapter::connectionState() {
-//  	if(this->server_nl.start != 0) {
-//  			cout << "Error during binding. Please close all open connection by port." << endl;
-//  			exit(0);
-//  	}
-
-	return true;
-	
 }

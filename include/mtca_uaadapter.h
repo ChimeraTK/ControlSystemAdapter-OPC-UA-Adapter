@@ -99,7 +99,6 @@ public:
 	list<mtca_processvariable *> getVariables();
 	list<mtca_processvariable *> getConstants();
 	
-	bool connectionState();
 	void workerThread();
 	
 	void readConfig();
