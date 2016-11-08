@@ -42,7 +42,7 @@
  */
 // Generate Call-Through functions as stack callbacks
 #define UA_CALLPROXY_NAME(_CLASS_P, _CLASS_F) ua_callproxy_##_CLASS_P##_##_CLASS_F
-#define UA_CALLPROXY_TABLENAME(_CLASS_P, _CLASS_F) C_MACRO_CONCAT( UA_CALLPROXY_NAME(_CLASS_P,_CLASS_F) , _InstanceLookUpTable)
+//#define UA_CALLPROXY_TABLENAME(_CLASS_P, _CLASS_F) C_MACRO_CONCAT( UA_CALLPROXY_NAME(_CLASS_P,_CLASS_F) , _InstanceLookUpTable)
 #define UA_CALLPROXY_TABLE(_CLASS_P, _CLASS_F) & UA_CALLPROXY_TABLENAME(_CLASS_P, _CLASS_F)
 
 #define UA_CALLPROXY(_CLASS_P, _CLASS_F) \
@@ -67,12 +67,14 @@ UA_StatusCode UA_CALLPROXY_NAME(_CLASS_P,_CLASS_F)(void *methodHandle, const UA_
 #define UA_RDPROXY_NAME(_p_class, _p_method) ua_readproxy_ ##_p_class## _ ##_p_method
 #define UA_WRPROXY_NAME(_p_class, _p_method) ua_writeproxy_ ##_p_class## _ ##_p_method
 
+//value->sourceTimestamp = thisObj->getTimeStampSeconds(); \
 // Generate Proxy tails (common function end)
 #define UA_RDPROXY_TAIL() \
 value->hasValue = UA_TRUE; \
 if (includeSourceTimeStamp) { \
-value->sourceTimestamp = UA_DateTime_now(); \
-value->hasSourceTimestamp = UA_TRUE; } \
+value->sourceTimestamp = (thisObj->getTimeStampSeconds() * UA_SEC_TO_DATETIME) + UA_DATETIME_UNIX_EPOCH; \
+value->hasSourceTimestamp = UA_TRUE; \
+}\
 return UA_STATUSCODE_GOOD; } // Ends Fnct
 
 #define UA_WRPROXY_TAIL(_p_method) \
@@ -82,10 +84,6 @@ return UA_STATUSCODE_GOOD; } // End Fnct
 #define UA_RDPROXY_HEAD(_p_class, _p_method) \
 UA_StatusCode UA_RDPROXY_NAME(_p_class, _p_method) (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) { \
 _p_class *thisObj = static_cast<_p_class *> (handle); \
-if (includeSourceTimeStamp) { \
-value->serverTimestamp = UA_DateTime_now(); \
-value->hasServerTimestamp = UA_TRUE; \
-}
 
 #define UA_WRPROXY_HEAD(_p_class, _p_method)  \
 UA_StatusCode UA_WRPROXY_NAME(_p_class, _p_method) (void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range) {\

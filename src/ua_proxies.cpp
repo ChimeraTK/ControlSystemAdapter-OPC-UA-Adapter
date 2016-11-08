@@ -185,7 +185,7 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
 				retval = UA_Server_writeDataType(server, instantiatedId, variantVal.type->typeId);
 				
 				// See IEC 62541-3: OPC Unified Architecture - Part 3: Address space model -> Page 75
-				UA_Int32 valueRank = -2;				
+				UA_Int32 valueRank = -2;	
 				if(variantVal.arrayDimensionsSize == 0 && UA_Variant_isScalar(&variantVal)) {
 					// Scalar
 					valueRank = -1;
@@ -208,26 +208,4 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
 	}
   
   return retval;
-}
-
-template <class C, typename T, uint32_t UA_T>
-UA_StatusCode ua_valuesource_rdproxy(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, 
-                                     const UA_NumericRange *range, UA_DataValue *value) 
-{
-  C *thisObj = static_cast<C *> (handle); 
-  if (includeSourceTimeStamp) { 
-    value->serverTimestamp = UA_DateTime_now(); 
-    value->hasServerTimestamp = UA_TRUE; 
-  } 
-  
-  T ua_val = thisObj->M(); 
-  UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_T]); 
-  
-  value->hasValue = UA_TRUE; 
-  if (includeSourceTimeStamp) { 
-    value->sourceTimestamp = UA_DateTime_now(); 
-    value->hasSourceTimestamp = UA_TRUE; 
-  } 
-  
-  return UA_STATUSCODE_GOOD;
 }
