@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <uamapping>
-	<config rootFolder="TestFolder" description="Ich bin die Beschreibung des TestFolders">
+	<config id="10001" rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
 		<serverConfig applicationName="OPCUAServer" port="16660" />
+		<login username="test" password="test123" /> 
+	</config>
+	<config id="10002" rootFolder="TestFolder_2" description="Ich bin die Beschreibung des TestFolders">
+		<serverConfig applicationName="OPCUAServer" port="16661" />
+		<login username="test" password="test123" /> 
+	</config>
+	<config id="10003" rootFolder="TestFolder_3" description="Ich bin die Beschreibung des TestFolders">
+		<serverConfig applicationName="OPCUAServer" port="16662" />
+		<login username="test" password="test123" /> 
+	</config>
+	<config id="10004" rootFolder="TestFolder_4" description="Ich bin die Beschreibung des TestFolders">
+		<serverConfig applicationName="OPCUAServer" port="16663" />
 		<login username="test" password="test123" /> 
 	</config>
 

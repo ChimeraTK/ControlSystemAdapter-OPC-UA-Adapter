@@ -38,30 +38,30 @@
 typedef boost::shared_ptr<ChimeraTK::ControlSystemPVManager> shCSysPVManager;
 
 class ControlSystemAdapterOPCUA {
-  private:
-    ipc_manager    *mgr;
-    mtca_uaadapter *adapter;
-
-    shCSysPVManager csManager;
-    uint16_t opcuaPort;
+private:
+	ipc_manager    *mgr;
+	mtca_uaadapter *adapter;
+	
+	shCSysPVManager csManager;
+	string configId;
+	
+	void ControlSystemAdapterOPCUA_InitServer(string configFile, string configId);
+	void ControlSystemAdapterOPCUA_InitVarMapping(shCSysPVManager csManager);
     
-    void ControlSystemAdapterOPCUA_InitServer(uint16_t opcuaPort, std::string configFile);
-    void ControlSystemAdapterOPCUA_InitVarMapping(shCSysPVManager csManager);
-    
-  public:
-    ControlSystemAdapterOPCUA(uint16_t opcuaPort, shCSysPVManager csManager, std::string configFile);
-    ~ControlSystemAdapterOPCUA();
+public:
+	ControlSystemAdapterOPCUA(shCSysPVManager csManager, string configFile, string configId);
+	~ControlSystemAdapterOPCUA();
     
 	shCSysPVManager const & getControlSystemPVManager() const;
 	mtca_uaadapter* getUAAdapter();
 	 
-	uint32_t getOPCUAPort();
+	string getConfigId();
 	
 	ipc_manager* getIPCManager();
-    void start();
-    void stop();
-    void terminate();
-    bool isRunning();
+	void start();
+	void stop();
+	void terminate();
+	bool isRunning();
 };
 
 #endif // CONTROLSYSTEMADAPTER_H

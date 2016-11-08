@@ -18,14 +18,11 @@ struct TestFixtureEmptySet {
   std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers;
   boost::shared_ptr<ControlSystemPVManager> csManager;
   boost::shared_ptr<DevicePVManager> devManager;
-  
-  uint32_t opcuaPort;
-  
+    
   ControlSystemSynchronizationUtility csSyncUtil;
 
   TestFixtureEmptySet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second), csSyncUtil(csManager) {
 		csSyncUtil.receiveAll();
-		opcuaPort = 16664;
 	}
 };
 
@@ -34,14 +31,11 @@ struct TestFixturePVSet {
 	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers;
 	boost::shared_ptr<ControlSystemPVManager> csManager;
 	boost::shared_ptr<DevicePVManager> devManager;
-	
-	uint32_t opcuaPort;
-	
+		
 	ControlSystemSynchronizationUtility csSyncUtil;
 	
   TestFixturePVSet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second), csSyncUtil(csManager) {
 		csSyncUtil.receiveAll();
-		opcuaPort = 16664;
 		
 		ProcessScalar<int8_t>::SharedPtr intA8dev = devManager->createProcessScalar<int8_t>(controlSystemToDevice, "int8Scalar");
 		ProcessScalar<uint8_t>::SharedPtr intAu8dev = devManager->createProcessScalar<uint8_t>(controlSystemToDevice, "uint8Scalar");
@@ -75,8 +69,6 @@ struct TestFixtureServerSet {
 	UA_Boolean runUAServer;
 	
 	TestFixtureServerSet() {
-		
-		opcuaPort = 16660;
 		
 		server_config = UA_ServerConfig_standard;
 		server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, opcuaPort);

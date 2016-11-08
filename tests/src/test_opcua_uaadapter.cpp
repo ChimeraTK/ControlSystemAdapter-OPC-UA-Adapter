@@ -24,7 +24,7 @@ class UAAdapterTest {
 void UAAdapterTest::testEmptySet(){ 
 	cout << "UAAdapterTest with EmptySet started." << endl;
 	TestFixtureEmptySet tfEmptySet;
-	mtca_uaadapter *adapter = new mtca_uaadapter(tfEmptySet.opcuaPort, "../../tests/uamapping_test.xml");
+	mtca_uaadapter *adapter = new mtca_uaadapter("../../tests/uamapping_test.xml", "10001");
 	
 	// is Server running?
 	adapter->doStart();
@@ -50,7 +50,7 @@ void UAAdapterTest::testExampleSet() {
 	cout << "UAAdapterTest with ExampleSet started." << endl;
 	TestFixturePVSet tfExampleSet;
 	 // Create the managers
-	mtca_uaadapter *adapter = new mtca_uaadapter(tfExampleSet.opcuaPort, "../../tests/uamapping_test.xml");
+	mtca_uaadapter *adapter = new mtca_uaadapter("../../tests/uamapping_test.xml", "10001");
 	xml_file_handler *xmlHandler = new xml_file_handler("../../tests/uamapping_test.xml");
 	
 	// is Server running?

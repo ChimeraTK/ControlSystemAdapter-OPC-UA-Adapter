@@ -103,12 +103,10 @@ std::string mtca_processvariable::getType() {
     else                                    return "Unsupported type";
 }
 
-
 //UA_WRPROXY_STRING(mtca_processvariable, setType)
 //void mtca_processvariable::setType(std::string type) {
   //return; // Change of Type is not possible
 //}
-
 
 // TimeStamp
 //UA_RDPROXY_UINT32(mtca_processvariable, getTimeStamp)
@@ -123,17 +121,18 @@ void mtca_processvariable::setTimeStamp(ChimeraTK::TimeStamp timeStamp) {
 }
 */
 
+UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampSeconds)
+uint32_t mtca_processvariable::getTimeStampSeconds() {
+	//cout << "Current TimeStamp: " << this->csManager->getProcessVariable(this->namePV)->getTimeStamp().seconds << endl;
+	return this->csManager->getProcessVariable(this->namePV)->getTimeStamp().seconds;
+}
+
 /*
 UA_WRPROXY_UINT32(mtca_processvariable, setTimeStampSeconds)
 void mtca_processvariable::setTimeStampSeconds(uint32_t seconds) {
 	return;
 }
 */
-
-UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampSeconds)
-uint32_t mtca_processvariable::getTimeStampSeconds() {
-	return this->csManager->getProcessVariable(this->namePV)->getTimeStamp().seconds;
-}
 
 UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampNanoSeconds)
 uint32_t mtca_processvariable::getTimeStampNanoSeconds() {
@@ -217,9 +216,9 @@ void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) 
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
     if (!this->csManager->getProcessVariable(this->namePV)->isArray())    return; \
     if (this->csManager->getProcessVariable(this->namePV)->isSender()) { \
- 				int32_t valueSize = this->csManager->getProcessArray<_p_type>(this->namePV)->get().size(); \
- 				value.resize(valueSize); \
-         this->csManager->getProcessArray<_p_type>(this->namePV)->set(value); \
+			int32_t valueSize = this->csManager->getProcessArray<_p_type>(this->namePV)->get().size(); \
+			value.resize(valueSize); \
+			this->csManager->getProcessArray<_p_type>(this->namePV)->set(value); \
 		} \
 	return; \
 }
@@ -293,7 +292,6 @@ CREATE_WRITE_FUNCTION_ARRAY(float)
 UA_WRPROXY_ARRAY_DOUBLE(mtca_processvariable, setValue_Array_double);
 CREATE_WRITE_FUNCTION_ARRAY(double)
 
-
 // Just a macro to easy pushing different types of dataSources
 // ... and make sure we lock down writing to receivers in this stage already
 #define PUSH_RDVALUE_TYPE(_p_typeName) { \
@@ -364,7 +362,7 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
         else if (valueType == typeid(double))     PUSH_RDVALUE_ARRAY_TYPE(double)
         else std::cout << "Cannot proxy unknown array type " << typeid(valueType).name() << std::endl;
     }
-    		
+		
 		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), .read=UA_RDPROXY_NAME(mtca_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(mtca_processvariable, setEngineeringUnit)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});

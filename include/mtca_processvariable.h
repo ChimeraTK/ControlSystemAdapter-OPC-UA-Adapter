@@ -50,6 +50,21 @@ public:
    
     ~mtca_processvariable();
 
+		void setTimeStamp(ChimeraTK::TimeStamp timeStamp);
+    ChimeraTK::TimeStamp getTimeStamp();
+		
+		void setTimeStampSeconds(uint32_t seconds);
+		uint32_t getTimeStampSeconds();
+	
+		void setTimeStampNanoSeconds(uint32_t nanoSeconds);
+		uint32_t getTimeStampNanoSeconds();
+	
+		void setTimeStampIndex0(uint32_t index0);
+		uint32_t getTimeStampIndex0();
+	
+		void setTimeStampIndex1(uint32_t index1);
+		uint32_t getTimeStampIndex1();
+		
     void setName(std::string name);
     std::string getName();
 
@@ -58,21 +73,6 @@ public:
 		
 		void setEngineeringUnit(std::string engineeringUnit);
 		std::string getEngineeringUnit();
-
-    void setTimeStamp(ChimeraTK::TimeStamp timeStamp);
-    ChimeraTK::TimeStamp getTimeStamp();
-	
-	void setTimeStampSeconds(uint32_t seconds);
-	uint32_t getTimeStampSeconds();
-	
-	void setTimeStampNanoSeconds(uint32_t nanoSeconds);
-	uint32_t getTimeStampNanoSeconds();
-	
-	void setTimeStampIndex0(uint32_t index0);
-	uint32_t getTimeStampIndex0();
-	
-	void setTimeStampIndex1(uint32_t index1);
-	uint32_t getTimeStampIndex1();
 	
 	UA_NodeId getOwnNodeId();
     

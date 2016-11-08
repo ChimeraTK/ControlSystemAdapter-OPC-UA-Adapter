@@ -46,19 +46,19 @@ extern "C" {
  * This class provide the two parts of the OPCUA Adapter. First of all the OPCUA server starts with a random port number (recommended 16664),
  * following the mapping process start. For this, the ProcessVariable from ControlSystemPVManager will be mapped to the OPCUA Model 
  */ 
-ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(uint16_t opcuaPort, shCSysPVManager csManager, std::string configFile) {
-	this->opcuaPort = opcuaPort;
+ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(shCSysPVManager csManager, string configFile, string configId) {
+	this->configId = configId;
 	this->csManager = csManager;
-	this->ControlSystemAdapterOPCUA_InitServer(opcuaPort, configFile);
+	this->ControlSystemAdapterOPCUA_InitServer(configFile, configId);
 	this->ControlSystemAdapterOPCUA_InitVarMapping(csManager);
 }
 
 // Init the OPCUA server
-void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(uint16_t opcuaPort, std::string configFile) {
+void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(string configFile, string configId) {
     this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
 
     // Create new server adapter
-    this->adapter = new mtca_uaadapter(opcuaPort, configFile);
+     this->adapter = new mtca_uaadapter(configFile, configId);
   
     this->mgr->addObject(this->adapter);
     this->mgr->doStart(); // Implicit: Startet Worker-Threads aller ipc_managed_objects, die mit addObject registriert wurden  
@@ -72,6 +72,12 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(shCSysP
     for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
         adapter->addVariable(oneProcessVariable->getName(), csManager);
     }
+    
+    vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
+		cout << "The following VariableNodes cant be mapped, because they are not member in the PV-Manager:" << endl;
+		for(string var:allNotMappedVariables) {
+			cout << var << endl;
+		}
 }
 
 ControlSystemAdapterOPCUA::~ControlSystemAdapterOPCUA() {
@@ -92,8 +98,8 @@ mtca_uaadapter* ControlSystemAdapterOPCUA::getUAAdapter() {
 }
 
 // Maybe needed, return the OPCUA Portnumber
-uint32_t ControlSystemAdapterOPCUA::getOPCUAPort() {
-	return this->opcuaPort;
+string ControlSystemAdapterOPCUA::getConfigId() {
+	return this->configId;
 }
 
 ipc_manager* ControlSystemAdapterOPCUA::getIPCManager() {

@@ -30,6 +30,11 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 }
+
+#include <thread>
+#include <future>
+#include <functional>     // std::ref
+
 #include "csa_config.h"
 
 #include "mtca_uaadapter.h"
@@ -53,17 +58,18 @@ using namespace std;
  * config-file parameter will parsed and are set to the right variable.
  * 
  */
-mtca_uaadapter::mtca_uaadapter(uint16_t opcuaPort, std::string configFile) : ua_mapped_class() {
+mtca_uaadapter::mtca_uaadapter(string configFile, string configId) : ua_mapped_class() {
 	// XML file handling for variable mapping, just an example...
 	this->fileHandler = new xml_file_handler(configFile);
 	
-	this->readConfig();
+	this->readConfig(configId);
 	
-	this->mtca_uaadapter_constructserver(opcuaPort);
+	this->mtca_uaadapter_constructserver();
 	
 	this->mapSelfToNamespace();
 	
 	this->readAdditionalNodes();
+	
 }
 
 /** @brief Destrructor of the class. 
@@ -86,23 +92,15 @@ mtca_uaadapter::~mtca_uaadapter() {
  * Especially it reads the config-file and add all Variables from 
  * a pv-manager and additional variables. For config purpose the 
  * config-file parameter will parsed and are set to the right variable.
- * @param opcuaPort Beschreibung
  * @return
  */
-void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
+void mtca_uaadapter::mtca_uaadapter_constructserver() {
 
     this->server_config = UA_ServerConfig_standard;
     this->server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, this->serverConfig.opcuaPort);
     this->server_config.logger = UA_Log_Stdout;
     this->server_config.networkLayers = &this->server_nl;
     this->server_config.networkLayersSize = 1;
-		
-		// Check if network works well
-		UA_StatusCode retval = (*this->server_nl.start)(&this->server_nl, this->server_config.logger);
-		if(retval != UA_STATUSCODE_GOOD) {
-			cout << "Error during establishing the network interface." << endl;
-			exit(0);
-		}
 		
 		this->server_config.enableUsernamePasswordLogin = this->serverConfig.UsernamePasswordLogin;
 		this->server_config.enableAnonymousLogin = !this->serverConfig.UsernamePasswordLogin;
@@ -112,7 +110,7 @@ void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
 		usernamePasswordLogins->username = UA_STRING((char*)this->serverConfig.username.c_str());
 		this->server_config.usernamePasswordLogins = usernamePasswordLogins;
 		this->server_config.usernamePasswordLoginsSize = (size_t)(usernamePasswordLogins->password.length + usernamePasswordLogins->username.length);
-		
+		this->server_config.networkLayers->start;
 		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
 		this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
 		this->server_config.applicationDescription.applicationUri = UA_STRING((char*)"opc.tcp://localhost");
@@ -127,9 +125,10 @@ void mtca_uaadapter::mtca_uaadapter_constructserver(uint16_t opcuaPort) {
     mtca_namespaceinit_generated(this->mappedServer);
 }
 
-void mtca_uaadapter::readConfig() {
+void mtca_uaadapter::readConfig(string configId) {
 	
-	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//config");	
+	string xpath = "//config[@id=" + configId + "]";
+	xmlXPathObjectPtr result = this->fileHandler->getNodeSet(xpath);	
 	string placeHolder = "";
 	if(result) {
 		xmlNodeSetPtr nodeset = result->nodesetval;
@@ -145,7 +144,7 @@ void mtca_uaadapter::readConfig() {
 		}
 	}	
 	
-	result = this->fileHandler->getNodeSet("//config//login");	
+	result = this->fileHandler->getNodeSet(xpath + "//login");	
 	if(result) {
 		xmlNodeSetPtr nodeset = result->nodesetval;
 		this->serverConfig.UsernamePasswordLogin = UA_TRUE;
@@ -160,7 +159,7 @@ void mtca_uaadapter::readConfig() {
 		}
 	}
 	
-	result = this->fileHandler->getNodeSet("//config//serverConfig");	
+	result = this->fileHandler->getNodeSet(xpath +"//serverConfig");	
 	if(result) {
 		xmlNodeSetPtr nodeset = result->nodesetval;
 		string opcuaPort = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "port");
@@ -231,19 +230,40 @@ void mtca_uaadapter::workerThread() {
     }
     
     UA_Boolean runUAServer = UA_TRUE;
-    thread *serverThread = new std::thread(UA_Server_run, this->mappedServer, &runUAServer);
-  
-    while (runUAServer == UA_TRUE) {
-        if (! this->isRunning()) {
-            runUAServer = UA_FALSE;
-        }
-        sleep(1);
-    }
-    if (serverThread->joinable()) {
-        serverThread->join();
-    }
-  
-    delete serverThread;
+		
+// 		std::packaged_task<UA_StatusCode(UA_Server*, UA_Boolean*)> task(UA_Server_run);
+//    std::future<UA_StatusCode> result = task.get_future();
+//    std::thread *serverThread = new std::thread (std::move(task), this->mappedServer, &runUAServer);
+		
+		//std::future<UA_StatusCode> serverThread = std::async(std::launch::async, UA_Server_run, this->mappedServer, &runUAServer);
+		
+
+    //thread *serverThread = new std::thread(UA_Server_run, this->mappedServer, &runUAServer);
+		std::future<UA_StatusCode> serverThread = std::async(std::launch::async, UA_Server_run, this->mappedServer, &runUAServer);
+		if(serverThread.get() != UA_STATUSCODE_GOOD) {
+			cout << "Error during establishing the network interface." << endl;
+			exit(0);
+ 		}
+		
+// 		cout << "Now we are here1" << endl;
+//  		if(result.get() != UA_STATUSCODE_GOOD) {
+//    			cout << "Error during establishing the network interface." << endl;
+//    			exit(0);
+//    	}
+
+     while (runUAServer == UA_TRUE) {
+         if (! this->isRunning()) {
+             runUAServer = UA_FALSE;
+ 						cout << "Now we are here2" << endl;
+         }
+         sleep(1);
+     }
+		
+// 		if (serverThread->joinable()) {
+// 			serverThread->join();
+// 		}
+
+		//delete serverThread;
 }
 
 void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
@@ -370,11 +390,11 @@ void mtca_uaadapter::addConstant(std::string varName, shCSysPVManager mgr) {
     this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, mgr));
 }
 
-std::list<mtca_processvariable *> mtca_uaadapter::getVariables() {
+vector<mtca_processvariable *> mtca_uaadapter::getVariables() {
 	return this->variables;
 }
 
-std::list<mtca_processvariable *> mtca_uaadapter::getConstants() {
+vector<mtca_processvariable *> mtca_uaadapter::getConstants() {
 	return this->constants;
 }
 
@@ -519,4 +539,37 @@ UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName, 
 	}
 
 	return newFolder.folderNodeId;
+}
+
+
+/** @brief Methode to get all names from all potential VarableNodes from XML-Mappingfile which could not allocated.
+ * 
+ * 
+ * @return vector<string> notMappableVariablesNames List with all VariableNodes which could not allocated a Varaible in PV-Manager.
+ * 
+ */
+vector<string> mtca_uaadapter::getAllNotMappableVariablesNames() {
+	
+	vector<string> notMappableVariablesNames;
+	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
+	
+	if(result) {
+		xmlNodeSetPtr nodeset = result->nodesetval;
+		this->variables;
+		for (int32_t i=0; i < nodeset->nodeNr; i++) {
+			//for(auto var:this->variables) {
+			bool mapped = false;
+			string mappedVar = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "sourceVariableName");
+			for(auto var:this->getVariables()) {
+				if(var->getName().compare(mappedVar) == 0) {
+					mapped = true;
+				}
+			}
+ 			if(!mapped) {
+ 				notMappableVariablesNames.push_back(mappedVar);
+ 			}
+		}
+	}
+	
+	return notMappableVariablesNames;
 }

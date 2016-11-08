@@ -22,8 +22,8 @@ void IPCManagerTest::testManagerConnection(){
 	
 	ipc_manager *manager = new ipc_manager();
 	
-	mtca_uaadapter *adapterOne = new mtca_uaadapter(16660, "../../tests/uamapping_test.xml");
-	mtca_uaadapter *adapterTwo = new mtca_uaadapter(16661, "../../tests/uamapping_test.xml");	
+	mtca_uaadapter *adapterOne = new mtca_uaadapter("../../tests/uamapping_test.xml", "10001");
+	mtca_uaadapter *adapterTwo = new mtca_uaadapter("../../tests/uamapping_test.xml", "10002");	
 	
 	BOOST_CHECK(adapterTwo->isManaged() == false);
 	

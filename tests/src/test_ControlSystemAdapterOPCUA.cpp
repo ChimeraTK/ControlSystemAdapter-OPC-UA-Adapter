@@ -27,15 +27,13 @@ void CSAOPCUATest::testWithoutPVSet(){
 	std::cout << "Enter CSAOPCUATest without any pv" << std::endl;
 	TestFixtureEmptySet tfEmptySet;
 	 // Create the managers
-	ControlSystemAdapterOPCUA *csaOPCUA = new ControlSystemAdapterOPCUA(tfEmptySet.opcuaPort, tfEmptySet.csManager, "../../tests/uamapping_test.xml");
+	ControlSystemAdapterOPCUA *csaOPCUA = new ControlSystemAdapterOPCUA(tfEmptySet.csManager, "../../tests/uamapping_test.xml", "10001");
 	// is Server running?
 	csaOPCUA->start();
 	BOOST_CHECK(csaOPCUA->isRunning() == true);
 	// is csManager init
 	BOOST_CHECK(csaOPCUA->getControlSystemPVManager()->getAllProcessVariables().size() == 0);
-	
-	BOOST_CHECK(csaOPCUA->getOPCUAPort() == 16664);	
-	
+		
 	csaOPCUA->stop();
 	csaOPCUA->terminate();
 	BOOST_CHECK(csaOPCUA->isRunning() != true);
@@ -47,14 +45,12 @@ void CSAOPCUATest::testWithPVSet(){
 	std::cout << "Enter CSAOPCUATest with ExampleSet" << std::endl;
 	TestFixturePVSet tfExampleSet;
 	 // Create the managers
-	ControlSystemAdapterOPCUA *csaOPCUA = new ControlSystemAdapterOPCUA(tfExampleSet.opcuaPort, tfExampleSet.csManager, "../../tests/uamapping_test.xml");
+	ControlSystemAdapterOPCUA *csaOPCUA = new ControlSystemAdapterOPCUA(tfExampleSet.csManager, "../../tests/uamapping_test.xml", "10001");
 	// is Server running?
 	BOOST_CHECK(csaOPCUA->isRunning() == true);
 	
 	// is csManager init
 	BOOST_CHECK(csaOPCUA->getControlSystemPVManager()->getAllProcessVariables().size() == 16);
-	
-	BOOST_CHECK(csaOPCUA->getOPCUAPort() == 16664);
 			
 	BOOST_CHECK(csaOPCUA->getIPCManager() != NULL);
 	

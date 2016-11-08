@@ -73,17 +73,17 @@ private:
 	
 	ServerConfig 							serverConfig;
 	
-	list<mtca_processvariable *> variables;
-	list<mtca_processvariable *> constants;
+	vector<mtca_processvariable *> variables;
+	vector<mtca_processvariable *> constants;
 	
 	xml_file_handler *fileHandler;
 	
-	void mtca_uaadapter_constructserver(uint16_t opcuaPort);
+	void mtca_uaadapter_constructserver();
 	UA_StatusCode mapSelfToNamespace();
 	UA_NodeId createUAFolder(UA_NodeId basenodeid, string folderName, string description = "");
 	
 public:
-	mtca_uaadapter(uint16_t opcuaPort, string configPath);
+	mtca_uaadapter(string configPath, string configId);
 	~mtca_uaadapter();
 	
 	UA_NodeId createFolderPath(UA_NodeId basenodeid, vector<string> folderPathVector);
@@ -96,13 +96,15 @@ public:
 	void addConstant(string name, shCSysPVManager mgr);
 	
 	UA_NodeId getOwnNodeId();
-	list<mtca_processvariable *> getVariables();
-	list<mtca_processvariable *> getConstants();
+	vector<mtca_processvariable *> getVariables();
+	vector<mtca_processvariable *> getConstants();
 	
 	void workerThread();
 	
-	void readConfig();
+	void readConfig(string configId);
 	void readAdditionalNodes();
+	
+	vector<string> getAllNotMappableVariablesNames();
 };
 
 #endif // MTCA_UAADAPTER_H
