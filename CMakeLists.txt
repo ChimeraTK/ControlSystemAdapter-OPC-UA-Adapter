@@ -21,8 +21,8 @@ if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
   ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
     GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
     #When creationg a tag, base it on a tag of the ControlSystemAdapter so it stays stable
-    #GIT_TAG "00.02.00"
-    GIT_TAG "master"
+    GIT_TAG "00.02.00"
+    #GIT_TAG "master"
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK"
     )
   #FIXME: Find a better name for this variable
@@ -71,7 +71,6 @@ include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR})
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 link_directories(${LIBXML2_LIBRARIES})
 
- 
                     
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
@@ -122,8 +121,14 @@ if(ENABLE_COVERAGE)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
-  add_definitions(-ftest-coverage)
-  add_definitions(-fprofile-arcs)
+  
+  add_custom_target(coverage ALL
+										${PROJECT_SOURCE_DIR}/cmake/makeGcov.sh ${CMAKE_CURRENT_BINARY_DIR}
+										WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+										DEPENDS ControlSystem-OPCUA_Sample_Adapter
+										COMMENT "Generating test coverage documentation" VERBATIM)
+             
+	set(ENABLE_UNIT_TESTS ON)
 endif()
 
 if(ENABLE_UNIT_TESTS)

@@ -86,7 +86,6 @@ std::string mtca_processvariable::getEngineeringUnit() {
 	return this->engineeringUnit;
 }
 
-		
 // Type
 UA_RDPROXY_STRING(mtca_processvariable, getType)
 std::string mtca_processvariable::getType() {		
@@ -363,13 +362,13 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
         else std::cout << "Cannot proxy unknown array type " << typeid(valueType).name() << std::endl;
     }
 		
-		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), .read=UA_RDPROXY_NAME(mtca_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(mtca_processvariable, setEngineeringUnit)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});
 		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_SECONDS), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampSeconds)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_NANOSECONDS), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampNanoSeconds)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX0), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex0)});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX1), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex1)});
+		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName)});
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), .read=UA_RDPROXY_NAME(mtca_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(mtca_processvariable, setEngineeringUnit)});
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});
 
 	this->ua_mapDataSources((void *) this, &mapDs);
 	

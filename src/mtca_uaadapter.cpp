@@ -78,6 +78,7 @@ mtca_uaadapter::mtca_uaadapter(string configFile, string configId) : ua_mapped_c
  * 
  */
 mtca_uaadapter::~mtca_uaadapter() {
+	
 	if (this->isRunning()) {
 		this->doStop();
 	}
@@ -225,11 +226,11 @@ void mtca_uaadapter::readAdditionalNodes() {
 }
 
 void mtca_uaadapter::workerThread() {
-    if (this->mappedServer == nullptr) {
-        return;
-    }
+	if (this->mappedServer == nullptr) {
+		return;
+	}
     
-    UA_Boolean runUAServer = UA_TRUE;
+	UA_Boolean runUAServer = UA_TRUE;
 		
 // 		std::packaged_task<UA_StatusCode(UA_Server*, UA_Boolean*)> task(UA_Server_run);
 //    std::future<UA_StatusCode> result = task.get_future();
@@ -238,32 +239,25 @@ void mtca_uaadapter::workerThread() {
 		//std::future<UA_StatusCode> serverThread = std::async(std::launch::async, UA_Server_run, this->mappedServer, &runUAServer);
 		
 
-    //thread *serverThread = new std::thread(UA_Server_run, this->mappedServer, &runUAServer);
-		std::future<UA_StatusCode> serverThread = std::async(std::launch::async, UA_Server_run, this->mappedServer, &runUAServer);
-		if(serverThread.get() != UA_STATUSCODE_GOOD) {
-			cout << "Error during establishing the network interface." << endl;
-			exit(0);
- 		}
-		
-// 		cout << "Now we are here1" << endl;
-//  		if(result.get() != UA_STATUSCODE_GOOD) {
-//    			cout << "Error during establishing the network interface." << endl;
-//    			exit(0);
-//    	}
+	thread *serverThread = new std::thread(UA_Server_run, this->mappedServer, &runUAServer);
+// 		std::future<UA_StatusCode> serverThread = std::async(std::launch::async, UA_Server_run, this->mappedServer, &runUAServer);
+// 		if(serverThread.get() != UA_STATUSCODE_GOOD) {
+// 			cout << "Error during establishing the network interface." << endl;
+// 			exit(0);
+//  		}
 
-     while (runUAServer == UA_TRUE) {
-         if (! this->isRunning()) {
-             runUAServer = UA_FALSE;
- 						cout << "Now we are here2" << endl;
-         }
-         sleep(1);
-     }
-		
-// 		if (serverThread->joinable()) {
-// 			serverThread->join();
-// 		}
+	while (runUAServer == UA_TRUE) {
+		 if (! this->isRunning()) {
+			 runUAServer = UA_FALSE;
+		}
+		sleep(1);
+	}
+	
+ 	if (serverThread->joinable()) {
+ 		serverThread->join();
+ 	}
 
-		//delete serverThread;
+	delete serverThread;
 }
 
 void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
@@ -368,21 +362,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
  			}
 		}
 	}
-// 	for (int32_t i=0; i < nodeset->nodeNr; i++) {
-// 		bool notFound = true;
-// 		for(int32_t m=0; i < mappedVariables.size(); m++) {
-// 			if(mappedVariables.at(m).compare(this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "sourceVariableName"))) {
-// 				notFound = false;
-// 				mappedVariables.erase(mappedVariables.begin()+ m);
-// 				break;
-// 			}
-// 		}	
-// 	}		
-// 		
-// 	cout << "The following element cant be mapped: " << endl;
-// 	for(auto mappedVar:mappedVariables) {
-// 		cout << mappedVar << endl;
-// 	}
+
 	xmlXPathFreeObject (result);
 }
 

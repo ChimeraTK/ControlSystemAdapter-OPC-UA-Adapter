@@ -16,52 +16,26 @@ using namespace std;
 
 class UAAdapterTest {
 	public:
-		static void testEmptySet();
 		static void testExampleSet();
 		static void testConfigHandling();
 };
    
-void UAAdapterTest::testEmptySet(){ 
-	cout << "UAAdapterTest with EmptySet started." << endl;
-	TestFixtureEmptySet tfEmptySet;
-	mtca_uaadapter *adapter = new mtca_uaadapter("../../tests/uamapping_test.xml", "10001");
-	
-	// is Server running?
-	adapter->doStart();
-	BOOST_CHECK(adapter->isRunning() == true);
-	
-	adapter->doStop();
-	BOOST_CHECK(adapter->isRunning() != true);
-	
-	adapter->doStart();
-	BOOST_CHECK(adapter->isRunning() == true);
-	
-	BOOST_CHECK(adapter->getIpcId() == 0);
-	
-	UA_NodeId nodeId = adapter->getOwnNodeId();
-	BOOST_CHECK(!UA_NodeId_isNull(&nodeId));
-	
-	adapter->doStop();
-	BOOST_CHECK(adapter->isRunning() != true);
-	
-};
-
 void UAAdapterTest::testExampleSet() { 
 	cout << "UAAdapterTest with ExampleSet started." << endl;
 	TestFixturePVSet tfExampleSet;
 	 // Create the managers
-	mtca_uaadapter *adapter = new mtca_uaadapter("../../tests/uamapping_test.xml", "10001");
+	mtca_uaadapter *adapter = new mtca_uaadapter("../../tests/uamapping_test.xml", "10002");
 	xml_file_handler *xmlHandler = new xml_file_handler("../../tests/uamapping_test.xml");
 	
 	// is Server running?
 	adapter->doStart();
 	BOOST_CHECK(adapter->isRunning() == true);
-	
+	/*
 	adapter->doStop();
 	BOOST_CHECK(adapter->isRunning() != true);
 	
 	adapter->doStart();
-	BOOST_CHECK(adapter->isRunning() == true);
+	BOOST_CHECK(adapter->isRunning() == true);*/
 	
 	BOOST_CHECK(adapter->getIpcId() == 0);
 	UA_NodeId ownNodeId = adapter->getOwnNodeId();
@@ -69,7 +43,6 @@ void UAAdapterTest::testExampleSet() {
 	
 	// Check folder functions
 	vector<string> pathVector = xmlHandler->praseVariablePath("/test/test/");
-	//vector<string> pathVector = {"tee", "tea"};
 	// Check if path exist
 	UA_NodeId folderNodeId = adapter->existFolderPath(ownNodeId, pathVector);
 	BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
@@ -99,22 +72,33 @@ void UAAdapterTest::testExampleSet() {
 	folderNodeId = adapter->existFolderPath(UA_NODEID_NULL, pathVector);
 	BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
 	
+	for(auto processVar:tfExampleSet.csManager.get()->getAllProcessVariables()) {
+		adapter->addVariable(processVar.get()->getName() , tfExampleSet.csManager);
+	}
+
 	adapter->addConstant("int8Scalar", tfExampleSet.csManager);
-	adapter->addVariable("int32Array_s15", tfExampleSet.csManager);
-	adapter->addVariable("uint8Array_s10", tfExampleSet.csManager);
-	adapter->addVariable("uint16Array_s10", tfExampleSet.csManager);
-	adapter->addVariable("int8Array_s15", tfExampleSet.csManager);
-	adapter->addVariable("floatScalar", tfExampleSet.csManager);
 
 	BOOST_CHECK(adapter->getConstants().size() > 0);
 	BOOST_CHECK(adapter->getVariables().size() > 0);
+	
+	/* Check if both var are not mapped */
+	BOOST_CHECK(adapter->getAllNotMappableVariablesNames().size() == 2);
 		
 	adapter->~mtca_uaadapter();
+	free(adapter);
 };
 
 void UAAdapterTest::testConfigHandling() {
-	
-	
+// 	cout << "UAAdapterTest with ExampleSet started." << endl;
+// 	TestFixturePVSet tfExampleSet;
+// 	 // Create the managers
+// 	mtca_uaadapter *adapter = new mtca_uaadapter("../../tests/uamapping_test.xml", "10002");
+// 	xml_file_handler *xmlHandler = new xml_file_handler("../../tests/uamapping_test.xml");
+// 	
+// 	adapter->doStart();
+// 		
+	//while(true) {}
+
 	
 };
 
@@ -125,7 +109,6 @@ void UAAdapterTest::testConfigHandling() {
 class UAAdapterTestSuite: public test_suite {
 	public:
 		UAAdapterTestSuite() : test_suite("mtca_uaadapter Test Suite") {
-			add(BOOST_TEST_CASE(&UAAdapterTest::testEmptySet));
 			add(BOOST_TEST_CASE(&UAAdapterTest::testExampleSet));
 			add(BOOST_TEST_CASE(&UAAdapterTest::testConfigHandling));
     }

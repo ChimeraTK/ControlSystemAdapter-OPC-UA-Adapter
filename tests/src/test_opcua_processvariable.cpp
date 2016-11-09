@@ -29,13 +29,11 @@ class ProcessVariableTest {
 		static void testEmptySet();
 		static void testClientSide();
 		static void testExampleSet();
-		static UA_StatusCode readAttribueValue(UA_Client *client, const UA_NodeId nodeId, UA_Variant *outValue);
 };
    
 void ProcessVariableTest::testEmptySet(){ 
 	std::cout << "Enter ProcessVariableTest with EmptySet" << std::endl;
 	TestFixtureServerSet *serverSet = new TestFixtureServerSet;
-		
 	TestFixturePVSet pvSet;
 	
 	thread *serverThread = new std::thread(UA_Server_run, serverSet->mappedServer, &serverSet->runUAServer);
@@ -218,9 +216,18 @@ void ProcessVariableTest::testEmptySet(){
 		// Should not being changed
 		BOOST_CHECK(test->getName() != "");
 		
-  }  
+		test->~mtca_processvariable();
+  }  	
   
-	UA_Server_run_shutdown(serverSet->mappedServer);
+  serverSet->runUAServer = UA_FALSE;
+	UA_Server_delete(serverSet->mappedServer);
+ 	
+ 	if (serverThread->joinable()) {
+  		serverThread->join();
+  	}
+ 
+ 	delete serverThread;
+	delete(serverSet); 
 	
 };
 
@@ -238,8 +245,9 @@ void ProcessVariableTest::testClientSide(){
 	}
 	
 	// add set
+	vector<mtca_processvariable*> varList;
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-		mtca_processvariable *test = new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager); 
+		varList.push_back(new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager)); 
 	}
 	
 	// Create client to connect to server
@@ -1032,8 +1040,18 @@ void ProcessVariableTest::testClientSide(){
 
 	UA_BrowseRequest_deleteMembers(&bReq);
 	UA_BrowseResponse_deleteMembers(&bResp);
+	  
 	
-	//UA_Server_run_shutdown(serverSet->mappedServer);	
+	serverSet->runUAServer = UA_FALSE;
+	UA_Server_delete(serverSet->mappedServer);
+ 	
+ 	if (serverThread->joinable()) {
+  		serverThread->join();
+  	}
+ 
+ 	delete serverThread;
+	delete(serverSet); 
+
 };
 
 
