@@ -21,8 +21,8 @@ if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
   ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
     GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
     #When creationg a tag, base it on a tag of the ControlSystemAdapter so it stays stable
-    #GIT_TAG "00.02.00"
-    GIT_TAG "master"
+    GIT_TAG "00.02.00"
+    #GIT_TAG "master"
     CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK"
     )
   #FIXME: Find a better name for this variable
