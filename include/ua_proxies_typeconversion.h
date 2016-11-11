@@ -56,7 +56,7 @@ memcpy(_p_strbuffer, _p_uastring.data,_p_uastring.length); \
 #define UASTRING_TO_CPPSTRING(_p_uastring, _p_cppstring) do { \
 char *s;\
 UASTRING_AS_CSTRING(_p_uastring, s) \
-_p_cppstring = s;\
+_p_cppstring.assign(s, _p_uastring.length);\
 free(s);\
 } while(0);
 
@@ -65,7 +65,8 @@ free(s);\
  * Copy contents of s_cpp into s_ua
  */
 #define CPPSTRING_TO_UASTRING(_p_uastring, _p_cppstring) {\
-const char *s  = _p_cppstring.c_str(); \
+char *s  = (char *) malloc(_p_cppstring.length()+1); \
+strncpy(s, (char*) _p_cppstring.c_str(), _p_cppstring.length()); \
 _p_uastring.length = _p_cppstring.length(); \
 _p_uastring.data = (UA_Byte *) malloc(_p_uastring.length); \
 memcpy(_p_uastring.data, s, _p_uastring.length); \
