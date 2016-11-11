@@ -38,14 +38,14 @@ extern "C" {
 
 using namespace std;
 
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, std::string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
-	
-	// FIXME Check if name member of a csManager Parameter
-	this->namePV = namePV;
-	this->nameNew = namePV;
-	this->csManager = csManager;
-	
-	this->mapSelfToNamespace();
+mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
+  	
+  	// FIXME Check if name member of a csManager Parameter
+  	this->namePV = namePV;
+  	this->nameNew = namePV;
+  	this->csManager = csManager;
+  	
+  	this->mapSelfToNamespace();
 }
 
 mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, std::string namePV, std::string nameNew, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
@@ -65,30 +65,29 @@ mtca_processvariable::~mtca_processvariable()
 
 // Name
 UA_RDPROXY_STRING(mtca_processvariable, getName)
-std::string mtca_processvariable::getName() {
+string mtca_processvariable::getName() {
   return this->namePV;
 }
 
-/*
-UA_WRPROXY_STRING(mtca_processvariable, setName)
-void mtca_processvariable::setName(std::string name) {
-	return; // Change of name is not possible
-}
-*/
+// UA_WRPROXY_STRING(mtca_processvariable, setName)
+// void mtca_processvariable::setName(std::string name) {
+// 	return; // Change of name is not possible
+// }
 
+// EngineeringUnit
 UA_WRPROXY_STRING(mtca_processvariable, setEngineeringUnit)
 void mtca_processvariable::setEngineeringUnit(std::string engineeringUnit) {
 	this->engineeringUnit = engineeringUnit;
 }
 
 UA_RDPROXY_STRING(mtca_processvariable, getEngineeringUnit)
-std::string mtca_processvariable::getEngineeringUnit() {
+string mtca_processvariable::getEngineeringUnit() {
 	return this->engineeringUnit;
 }
 
 // Type
 UA_RDPROXY_STRING(mtca_processvariable, getType)
-std::string mtca_processvariable::getType() {		
+string mtca_processvariable::getType() {		
     // Note: typeid().name() may return the name; may as well return the symbol's name from the binary though...
     std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
     if (valueType == typeid(int8_t))        return "int8_t";
@@ -175,6 +174,9 @@ _p_type    mtca_processvariable::getValue_##_p_type() { \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return 0; \
     if (this->csManager->getProcessVariable(this->namePV)->isArray()) return 0; \
     _p_type v = this->csManager->getProcessScalar<_p_type>(this->namePV)->get(); \
+    if(this->csManager->getProcessVariable(this->namePV)->isSender()) { \
+			this->csManager->getProcessScalar<_p_type>(this->namePV)->send(); \
+		} \
     return v; \
 } \
 

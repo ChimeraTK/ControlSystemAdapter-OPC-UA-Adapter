@@ -75,9 +75,8 @@ void runtimeValueGenerator::generateValues(shCSysPVManager csManager) {
 // 	std::cout << "bool_sine: " << bool_sine << std::endl;
 			
 		csManager->getProcessScalar<double>("double_sine")->set(double_sine);
-		csManager->getProcessScalar<int32_t>("int_sine")->set(int_sine); 		
-// 	csManager->getProcessScalar<bool>("bool_sine")->set(bool_sine); 		
-		csManager->getProcessScalar<int32_t>("t")->set((end - start)/(CLOCKS_PER_SEC/1000));
+		csManager->getProcessScalar<int32_t>("int_sine")->set(int_sine); 			
+		csManager->getProcessScalar<int32_t>("t")->set((end - start)/(CLOCKS_PER_SEC/1000));	
 		
 		usleep(csManager->getProcessScalar<int32_t>("dt")->get());
 		end = clock();

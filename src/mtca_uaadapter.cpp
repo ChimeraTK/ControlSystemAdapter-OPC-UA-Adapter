@@ -239,12 +239,12 @@ void mtca_uaadapter::workerThread() {
 		//std::future<UA_StatusCode> serverThread = std::async(std::launch::async, UA_Server_run, this->mappedServer, &runUAServer);
 		
 
-	thread *serverThread = new std::thread(UA_Server_run, this->mappedServer, &runUAServer);
-// 		std::future<UA_StatusCode> serverThread = std::async(std::launch::async, UA_Server_run, this->mappedServer, &runUAServer);
-// 		if(serverThread.get() != UA_STATUSCODE_GOOD) {
-// 			cout << "Error during establishing the network interface." << endl;
-// 			exit(0);
-//  		}
+ 	thread *serverThread = new std::thread(UA_Server_run, this->mappedServer, &runUAServer);
+//  		std::future<UA_StatusCode> serverThread = std::async(std::launch::async, UA_Server_run, this->mappedServer, &runUAServer);
+//  		if(serverThread.get() != UA_STATUSCODE_GOOD) {
+//  			cout << "Error during establishing the network interface." << endl;
+//  			exit(0);
+//   		}
 
 	while (runUAServer == UA_TRUE) {
 		 if (! this->isRunning()) {
@@ -254,10 +254,11 @@ void mtca_uaadapter::workerThread() {
 	}
 	
  	if (serverThread->joinable()) {
- 		serverThread->join();
- 	}
+  	serverThread->join();
+  }
+ 
+ 	delete serverThread;
 
-	delete serverThread;
 }
 
 void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
@@ -345,8 +346,8 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 						
 						if(varPathVector.size() > 0) {
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
-						}
-						new mtca_processvariable(this->mappedServer, newFolderNodeId, srcVarName, renameVar, mgr);
+						}						
+						this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, mgr));
 						createdVar = true;
 				}
 				
@@ -356,8 +357,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 					if(varPathVector.size() > 0) {
 						newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 					}
-					
-					new mtca_processvariable(this->mappedServer, newFolderNodeId, srcVarName, renameVar, mgr);
+					this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, mgr));
 				}
  			}
 		}
@@ -367,7 +367,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 }
 
 void mtca_uaadapter::addConstant(std::string varName, shCSysPVManager mgr) {
-    this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, mgr));
+    this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, varName, mgr));
 }
 
 vector<mtca_processvariable *> mtca_uaadapter::getVariables() {

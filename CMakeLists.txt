@@ -97,10 +97,10 @@ include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 option(ENABLE_BUILDMODEL      "Create model from XML description"      ON)
 
 ## Code quality control options
-option(ENABLE_COVERAGE        "Enable coverage stats for server build" OFF)
+option(ENABLE_COVERAGE        "Enable coverage stats and tests for adapter build" OFF)
 option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static code analysis using clangs analyzer." OFF)
 option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prior to compilation." OFF)
-option(ENABLE_UNIT_TESTS      "Compile and run unit tests." OFF)
+option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." OFF)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
 
 if(ENABLE_BUILDMODEL)
@@ -122,13 +122,17 @@ if(ENABLE_COVERAGE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
   
-  add_custom_target(coverage ALL
+	add_custom_target(coverage ALL
 										${PROJECT_SOURCE_DIR}/cmake/makeGcov.sh ${CMAKE_CURRENT_BINARY_DIR}
 										WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-										DEPENDS ControlSystem-OPCUA_Sample_Adapter
+										# Bad soulution to provide all depencys
+										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ControlSystemAdapterOPCUA
+										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
+										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
+										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_uaadapter
+										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler										
 										COMMENT "Generating test coverage documentation" VERBATIM)
              
-	set(ENABLE_UNIT_TESTS ON)
 endif()
 
 if(ENABLE_UNIT_TESTS)

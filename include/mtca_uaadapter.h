@@ -75,6 +75,7 @@ private:
 	
 	vector<mtca_processvariable *> variables;
 	vector<mtca_processvariable *> constants;
+	vector<mtca_processvariable *> mappedVariables;
 	
 	xml_file_handler *fileHandler;
 	

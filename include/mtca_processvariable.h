@@ -30,56 +30,54 @@
 #include "ua_mapped_class.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 
-//typedef boost::shared_ptr<ChimeraTK::ControlSystemPVManager> shCSysPVManager;
+using namespace std;
 
 class mtca_processvariable : ua_mapped_class {
 private:
-  std::string namePV;
-	std::string nameNew;
-	std::string engineeringUnit;
+  string namePV;
+	string nameNew;
+	string engineeringUnit;
 	UA_NodeId ownNodeId;
-	std::string type4TestPurposes;
 	
-    boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager;
-
-    UA_StatusCode mapSelfToNamespace();
+	boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager;
+	UA_StatusCode mapSelfToNamespace();
 	
 public:
-    mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, std::string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
-		mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, std::string namePV, std::string nameNew, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
-   
-    ~mtca_processvariable();
-
-		void setTimeStamp(ChimeraTK::TimeStamp timeStamp);
-    ChimeraTK::TimeStamp getTimeStamp();
-		
-		void setTimeStampSeconds(uint32_t seconds);
-		uint32_t getTimeStampSeconds();
+	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, std::string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
+	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, string nameNew, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
 	
-		void setTimeStampNanoSeconds(uint32_t nanoSeconds);
-		uint32_t getTimeStampNanoSeconds();
+	~mtca_processvariable();
 	
-		void setTimeStampIndex0(uint32_t index0);
-		uint32_t getTimeStampIndex0();
+	void setTimeStamp(ChimeraTK::TimeStamp timeStamp);
+	ChimeraTK::TimeStamp getTimeStamp();
 	
-		void setTimeStampIndex1(uint32_t index1);
-		uint32_t getTimeStampIndex1();
-		
-    void setName(std::string name);
-    std::string getName();
-
-    void setType(std::string type);
-    std::string getType();
-		
-		void setEngineeringUnit(std::string engineeringUnit);
-		std::string getEngineeringUnit();
+	void setTimeStampSeconds(uint32_t seconds);
+	uint32_t getTimeStampSeconds();
+	
+	void setTimeStampNanoSeconds(uint32_t nanoSeconds);
+	uint32_t getTimeStampNanoSeconds();
+	
+	void setTimeStampIndex0(uint32_t index0);
+	uint32_t getTimeStampIndex0();
+	
+	void setTimeStampIndex1(uint32_t index1);
+	uint32_t getTimeStampIndex1();
+	
+	void setName(string name);
+	string getName();
+	
+	void setType(string type);
+	string getType();
+	
+	void setEngineeringUnit(string engineeringUnit);
+	string getEngineeringUnit();
 	
 	UA_NodeId getOwnNodeId();
     
-#define CREATE_READ_FUNCTION_ARRAY_DEF(_p_type)  std::vector<_p_type>  getValue_Array_##_p_type();    
-#define CREATE_WRITE_FUNCTION_ARRAY_DEF(_p_type) void setValue_Array_##_p_type(std::vector<_p_type> value);
-#define CREATE_READ_FUNCTION_DEF(_p_type)  _p_type  getValue_##_p_type();    
-#define CREATE_WRITE_FUNCTION_DEF(_p_type) void setValue_##_p_type(_p_type value);
+	#define CREATE_READ_FUNCTION_ARRAY_DEF(_p_type)  std::vector<_p_type>  getValue_Array_##_p_type();    
+	#define CREATE_WRITE_FUNCTION_ARRAY_DEF(_p_type) void setValue_Array_##_p_type(std::vector<_p_type> value);
+	#define CREATE_READ_FUNCTION_DEF(_p_type)  _p_type  getValue_##_p_type();    
+	#define CREATE_WRITE_FUNCTION_DEF(_p_type) void setValue_##_p_type(_p_type value);
 
     CREATE_WRITE_FUNCTION_DEF(int8_t)
     CREATE_WRITE_FUNCTION_DEF(uint8_t)

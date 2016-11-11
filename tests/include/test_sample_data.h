@@ -36,35 +36,28 @@ struct TestFixturePVSet {
 	
   TestFixturePVSet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second), csSyncUtil(csManager) {
 		csSyncUtil.receiveAll();
-		
+	ControlSystemSynchronizationUtility syncUtil(csManager);
+	
+	// Testset
 	ProcessScalar<int8_t>::SharedPtr intA8dev = devManager->createProcessScalar<int8_t>(controlSystemToDevice, "int8Scalar");
 	ProcessScalar<uint8_t>::SharedPtr intAu8dev = devManager->createProcessScalar<uint8_t>(controlSystemToDevice, "uint8Scalar");
 	ProcessScalar<int16_t>::SharedPtr intA16dev = devManager->createProcessScalar<int16_t>(controlSystemToDevice, "int16Scalar");
 	ProcessScalar<uint16_t>::SharedPtr intAu16dev = devManager->createProcessScalar<uint16_t>(controlSystemToDevice, "uint16Scalar");
-	ProcessScalar<int32_t>::SharedPtr intA32dev = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "int32Scalar");
-	ProcessScalar<uint32_t>::SharedPtr intAu32dev = devManager->createProcessScalar<uint32_t>(controlSystemToDevice, "uint32Scalar");
+	ProcessScalar<int32_t>::SharedPtr intA32devMap = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "Dein/Name/ist/int32Scalar");
+	ProcessScalar<uint32_t>::SharedPtr intAu32devMap = devManager->createProcessScalar<uint32_t>(controlSystemToDevice, "Mein/Name/ist/uint32Scalar");
 	ProcessScalar<float>::SharedPtr intAfdev = devManager->createProcessScalar<float>(controlSystemToDevice, "floatScalar");
-	ProcessScalar<double>::SharedPtr intAddev = devManager->createProcessScalar<double>(controlSystemToDevice, "doubleScalar");
+	ProcessScalar<double>::SharedPtr doubledevMap = devManager->createProcessScalar<double>(controlSystemToDevice, "Dieser/Name/ist/doubleScalar");
     
-	ProcessArray<int8_t>::SharedPtr intB15A8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Array_s15", 15);
-	ProcessArray<uint8_t>::SharedPtr intB10Au8dev = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Array_s10", 10);
-	ProcessArray<int16_t>::SharedPtr intB15A16dev = devManager->createProcessArray<int16_t>(controlSystemToDevice, "int16Array_s15", 15);
-	ProcessArray<uint16_t>::SharedPtr intB10Au16dev = devManager->createProcessArray<uint16_t>(controlSystemToDevice, "uint16Array_s10", 10);
+	ProcessArray<int8_t>::SharedPtr intB15A8devMap = devManager->createProcessArray<int8_t>(controlSystemToDevice, "Mein/Name_ist#int8Array_s15", 15);
+	ProcessArray<uint8_t>::SharedPtr intB10Au8devMap1 = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "Dein/Name/ist/uint8Array_s10", 10);
+	ProcessArray<int16_t>::SharedPtr intB10Au16devMap2 = devManager->createProcessArray<int16_t>(controlSystemToDevice, "Unser/Name/ist_int16Array_s10", 12);
+	ProcessArray<uint16_t>::SharedPtr intB10Au8devMap2 = devManager->createProcessArray<uint16_t>(controlSystemToDevice, "Unser/Name/ist_uint8Array_s10", 10);
 	ProcessArray<int32_t>::SharedPtr intB15A32dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "int32Array_s15", 15);
 	ProcessArray<uint32_t>::SharedPtr intB10Au32dev = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "uint32Array_s10", 10);
 	ProcessArray<double>::SharedPtr intB15Afdev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleArray_s15", 15);
-	ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s10", 10);
-		
-	// example mapping variable
-	ProcessArray<int8_t>::SharedPtr intB15A8devMap = devManager->createProcessArray<int8_t>(controlSystemToDevice, "Mein/Name_ist#int8Array_s15", 15);
-	ProcessArray<uint8_t>::SharedPtr intB10Au8devMap1 = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "Dein/Name/ist/uint8Array_s10", 10);
-	ProcessArray<uint8_t>::SharedPtr intB10Au8devMap2 = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "Unser/Name/ist_uint8Array_s10", 10);
-	ProcessScalar<uint32_t>::SharedPtr intAu32devMap = devManager->createProcessScalar<uint32_t>(controlSystemToDevice, "Ist/Name/dieser/uint32Scalar");
-	ProcessScalar<int32_t>::SharedPtr intA32devMap = devManager->createProcessScalar<int32_t>(controlSystemToDevice, "Ist/Name/dieser/int32Scalar");
-	ProcessScalar<double>::SharedPtr doubledevMap = devManager->createProcessScalar<double>(controlSystemToDevice, "Ist/Name/dieser/doubleScalar");
+	ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s101234", 10);
 	}
 };
-
 
 struct TestFixtureServerSet {
 	

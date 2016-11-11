@@ -40,14 +40,14 @@
 	</application>
 
 	<application name="WinAA">
-		<map sourceVariableName="Mein/Name_ist#int8Array" rename="Array_s15_int8">
+		<map sourceVariableName="Mein/Name_ist#int16Array" rename="Array_s15_int8">
 			<unrollPath pathSep="_">True</unrollPath>
 			<unrollPath pathSep="/">True</unrollPath>
 			<unrollPath pathSep="#">True</unrollPath>
 		  <folder>NorthSide/LINAC/partA</folder>
 			<folder>NorthSide/LINAC/partX</folder>
   	</map>
-		<map sourceVariableName="Mein/Name_ist#int8Array_s15" rename="Array">
+		<map sourceVariableName="Mein/Name_ist#int16Array_s15" rename="Array">
 			<unrollPath pathSep="_">True</unrollPath>
 			<unrollPath pathSep="/">True</unrollPath>
 			<unrollPath pathSep="#">True</unrollPath>
@@ -65,7 +65,7 @@
 		  <folder>SouthSide/LINAC/partA</folder>
 			<folder>SouthSide/LINAC/partB</folder>
 		</map>
-		<map sourceVariableName="Ist/Name/dieser/int32Scalar">
+		<map sourceVariableName="Dein/Name/ist/int32Scalar">
 			<unrollPath pathSep="-">True</unrollPath>
 			<folder>EastSide/LINAC</folder>
   	</map>
@@ -85,14 +85,14 @@
    	</map>
 	</application>
 	<application name="EPICS">
-		<map sourceVariableName="Ist/Name/dieser/uint32Scalar" rename="uint32S">
+		<map sourceVariableName="Mein/Name/ist/uint32Scalar" rename="uint32S">
 			<unrollPath pathSep="/">True</unrollPath>
 		  <folder>EastSide/LINAC</folder>
     </map>
-		<map sourceVariableName="Ist/Name/dieser/int32Scalar">
+		<map sourceVariableName="Dein/Name/ist/int32Scalar">
 		  <folder>NorthSideLINAC/partA</folder>
     </map>
-		<map sourceVariableName="Ist/Name/dieser/doubleScalar">
+		<map sourceVariableName="Dieser/Name/ist/doubleScalar">
 			<unrollPath pathSep="/">True</unrollPath>
     </map>
 	</application>
