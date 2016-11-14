@@ -12,18 +12,33 @@ find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 
 #Do not put the ControlSystemAdapter as required. We will install it if it is not found.
-find_package(ChimeraTK-ControlSystemAdapter)
+#list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-3.5/Modules/")
 
+find_package(ChimeraTK-ControlSystemAdapter)
+find_package(mtca4u-deviceaccess)
+
+if(NOT mtca4u-deviceaccess_FOUND)		
+		ExternalProject_Add(external-ChimeraTK-DeviceAccess
+			GIT_REPOSITORY "https://github.com/ChimeraTK/DeviceAccess.git"
+			GIT_TAG "master"
+			CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess"
+			)
+		list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-3.5/Modules/")
+	endif()
+	
 #Install the ControlSystemAdapter if it is not pre-installed
 if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
   message("Installing ChimeraTK-ControlSystemAdapter as external dependency inside the build directory.")
-  message("You will not be able to make a proper installation of the OPCUA_Adapter. Only use this for testing and development.\n")
+	message("You will not be able to make a proper installation of the OPCUA_Adapter. Only use this for testing and development.\n")
   ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
     GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
     #When creationg a tag, base it on a tag of the ControlSystemAdapter so it stays stable
-    GIT_TAG "00.02.00"
-    #GIT_TAG "master"
-    CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK"
+    #GIT_TAG "00.02.00"
+    GIT_TAG "master"
+    DEPENDS external-ChimeraTK-DeviceAccess
+    CMAKE_ARGS 
+    "-DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}"
+    "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter" 
     )
   #FIXME: Find a better name for this variable
   set(USE_SELFINSTALLED_ControlSystemAdapter TRUE)
@@ -35,13 +50,13 @@ if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
   #ChimeraTK-ControlSystemAdapter_LINKER_FLAGS provides the rpath, not needed for testing
   #
   #We leave out the boost flags as the OPCUA_Adapter uses them itself
-  set(ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/include)
-  set(ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/lib)
+  set(ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/include)
+  set(ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/lib)
   set(ChimeraTK-ControlSystemAdapter_LIBRARIES ChimeraTK-ControlSystemAdapter)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
-link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
+#link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
 
 ##########################################################################################################
 ## Compiler specific stuff
@@ -95,7 +110,6 @@ include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 
 ## Project specific options
 option(ENABLE_BUILDMODEL      "Create model from XML description"      ON)
-
 ## Code quality control options
 option(ENABLE_COVERAGE        "Enable coverage stats and tests for adapter build" OFF)
 option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static code analysis using clangs analyzer." OFF)
@@ -181,6 +195,7 @@ endif()
 add_library(ControlSystemAdapterOPCUA SHARED $<TARGET_OBJECTS:mtca_objects>)
 target_link_libraries(ControlSystemAdapterOPCUA open62541)
 target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
+#target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-DeviceAccess_LIBRARIES})
 target_link_libraries(ControlSystemAdapterOPCUA pthread)
 target_link_libraries(ControlSystemAdapterOPCUA dl)
 target_link_libraries(ControlSystemAdapterOPCUA
@@ -239,13 +254,13 @@ add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/C
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapterOPCUA)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
+target_link_libraries(ControlSystemAdapterOPCUA ${LIBXML2_LIBRARIES})
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
   ${Boost_CHRONO_LIBRARY}
 )
-target_link_libraries(ControlSystemAdapterOPCUA ${LIBXML2_LIBRARIES})
 
 if(ENABLE_LINTING)
 add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
