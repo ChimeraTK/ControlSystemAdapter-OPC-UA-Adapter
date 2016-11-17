@@ -187,6 +187,9 @@ std::vector<_p_type>    mtca_processvariable::getValue_Array_##_p_type() { \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return v; \
     if (!this->csManager->getProcessVariable(this->namePV)->isArray()) return v; \
     v = this->csManager->getProcessArray<_p_type>(this->namePV)->get(); \
+    if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
+			this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
+		} \
     return v; \
 } \
 
@@ -222,6 +225,7 @@ void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) 
 			int32_t valueSize = this->csManager->getProcessArray<_p_type>(this->namePV)->get().size(); \
 			value.resize(valueSize); \
 			this->csManager->getProcessArray<_p_type>(this->namePV)->set(value); \
+			this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
 		} \
 	return; \
 }
