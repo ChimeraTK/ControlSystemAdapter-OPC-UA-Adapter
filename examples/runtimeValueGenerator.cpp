@@ -61,12 +61,12 @@ void runtimeValueGenerator::generateValues(shCSysPVManager csManager) {
 	clock_t start, end;
 	start = clock();
 	end = clock();
-	csManager->getProcessScalar<int32_t>("t")->set(start);
+	csManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {start});
 	
 	while(true) {
 //  FIXME -Or maybe not: The Const M_PI from math.h generate senceless values, hence I use fix value 3.141
 // 	double double_sine = csManager->getProcessScalar<double>("amplitude")->get() * sin(((2*M_PI)/csManager->getProcessScalar<int32_t>("period")->get()) * csManager->getProcessScalar<int32_t>("t")->get());
-		double double_sine = csManager->getProcessScalar<double>("amplitude")->get() * sin((2*3.141)/csManager->getProcessScalar<int32_t>("period")->get() * csManager->getProcessScalar<int32_t>("t")->get());
+		double double_sine = csManager->getProcessArray<double>("amplitude")->get().at(0) * sin((2*3.141)/csManager->getProcessArray<int32_t>("period")->get().at(0) * csManager->getProcessArray<int32_t>("t")->get().at(0));
 		int32_t int_sine = round(double_sine);
 		bool bool_sine = (double_sine > 0)? true : false;
 		
@@ -74,11 +74,11 @@ void runtimeValueGenerator::generateValues(shCSysPVManager csManager) {
 // 	std::cout << "int_sine: " << int_sine << std::endl;
 // 	std::cout << "bool_sine: " << bool_sine << std::endl;
 			
-		csManager->getProcessScalar<double>("double_sine")->set(double_sine);
-		csManager->getProcessScalar<int32_t>("int_sine")->set(int_sine); 			
-		csManager->getProcessScalar<int32_t>("t")->set((end - start)/(CLOCKS_PER_SEC/1000));	
+		csManager->getProcessArray<double>("double_sine")->set(vector<double> {double_sine});
+		csManager->getProcessArray<int32_t>("int_sine")->set(vector<int32_t> {int_sine}); 			
+		csManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {(end - start)/(CLOCKS_PER_SEC/1000)});	
 		
-		usleep(csManager->getProcessScalar<int32_t>("dt")->get());
+		usleep(csManager->getProcessArray<int32_t>("dt")->get().at(0));
 		end = clock();
 	}
 }

@@ -41,7 +41,6 @@ extern "C" {
 #include "mtca_processvariable.h"
 #include "xml_file_handler.h"
 
-#include "ChimeraTK/ControlSystemAdapter/ProcessScalar.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"

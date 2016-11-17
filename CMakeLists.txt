@@ -12,8 +12,6 @@ find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 
 #Do not put the ControlSystemAdapter as required. We will install it if it is not found.
-#list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-3.5/Modules/")
-
 find_package(ChimeraTK-ControlSystemAdapter)
 find_package(mtca4u-deviceaccess)
 
@@ -21,10 +19,18 @@ if(NOT mtca4u-deviceaccess_FOUND)
 		ExternalProject_Add(external-ChimeraTK-DeviceAccess
 			GIT_REPOSITORY "https://github.com/ChimeraTK/DeviceAccess.git"
 			GIT_TAG "master"
-			CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess"
+			CMAKE_ARGS 
+			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess"
 			)
+			
 		list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-3.5/Modules/")
+		
+		set(ChimeraTK-DeviceAccess_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/include)
+		set(ChimeraTK-DeviceAccess_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/lib)
+		set(ChimeraTK-DeviceAccess_LIBRARIES mtca4u-deviceaccess)
 	endif()
+	
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-DeviceAccess_CXX_FLAGS}")
 	
 #Install the ControlSystemAdapter if it is not pre-installed
 if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
@@ -56,7 +62,6 @@ if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
-#link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
 
 ##########################################################################################################
 ## Compiler specific stuff
@@ -81,11 +86,14 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/include/open62541/)
 include_directories(SYSTEM ${ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS})
+include_directories(SYSTEM ${ChimeraTK-DeviceAccess_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/examples/)
 include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR})
+
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 link_directories(${LIBXML2_LIBRARIES})
-
+link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
+link_directories(${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
                     
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
@@ -188,6 +196,7 @@ configure_file (
 add_library(mtca_objects OBJECT ${objectSources})
 if(USE_SELFINSTALLED_ControlSystemAdapter)
   ADD_DEPENDENCIES(mtca_objects external-ChimeraTK-ControlSystemAdapter) 
+  ADD_DEPENDENCIES(mtca_objects external-ChimeraTK-DeviceAccess) 
 endif()
 
 ## Early declaration due to the requirement to run the dependencies update prior to building
@@ -195,7 +204,8 @@ endif()
 add_library(ControlSystemAdapterOPCUA SHARED $<TARGET_OBJECTS:mtca_objects>)
 target_link_libraries(ControlSystemAdapterOPCUA open62541)
 target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
-#target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-DeviceAccess_LIBRARIES})
+target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-DeviceAccess_LIBRARIES})
+#target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
 target_link_libraries(ControlSystemAdapterOPCUA pthread)
 target_link_libraries(ControlSystemAdapterOPCUA dl)
 target_link_libraries(ControlSystemAdapterOPCUA
@@ -255,6 +265,8 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapterOPC
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
 target_link_libraries(ControlSystemAdapterOPCUA ${LIBXML2_LIBRARIES})
+target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
+target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-DeviceAccess_LIBRARIES})
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
