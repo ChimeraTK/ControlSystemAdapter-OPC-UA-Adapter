@@ -68,17 +68,6 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_int8_t(newVector);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds == 0);
-				BOOST_CHECK(test->getTimeStamp().seconds == 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() == 0);
-				BOOST_CHECK(test->getTimeStampSeconds() == 0);
 			}
 			else if (valueType == "uint8_t") {
 				BOOST_CHECK(valueType == "uint8_t");
@@ -90,17 +79,6 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_uint8_t(newVector);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds == 0);
-				BOOST_CHECK(test->getTimeStamp().seconds == 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() == 0);
-				BOOST_CHECK(test->getTimeStampSeconds() == 0);
 			}
 			else if (valueType == "int16_t") {
 				BOOST_CHECK(valueType == "int16_t");
@@ -112,17 +90,6 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_int16_t(newVector);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds == 0);
-				BOOST_CHECK(test->getTimeStamp().seconds == 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() == 0);
-				BOOST_CHECK(test->getTimeStampSeconds() == 0);
 			}
 			else if (valueType == "uint16_t") {
 				BOOST_CHECK(valueType == "uint16_t");
@@ -134,17 +101,6 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_uint16_t(newVector);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds == 0);
-				BOOST_CHECK(test->getTimeStamp().seconds == 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() == 0);
-				BOOST_CHECK(test->getTimeStampSeconds() == 0);
 			}
 			else if (valueType == "int32_t") {
 				BOOST_CHECK(valueType == "int32_t");
@@ -156,17 +112,6 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_int32_t(newVector);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds == 0);
-				BOOST_CHECK(test->getTimeStamp().seconds == 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() == 0);
-				BOOST_CHECK(test->getTimeStampSeconds() == 0);
 			}
 			else if (valueType == "uint32_t") {
 				BOOST_CHECK(valueType == "uint32_t");
@@ -178,17 +123,6 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_uint32_t(newVector);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds == 0);
-				BOOST_CHECK(test->getTimeStamp().seconds == 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() == 0);
-				BOOST_CHECK(test->getTimeStampSeconds() == 0);
 			}
 			else if (valueType == "float") {
 				BOOST_CHECK(valueType == "float");
@@ -211,17 +145,6 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_double(newVector);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds == 0);
-				BOOST_CHECK(test->getTimeStamp().seconds == 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() == 0);
-				BOOST_CHECK(test->getTimeStampSeconds() == 0);
 			}
 			else BOOST_CHECK(false);
 		const UA_NodeId nodeId = test->getOwnNodeId();

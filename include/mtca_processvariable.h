@@ -37,6 +37,7 @@ private:
   string namePV;
 	string nameNew;
 	string engineeringUnit;
+	string description;
 	UA_NodeId ownNodeId;
 	
 	boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager;
@@ -48,20 +49,11 @@ public:
 	
 	~mtca_processvariable();
 	
-	void setTimeStamp(ChimeraTK::TimeStamp timeStamp);
-	ChimeraTK::TimeStamp getTimeStamp();
-	
 	void setTimeStampSeconds(uint32_t seconds);
 	uint32_t getTimeStampSeconds();
 	
 	void setTimeStampNanoSeconds(uint32_t nanoSeconds);
 	uint32_t getTimeStampNanoSeconds();
-	
-	void setTimeStampIndex0(uint32_t index0);
-	uint32_t getTimeStampIndex0();
-	
-	void setTimeStampIndex1(uint32_t index1);
-	uint32_t getTimeStampIndex1();
 	
 	void setName(string name);
 	string getName();
@@ -71,6 +63,9 @@ public:
 	
 	void setEngineeringUnit(string engineeringUnit);
 	string getEngineeringUnit();
+	
+	void setDescription(string description);
+	string getDescription();
 	
 	UA_NodeId getOwnNodeId();
     

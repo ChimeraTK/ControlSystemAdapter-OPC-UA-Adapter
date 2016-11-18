@@ -76,13 +76,24 @@ string mtca_processvariable::getName() {
 
 // EngineeringUnit
 UA_WRPROXY_STRING(mtca_processvariable, setEngineeringUnit)
-void mtca_processvariable::setEngineeringUnit(std::string engineeringUnit) {
+void mtca_processvariable::setEngineeringUnit(string engineeringUnit) {
 	this->engineeringUnit = engineeringUnit;
 }
 
 UA_RDPROXY_STRING(mtca_processvariable, getEngineeringUnit)
 string mtca_processvariable::getEngineeringUnit() {
 	return this->engineeringUnit;
+}
+
+// Description
+UA_WRPROXY_STRING(mtca_processvariable, setDescription)
+void mtca_processvariable::setDescription(string description) {
+	this->description = description;
+}
+
+UA_RDPROXY_STRING(mtca_processvariable, getDescription)
+string mtca_processvariable::getDescription() {
+	return this->description;
 }
 
 // Type
@@ -107,18 +118,6 @@ string mtca_processvariable::getType() {
 //}
 
 // TimeStamp
-//UA_RDPROXY_UINT32(mtca_processvariable, getTimeStamp)
-ChimeraTK::TimeStamp mtca_processvariable::getTimeStamp() {
-    return this->csManager->getProcessVariable(this->namePV)->getTimeStamp();
-}
-
-/*
-//UA_WRPROXY_UINT32(mtca_processvariable, setTimeStamp)
-void mtca_processvariable::setTimeStamp(ChimeraTK::TimeStamp timeStamp) {
-    return; // Change of TimeStamp is not possible
-}
-*/
-
 UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampSeconds)
 uint32_t mtca_processvariable::getTimeStampSeconds() {
 	//cout << "Current TimeStamp: " << this->csManager->getProcessVariable(this->namePV)->getTimeStamp().seconds << endl;
@@ -144,29 +143,6 @@ void mtca_processvariable::setTimeStampNanoSeconds(uint32_t indexNanoSeconds) {
 }
 */
 
-UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampIndex0)
-uint32_t mtca_processvariable::getTimeStampIndex0() {
-	return this->csManager->getProcessVariable(this->namePV)->getTimeStamp().index0;
-}
-
-/*
-UA_WRPROXY_UINT32(mtca_processvariable, setTimeStampIndex0)
-void mtca_processvariable::setTimeStampIndex0(uint32_t index0) {
-	return;
-}
-*/
-
-UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampIndex1)
-uint32_t mtca_processvariable::getTimeStampIndex1() {
-	return this->csManager->getProcessVariable(this->namePV)->getTimeStamp().index1;
-}
-
-/*
-UA_WRPROXY_UINT32(mtca_processvariable, setTimeStampIndex1)
-void mtca_processvariable::setTimeStampIndex1(uint32_t index1) {
-	return;
-}
-*/
 
 /* Multivariant Read Functions for Value (without template-Foo) */
 #define CREATE_READ_FUNCTION(_p_type) \
@@ -328,17 +304,17 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME_ALLOC(1, this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAPROCESSVARIABLE), oAttr, &icb, &createdNodeId);
     
-    /* Use a function map to map any local functioncalls to opcua methods (we do not own any methods) */
-    UA_FunctionCall_Map mapThis;
-    this->ua_mapFunctions(this, &mapThis, createdNodeId);
+	/* Use a function map to map any local functioncalls to opcua methods (we do not own any methods) */
+	UA_FunctionCall_Map mapThis;
+	this->ua_mapFunctions(this, &mapThis, createdNodeId);
 	
 	// know your own nodeId
 	this->ownNodeId = createdNodeId;
     
-    /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
-    UA_DataSource_Map mapDs;
-    // FIXME: We should not be using std::cout here... Where's our logger?
-         std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
+	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
+	UA_DataSource_Map mapDs;
+	// FIXME: We should not be using std::cout here... Where's our logger?
+	std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
 				if (valueType == typeid(int8_t)) {
 					if(this->csManager->getProcessArray<int8_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(int8_t)
 					else PUSH_RDVALUE_ARRAY_TYPE(int8_t)
@@ -373,13 +349,9 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
 				}
 				else std::cout << "Cannot proxy unknown type " << typeid(valueType).name()  << std::endl;
 				
-		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_SECONDS), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampSeconds)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_NANOSECONDS), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampNanoSeconds)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX0), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex0)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TIMESTAMP_INDEX1), .read=UA_RDPROXY_NAME(mtca_processvariable, getTimeStampIndex1)});
 		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), .read=UA_RDPROXY_NAME(mtca_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(mtca_processvariable, setEngineeringUnit)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});
+		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), .read=UA_RDPROXY_NAME(mtca_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(mtca_processvariable, setEngineeringUnit)});
+		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});
 
 	this->ua_mapDataSources((void *) this, &mapDs);
 	
