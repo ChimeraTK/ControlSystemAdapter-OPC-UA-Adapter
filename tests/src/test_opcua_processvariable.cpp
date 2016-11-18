@@ -58,146 +58,6 @@ void ProcessVariableTest::testEmptySet(){
 		BOOST_CHECK(test->getEngineeringUnit() == "test");
 				
 		std::string valueType = test->getType();
-		if(!oneProcessVariable->isArray()) {
-			if (valueType == "int8_t") {
- 				BOOST_CHECK(valueType == "int8_t");
- 				BOOST_CHECK(test->getValue_int8_t() == 0);
- 				test->setValue_int8_t(111);
- 				BOOST_CHECK(test->getValue_int8_t() == 111);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds != 0);
-				BOOST_CHECK(test->getTimeStamp().seconds != 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() != 0);
-				BOOST_CHECK(test->getTimeStampSeconds() != 0);
-			}
-			else if (valueType == "uint8_t") {
-				BOOST_CHECK(valueType == "uint8_t");
-				BOOST_CHECK(test->getValue_uint8_t() == 0);
-				test->setValue_uint8_t(111);
-				BOOST_CHECK(test->getValue_uint8_t() == 111);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds != 0);
-				BOOST_CHECK(test->getTimeStamp().seconds != 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() != 0);
-				BOOST_CHECK(test->getTimeStampSeconds() != 0);
-			}
-			else if (valueType == "int16_t") {
-				BOOST_CHECK(valueType == "int16_t");
-				BOOST_CHECK(test->getValue_int16_t() == 0);
-				test->setValue_int16_t(987);
-				BOOST_CHECK(test->getValue_int16_t() == 987);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds != 0);
-				BOOST_CHECK(test->getTimeStamp().seconds != 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() != 0);
-				BOOST_CHECK(test->getTimeStampSeconds() != 0);
-			}
-			else if (valueType == "uint16_t") {
-				BOOST_CHECK(valueType == "uint16_t");
-				BOOST_CHECK(test->getValue_uint16_t() == 0);
-				test->setValue_uint16_t(987);
-				BOOST_CHECK(test->getValue_uint16_t() == 987);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds != 0);
-				BOOST_CHECK(test->getTimeStamp().seconds != 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() != 0);
-				BOOST_CHECK(test->getTimeStampSeconds() != 0);
-			}
-			else if (valueType == "int32_t") {
-				BOOST_CHECK(valueType == "int32_t");
-				BOOST_CHECK(test->getValue_int32_t() == 0);
-				test->setValue_int32_t(987);
-				BOOST_CHECK(test->getValue_int32_t() == 987);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds != 0);
-				BOOST_CHECK(test->getTimeStamp().seconds != 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() != 0);
-				BOOST_CHECK(test->getTimeStampSeconds() != 0);
-			}
-			else if (valueType == "uint32_t") {
-				BOOST_CHECK(valueType == "uint32_t");
-				BOOST_CHECK(test->getValue_uint32_t() == 0);
-				test->setValue_uint32_t(987);
-				BOOST_CHECK(test->getValue_uint32_t() == 987);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds != 0);
-				BOOST_CHECK(test->getTimeStamp().seconds != 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() != 0);
-				BOOST_CHECK(test->getTimeStampSeconds() != 0);
-			}
-			else if (valueType == "float") {
-				BOOST_CHECK(valueType == "float");
-				BOOST_CHECK(test->getValue_float() == 0);
-				test->setValue_float(987);
-				BOOST_CHECK(test->getValue_float() == 987);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds != 0);
-				BOOST_CHECK(test->getTimeStamp().seconds != 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() != 0);
-				BOOST_CHECK(test->getTimeStampSeconds() != 0);
-			}
-			else if (valueType == "double") {
-				BOOST_CHECK(valueType == "double");
-				BOOST_CHECK(test->getValue_double() == 0);
-				test->setValue_double(987);
-				BOOST_CHECK(test->getValue_double() == 987);
-				
-				// Check Time
-				BOOST_CHECK(test->getTimeStamp().index0 == 0);
-				BOOST_CHECK(test->getTimeStamp().index1 == 0);
-				BOOST_CHECK(test->getTimeStamp().nanoSeconds != 0);
-				BOOST_CHECK(test->getTimeStamp().seconds != 0);
-				
-				BOOST_CHECK(test->getTimeStampIndex0() == 0);
-				BOOST_CHECK(test->getTimeStampIndex1() == 0);
-				BOOST_CHECK(test->getTimeStampNanoSeconds() != 0);
-				BOOST_CHECK(test->getTimeStampSeconds() != 0);
-			}
-			else BOOST_CHECK(false);	
-		}
-		else {
 			if (valueType == "int8_t") {
 				BOOST_CHECK(valueType == "int8_t");
 				int32_t i = 0;
@@ -364,7 +224,6 @@ void ProcessVariableTest::testEmptySet(){
 				BOOST_CHECK(test->getTimeStampSeconds() == 0);
 			}
 			else BOOST_CHECK(false);
-		}
 		const UA_NodeId nodeId = test->getOwnNodeId();
 		BOOST_CHECK(!UA_NodeId_isNull(&nodeId));
 		
@@ -470,7 +329,7 @@ void ProcessVariableTest::testClientSide(){
 								if(browseNameFound2 == "Value") {
 									valueNodeId = refe->nodeId.nodeId;
 									name = browseNameFound;
-									//cout << "Checking ProcessVariable: " <<  name << endl;
+									cout << "Checking ProcessVariable: " <<  name << endl;
 								}
 								
 								if(browseNameFound2 == "EngineeringUnit") {
@@ -521,6 +380,7 @@ void ProcessVariableTest::testClientSide(){
 									
 									/* timeStamp check begin */
 									// set wrong value
+									cout << "Ausgabe: " << name << endl;
 									if(name.compare("uint16Scalar") == 0) {
 										uint32_t value = 123;
 										UA_StatusCode retvalValue = UA_STATUSCODE_BADUNEXPECTEDERROR;
