@@ -92,3 +92,8 @@ UA_StatusCode ua_mapped_class::ua_mapFunctions(void* srcClass, UA_FunctionCall_M
 UA_StatusCode ua_mapped_class::ua_mapDataSources(void* srcClass, UA_DataSource_Map *map) {
   return ua_callProxy_mapDataSources(this->mappedServer, this->ownedNodes, map, srcClass);
 }
+
+	
+UA_DateTime ua_mapped_class::getSourceTimeStamp() {
+	return this->sourceTimeStamp;	
+}

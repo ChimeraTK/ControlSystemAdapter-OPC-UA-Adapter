@@ -117,33 +117,6 @@ string mtca_processvariable::getType() {
   //return; // Change of Type is not possible
 //}
 
-// TimeStamp
-UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampSeconds)
-uint32_t mtca_processvariable::getTimeStampSeconds() {
-	//cout << "Current TimeStamp: " << this->csManager->getProcessVariable(this->namePV)->getTimeStamp().seconds << endl;
-	return this->csManager->getProcessVariable(this->namePV)->getTimeStamp().seconds;
-}
-
-/*
-UA_WRPROXY_UINT32(mtca_processvariable, setTimeStampSeconds)
-void mtca_processvariable::setTimeStampSeconds(uint32_t seconds) {
-	return;
-}
-*/
-
-UA_RDPROXY_UINT32(mtca_processvariable, getTimeStampNanoSeconds)
-uint32_t mtca_processvariable::getTimeStampNanoSeconds() {
-	return this->csManager->getProcessVariable(this->namePV)->getTimeStamp().nanoSeconds;
-}
-
-/*
-UA_WRPROXY_UINT32(mtca_processvariable, setTimeStampNanoSeconds)
-void mtca_processvariable::setTimeStampNanoSeconds(uint32_t indexNanoSeconds) {
-	return;
-}
-*/
-
-
 /* Multivariant Read Functions for Value (without template-Foo) */
 #define CREATE_READ_FUNCTION(_p_type) \
 _p_type    mtca_processvariable::getValue_##_p_type() { \
@@ -315,48 +288,57 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
 	UA_DataSource_Map mapDs;
 	// FIXME: We should not be using std::cout here... Where's our logger?
 	std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
-				if (valueType == typeid(int8_t)) {
-					if(this->csManager->getProcessArray<int8_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(int8_t)
-					else PUSH_RDVALUE_ARRAY_TYPE(int8_t)
-				}
-				else if (valueType == typeid(uint8_t)) {
-					if(this->csManager->getProcessArray<uint8_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(uint8_t)
-					else PUSH_RDVALUE_ARRAY_TYPE(uint8_t)
-				} 
-				else if (valueType == typeid(int16_t)) {
-					if(this->csManager->getProcessArray<int16_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(int16_t)
-					else PUSH_RDVALUE_ARRAY_TYPE(int16_t)
-				}
-				else if (valueType == typeid(uint16_t)) {
-					if(this->csManager->getProcessArray<uint16_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(uint16_t)
-					else PUSH_RDVALUE_ARRAY_TYPE(uint16_t)
-				}
-				else if (valueType == typeid(int32_t)) {
-					if(this->csManager->getProcessArray<int32_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(int32_t)
-					else PUSH_RDVALUE_ARRAY_TYPE(int32_t)
-				}
-				else if (valueType == typeid(uint32_t)) {
-					if(this->csManager->getProcessArray<uint32_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(uint32_t)
-					else PUSH_RDVALUE_ARRAY_TYPE(uint32_t)
-				}
-				else if (valueType == typeid(float)) {
-					if(this->csManager->getProcessArray<float>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(float)
-					else PUSH_RDVALUE_ARRAY_TYPE(float)
-				}
-				else if (valueType == typeid(double)) {
-					if(this->csManager->getProcessArray<double>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(double)
-					else PUSH_RDVALUE_ARRAY_TYPE(double)
-				}
-				else std::cout << "Cannot proxy unknown type " << typeid(valueType).name()  << std::endl;
+	if (valueType == typeid(int8_t)) {
+		if(this->csManager->getProcessArray<int8_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(int8_t)
+			else PUSH_RDVALUE_ARRAY_TYPE(int8_t)
+		}
+		else if (valueType == typeid(uint8_t)) {
+			if(this->csManager->getProcessArray<uint8_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(uint8_t)
+			else PUSH_RDVALUE_ARRAY_TYPE(uint8_t)
+		} 
+		else if (valueType == typeid(int16_t)) {
+			if(this->csManager->getProcessArray<int16_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(int16_t)
+			else PUSH_RDVALUE_ARRAY_TYPE(int16_t)
+		}
+		else if (valueType == typeid(uint16_t)) {
+			if(this->csManager->getProcessArray<uint16_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(uint16_t)
+			else PUSH_RDVALUE_ARRAY_TYPE(uint16_t)
+		}
+		else if (valueType == typeid(int32_t)) {
+			if(this->csManager->getProcessArray<int32_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(int32_t)
+			else PUSH_RDVALUE_ARRAY_TYPE(int32_t)
+		}
+		else if (valueType == typeid(uint32_t)) {
+			if(this->csManager->getProcessArray<uint32_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(uint32_t)
+			else PUSH_RDVALUE_ARRAY_TYPE(uint32_t)
+		}
+		else if (valueType == typeid(float)) {
+			if(this->csManager->getProcessArray<float>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(float)
+			else PUSH_RDVALUE_ARRAY_TYPE(float)
+		}
+		else if (valueType == typeid(double)) {
+			if(this->csManager->getProcessArray<double>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(double)
+			else PUSH_RDVALUE_ARRAY_TYPE(double)
+		}
+	else std::cout << "Cannot proxy unknown type " << typeid(valueType).name()  << std::endl;
 				
-		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName)});
-		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), .read=UA_RDPROXY_NAME(mtca_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(mtca_processvariable, setEngineeringUnit)});
-		mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), .read=UA_RDPROXY_NAME(mtca_processvariable, getDescription), .write=UA_WRPROXY_NAME(mtca_processvariable, setDescription)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), .read=UA_RDPROXY_NAME(mtca_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(mtca_processvariable, setEngineeringUnit)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});
 
 	this->ua_mapDataSources((void *) this, &mapDs);
 	
 	return UA_STATUSCODE_GOOD;
 }
+	
+/** @brief Reimplement the SourceTimeStamp to timestamp of the csa_config
+ *
+ */
+UA_DateTime mtca_processvariable::getSourceTimeStamp() {
+	return (this->csManager->getProcessVariable(this->namePV)->getTimeStamp().seconds * UA_SEC_TO_DATETIME) + (this->csManager->getProcessVariable(this->namePV)->getTimeStamp().nanoSeconds * UA_USEC_TO_DATETIME / 1000LL) + UA_DATETIME_UNIX_EPOCH;
+}
+
 
 UA_NodeId mtca_processvariable::getOwnNodeId() {
 	return this->ownNodeId;

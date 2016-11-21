@@ -72,7 +72,7 @@ UA_StatusCode UA_CALLPROXY_NAME(_CLASS_P,_CLASS_F)(void *methodHandle, const UA_
 #define UA_RDPROXY_TAIL() \
 value->hasValue = UA_TRUE; \
 if (includeSourceTimeStamp) { \
-value->sourceTimestamp = (thisObj->getTimeStampSeconds() * UA_SEC_TO_DATETIME) + (thisObj->getTimeStampNanoSeconds() * UA_USEC_TO_DATETIME / 1000LL) + UA_DATETIME_UNIX_EPOCH; \
+value->sourceTimestamp =  thisObj->getSourceTimeStamp(); \
 value->hasSourceTimestamp = UA_TRUE; \
 }\
 return UA_STATUSCODE_GOOD; } // Ends Fnct

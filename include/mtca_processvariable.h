@@ -49,12 +49,8 @@ public:
 	
 	~mtca_processvariable();
 	
-	void setTimeStampSeconds(uint32_t seconds);
-	uint32_t getTimeStampSeconds();
-	
-	void setTimeStampNanoSeconds(uint32_t nanoSeconds);
-	uint32_t getTimeStampNanoSeconds();
-	
+	UA_DateTime getSourceTimeStamp();
+		
 	void setName(string name);
 	string getName();
 	

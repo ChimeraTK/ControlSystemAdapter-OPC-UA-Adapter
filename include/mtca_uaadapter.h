@@ -52,10 +52,10 @@ struct ServerConfig {
 	string rootFolder = "DefaultRootFolder";
 	string descriptionFolder = "No description is set";
 	UA_Boolean	UsernamePasswordLogin = UA_FALSE;
-	string password	= "DefaultPassword";
-	string username = "DefaultUser";
+	string password;
+	string username;
 	string applicationName = "DefaultApplication";
-	uint16_t opcuaPort = 16660;
+	uint16_t opcuaPort;
 };
 
 class mtca_uaadapter : ua_mapped_class, public ipc_managed_object {

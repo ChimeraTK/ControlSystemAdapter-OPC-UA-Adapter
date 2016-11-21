@@ -40,23 +40,25 @@ class ua_mapped_class {
 	
 protected:
  
-  UA_Client *mappedClient;
-  nodePairList ownedNodes;
-  UA_NodeId baseNodeId;
-
+	UA_Client *mappedClient;
+	nodePairList ownedNodes;
+	UA_NodeId baseNodeId;
+	UA_DateTime sourceTimeStamp;
+	
 public:
-    ua_mapped_class(UA_Server *server, UA_NodeId *baseNodeId);
-    ua_mapped_class(UA_Server *server, UA_NodeId baseNodeId);
-    ua_mapped_class();
-    ~ua_mapped_class();
+	ua_mapped_class(UA_Server *server, UA_NodeId *baseNodeId);
+	ua_mapped_class(UA_Server *server, UA_NodeId baseNodeId);
+	ua_mapped_class();
+	~ua_mapped_class();
     
-		UA_Server *mappedServer;
-		 
-		UA_StatusCode ua_mapSelfToNamespace();
-    UA_StatusCode ua_unmapSelfFromNamespace();
-    UA_StatusCode ua_mapFunctions(void* srcClass, UA_FunctionCall_Map *map, UA_NodeId objectId);
-    UA_StatusCode ua_mapDataSources(void* srcClass, UA_DataSource_Map* map);
-
+	UA_Server *mappedServer;
+	 
+	UA_StatusCode ua_mapSelfToNamespace();
+	UA_StatusCode ua_unmapSelfFromNamespace();
+	UA_StatusCode ua_mapFunctions(void* srcClass, UA_FunctionCall_Map *map, UA_NodeId objectId);
+	UA_StatusCode ua_mapDataSources(void* srcClass, UA_DataSource_Map* map);
+	UA_DateTime getSourceTimeStamp();
+	
 };
 
 #endif // UA_MAPPED_CLASS_H
