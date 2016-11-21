@@ -1,22 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <uamapping>
-	<config id="10001" rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
+	<config rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
 		<serverConfig applicationName="OPCUAServer" port="16660" />
 		<login username="test" password="test123" /> 
 	</config>
-	<config id="10002" rootFolder="TestFolder_2" description="Ich bin die Beschreibung des TestFolders">
-		<serverConfig applicationName="OPCUAServer" port="16661" />
-		<login username="test" password="test123" /> 
-	</config>
-	<config id="10003" rootFolder="TestFolder_3" description="Ich bin die Beschreibung des TestFolders">
-		<serverConfig applicationName="OPCUAServer" port="16662" />
-		<login username="test" password="test123" /> 
-	</config>
-	<config id="10004" rootFolder="TestFolder_4" description="Ich bin die Beschreibung des TestFolders">
-		<serverConfig applicationName="OPCUAServer" port="16663" />
-		<login username="test" password="test123" /> 
-	</config>
-	
+
 	<additionalNodes folderName="AdditionalNodesFolder" description="DescriptionOfAdditionalNodes">
 		<variable browseName="BrowseName1" displayname="displayName1" description="myDescription1" value="Wert1" />
 		<variable browseName="BrowseName2" displayname="displayName2" description="myDescription2" value="Wert2" />
@@ -30,7 +18,7 @@
 	</additionalNodes>
 
 	<application name="WinAA">
-		<map sourceVariableName="Mein/Name_ist#int8Array" rename="Array_s15_int8">
+		<map sourceVariableName="Mein/Name_ist#int8Array" rename="Array_s15_int8" engineeringUnit="Test" description="">
 			<unrollPath pathSep="_">True</unrollPath>
 			<unrollPath pathSep="/">True</unrollPath>
 			<unrollPath pathSep="#">True</unrollPath>
@@ -83,7 +71,7 @@
 			<unrollPath pathSep="/">False</unrollPath>
 		  <folder>EastSide/LINAC</folder>
     </map>
-		<map sourceVariableName="Ist/Name/dieser/doubleScalar">
+		<map sourceVariableName="Ist/Name/dieser/doubleScalar" engineeringUnit="Test" description="">
 			<unrollPath pathSep="/">True</unrollPath>
 		  <folder></folder>
     </map>

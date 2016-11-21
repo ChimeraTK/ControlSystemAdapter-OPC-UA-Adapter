@@ -52,6 +52,7 @@ SUBPROJECTS=1
 SUBPROJECTS_NAMES[0]="open62541"
 SUBPROJECTS_VCS[0]="git"
 SUBPROJECTS_URI[0]="https://github.com/open62541/open62541.git"
+SUBPROJECTS_BRANCH[0]=""
 SUBPROJECTS_CMAKEOPTIONS[0]="-DUA_ENABLE_AMALGAMATION=On -DBUILD_SHARED_LIBS=On -DUA_ENABLE_GENERATE_NAMESPACE0=On -DUA_ENABLE_METHODCALLS=ON -DUA_ENABLE_NODEMANAGEMENT=ON -DUA_ENABLE_SUBSCRIPTIONS=ON"
 
 #SUBPROJECTS_NAMES[1]="ControlSystemAdapter"
@@ -62,10 +63,15 @@ SUBPROJECTS_CMAKEOPTIONS[0]="-DUA_ENABLE_AMALGAMATION=On -DBUILD_SHARED_LIBS=On 
 function vcs_getProject() {
     VCS="$1"
     URI="$2"
-    TGTDIR="$3"
+		BRANCH="$3"
+    TGTDIR="$4"
     
     if [ $VCS == "git" -o $VCS="GIT" ]; then
+			if [$BRANCH == ""]; then
         git $OPTIONS clone "$URI" "$TGTDIR"
+			else
+				git $OPTIONS clone -b $BRANCH "$URI" "$TGTDIR"
+			fi
     elif  [ $VCS == "svn" -o $VCS="SVN" ]; then
         svn $OPTIONS checkout "$URI" "$TGTDIR"
     fi
@@ -74,10 +80,11 @@ function vcs_getProject() {
 function vcs_updateProject() {
     VCS="$1"
     URI="$2"
-    TGTDIR="$3"
+		BRANCH="$3"
+    TGTDIR="$4"
     
     if [ $VCS == "git" -o $VCS="GIT" ]; then
-        git -C "$TGTDIR" fetch 
+        git -C "$TGTDIR" fetch
     elif  [ $VCS == "svn" -o $VCS="SVN" ]; then
         svn $OPTIONS update "$TGTDIR"
     fi
@@ -94,9 +101,9 @@ function installAll() {
     log "Fetching/Updating subproject $I ${SUBPROJECTS_NAMES[$I]}"
     # Decide whether to clone or pull 
     if [ -d "$PROJECT_DEPENDENCIES_DIR/${SUBPROJECTS_NAMES[$I]}" ]; then
-        vcs_updateProject "${SUBPROJECTS_VCS[$I]}" "${SUBPROJECTS_URI[$I]}" "$PROJECT_DEPENDENCIES_DIR/${SUBPROJECTS_NAMES[$I]}"
+        vcs_updateProject "${SUBPROJECTS_VCS[$I]}" "${SUBPROJECTS_URI[$I]}" "${SUBPROJECTS_BRANCH[$I]}" "$PROJECT_DEPENDENCIES_DIR/${SUBPROJECTS_NAMES[$I]}"
     else
-        vcs_getProject "${SUBPROJECTS_VCS[$I]}" "${SUBPROJECTS_URI[$I]}" "$PROJECT_DEPENDENCIES_DIR/${SUBPROJECTS_NAMES[$I]}"
+        vcs_getProject "${SUBPROJECTS_VCS[$I]}" "${SUBPROJECTS_URI[$I]}" "${SUBPROJECTS_BRANCH[$I]}" "$PROJECT_DEPENDENCIES_DIR/${SUBPROJECTS_NAMES[$I]}"
     fi
     
     I=$((I+1))

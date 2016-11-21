@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Julian Rahm <Julian.Rahm@tu-dresden.de>
+ * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,44 +24,34 @@
  *
  */
 
-#ifndef CONTROLSYSTEMADAPTER_OPCUA_H
-#define CONTROLSYSTEMADAPTER_OPCUA_H
+#ifndef MTCA_ADDITIONALVARIABLE_H
+#define MTCA_ADDITIONALVARIABLE_H
 
-#include <vector>
-#include "ipc_managed_object.h"
+#include "ua_mapped_class.h"
 
-#include "mtca_uaadapter.h"
-#include "mtca_processvariable.h"
+using namespace std;
 
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
-
-typedef boost::shared_ptr<ChimeraTK::ControlSystemPVManager> shCSysPVManager;
-
-class ControlSystemAdapterOPCUA {
+class mtca_additionalvariable : ua_mapped_class {
 private:
-	ipc_manager    *mgr;
-	mtca_uaadapter *adapter;
+  string value;
+	string name;
+	string description;
+
+	UA_NodeId ownNodeId;
+	UA_StatusCode mapSelfToNamespace();
 	
-	shCSysPVManager csManager;
-	string configId;
-	
-	void ControlSystemAdapterOPCUA_InitServer(string configFile);
-	void ControlSystemAdapterOPCUA_InitVarMapping(shCSysPVManager csManager);
-    
 public:
-	ControlSystemAdapterOPCUA(shCSysPVManager csManager, string configFile);
-	~ControlSystemAdapterOPCUA();
-    
-	shCSysPVManager const & getControlSystemPVManager() const;
-	mtca_uaadapter* getUAAdapter();
-	 
-	string getConfigId();
+	mtca_additionalvariable(UA_Server *server, UA_NodeId basenodeid, string name, string value, string description);
 	
-	ipc_manager* getIPCManager();
-	void start();
-	void stop();
-	void terminate();
-	bool isRunning();
+	~mtca_additionalvariable();
+	
+	UA_DateTime getSourceTimeStamp();
+		
+	void setValue(string value);
+	string getValue();
+	
+	
+	UA_NodeId getOwnNodeId();
 };
 
-#endif // CONTROLSYSTEMADAPTER_H
+#endif // MTCA_ADDITIONALVARIABLE_H

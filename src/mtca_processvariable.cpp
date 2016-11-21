@@ -48,12 +48,15 @@ mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenode
   	this->mapSelfToNamespace();
 }
 
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, std::string namePV, std::string nameNew, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
+mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
 	
 	// FIXME Check if name member of a csManager Parameter
 	this->namePV = namePV;
 	this->nameNew = nameNew;
 	this->csManager = csManager;
+	
+	setEngineeringUnit(engineeringUnit);
+	setDescription(description);
 	
 	this->mapSelfToNamespace();
 }

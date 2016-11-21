@@ -102,7 +102,9 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ControlSystemAdapterOPCUA.cpp
                    ${CMAKE_SOURCE_DIR}/src/xml_file_handler.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_processvariable.cpp
+                   ${CMAKE_SOURCE_DIR}/src/mtca_additionalvariable.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_uaadapter.cpp
+                   
                    
                    # Example HelperClass
                    ${CMAKE_SOURCE_DIR}/examples/runtimeValueGenerator.cpp

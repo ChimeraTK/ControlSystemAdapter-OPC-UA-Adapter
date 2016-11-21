@@ -57,7 +57,7 @@ public:
 	UA_StatusCode ua_unmapSelfFromNamespace();
 	UA_StatusCode ua_mapFunctions(void* srcClass, UA_FunctionCall_Map *map, UA_NodeId objectId);
 	UA_StatusCode ua_mapDataSources(void* srcClass, UA_DataSource_Map* map);
-	UA_DateTime getSourceTimeStamp();
+	virtual UA_DateTime getSourceTimeStamp()=0;
 	
 };
 

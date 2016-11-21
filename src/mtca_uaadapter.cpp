@@ -39,6 +39,7 @@ extern "C" {
 
 #include "mtca_uaadapter.h"
 #include "mtca_processvariable.h"
+#include "mtca_additionalvariable.h"
 #include "xml_file_handler.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
@@ -57,11 +58,11 @@ using namespace std;
  * config-file parameter will parsed and are set to the right variable.
  * 
  */
-mtca_uaadapter::mtca_uaadapter(string configFile, string configId) : ua_mapped_class() {
+mtca_uaadapter::mtca_uaadapter(string configFile) : ua_mapped_class() {
 	// XML file handling for variable mapping, just an example...
 	this->fileHandler = new xml_file_handler(configFile);
 	
-	this->readConfig(configId);
+	this->readConfig();
 	
 	this->mtca_uaadapter_constructserver();
 	
@@ -125,13 +126,19 @@ void mtca_uaadapter::mtca_uaadapter_constructserver() {
     mtca_namespaceinit_generated(this->mappedServer);
 }
 
-void mtca_uaadapter::readConfig(string configId) {
+void mtca_uaadapter::readConfig() {
 	
-	string xpath = "//config[@id=" + configId + "]";
+	string xpath = "//config";
 	xmlXPathObjectPtr result = this->fileHandler->getNodeSet(xpath);	
 	string placeHolder = "";
 	if(result) {
 		xmlNodeSetPtr nodeset = result->nodesetval;
+		
+		// There should be only one <config>-Tag in config file
+		if(nodeset->nodeNr > 1) {
+			cout << "More than one <config>-Tag was found in config file. Please provide only one Tag." << endl;
+			exit(0);
+		}		
 		
 		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "rootFolder");
 		if(!placeHolder.empty()) {
@@ -195,29 +202,10 @@ void mtca_uaadapter::readAdditionalNodes() {
 				vector<xmlNodePtr> variableNodeList = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "variable");
 				
 				for(auto variableNode: variableNodeList) {
-					UA_StatusCode retval = UA_STATUSCODE_GOOD;
-					UA_NodeId createdNodeId = UA_NODEID_NULL;
-						
-					UA_VariableAttributes vAttr; 
-					UA_VariableAttributes_init(&vAttr);
-					vAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->fileHandler->getAttributeValueFromNode(variableNode, "displayname").c_str());
-					vAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->fileHandler->getAttributeValueFromNode(variableNode, "description").c_str());
-					vAttr.valueRank = -1;
-					vAttr.writeMask = 0x01;
-					vAttr.userWriteMask = 0x01;
-					vAttr.accessLevel = UA_ACCESSLEVELMASK_READ;
-					vAttr.userAccessLevel= UA_ACCESSLEVELMASK_READ;
-					vAttr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
-					UA_String myInteger = UA_STRING((char*)this->fileHandler->getAttributeValueFromNode(variableNode, "value").c_str());
-					UA_Variant_setScalar(&vAttr.value, &myInteger, &UA_TYPES[UA_TYPES_STRING]);
-					/*
-					 * Mybe it is useful to set a specific type
-					 */
-					// this->fileHandler->getAttributeValueFromNode(variableNode, "type");
-					UA_Server_addVariableNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
-																		folderNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-																		UA_QUALIFIEDNAME(1, (char*)this->fileHandler->getAttributeValueFromNode(variableNode, "browseName").c_str()), 
-																		UA_NODEID_NULL, vAttr, NULL, &createdNodeId);    
+					string name = this->fileHandler->getAttributeValueFromNode(variableNode, "browseName").c_str();
+					string value = this->fileHandler->getAttributeValueFromNode(variableNode, "value");
+					string description = this->fileHandler->getAttributeValueFromNode(variableNode, "description");
+					this->additionalVariables.push_back(new mtca_additionalvariable(this->mappedServer, folderNodeId, name, value, description));
 				}
 			}
 		}
@@ -280,6 +268,8 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 				applicName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i]->parent, "name");
 				// Check if "rename" is not empty
 				string renameVar = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "rename");
+				string engineeringUnit = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "engineeringUnit");
+				string description = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "description");
 			
 				// Application Name have to be unique!!!
 				UA_NodeId appliFolderNodeId = this->existFolder(this->ownNodeId, applicName);
@@ -346,7 +336,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 						if(varPathVector.size() > 0) {
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 						}						
-						this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, mgr));
+						this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, mgr));
 						createdVar = true;
 				}
 				
@@ -356,7 +346,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 					if(varPathVector.size() > 0) {
 						newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 					}
-					this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, mgr));
+					this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, mgr));
 				}
  			}
 		}
@@ -366,7 +356,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 }
 
 void mtca_uaadapter::addConstant(std::string varName, shCSysPVManager mgr) {
-    this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, varName, mgr));
+    this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, mgr));
 }
 
 vector<mtca_processvariable *> mtca_uaadapter::getVariables() {
@@ -551,4 +541,8 @@ vector<string> mtca_uaadapter::getAllNotMappableVariablesNames() {
 	}
 	
 	return notMappableVariablesNames;
+}
+
+UA_DateTime mtca_uaadapter::getSourceTimeStamp() {
+	return UA_DateTime_now();
 }

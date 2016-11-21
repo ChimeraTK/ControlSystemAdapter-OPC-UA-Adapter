@@ -34,6 +34,7 @@
 #ifndef UA_free
   #define UA_free(_p_ptr) free(_p_ptr)
 #endif
+#define UA_NS2ID_MTCAADDITIONALVARIABLE 1005
 #define UA_NS2ID_MTCAMODULE 1002
 #define UA_NS2ID_MTCAPROCESSVARIABLE 1001
 #define UA_NS2ID_MTCATIMESTAMP 1004

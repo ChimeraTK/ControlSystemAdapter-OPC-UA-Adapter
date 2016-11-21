@@ -46,19 +46,19 @@ extern "C" {
  * This class provide the two parts of the OPCUA Adapter. First of all the OPCUA server starts with a random port number (recommended 16664),
  * following the mapping process start. For this, the ProcessVariable from ControlSystemPVManager will be mapped to the OPCUA Model 
  */ 
-ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(shCSysPVManager csManager, string configFile, string configId) {
+ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(shCSysPVManager csManager, string configFile) {
 	this->configId = configId;
 	this->csManager = csManager;
-	this->ControlSystemAdapterOPCUA_InitServer(configFile, configId);
+	this->ControlSystemAdapterOPCUA_InitServer(configFile);
 	this->ControlSystemAdapterOPCUA_InitVarMapping(csManager);
 }
 
 // Init the OPCUA server
-void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(string configFile, string configId) {
+void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(string configFile) {
     this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
 
     // Create new server adapter
-     this->adapter = new mtca_uaadapter(configFile, configId);
+     this->adapter = new mtca_uaadapter(configFile);
   
     this->mgr->addObject(this->adapter);
     this->mgr->doStart(); // Implicit: Startet Worker-Threads aller ipc_managed_objects, die mit addObject registriert wurden  

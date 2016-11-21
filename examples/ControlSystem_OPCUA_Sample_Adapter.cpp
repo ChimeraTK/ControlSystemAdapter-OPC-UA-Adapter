@@ -55,8 +55,7 @@ extern "C" {
 
 #include "runtimeValueGenerator.h"
 
-using std::cout;
-using std::endl;
+using namespace std;
 using namespace ChimeraTK;
 
 /* GLOBAL VAR */
@@ -139,7 +138,7 @@ int main() {
 	
 	// Only for ValueGenerator
 	ipc_manager *mgr;
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, "../uamapping.xml", "10001");
+	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, "../uamapping.xml");
 	mgr = csaOPCUA->getIPCManager();
 	runtimeValueGenerator *valGen = new runtimeValueGenerator(csManager);
 	mgr->addObject(valGen);

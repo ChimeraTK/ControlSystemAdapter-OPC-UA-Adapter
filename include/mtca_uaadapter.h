@@ -32,6 +32,7 @@
 #include "ua_mapped_class.h"
 #include "ipc_managed_object.h"
 #include "mtca_processvariable.h"
+#include "mtca_additionalvariable.h"
 #include "xml_file_handler.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
@@ -75,6 +76,7 @@ private:
 	
 	vector<mtca_processvariable *> variables;
 	vector<mtca_processvariable *> constants;
+	vector<mtca_additionalvariable *> additionalVariables;
 	vector<mtca_processvariable *> mappedVariables;
 	
 	xml_file_handler *fileHandler;
@@ -84,8 +86,10 @@ private:
 	UA_NodeId createUAFolder(UA_NodeId basenodeid, string folderName, string description = "");
 	
 public:
-	mtca_uaadapter(string configPath, string configId);
+	mtca_uaadapter(string configPath);
 	~mtca_uaadapter();
+	
+	UA_DateTime getSourceTimeStamp();
 	
 	UA_NodeId createFolderPath(UA_NodeId basenodeid, vector<string> folderPathVector);
 	UA_NodeId createFolder(UA_NodeId basenodeid, string folder, string description = "");
@@ -102,7 +106,7 @@ public:
 	
 	void workerThread();
 	
-	void readConfig(string configId);
+	void readConfig();
 	void readAdditionalNodes();
 	
 	vector<string> getAllNotMappableVariablesNames();

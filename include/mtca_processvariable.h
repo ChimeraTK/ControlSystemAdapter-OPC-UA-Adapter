@@ -44,8 +44,8 @@ private:
 	UA_StatusCode mapSelfToNamespace();
 	
 public:
-	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, std::string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
-	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, string nameNew, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
+	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
+	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager);
 	
 	~mtca_processvariable();
 	
