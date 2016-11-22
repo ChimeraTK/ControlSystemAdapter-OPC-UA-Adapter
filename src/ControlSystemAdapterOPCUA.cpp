@@ -26,6 +26,18 @@
  *
  */
 
+/**
+* @mainpage Example program
+*
+* Description of the project
+* You can force new lines in the HTML documentation with <br>
+*
+* With the <img-keyword you can add own pictures
+* <img src="../images/application_screenshot.jpg" alt="Screenshot">
+*
+* @author Jack Pot
+*/ 
+
 extern "C" {
 #include "unistd.h"
 }
@@ -95,11 +107,6 @@ shCSysPVManager const & ControlSystemAdapterOPCUA::getControlSystemPVManager() c
 
 mtca_uaadapter* ControlSystemAdapterOPCUA::getUAAdapter() {
 	return this->adapter;
-}
-
-// Maybe needed, return the OPCUA Portnumber
-string ControlSystemAdapterOPCUA::getConfigId() {
-	return this->configId;
 }
 
 ipc_manager* ControlSystemAdapterOPCUA::getIPCManager() {

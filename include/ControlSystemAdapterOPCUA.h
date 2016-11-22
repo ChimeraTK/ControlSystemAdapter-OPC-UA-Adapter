@@ -54,8 +54,6 @@ public:
     
 	shCSysPVManager const & getControlSystemPVManager() const;
 	mtca_uaadapter* getUAAdapter();
-	 
-	string getConfigId();
 	
 	ipc_manager* getIPCManager();
 	void start();

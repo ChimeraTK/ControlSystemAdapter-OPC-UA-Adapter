@@ -14,7 +14,7 @@
     </Aliases>
     <Extensions>
         <Extension>
-            <ModelInfo Tool="UaModeler" Hash="MKD5dtAahEp0SBwSiVJpmg==" Version="1.4.4"/>
+            <ModelInfo Tool="UaModeler" Hash="M4Mm9oCL1cjC2Mztza+1Ag==" Version="1.4.4"/>
         </Extension>
     </Extensions>
     <UAVariable DataType="UInt32" ParentNodeId="i=11487" NodeId="ns=1;i=6017" BrowseName="1:seconds" UserAccessLevel="3" AccessLevel="3">
@@ -84,13 +84,16 @@
             <Reference ReferenceType="HasComponent">ns=1;i=6010</Reference>
         </References>
     </UAObjectType>
-    <UAVariable DataType="String" ParentNodeId="ns=1;i=1001" NodeId="ns=1;i=6001" BrowseName="1:description" UserAccessLevel="3" AccessLevel="3">
-        <DisplayName>description</DisplayName>
+    <UAVariable SymbolicName="description" DataType="String" ParentNodeId="ns=1;i=1001" NodeId="ns=1;i=6001" BrowseName="1:Description" UserAccessLevel="3" AccessLevel="3">
+        <DisplayName>Description</DisplayName>
         <References>
             <Reference ReferenceType="HasTypeDefinition">i=63</Reference>
             <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1001</Reference>
             <Reference ReferenceType="HasModellingRule">i=78</Reference>
         </References>
+        <Value>
+            <uax:String></uax:String>
+        </Value>
     </UAVariable>
     <UAVariable DataType="String" ParentNodeId="ns=1;i=1001" NodeId="ns=1;i=6006" BrowseName="1:EngineeringUnit" UserAccessLevel="3" AccessLevel="3">
         <DisplayName>EngineeringUnit</DisplayName>

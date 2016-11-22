@@ -49,9 +49,7 @@ public:
 		
 	void setValue(string value);
 	string getValue();
-	
-	
-	UA_NodeId getOwnNodeId();
+
 };
 
 #endif // MTCA_ADDITIONALVARIABLE_H

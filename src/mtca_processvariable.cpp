@@ -24,6 +24,14 @@
  *
  */
 
+/** @class mtca_processvariable 
+ *	@brief This Class is for the information content of a OPC UA Server 
+ *   
+ *  @author Chris Iatrou, Julian Rahm
+ *  @date 22.11.2016
+ * 
+ */
+
 #include "mtca_processvariable.h"
 #include "csa_config.h"
 
@@ -38,6 +46,14 @@ extern "C" {
 
 using namespace std;
 
+/** @brief Constructor from mtca_processvaribale for generic creation
+ * 
+ * @param server A UA_Server type, with all server specific information from the used server
+ * @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
+ * @param namePV Name of the process variable from control-system-adapter, is needed to fetch the rigth process varibale from PV-Manager
+ * @param csManager The hole PVManager from control-system-adapter 
+ * 
+ */
 mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
   	
   	// FIXME Check if name member of a csManager Parameter
@@ -48,6 +64,17 @@ mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenode
   	this->mapSelfToNamespace();
 }
 
+/** @brief Constructor from mtca_processvaribale for mapped process variables
+ * 
+ * @param server A UA_Server type, with all server specific information from the used server
+ * @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
+ * @param namePV Name of the process variable from control-system-adapter, is needed to fetch the rigth process varibale from PV-Manager
+ * @param nameNew Display name for the new UA_ObjectNode, only used for changing the Name form mapped-xml
+ * @param engineringUnit Change the current engineering unit of process variable
+ * @param description Change the current description of process varibale
+ * @param csManager The hole PVManager from control-system-adapter 
+ * 
+ */
 mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
 	
 	// FIXME Check if name member of a csManager Parameter
@@ -55,15 +82,22 @@ mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenode
 	this->nameNew = nameNew;
 	this->csManager = csManager;
 	
-	setEngineeringUnit(engineeringUnit);
-	setDescription(description);
+	if(!engineeringUnit.empty()) {
+		setEngineeringUnit(engineeringUnit);
+	}
+	if(!description.empty()) {
+		setDescription(description);
+	}
 	
 	this->mapSelfToNamespace();
 }
 
+/** @brief Destructor for mtca_processvariable
+ * 
+ */
 mtca_processvariable::~mtca_processvariable()
 {
-  // Our ua_mapped_class destructor will take care of deleting our opcua footprint as long as all variables are mapped in this->ownedNodes
+  //* Our ua_mapped_class destructor will take care of deleting our opcua footprint as long as all variables are mapped in this->ownedNodes
 }
 
 // Name
@@ -85,7 +119,10 @@ void mtca_processvariable::setEngineeringUnit(string engineeringUnit) {
 
 UA_RDPROXY_STRING(mtca_processvariable, getEngineeringUnit)
 string mtca_processvariable::getEngineeringUnit() {
-	return this->engineeringUnit;
+	if(!this->engineeringUnit.empty()) {
+		return this->engineeringUnit;
+	}
+	return this->csManager->getProcessVariable(this->namePV)->getUnit();
 }
 
 // Description
@@ -96,7 +133,10 @@ void mtca_processvariable::setDescription(string description) {
 
 UA_RDPROXY_STRING(mtca_processvariable, getDescription)
 string mtca_processvariable::getDescription() {
-	return this->description;
+	if(!this->description.empty()) {
+		return this->description;
+	}
+	return this->csManager->getProcessVariable(this->namePV)->getDescription();
 }
 
 // Type

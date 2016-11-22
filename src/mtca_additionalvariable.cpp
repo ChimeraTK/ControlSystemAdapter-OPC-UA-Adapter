@@ -98,7 +98,3 @@ UA_StatusCode mtca_additionalvariable::mapSelfToNamespace() {
 UA_DateTime mtca_additionalvariable::getSourceTimeStamp() {
 	return UA_DateTime_now();
 }
-
-UA_NodeId mtca_additionalvariable::getOwnNodeId() {
-	return this->ownNodeId;
-}
