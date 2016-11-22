@@ -24,8 +24,8 @@ void UAAdapterTest::testExampleSet() {
 	cout << "UAAdapterTest with ExampleSet started." << endl;
 	TestFixturePVSet tfExampleSet;
 	 // Create the managers
-	mtca_uaadapter *adapter = new mtca_uaadapter("../../tests/uamapping_test.xml", "10002");
-	xml_file_handler *xmlHandler = new xml_file_handler("../../tests/uamapping_test.xml");
+	mtca_uaadapter *adapter = new mtca_uaadapter("../../tests/uamapping_test_2.xml");
+	xml_file_handler *xmlHandler = new xml_file_handler("../../tests/uamapping_test_2.xml");
 	
 	// is Server running?
 	adapter->doStart();
@@ -82,7 +82,8 @@ void UAAdapterTest::testExampleSet() {
 	BOOST_CHECK(adapter->getVariables().size() > 0);
 	
 	/* Check if both var are not mapped */
-	BOOST_CHECK(adapter->getAllNotMappableVariablesNames().size() == 2);
+	cout << "Größe von: " << adapter->getAllNotMappableVariablesNames().size() << endl;
+	BOOST_CHECK(adapter->getAllNotMappableVariablesNames().size() == 6);
 		
 	adapter->~mtca_uaadapter();
 	free(adapter);

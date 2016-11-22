@@ -49,13 +49,15 @@ void ProcessVariableTest::testEmptySet(){
 	//mtca_processvariable *test;
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
 		//std::cout << "Checking ProcessVariable: " <<  oneProcessVariable->getName() << std::endl;
-		mtca_processvariable *test = new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), oneProcessVariable->getName(), pvSet.csManager);
+		mtca_processvariable *test = new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), oneProcessVariable->getName(), "", "", pvSet.csManager);
 
 		BOOST_CHECK(test->getName() == oneProcessVariable->getName());
 		
 		BOOST_CHECK(test->getEngineeringUnit() == "");
 		test->setEngineeringUnit("test");
 		BOOST_CHECK(test->getEngineeringUnit() == "test");
+		
+		BOOST_CHECK(test->getSourceTimeStamp() == ((oneProcessVariable->getTimeStamp().seconds * UA_SEC_TO_DATETIME) + (oneProcessVariable->getTimeStamp().nanoSeconds * UA_USEC_TO_DATETIME / 1000LL) + UA_DATETIME_UNIX_EPOCH));
 				
 		std::string valueType = test->getType();
 			if (valueType == "int8_t") {
@@ -157,32 +159,30 @@ void ProcessVariableTest::testEmptySet(){
 		
 		test->~mtca_processvariable();
   }  	
-  
+
   serverSet->runUAServer = UA_FALSE;
 	UA_Server_delete(serverSet->mappedServer);
- 	
+
  	if (serverThread->joinable()) {
-  		serverThread->join();
-  	}
- 
+  	serverThread->join();
+  }
+
  	delete serverThread;
 	delete(serverSet); 
-	
 };
 
 void ProcessVariableTest::testClientSide(){ 
 	std::cout << "Enter ProcessVariableTest with ExampleSet and ClientSide testing" << std::endl;
-	
+
 	TestFixtureServerSet *serverSet = new TestFixtureServerSet;	
 	TestFixturePVSet pvSet;
-	
 	thread *serverThread = new std::thread(UA_Server_run, serverSet->mappedServer, &serverSet->runUAServer);
-	
+
 	// check server
 	if (serverSet->mappedServer == nullptr) {
 		BOOST_CHECK(false);
 	}
-	
+
 	// add set
 	vector<mtca_processvariable*> varList;
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
@@ -209,8 +209,7 @@ void ProcessVariableTest::testClientSide(){
 	UA_BrowseResponse bResp = UA_Client_Service_browse(client, bReq);
 	
 	for (size_t i = 0; i < bResp.resultsSize; ++i) {
-		for (size_t j = 0; j < bResp.results[i].referencesSize; ++j) {
-		
+		for (size_t j = 0; j < bResp.results[i].referencesSize; ++j) {		
 		UA_ReferenceDescription *ref = &(bResp.results[i].references[j]);
 		if(ref->nodeId.nodeId.identifierType == UA_NODEIDTYPE_NUMERIC) {
 						
@@ -230,6 +229,7 @@ void ProcessVariableTest::testClientSide(){
 			UA_NodeId typeNodeId = UA_NODEID_NULL;
 			UA_NodeId nameNodeId = UA_NODEID_NULL;
 			UA_NodeId engineeringUnitNodeId = UA_NODEID_NULL;
+			UA_NodeId descriptionNodeId = UA_NODEID_NULL;
 			string name = "";
 			
 					UA_ReferenceDescription *refe;
@@ -254,142 +254,13 @@ void ProcessVariableTest::testClientSide(){
 									name = browseNameFound;
 									cout << "Checking ProcessVariable: " <<  name << endl;
 								}
-								
 								if(browseNameFound2 == "EngineeringUnit") {
 									engineeringUnitNodeId = refe->nodeId.nodeId;
 								}
 								
-								/* timeStamp Begin */
-								if(browseNameFound2 == "timeStamp") {
-									// TimeStamp Request
-									UA_BrowseRequest bReq4TimeStamp;
-									UA_BrowseRequest_init(&bReq4TimeStamp);
-									bReq4TimeStamp.requestedMaxReferencesPerNode = 0;
-									bReq4TimeStamp.nodesToBrowse = UA_BrowseDescription_new();
-									bReq4TimeStamp.nodesToBrowseSize = 1;
-									bReq4TimeStamp.nodesToBrowse[0].nodeId = refe->nodeId.nodeId; 
-									bReq4TimeStamp.nodesToBrowse[0].resultMask = UA_BROWSERESULTMASK_ALL; 
-									UA_BrowseResponse bResp4TimeStamp = UA_Client_Service_browse(client, bReq4TimeStamp);		
-									
-									UA_NodeId tsSecondsNodeId = UA_NODEID_NULL;
-									UA_NodeId tsNanoSecondsNodeId = UA_NODEID_NULL;
-									UA_NodeId tsIndex0NodeId = UA_NODEID_NULL;
-									UA_NodeId tsIndex1NodeId = UA_NODEID_NULL;
-									
-									UA_ReferenceDescription *refDes4TimeStamp;
-									for (size_t o = 0; o < bResp4TimeStamp.resultsSize; ++o) {
-										for (size_t r = 0; r < bResp4TimeStamp.results[o].referencesSize; ++r) {
-											refDes4TimeStamp = &(bResp4TimeStamp.results[o].references[r]);
-											if(refDes4TimeStamp->nodeId.nodeId.identifierType == UA_NODEIDTYPE_NUMERIC) {
-											
-												size_t lenBrowseName4TimeStamp = (int)refDes4TimeStamp->browseName.name.length;
-												string browseName4TimeStamp(reinterpret_cast<char const*>(refDes4TimeStamp->browseName.name.data), lenBrowseName4TimeStamp);
-												if(browseName4TimeStamp == "seconds") {
-													tsSecondsNodeId = refDes4TimeStamp->nodeId.nodeId;
-												}
-												if(browseName4TimeStamp == "nanoseconds") {
-													tsNanoSecondsNodeId = refDes4TimeStamp->nodeId.nodeId;
-												}
-												if(browseName4TimeStamp == "index0") {
-													tsIndex0NodeId = refDes4TimeStamp->nodeId.nodeId;
-												}
-												if(browseName4TimeStamp == "index1") {
-													tsIndex1NodeId = refDes4TimeStamp->nodeId.nodeId;
-												}
-												
-											}
-										}
-									}
-									
-									/* timeStamp check begin */
-									// set wrong value
-									cout << "Ausgabe: " << name << endl;
-									if(name.compare("uint16Scalar") == 0) {
-										uint32_t value = 123;
-										UA_StatusCode retvalValue = UA_STATUSCODE_BADUNEXPECTEDERROR;
-										UA_Variant *timeStampToCheck = UA_Variant_new();
-										// Seconds
-										UA_Variant_init(timeStampToCheck);
-										retvalValue = UA_Client_readValueAttribute(client, tsSecondsNodeId, timeStampToCheck);
-										if(retvalValue != UA_STATUSCODE_GOOD) {
-											BOOST_CHECK(false);
-										}
-										value = (uint32_t) *((uint32_t*) timeStampToCheck->data);
-										BOOST_CHECK(value != 0);
-										
-										// NanoSeconds
-										UA_Variant_init(timeStampToCheck);
-										retvalValue = UA_Client_readValueAttribute(client, tsNanoSecondsNodeId, timeStampToCheck);
-										if(retvalValue != UA_STATUSCODE_GOOD) {
-											BOOST_CHECK(false);
-										}
-										value = (uint32_t) *((uint32_t*) timeStampToCheck->data);
-										BOOST_CHECK(value != 0);
-										
-										// Index0
-										UA_Variant_init(timeStampToCheck);
-										retvalValue = UA_Client_readValueAttribute(client, tsIndex0NodeId, timeStampToCheck);
-										if(retvalValue != UA_STATUSCODE_GOOD) {
-											BOOST_CHECK(false);
-										}
-										value = (uint32_t) *((uint32_t*) timeStampToCheck->data);
-										BOOST_CHECK(value == 0);
-										
-										// Index1
-										UA_Variant_init(timeStampToCheck);
-										retvalValue = UA_Client_readValueAttribute(client, tsIndex1NodeId, timeStampToCheck);
-										if(retvalValue != UA_STATUSCODE_GOOD) {
-											BOOST_CHECK(false);
-										}
-										value = (uint32_t) *((uint32_t*) timeStampToCheck->data);
-										BOOST_CHECK(value == 0);
-									}
-									
-									if(name.compare("Dein/Name/ist/int32Scalar") == 0) {
-										uint32_t value = 123;
-										UA_StatusCode retvalValue = UA_STATUSCODE_BADUNEXPECTEDERROR;
-										UA_Variant *timeStampToCheck = UA_Variant_new();
-										// Seconds
-										UA_Variant_init(timeStampToCheck);
-										retvalValue = UA_Client_readValueAttribute(client, tsSecondsNodeId, timeStampToCheck);
-										if(retvalValue != UA_STATUSCODE_GOOD) {
-											BOOST_CHECK(false);
-										}
-										value = (uint32_t) *((uint32_t*) timeStampToCheck->data);
-										BOOST_CHECK(value != 0);
-										
-										// NanoSeconds
-										UA_Variant_init(timeStampToCheck);
-										retvalValue = UA_Client_readValueAttribute(client, tsNanoSecondsNodeId, timeStampToCheck);
-										if(retvalValue != UA_STATUSCODE_GOOD) {
-											BOOST_CHECK(false);
-										}
-										value = (uint32_t) *((uint32_t*) timeStampToCheck->data);
-										BOOST_CHECK(value != 0);
-										
-										// Index0
-										UA_Variant_init(timeStampToCheck);
-										retvalValue = UA_Client_readValueAttribute(client, tsIndex0NodeId, timeStampToCheck);
-										if(retvalValue != UA_STATUSCODE_GOOD) {
-											BOOST_CHECK(false);
-										}
-										value = (uint32_t) *((uint32_t*) timeStampToCheck->data);
-										BOOST_CHECK(value == 0);
-										
-										// Index1
-										UA_Variant_init(timeStampToCheck);
-										retvalValue = UA_Client_readValueAttribute(client, tsIndex1NodeId, timeStampToCheck);
-										if(retvalValue != UA_STATUSCODE_GOOD) {
-											BOOST_CHECK(false);
-										}
-										value = (uint32_t) *((uint32_t*) timeStampToCheck->data);
-										BOOST_CHECK(value == 0);
-									}
-										
-										
-									/* timeStamp check end */
+								if(browseNameFound2 == "Description") {
+									descriptionNodeId = refe->nodeId.nodeId;
 								}
-								/* timeStamp End */
 							}
 						}
 					}
@@ -424,6 +295,13 @@ void ProcessVariableTest::testClientSide(){
 									if(retvalValueEu != UA_STATUSCODE_GOOD) {
 										BOOST_CHECK(false);
 									}
+									
+									UA_Variant *descToCheck = UA_Variant_new();
+									UA_Variant_init(descToCheck);
+									UA_StatusCode retvalValueDesc = UA_Client_readValueAttribute(client, descriptionNodeId, descToCheck);
+									if(retvalValueDesc != UA_STATUSCODE_GOOD) {
+										BOOST_CHECK(false);
+									}
 
 									UA_NodeId datatypeId;
 									if(retvalValue == UA_STATUSCODE_GOOD) {
@@ -432,16 +310,16 @@ void ProcessVariableTest::testClientSide(){
 											BOOST_CHECK(false);
 										}
 									}
-									
+										
+										
 									if(retvalValue == UA_STATUSCODE_GOOD) {
 										string datatype = "";
 										string valName = "";
-										
+
 										// Check EngineeringUnit -> for all the same
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), valName);
 										//cout << "EngineeringUnit: " << valName << endl;
 										BOOST_CHECK(valName == "");
-										
 										// Write new engineering unit
 										UA_String newEU;
 										UA_String_init(&newEU);
@@ -451,9 +329,24 @@ void ProcessVariableTest::testClientSide(){
 										UA_Variant_setScalarCopy(euToCheck, &newEU, &UA_TYPES[UA_TYPES_STRING]);
 										UA_StatusCode retvalNewEU = UA_Client_writeValueAttribute(client, engineeringUnitNodeId, euToCheck);
 										UA_String_deleteMembers(&newEU);
-										
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), valName);
 										BOOST_CHECK(valName == "mHensel/Iatrou");
+										
+										// Check Description -> for all the same
+										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) descToCheck->data)), valName);
+										//cout << "Description: " << valName << endl;
+										BOOST_CHECK(valName == "");
+										// Write new engineering unit
+										UA_String newDesc;
+										UA_String_init(&newDesc);
+										merker = "Beschreibung";
+										CPPSTRING_TO_UASTRING(newDesc, merker);
+										UA_Variant_init(descToCheck);
+										UA_Variant_setScalarCopy(descToCheck, &newDesc, &UA_TYPES[UA_TYPES_STRING]);
+										UA_StatusCode retvalNewDesc = UA_Client_writeValueAttribute(client, descriptionNodeId, descToCheck);
+										UA_String_deleteMembers(&newDesc);
+										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) descToCheck->data)), valName);
+										BOOST_CHECK(valName == "Beschreibung");
 										
 										// i know, this part is perfecly for makro stuff... but common, for maintainability reason we should use simple code... 
 										if(valueToCheck->arrayLength < 1) {
@@ -1021,6 +914,10 @@ void ProcessVariableTest::testClientSide(){
 										}
 									}
 									UA_Variant_delete(valueToCheck);
+									UA_Variant_delete(euToCheck);
+									UA_Variant_delete(nameToCheck);
+									UA_Variant_delete(datatypeToCheck);
+									UA_Variant_delete(descToCheck);
 						}
 					}
 		}
@@ -1041,11 +938,6 @@ void ProcessVariableTest::testClientSide(){
 	delete(serverSet); 
 
 };
-
-void ProcessVariableTest::checkTimeStamp(UA_NodeId test) {
-
-
-}
 
 
 class ProcessVariableTestSuite: public test_suite {
