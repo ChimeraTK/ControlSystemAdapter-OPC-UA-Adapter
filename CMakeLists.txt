@@ -64,6 +64,18 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
 
 ##########################################################################################################
+## Copy mapping.xml into build folder
+##########################################################################################################
+if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+	message("Copy mapping files into build folder.")
+	file(GLOB mappingFiles "${CMAKE_SOURCE_DIR}/*_mapping.xml")
+	foreach(mappingFile ${mappingFiles})
+		file(COPY ${mappingFile} DESTINATION ${CMAKE_BINARY_DIR}/)
+		message("Copy ${mappingFile}")
+	endforeach(mappingFile)
+endif()         
+                       
+##########################################################################################################
 ## Compiler specific stuff
 ##########################################################################################################
 
@@ -105,6 +117,7 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_additionalvariable.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_uaadapter.cpp
                    
+                   ${CMAKE_SOURCE_DIR}/src/CSA_OPCUA_Application.cpp
                    
                    # Example HelperClass
                    ${CMAKE_SOURCE_DIR}/examples/runtimeValueGenerator.cpp
@@ -165,8 +178,8 @@ if(ENABLE_UNIT_TESTS)
 endif()
 
 if(BUILD_STATIC_ANALYSIS)
-  set(CMAKE_C_COMPILER   ccc-analyzer)
-  set(CMAKE_CXX_COMPILER ccc-analyzer)
+  set(CMAKE_C_COMPILER   clang)
+  set(CMAKE_CXX_COMPILER clang++)
   add_definitions(-o ${PROJECT_BINARY_DIR}/static-analysis})
 endif()
 

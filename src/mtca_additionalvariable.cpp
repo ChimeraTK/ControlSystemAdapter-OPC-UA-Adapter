@@ -87,7 +87,7 @@ UA_StatusCode mtca_additionalvariable::mapSelfToNamespace() {
     
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_additionalvariable, getValue)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(mtca_additionalvariable, getValue)});
 			
 
 	this->ua_mapDataSources((void *) this, &mapDs);

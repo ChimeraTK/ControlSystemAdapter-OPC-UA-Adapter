@@ -26,13 +26,11 @@
  *
  */
 
-
 extern "C" {
     #include <unistd.h>
     #include <signal.h>
 		#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
-
 
 #include <iostream>
 #include <math.h>
@@ -45,42 +43,51 @@ extern "C" {
 #include <sys/sysinfo.h>
 
 #include "open62541.h"
-#include "ControlSystemAdapterOPCUA.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
-#include "ipc_manager.h"
+#include "ChimeraTK/ControlSystemAdapter/PersistentDataStorage.h"
 
+#include "ipc_manager.h"
+#include "ControlSystemAdapterOPCUA.h"
 #include "runtimeValueGenerator.h"
 
 using namespace std;
 using namespace ChimeraTK;
 
-/* GLOBAL VAR */
-ControlSystemAdapterOPCUA *csaOPCUA;
-
+	ipc_manager *mgr;
+	runtimeValueGenerator *valGen;
+		ControlSystemAdapterOPCUA *csaOPCUA;
+	
 /* FUNCTIONS */
 static void SigHandler_Int(int sign) {
     cout << "Received SIGINT... terminating" << endl;
-    csaOPCUA->stop();
-    csaOPCUA->terminate();
+		valGen->doStop();
+		valGen->terminate();
+		valGen->~runtimeValueGenerator();
+		csaOPCUA->stop();
+		csaOPCUA->terminate();
+		csaOPCUA->~ControlSystemAdapterOPCUA();
     cout << "terminated threads" << endl;
 }
-
+	
 int main() {
 	signal(SIGINT,  SigHandler_Int); // Registriert CTRL-C/SIGINT
 	signal(SIGTERM, SigHandler_Int); // Registriert SIGTERM
-    
+
 	// Create the managers
 	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers = createPVManager();
     
 	boost::shared_ptr<DevicePVManager> devManager = pvManagers.second;
 	boost::shared_ptr<ControlSystemPVManager> csManager = pvManagers.first;
-    
-	ControlSystemSynchronizationUtility syncUtil(csManager);
-    
+	
+	boost::shared_ptr<ControlSystemSynchronizationUtility> syncUtility;
+	syncUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
+
+	//csManager->enablePersistentDataStorage();
+	
 	/*
 	 * Generate dummy data
 	 */
@@ -100,14 +107,7 @@ int main() {
 	ProcessArray<int32_t>::SharedPtr intB15A32dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "int32Array_s15", 15);
 	ProcessArray<uint32_t>::SharedPtr intB10Au32dev = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "uint32Array_s10", 10);
 	ProcessArray<double>::SharedPtr intB15Afdev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleArray_s15", 15);
-	ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s10", 10);
-	
-	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(0) = 12;
-	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(1) = 13;
-	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(2) = 14;
-	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(3) = 15;
-	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(4) = 16;
-	
+	ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s10", 10);	
 	// data generation cycle time in ms
 	ProcessArray<int32_t>::SharedPtr dtDev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "dt", 1);
 	// time since server start in ms
@@ -125,6 +125,12 @@ int main() {
 	ProcessArray<int32_t>::SharedPtr intA32devMap = devManager->createProcessArray<int32_t>(controlSystemToDevice, "Ist/Name/dieser/int32Scalar", 1);
 	ProcessArray<double>::SharedPtr doubledevMap = devManager->createProcessArray<double>(controlSystemToDevice, "Ist/Name/dieser/doubleScalar", 1);
 	
+	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(0) = 12;
+	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(1) = 13;
+	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(2) = 14;
+	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(3) = 15;
+	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(4) = 16;
+	
 	// start values
 	int32_t microseconds = 1000000;
 	int32_t period = 3.141;
@@ -134,13 +140,15 @@ int main() {
 	csManager->getProcessArray<int32_t>("dt")->set(vector<int32_t> {microseconds});
 	csManager->getProcessArray<int32_t>("period")->set(vector<int32_t> {period});
 	csManager->getProcessArray<double>("amplitude")->set(vector<double> {amplitude});
+	
 	cout << "Dummy Daten geschrieben..." << std::endl;	
 	
-	// Only for ValueGenerator
-	ipc_manager *mgr;
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, "../uamapping.xml");
-	mgr = csaOPCUA->getIPCManager();
-	runtimeValueGenerator *valGen = new runtimeValueGenerator(csManager);
+	string pathToConfig = "opcuaAdapter_mapping.xml";
+	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, pathToConfig);
+	
+	// Only for Sin ValueGenerator
+	mgr = new ipc_manager();
+	valGen = new runtimeValueGenerator(csManager);
 	mgr->addObject(valGen);
 	mgr->doStart();	
 	

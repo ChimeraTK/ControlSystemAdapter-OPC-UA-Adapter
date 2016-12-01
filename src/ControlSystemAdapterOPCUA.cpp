@@ -53,16 +53,25 @@ extern "C" {
 #include "mtca_processvariable.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
+#include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
+#include "ChimeraTK/ControlSystemAdapter/PVManager.h"
+#include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
 
 /**
  * This class provide the two parts of the OPCUA Adapter. First of all the OPCUA server starts with a random port number (recommended 16664),
  * following the mapping process start. For this, the ProcessVariable from ControlSystemPVManager will be mapped to the OPCUA Model 
  */ 
-ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(shCSysPVManager csManager, string configFile) {
-	this->configId = configId;
-	this->csManager = csManager;
+ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
+		
+// 	string object_name = ChimeraTK::ApplicationBase::getInstance().getName().c_str();
+//   ChimeraTK::ApplicationBase::getInstance().setPVManager(csManager);
+// 	ChimeraTK::ApplicationBase::getInstance().initialise();
+	this->csManager = csManager; 	
 	this->ControlSystemAdapterOPCUA_InitServer(configFile);
-	this->ControlSystemAdapterOPCUA_InitVarMapping(csManager);
+	this->ControlSystemAdapterOPCUA_InitVarMapping();
+	
+	
+	//ChimeraTK::ApplicationBase::getInstance().run();
 }
 
 // Init the OPCUA server
@@ -77,18 +86,20 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(string conf
 }
 
 // Mapping the ProcessVariables to the server
-void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping(shCSysPVManager csManager) {
+void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping() {
     // Get all ProcessVariables
-    vector<ProcessVariable::SharedPtr> allProcessVariables = csManager->getAllProcessVariables();
+    vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
   
     for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
-        adapter->addVariable(oneProcessVariable->getName(), csManager);
+        adapter->addVariable(oneProcessVariable->getName(), this->csManager);
     }
     
     vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
-		cout << "The following VariableNodes cant be mapped, because they are not member in the PV-Manager:" << endl;
-		for(string var:allNotMappedVariables) {
-			cout << var << endl;
+		if(allNotMappedVariables.size() > 0) {
+			cout << "The following VariableNodes cant be mapped, because they are not member in the PV-Manager:" << endl;
+			for(string var:allNotMappedVariables) {
+				cout << var << endl;
+			}
 		}
 }
 
@@ -101,7 +112,7 @@ ControlSystemAdapterOPCUA::~ControlSystemAdapterOPCUA() {
 
 
 // Maybe needed, return the ControlSystemPVManager
-shCSysPVManager const & ControlSystemAdapterOPCUA::getControlSystemPVManager() const {
+boost::shared_ptr<ControlSystemPVManager> const & ControlSystemAdapterOPCUA::getControlSystemManager() const {
     return this->csManager;
 }
 

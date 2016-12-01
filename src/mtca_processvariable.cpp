@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
+ * Copyright (c) 2016
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -70,7 +70,7 @@ mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenode
  * @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
  * @param namePV Name of the process variable from control-system-adapter, is needed to fetch the rigth process varibale from PV-Manager
  * @param nameNew Display name for the new UA_ObjectNode, only used for changing the Name form mapped-xml
- * @param engineringUnit Change the current engineering unit of process variable
+ * @param engineeringUnit Change the current engineering unit of process variable
  * @param description Change the current description of process varibale
  * @param csManager The hole PVManager from control-system-adapter 
  * 
@@ -122,6 +122,10 @@ string mtca_processvariable::getEngineeringUnit() {
 	if(!this->engineeringUnit.empty()) {
 		return this->engineeringUnit;
 	}
+	else {
+		this->engineeringUnit = this->csManager->getProcessVariable(this->namePV)->getUnit();
+		return this->engineeringUnit;
+	}
 	return this->csManager->getProcessVariable(this->namePV)->getUnit();
 }
 
@@ -134,6 +138,10 @@ void mtca_processvariable::setDescription(string description) {
 UA_RDPROXY_STRING(mtca_processvariable, getDescription)
 string mtca_processvariable::getDescription() {
 	if(!this->description.empty()) {
+		return this->description;
+	}
+	else {
+		this->description = this->csManager->getProcessVariable(this->namePV)->getDescription();
 		return this->description;
 	}
 	return this->csManager->getProcessVariable(this->namePV)->getDescription();
@@ -163,7 +171,7 @@ string mtca_processvariable::getType() {
 /* Multivariant Read Functions for Value (without template-Foo) */
 #define CREATE_READ_FUNCTION(_p_type) \
 _p_type    mtca_processvariable::getValue_##_p_type() { \
-		_p_type v; \
+		_p_type v = NULL; \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return 0; \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() == 1) { \
 			v = this->csManager->getProcessArray<_p_type>(this->namePV)->get().at(0); \
@@ -287,13 +295,13 @@ CREATE_WRITE_FUNCTION_ARRAY(double)
 // Just a macro to easy pushing different types of dataSources
 // ... and make sure we lock down writing to receivers in this stage already
  #define PUSH_RDVALUE_TYPE(_p_typeName) { \
- if(this->csManager->getProcessVariable(this->namePV)->isWriteable())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
-     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName) }); }\
+ if(this->csManager->getProcessVariable(this->namePV)->isWriteable())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
+     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName) }); }\
  }
     
 #define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) { \
-if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \
-    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName) }); } \
+if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \
+    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName) }); } \
 }
 
 UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
@@ -329,6 +337,8 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
+	UA_LocalizedText description;
+	description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->csManager->getProcessVariable(this->namePV)->getDescription().c_str());
 	// FIXME: We should not be using std::cout here... Where's our logger?
 	std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
 	if (valueType == typeid(int8_t)) {
@@ -364,24 +374,23 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
 			else PUSH_RDVALUE_ARRAY_TYPE(double)
 		}
 	else std::cout << "Cannot proxy unknown type " << typeid(valueType).name()  << std::endl;
-				
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), .read=UA_RDPROXY_NAME(mtca_processvariable, getName)});
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), .read=UA_RDPROXY_NAME(mtca_processvariable, getDescription), .write=UA_WRPROXY_NAME(mtca_processvariable, setDescription)});
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), .read=UA_RDPROXY_NAME(mtca_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(mtca_processvariable, setEngineeringUnit)});
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});
+	
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(mtca_processvariable, getName)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(mtca_processvariable, getDescription), .write=UA_WRPROXY_NAME(mtca_processvariable, setDescription)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(mtca_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(mtca_processvariable, setEngineeringUnit)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});
 
-	this->ua_mapDataSources((void *) this, &mapDs);
+ 	this->ua_mapDataSources((void *) this, &mapDs);
 	
 	return UA_STATUSCODE_GOOD;
 }
 	
-/** @brief Reimplement the SourceTimeStamp to timestamp of the csa_config
+/** @brief Reimplement the SourceTimeStamp to timestamp of csa_config
  *
  */
 UA_DateTime mtca_processvariable::getSourceTimeStamp() {
 	return (this->csManager->getProcessVariable(this->namePV)->getTimeStamp().seconds * UA_SEC_TO_DATETIME) + (this->csManager->getProcessVariable(this->namePV)->getTimeStamp().nanoSeconds * UA_USEC_TO_DATETIME / 1000LL) + UA_DATETIME_UNIX_EPOCH;
 }
-
 
 UA_NodeId mtca_processvariable::getOwnNodeId() {
 	return this->ownNodeId;

@@ -40,8 +40,6 @@
 using namespace ChimeraTK;
 using namespace std;
   
-typedef boost::shared_ptr<ControlSystemPVManager> shCSysPVManager;
-
 struct FolderInfo {
 	string folderName;
 	UA_NodeId folderNodeId = UA_NODEID_NULL;
@@ -97,8 +95,8 @@ public:
 	UA_NodeId existFolder(UA_NodeId basenodeid, string folder);
 	
     
-	void addVariable(string name, shCSysPVManager mgr);
-	void addConstant(string name, shCSysPVManager mgr);
+	void addVariable(string name, boost::shared_ptr<ControlSystemPVManager> csmgr);
+	void addConstant(string name, boost::shared_ptr<ControlSystemPVManager> csmgr);
 	
 	UA_NodeId getOwnNodeId();
 	vector<mtca_processvariable *> getVariables();

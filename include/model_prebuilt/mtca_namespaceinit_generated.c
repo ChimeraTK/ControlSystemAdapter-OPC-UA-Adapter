@@ -186,19 +186,22 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 5001), UA_NODEID_NUMERIC(0, 
 
 do {
 // Referencing node found and declared as parent: ns=2;i=1001/1:mtcaProcessVariable using i=47/HasComponent
-// Node: opcua_node_variable_t(ns=2;i=6001), 1:description
+// Node: opcua_node_variable_t(ns=2;i=6001), 1:Description
 UA_VariableAttributes attr;
 UA_VariableAttributes_init(&attr);
-attr.displayName = UA_LOCALIZEDTEXT("", "description");
+attr.displayName = UA_LOCALIZEDTEXT("", "Description");
 attr.description = UA_LOCALIZEDTEXT("", "");
 attr.accessLevel = 3;
 attr.userAccessLevel = 3;
 attr.valueRank = -1;
+UA_String *opcua_node_variable_t_ns_2_i_6001_variant_DataContents =  UA_String_new();
+*opcua_node_variable_t_ns_2_i_6001_variant_DataContents = UA_STRING_ALLOC("");
+UA_Variant_setScalar( &attr.value, opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
 UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6001);
 UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
 UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
 UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 47);
-UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "description");
+UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "Description");
 UA_Server_addVariableNode(server, nodeId, parentNodeId, parentReferenceNodeId, nodeName
        , typeDefinition
        , attr, NULL, NULL);

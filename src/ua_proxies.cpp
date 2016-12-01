@@ -164,13 +164,23 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
     
     // Found a mapping, now register the dataSource
     UA_DataSource ds;
-    ds.read = ele->read;
+    ds.read = ele->read;		
     ds.write = ele->write;
+		if(ele->write == NULL) {
+			cout << "Fehlt1" << endl;
+			const UA_UInt32 test = 1;
+			retval = UA_Server_writeAccessLevel(server, instantiatedId, test);
+		}
+		if(ele->write != NULL) {
+			cout << "Fehlt nicht" << endl;
+			retval = UA_Server_writeAccessLevel(server, instantiatedId, (const UA_UInt32)UA_ACCESSLEVELMASK_WRITE);
+		}
     ds.handle = srcClass;
-    delete ele; // inhibit memleak warning during static analysis
-    
-    retval |= UA_Server_setVariableNode_dataSource(server, (const UA_NodeId) instantiatedId, ds);
-
+       
+    retval |= UA_Server_setVariableNode_dataSource(server, instantiatedId, ds);
+		
+		UA_Server_writeDescription(server, instantiatedId, ele->description);
+		delete ele; // inhibit memleak warning during static analysis
 	/* Set the right Value Datatype and ValueRank
 	 * -> This is a quickfix for subjective data handling by open62541
 	 */

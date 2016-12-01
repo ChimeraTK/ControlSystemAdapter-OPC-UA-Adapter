@@ -61,7 +61,7 @@ void runtimeValueGenerator::generateValues(shCSysPVManager csManager) {
 	clock_t start, end;
 	start = clock();
 	end = clock();
-	csManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {start});
+	csManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {(int32_t)start});
 	
 	while(true) {
 //  FIXME -Or maybe not: The Const M_PI from math.h generate senceless values, hence I use fix value 3.141
@@ -76,7 +76,7 @@ void runtimeValueGenerator::generateValues(shCSysPVManager csManager) {
 			
 		csManager->getProcessArray<double>("double_sine")->set(vector<double> {double_sine});
 		csManager->getProcessArray<int32_t>("int_sine")->set(vector<int32_t> {int_sine}); 			
-		csManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {(end - start)/(CLOCKS_PER_SEC/1000)});	
+		csManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {(int32_t)((end - start)/(CLOCKS_PER_SEC/1000))});	
 		
 		usleep(csManager->getProcessArray<int32_t>("dt")->get().at(0));
 		end = clock();
