@@ -81,10 +81,7 @@ mtca_uaadapter::~mtca_uaadapter() {
 	
 	if (this->isRunning()) {
 		this->doStop();
-	}
-	
-	this->~ipc_managed_object();
-	
+	}	
 	//UA_Server_delete(this->mappedServer);
 	this->fileHandler->~xml_file_handler();
 }
@@ -111,14 +108,13 @@ void mtca_uaadapter::mtca_uaadapter_constructserver() {
 		usernamePasswordLogins->username = UA_STRING((char*)this->serverConfig.username.c_str());
 		this->server_config.usernamePasswordLogins = usernamePasswordLogins;
 		this->server_config.usernamePasswordLoginsSize = (size_t)(usernamePasswordLogins->password.length + usernamePasswordLogins->username.length);
-		this->server_config.networkLayers->start;
 		this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
 		this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
 		this->server_config.applicationDescription.applicationUri = UA_STRING((char*)"opc.tcp://localhost");
 		this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
 		this->server_config.buildInfo.productName = UA_STRING((char*)"ControlSystemAdapterOPCUA");
 		this->server_config.buildInfo.productUri = UA_STRING((char*)"HZDR OPCUA Server");
-		this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"TU Dresden");
+		this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"TU Dresden - Professur für Prozessleittechnik");
 		
     this->mappedServer = UA_Server_new(this->server_config);
 		this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
@@ -194,7 +190,7 @@ void mtca_uaadapter::readAdditionalNodes() {
 			string folderName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "folderName"); 
 			string folderDescription = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "description");
 			if(folderName.empty()) {
-				cout << "There is no folder name specified. Pleas set a name" << endl;
+				cout << "There is no folder name specified. Please set a name" << endl;
 			}
 			else {
 				UA_NodeId folderNodeId = this->createFolder(this->ownNodeId, folderName, folderDescription);
@@ -248,9 +244,9 @@ void mtca_uaadapter::workerThread() {
 
 }
 
-void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
+void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
 	
-	this->variables.push_back(new mtca_processvariable(this->mappedServer, this->variablesListId, varName, mgr));
+	this->variables.push_back(new mtca_processvariable(this->mappedServer, this->variablesListId, varName, csManager));
 	
 	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
 	xmlNodeSetPtr nodeset;
@@ -336,7 +332,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 						if(varPathVector.size() > 0) {
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 						}						
-						this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, mgr));
+						this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
 						createdVar = true;
 				}
 				
@@ -346,7 +342,7 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 					if(varPathVector.size() > 0) {
 						newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 					}
-					this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, mgr));
+					this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
 				}
  			}
 		}
@@ -355,8 +351,8 @@ void mtca_uaadapter::addVariable(std::string varName, shCSysPVManager mgr) {
 	xmlXPathFreeObject (result);
 }
 
-void mtca_uaadapter::addConstant(std::string varName, shCSysPVManager mgr) {
-    this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, mgr));
+void mtca_uaadapter::addConstant(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
+    this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, csManager));
 }
 
 vector<mtca_processvariable *> mtca_uaadapter::getVariables() {
@@ -524,7 +520,6 @@ vector<string> mtca_uaadapter::getAllNotMappableVariablesNames() {
 	
 	if(result) {
 		xmlNodeSetPtr nodeset = result->nodesetval;
-		this->variables;
 		for (int32_t i=0; i < nodeset->nodeNr; i++) {
 			//for(auto var:this->variables) {
 			bool mapped = false;

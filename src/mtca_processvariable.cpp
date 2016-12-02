@@ -311,12 +311,15 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     if (UA_NodeId_equal(&this->baseNodeId, &createdNodeId) == UA_TRUE) 
         return 0; // Something went UA_WRING (initializer should have set this!)
 		
+		UA_LocalizedText description;
+		description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->csManager->getProcessVariable(this->namePV)->getDescription().c_str());
+	
     // Create our toplevel instance
     UA_ObjectAttributes oAttr; 
 		UA_ObjectAttributes_init(&oAttr);
 		
     oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", this->nameNew.c_str());
-    oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", "A process variable");
+    oAttr.description = description;
 		
 		if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
 			oAttr.userWriteMask = UA_ACCESSLEVELMASK_WRITE;
@@ -337,8 +340,6 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
-	UA_LocalizedText description;
-	description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->csManager->getProcessVariable(this->namePV)->getDescription().c_str());
 	// FIXME: We should not be using std::cout here... Where's our logger?
 	std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
 	if (valueType == typeid(int8_t)) {

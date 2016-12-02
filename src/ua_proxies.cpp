@@ -166,23 +166,34 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
     UA_DataSource ds;
     ds.read = ele->read;		
     ds.write = ele->write;
-		if(ele->write == NULL) {
-			cout << "Fehlt1" << endl;
-			const UA_UInt32 test = 1;
-			retval = UA_Server_writeAccessLevel(server, instantiatedId, test);
+		// Set accesslevel depending on callback functions
+		UA_Byte accessLevel;
+		if(ele->write == NULL && ele->read == NULL) {
+			accessLevel = 0;
 		}
-		if(ele->write != NULL) {
-			cout << "Fehlt nicht" << endl;
-			retval = UA_Server_writeAccessLevel(server, instantiatedId, (const UA_UInt32)UA_ACCESSLEVELMASK_WRITE);
+		if(ele->write != NULL && ele->read == NULL) {
+			accessLevel = UA_ACCESSLEVELMASK_WRITE;
 		}
-    ds.handle = srcClass;
+		if(ele->write != NULL && ele->read != NULL) {
+			accessLevel = UA_ACCESSLEVELMASK_WRITE^UA_ACCESSLEVELMASK_READ;
+		}
+		if(ele->write == NULL && ele->read != NULL) {
+			accessLevel = UA_ACCESSLEVELMASK_READ;
+		}
+		retval = UA_Server_writeAccessLevel(server, instantiatedId, accessLevel);
+		// There is currently no high- level function to do this. (02.12.2016)
+		retval = __UA_Server_write(server, &instantiatedId, UA_ATTRIBUTEID_USERACCESSLEVEL, &UA_TYPES[UA_TYPES_BYTE], &accessLevel);
+		
+		ds.handle = srcClass;
        
     retval |= UA_Server_setVariableNode_dataSource(server, instantiatedId, ds);
 		
 		UA_Server_writeDescription(server, instantiatedId, ele->description);
 		delete ele; // inhibit memleak warning during static analysis
+		
 	/* Set the right Value Datatype and ValueRank
 	 * -> This is a quickfix for subjective data handling by open62541
+	 * (02.12.2016)
 	 */
 	UA_NodeId datatTypeNodeId = UA_NODEID_NULL;
     retval = UA_Server_readDataType(server, instantiatedId, &datatTypeNodeId);
