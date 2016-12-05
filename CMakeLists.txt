@@ -1,8 +1,16 @@
 cmake_minimum_required(VERSION 2.8.0)
 
-project(ControlSystem-OPCUA_Adapter)
+project(ControlSystemAdapterOPCUA)
 
 include(ExternalProject)
+
+SET(${PROJECT_NAME}_MAJOR_VERSION 01)
+SET(${PROJECT_NAME}_MINOR_VERSION 02)
+SET(${PROJECT_NAME}_PATCH_VERSION 00)
+include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
+
 ##########################################################################################################
 ## Hard package dependencies
 ##########################################################################################################
@@ -64,6 +72,17 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
 
 ##########################################################################################################
+## Set the build type to Release if none is specified
+## Force it into Release if "None" is specified (needed to overrule dkpg_buildpackage)
+##########################################################################################################
+
+if(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "None")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+      "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
+      FORCE)
+endif(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "None")
+
+##########################################################################################################
 ## Copy mapping.xml into build folder
 ##########################################################################################################
 if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
@@ -74,7 +93,7 @@ if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
 		message("Copy ${mappingFile}")
 	endforeach(mappingFile)
 endif()         
-                       
+
 ##########################################################################################################
 ## Compiler specific stuff
 ##########################################################################################################
@@ -216,21 +235,23 @@ endif()
 
 ## Early declaration due to the requirement to run the dependencies update prior to building
 ## Create shared lib
-add_library(ControlSystemAdapterOPCUA SHARED $<TARGET_OBJECTS:mtca_objects>)
-target_link_libraries(ControlSystemAdapterOPCUA open62541)
-target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
-target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-DeviceAccess_LIBRARIES})
-#target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
-target_link_libraries(ControlSystemAdapterOPCUA pthread)
-target_link_libraries(ControlSystemAdapterOPCUA dl)
-target_link_libraries(ControlSystemAdapterOPCUA
+add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects>)
+target_link_libraries(${PROJECT_NAME} open62541)
+target_link_libraries(${PROJECT_NAME} ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${ChimeraTK-DeviceAccess_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} pthread)
+target_link_libraries(${PROJECT_NAME} dl)
+target_link_libraries(${PROJECT_NAME}
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
   ${Boost_CHRONO_LIBRARY}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
 )
-target_link_libraries(ControlSystemAdapterOPCUA ${LIBXML2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 ##########################################################################################################
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
@@ -276,12 +297,9 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit
 link_directories(${CMAKE_BINARY_DIR})
 
 add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/ControlSystem_OPCUA_Sample_Adapter.cpp)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ControlSystemAdapterOPCUA)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
-target_link_libraries(ControlSystemAdapterOPCUA ${LIBXML2_LIBRARIES})
-target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
-target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-DeviceAccess_LIBRARIES})
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
@@ -299,3 +317,18 @@ endif()
 ## Ends binary ControlSystem-OPCUA_Sample_Adapter
 
 install(TARGETS ControlSystem-OPCUA_Sample_Adapter RUNTIME DESTINATION bin)
+
+##########################################################################################################
+## Create the config files by filling the correct variables into the template (*.cmake.in).
+## All variables @VARIABLE@ are replaced with the current values, but they have to be set first....
+## Only the reference header is needed. The other variables are for dependencies of this library,
+## but there are none.
+##########################################################################################################
+
+set(${PROJECT_NAME}_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
+set(${PROJECT_NAME}_LIBRARIES "${ChimeraTK-ControlSystemAdapter_LIBRARIES}")
+set(${PROJECT_NAME}_LIBRARY_DIRS "${CMAKE_INSTALL_PREFIX}/lib ${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS}")
+set(${PROJECT_NAME}_CXX_FLAGS "${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
+set(${PROJECT_NAME}_LINKER_FLAGS "-Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib,--enable-new-dtags")
+include(${CMAKE_SOURCE_DIR}/cmake/create_cmake_config_files.cmake)
+
