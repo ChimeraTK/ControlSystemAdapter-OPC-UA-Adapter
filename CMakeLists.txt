@@ -19,6 +19,8 @@ find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framewor
 find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 
+find_package(open62541 REQUIRED)
+
 #Do not put the ControlSystemAdapter as required. We will install it if it is not found.
 find_package(ChimeraTK-ControlSystemAdapter)
 find_package(mtca4u-deviceaccess)
@@ -250,6 +252,9 @@ target_link_libraries(${PROJECT_NAME}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
 )
 target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION}
+    SOVERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION})
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
@@ -257,22 +262,22 @@ install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
 ##########################################################################################################
 
-add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
-                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/open62541_MacroHelper.py
-                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_builtin_types.py
-                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_constants.py
-                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_namespace.py
-                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_node_types.py
-                           ${PROJECT_SOURCE_DIR}/lib/libopen62541.so
-                           ${PROJECT_SOURCE_DIR}/include/open62541/open62541.h
-                   PRE_BUILD
-                   COMMAND /bin/bash ${PROJECT_SOURCE_DIR}/tools/buildDependencies.sh ${PROJECT_SOURCE_DIR}
-                   DEPENDS ${PROJECT_SOURCE_DIR}/tools/buildDependencies.sh)
+#add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
+#                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/open62541_MacroHelper.py
+#                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_builtin_types.py
+#                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_constants.py
+#                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_namespace.py
+#                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_node_types.py
+#                           ${PROJECT_SOURCE_DIR}/lib/libopen62541.so
+#                           ${PROJECT_SOURCE_DIR}/include/open62541/open62541.h
+#                   PRE_BUILD
+#                   COMMAND /bin/bash ${PROJECT_SOURCE_DIR}/tools/buildDependencies.sh ${PROJECT_SOURCE_DIR}
+#                   DEPENDS ${PROJECT_SOURCE_DIR}/tools/buildDependencies.sh)
 
 add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit_generated.c
                           ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit_generated.h
                    PRE_BUILD
-                   COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
+                   COMMAND ${PYTHON_EXECUTABLE} ${open62541_TOOLS}/generate_open62541CCode.py
                                                 -i ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist_FullNS0.txt
                                                 -b ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist.txt
                                                 ${PROJECT_SOURCE_DIR}/model/Opc.Ua.NodeSet2.xml
@@ -282,14 +287,13 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit
                            ${PROJECT_SOURCE_DIR}/model/${MODEL_XML_FILE}
                            ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist_FullNS0.txt
                            ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist.txt
-                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
-                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/open62541_MacroHelper.py
-                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_builtin_types.py
-                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_constants.py
-                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_namespace.py
-                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_node_types.py)
+                           ${open62541_TOOLS}/generate_open62541CCode.py
+                           ${open62541_TOOLS}/open62541_MacroHelper.py
+                           ${open62541_TOOLS}/ua_builtin_types.py
+                           ${open62541_TOOLS}/ua_constants.py
+                           ${open62541_TOOLS}/ua_namespace.py
+                           ${open62541_TOOLS}/ua_node_types.py)
 
-                           
 ##########################################################################################################
 ##  Tests and executables
 ##########################################################################################################
