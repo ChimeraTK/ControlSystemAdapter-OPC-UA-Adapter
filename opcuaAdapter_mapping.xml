@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<uamapping>
+	<config rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
+		<serverConfig applicationName="OPCUAServer" port="16660" />
+		<login username="test" password="test123" /> 
+	</config>
+
+	<additionalNodes folderName="AdditionalNodesFolder" description="DescriptionOfAdditionalNodes">
+		<variable browseName="BrowseName1" displayname="displayName1" description="myDescription1" value="Wert1" />
+		<variable browseName="BrowseName2" displayname="displayName2" description="myDescription2" value="Wert2" />
+		<variable browseName="BrowseName3" displayname="displayName3" description="myDescription3" value="Wert3" />
+		<variable browseName="BrowseName4" displayname="displayName4" description="myDescription4" value="Wert4" />
+		<variable browseName="BrowseName5" displayname="displayName5" description="myDescription5" value="Wert5" />
+	</additionalNodes>
+	<additionalNodes folderName="ConfigFolder" description="DescriptionOfConfigFolder">
+		<variable browseName="BrowseNameA" displayname="displayNameA" description="myDescriptionA" value="WertA" />
+		<variable browseName="BrowseNameB" displayname="displayNameB" description="myDescriptionB" value="WertB" />
+	</additionalNodes>
+
+	<application name="WinAA">
+		<map sourceVariableName="Mein/Name_ist#int8Array" rename="Array_s15_int8" engineeringUnit="Test" description="">
+			<unrollPath pathSep="_">True</unrollPath>
+			<unrollPath pathSep="/">True</unrollPath>
+			<unrollPath pathSep="#">True</unrollPath>
+		  <folder>NorthSide/LINAC/partA</folder>
+			<folder>NorthSide/LINAC/partX</folder>
+  	</map>
+		<map sourceVariableName="Mein/Name_ist#int8Array_s15" rename="Array">
+			<unrollPath pathSep="_">True</unrollPath>
+			<unrollPath pathSep="/">True</unrollPath>
+			<unrollPath pathSep="#">True</unrollPath>
+		  <folder>NorthSide/LINAC/partA</folder>
+			<folder>NorthSide/LINAC/partX</folder>
+  	</map>
+	</application>
+	<application name="WinBB">
+		<map sourceVariableName="Dein/Name/ist/uint8Array_s10" rename="">
+			<unrollPath pathSep="_">True</unrollPath>
+		  <folder>NorthSideLINAC/partA</folder>
+   	</map>
+		<map sourceVariableName="int16Array_s15">
+			<unrollPath pathSep="_">False</unrollPath>
+		  <folder>SouthSide/LINAC/partA</folder>
+			<folder>SouthSide/LINAC/partB</folder>
+		</map>
+		<map sourceVariableName="Ist/Name/dieser/int32Scalar">
+			<unrollPath pathSep="/">False</unrollPath>
+			<folder>EastSide/LINAC</folder>
+  	</map>
+	</application>
+	<application name="WinCC">
+		<map sourceVariableName="Unser/Name/ist_uint8Array_s10">
+			<unrollPath pathSep="_">True</unrollPath>
+			<unrollPath pathSep="/">True</unrollPath>
+		  <folder>SouthSide/LINAC/partA</folder>
+    </map>
+		<map sourceVariableName="int16Array_s15">
+			<unrollPath pathSep="_">False</unrollPath>
+		  <folder>NorthSideLINAC/partB</folder>
+    </map>
+		<map sourceVariableName="floatArray_s10" rename="Gustav">
+			<unrollPath pathSep="_">False</unrollPath>
+   	</map>
+	</application>
+	<application name="EPICS">
+		<map sourceVariableName="Ist/Name/dieser/uint32Scalar" rename="uint32S">
+			<unrollPath pathSep="/">True</unrollPath>
+		  <folder>EastSide/LINAC</folder>
+    </map>
+		<map sourceVariableName="Ist/Name/dieser/int32Scalar">
+			<unrollPath pathSep="/">False</unrollPath>
+		  <folder>EastSide/LINAC</folder>
+    </map>
+		<map sourceVariableName="Ist/Name/dieser/doubleScalar" engineeringUnit="Test" description="">
+			<unrollPath pathSep="/">True</unrollPath>
+		  <folder></folder>
+    </map>
+	</application>
+</uamapping>
