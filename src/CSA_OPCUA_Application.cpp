@@ -33,45 +33,59 @@
 * @author Julian Rahm
 */ 
 
+extern "C" {
+    #include <unistd.h>
+    #include <signal.h>
+}
+
 #include <iostream>
 #include <string>
+#include <atomic>
 
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ControlSystemAdapterOPCUA.h"
 
+boost::shared_ptr<ControlSystemPVManager> csManager;
+boost::shared_ptr<DevicePVManager> devManager;
+boost::shared_ptr<ControlSystemSynchronizationUtility> syncUtility;
+ControlSystemAdapterOPCUA *csaOPCUA;
 
-	boost::shared_ptr<ControlSystemPVManager> csManager;
-	boost::shared_ptr<DevicePVManager> devManager;
-	boost::shared_ptr<ControlSystemSynchronizationUtility> syncUtility;
-	ControlSystemAdapterOPCUA *csaOPCUA;
-	
-	
-void csa_opcua_prolog() {
-	// Create the managers
-	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers = createPVManager();
-    
-	devManager = pvManagers.second;
-	csManager = pvManagers.first;
+std::atomic<bool> terminateMain;
 
-	syncUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
-
-	csManager->enablePersistentDataStorage();
-	
-	ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
-	ChimeraTK::ApplicationBase::getInstance().initialise();
-	
+static void SigHandler_Int(int sign) {
+    cout << "Received SIGINT... terminating" << endl;
+    terminateMain = true;
+    csaOPCUA->stop();
+    csaOPCUA->terminate();
+    csaOPCUA->~ControlSystemAdapterOPCUA();
+    cout << "OPC UA adapter termianted." << endl;
 }
 
-ControlSystemAdapterOPCUA* csa_opcua_main() {
-	
-	string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, pathToConfig);
-	
-	return csaOPCUA;
-}
+int main() {
+    signal(SIGINT,  SigHandler_Int); // Registriert CTRL-C/SIGINT
+    signal(SIGTERM, SigHandler_Int); // Registriert SIGTERM
 
-void csa_opcua_epilog() {
-	
-	ChimeraTK::ApplicationBase::getInstance().run();
+    // Create the managers
+    std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers = createPVManager();
+
+    devManager = pvManagers.second;
+    csManager = pvManagers.first;
+
+    syncUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
+
+    csManager->enablePersistentDataStorage();
+
+    ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
+    ChimeraTK::ApplicationBase::getInstance().initialise();
+
+    string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
+    csaOPCUA = new ControlSystemAdapterOPCUA(csManager, pathToConfig);
+
+
+    ChimeraTK::ApplicationBase::getInstance().run();
+
+    while(!terminateMain) sleep(3600);  // sleep will be interrupted when signal is received
+    csManager.reset();
+    cout << "Application termianted." << endl;
 }
