@@ -84,6 +84,11 @@ mtca_uaadapter::~mtca_uaadapter() {
 	}	
 	//UA_Server_delete(this->mappedServer);
 	this->fileHandler->~xml_file_handler();
+
+        for(auto ptr : variables) delete ptr;
+        for(auto ptr : constants) delete ptr;
+        for(auto ptr : additionalVariables) delete ptr;
+        for(auto ptr : mappedVariables) delete ptr;
 }
 
 /** @brief This Class contain all variables of the opcua server. 
