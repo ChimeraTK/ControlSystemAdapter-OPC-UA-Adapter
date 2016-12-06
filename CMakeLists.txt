@@ -30,7 +30,7 @@ if(NOT mtca4u-deviceaccess_FOUND)
 		set(ChimeraTK-DeviceAccess_LIBRARIES mtca4u-deviceaccess)
 	endif()
 	
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-DeviceAccess_CXX_FLAGS}")
+	#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-DeviceAccess_CXX_FLAGS}")
 	
 #Install the ControlSystemAdapter if it is not pre-installed
 if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
@@ -210,8 +210,8 @@ configure_file (
 ## Object Files
 add_library(mtca_objects OBJECT ${objectSources})
 if(USE_SELFINSTALLED_ControlSystemAdapter)
-  ADD_DEPENDENCIES(mtca_objects external-ChimeraTK-ControlSystemAdapter) 
-  ADD_DEPENDENCIES(mtca_objects external-ChimeraTK-DeviceAccess) 
+   ADD_DEPENDENCIES(mtca_objects external-ChimeraTK-ControlSystemAdapter) 
+   ADD_DEPENDENCIES(mtca_objects external-ChimeraTK-DeviceAccess) 
 endif()
 
 ## Early declaration due to the requirement to run the dependencies update prior to building
@@ -220,7 +220,6 @@ add_library(ControlSystemAdapterOPCUA SHARED $<TARGET_OBJECTS:mtca_objects>)
 target_link_libraries(ControlSystemAdapterOPCUA open62541)
 target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
 target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-DeviceAccess_LIBRARIES})
-#target_link_libraries(ControlSystemAdapterOPCUA ${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
 target_link_libraries(ControlSystemAdapterOPCUA pthread)
 target_link_libraries(ControlSystemAdapterOPCUA dl)
 target_link_libraries(ControlSystemAdapterOPCUA

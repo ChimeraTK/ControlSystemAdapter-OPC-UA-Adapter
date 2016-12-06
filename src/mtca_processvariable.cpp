@@ -51,7 +51,7 @@ using namespace std;
  * @param server A UA_Server type, with all server specific information from the used server
  * @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
  * @param namePV Name of the process variable from control-system-adapter, is needed to fetch the rigth process varibale from PV-Manager
- * @param csManager The hole PVManager from control-system-adapter 
+ * @param csManager Provide the hole PVManager from control-system-adapter to map all processvariable to the OPC UA-Model
  * 
  */
 mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {

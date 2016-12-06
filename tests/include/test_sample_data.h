@@ -5,6 +5,7 @@
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
+#include "ChimeraTK/ControlSystemAdapter/ProcessArray.h"
 
 #include "ipc_managed_object.h"
 
@@ -13,6 +14,7 @@ extern "C" {
 	#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
 
+using namespace ChimeraTK;
 
 struct TestFixtureEmptySet {
   std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers;
