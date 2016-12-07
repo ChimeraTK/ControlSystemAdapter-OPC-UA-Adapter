@@ -44,8 +44,6 @@ extern "C" {
 
 #include <iostream>
 
-using namespace std;
-
 /** @brief Constructor from mtca_processvaribale for generic creation
  * 
  * @param server A UA_Server type, with all server specific information from the used server
@@ -54,12 +52,13 @@ using namespace std;
  * @param csManager Provide the hole PVManager from control-system-adapter to map all processvariable to the OPC UA-Model
  * 
  */
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
+mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility) : ua_mapped_class(server, basenodeid) {
   	
   	// FIXME Check if name member of a csManager Parameter
   	this->namePV = namePV;
   	this->nameNew = namePV;
   	this->csManager = csManager;
+		this->syncCsUtility = syncCsUtility;
   	
   	this->mapSelfToNamespace();
 }
@@ -75,12 +74,13 @@ mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenode
  * @param csManager The hole PVManager from control-system-adapter 
  * 
  */
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
+mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility) : ua_mapped_class(server, basenodeid) {
 	
 	// FIXME Check if name member of a csManager Parameter
 	this->namePV = namePV;
 	this->nameNew = nameNew;
 	this->csManager = csManager;
+	this->syncCsUtility = syncCsUtility;
 	
 	if(!engineeringUnit.empty()) {
 		setEngineeringUnit(engineeringUnit);
@@ -161,6 +161,8 @@ string mtca_processvariable::getType() {
     else if (valueType == typeid(float))    return "float";
     else if (valueType == typeid(double))   return "double";
     else                                    return "Unsupported type";
+// 		this->syncCsUtility->send<ProcessArry<_p_type>>(this->csManager->getProcessArray<_p_type>(this->namePV));
+//this->csManager->getProcessArray<int32_t>(this->namePV)->readNonBlocking()
 }
 
 //UA_WRPROXY_STRING(mtca_processvariable, setType)
@@ -174,10 +176,10 @@ _p_type    mtca_processvariable::getValue_##_p_type() { \
 		_p_type v = NULL; \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return 0; \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() == 1) { \
-			v = this->csManager->getProcessArray<_p_type>(this->namePV)->get().at(0); \
-			if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
-				this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
+			if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
+				this->csManager->getProcessArray<_p_type>(this->namePV)->readNonBlocking(); \
 			} \
+			v = this->csManager->getProcessArray<_p_type>(this->namePV)->get().at(0); \
 		} \
     return v; \
 } \
@@ -188,10 +190,10 @@ std::vector<_p_type>    mtca_processvariable::getValue_Array_##_p_type() { \
     std::vector<_p_type> v; \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return v; \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() > 1) { \
-			v = this->csManager->getProcessArray<_p_type>(this->namePV)->get(); \
-			if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
-				this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
+			if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
+				this->csManager->getProcessArray<_p_type>(this->namePV)->readNonBlocking(); \
 			} \
+			v = this->csManager->getProcessArray<_p_type>(this->namePV)->get(); \
 		} \
     return v; \
 } \

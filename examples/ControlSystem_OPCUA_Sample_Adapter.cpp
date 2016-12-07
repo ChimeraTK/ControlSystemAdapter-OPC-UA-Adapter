@@ -49,6 +49,7 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PersistentDataStorage.h"
+#include "ChimeraTK/ControlSystemAdapter/ProcessArray.h"
 
 #include "ipc_manager.h"
 #include "ControlSystemAdapterOPCUA.h"
@@ -83,8 +84,11 @@ int main() {
 	boost::shared_ptr<DevicePVManager> devManager = pvManagers.second;
 	boost::shared_ptr<ControlSystemPVManager> csManager = pvManagers.first;
 	
-	boost::shared_ptr<ControlSystemSynchronizationUtility> syncUtility;
-	syncUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
+	boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
+	syncCsUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
+	
+	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
+	syncDevUtility.reset(new ChimeraTK::DeviceSynchronizationUtility(devManager));
 
 	//csManager->enablePersistentDataStorage();
 	
@@ -109,11 +113,11 @@ int main() {
 	ProcessArray<double>::SharedPtr intB15Afdev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleArray_s15", 15);
 	ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s10", 10);	
 	// data generation cycle time in ms
-	ProcessArray<int32_t>::SharedPtr dtDev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "dt", 1);
+	ProcessArray<int32_t>::SharedPtr dtDev = devManager->createProcessArray<int32_t>(deviceToControlSystem, "dt", 1);
 	// time since server start in ms
 	ProcessArray<int32_t>::SharedPtr tDev = devManager->createProcessArray<int32_t>(deviceToControlSystem, "t", 1);
-	ProcessArray<int32_t>::SharedPtr periodDev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "period", 1);
-	ProcessArray<double>::SharedPtr amplitudeDev = devManager->createProcessArray<double>(controlSystemToDevice, "amplitude", 1);
+	ProcessArray<int32_t>::SharedPtr periodDev = devManager->createProcessArray<int32_t>(deviceToControlSystem, "period", 1);
+	ProcessArray<double>::SharedPtr amplitudeDev = devManager->createProcessArray<double>(deviceToControlSystem, "amplitude", 1);
 	ProcessArray<double>::SharedPtr double_sineDev = devManager->createProcessArray<double>(deviceToControlSystem, "double_sine", 1);
 	ProcessArray<int32_t>::SharedPtr int_sineDev = devManager->createProcessArray<int32_t>(deviceToControlSystem, "int_sine", 1);
 	
@@ -130,6 +134,10 @@ int main() {
 	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(2) = 14;
 	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(3) = 15;
 	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(4) = 16;
+	csManager->getProcessArray<int32_t>("int32Array_s15")->write();
+	
+	syncDevUtility->receiveAll();
+	//syncDevUtility->sendAll();
 	
 	// start values
 	int32_t microseconds = 1000000;
@@ -137,25 +145,32 @@ int main() {
 	double amplitude = 10;
 		
 	// Set values
-	csManager->getProcessArray<int32_t>("dt")->set(vector<int32_t> {microseconds});
-	csManager->getProcessArray<int32_t>("period")->set(vector<int32_t> {period});
-	csManager->getProcessArray<double>("amplitude")->set(vector<double> {amplitude});
+	devManager->getProcessArray<int32_t>("dt")->set(vector<int32_t> {microseconds});
+	devManager->getProcessArray<int32_t>("period")->set(vector<int32_t> {period});
+	devManager->getProcessArray<double>("amplitude")->set(vector<double> {amplitude});
 	
 	cout << "Dummy Daten geschrieben..." << std::endl;	
 	
 	string pathToConfig = "opcuaAdapter_mapping.xml";
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, pathToConfig);
+	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncCsUtility, pathToConfig);
 	
 	// Only for Sin ValueGenerator
 	mgr = new ipc_manager();
-	valGen = new runtimeValueGenerator(csManager);
+	valGen = new runtimeValueGenerator(devManager, syncCsUtility);
 	mgr->addObject(valGen);
 	mgr->doStart();	
 	
 	// Server is running
-	std::cout << "Server läuft..." << std::endl;	
+	std::cout << "Server läuft..." << std::endl;
 	while(csaOPCUA->isRunning()) {
-		// do something crazy shit
+// 		do something crazy shit
+// 		cout << "Part1: " << devManager->getProcessArray<int32_t>("int32Array_s15")->get().at(0) << endl;
+// 		cout << "Part2: " << csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(0) << endl;
+// 		
+// 		cout << "Part3: " << csManager->getProcessArray<int32_t>("int_sine")->get().at(0) << endl;
+// 		cout << "Part4: " << devManager->getProcessArray<int32_t>("int_sine")->get().at(0) << endl;
+		
+		sleep(2);
 	}
 	
 	return 0;
