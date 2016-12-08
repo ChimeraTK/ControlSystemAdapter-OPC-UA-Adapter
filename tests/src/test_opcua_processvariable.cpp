@@ -49,7 +49,7 @@ void ProcessVariableTest::testEmptySet(){
 	//mtca_processvariable *test;
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
 		//std::cout << "Checking ProcessVariable: " <<  oneProcessVariable->getName() << std::endl;
-		mtca_processvariable *test = new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), oneProcessVariable->getName(), "", "", pvSet.csManager);
+		mtca_processvariable *test = new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), oneProcessVariable->getName(), "", "", pvSet.csManager,  pvSet.syncDevUtility);
 
 		BOOST_CHECK(test->getName() == oneProcessVariable->getName());
 		
@@ -186,7 +186,7 @@ void ProcessVariableTest::testClientSide(){
 	// add set
 	vector<mtca_processvariable*> varList;
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-		varList.push_back(new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager)); 
+		varList.push_back(new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager, pvSet.syncDevUtility)); 
 	}
 	
 	// Create client to connect to server
