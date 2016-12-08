@@ -53,7 +53,7 @@ void ProcessVariableTest::testEmptySet(){
 
 		BOOST_CHECK(test->getName() == oneProcessVariable->getName());
 		
-		BOOST_CHECK(test->getEngineeringUnit() == "");
+		BOOST_CHECK(test->getEngineeringUnit() != "");
 		test->setEngineeringUnit("test");
 		BOOST_CHECK(test->getEngineeringUnit() == "test");
 		
@@ -319,7 +319,7 @@ void ProcessVariableTest::testClientSide(){
 										// Check EngineeringUnit -> for all the same
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), valName);
 										//cout << "EngineeringUnit: " << valName << endl;
-										BOOST_CHECK(valName == "");
+										BOOST_CHECK(valName != "");
 										// Write new engineering unit
 										UA_String newEU;
 										UA_String_init(&newEU);

@@ -36,6 +36,7 @@
 #include "xml_file_handler.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 
 using namespace ChimeraTK;
 using namespace std;
@@ -53,12 +54,12 @@ struct ServerConfig {
 	UA_Boolean	UsernamePasswordLogin = UA_FALSE;
 	string password;
 	string username;
-	string applicationName = "DefaultApplication";
+	string applicationName;
 	uint16_t opcuaPort;
 };
 
 class mtca_uaadapter : ua_mapped_class, public ipc_managed_object {
-private:
+private:	 
 	UA_ServerConfig          	server_config;
 	UA_ServerNetworkLayer    	server_nl;
 	UA_Logger                	logger;
@@ -95,8 +96,8 @@ public:
 	UA_NodeId existFolder(UA_NodeId basenodeid, string folder);
 	
     
-	void addVariable(string name, boost::shared_ptr<ControlSystemPVManager> csmgr);
-	void addConstant(string name, boost::shared_ptr<ControlSystemPVManager> csmgr);
+	void addVariable(string name, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility);
+	void addConstant(string name, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility);
 	
 	UA_NodeId getOwnNodeId();
 	vector<mtca_processvariable *> getVariables();

@@ -48,7 +48,7 @@ extern "C" {
 
 boost::shared_ptr<ControlSystemPVManager> csManager;
 boost::shared_ptr<DevicePVManager> devManager;
-boost::shared_ptr<ControlSystemSynchronizationUtility> syncUtility;
+	boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
 ControlSystemAdapterOPCUA *csaOPCUA;
 
 std::atomic<bool> terminateMain;
@@ -72,7 +72,7 @@ int main() {
     devManager = pvManagers.second;
     csManager = pvManagers.first;
 
-    syncUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
+	syncCsUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
 
     csManager->enablePersistentDataStorage();
 
@@ -80,7 +80,7 @@ int main() {
     ChimeraTK::ApplicationBase::getInstance().initialise();
 
     string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
-    csaOPCUA = new ControlSystemAdapterOPCUA(csManager, pathToConfig);
+	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncCsUtility, pathToConfig);
 
 
     ChimeraTK::ApplicationBase::getInstance().run();

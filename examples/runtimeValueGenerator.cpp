@@ -36,17 +36,17 @@
 #include "open62541.h"
 #include "ControlSystemAdapterOPCUA.h"
 
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
+#include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
+#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 #include "ipc_manager.h"
 
 using std::cout;
 using std::endl;
 using namespace ChimeraTK;
-
-typedef boost::shared_ptr<ControlSystemPVManager> shCSysPVManager;
 	 
-runtimeValueGenerator::runtimeValueGenerator(shCSysPVManager csManager) {
-	this->csManager = csManager;
+runtimeValueGenerator::runtimeValueGenerator(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncDevUtility) {
+	this->devManager = devManager;
+	this->syncDevUtility = syncDevUtility;
 	this->doStart();
 }
 
@@ -56,7 +56,7 @@ runtimeValueGenerator::~runtimeValueGenerator() {
 	}
 }
 
-void runtimeValueGenerator::generateValues(shCSysPVManager csManager) {
+void runtimeValueGenerator::generateValues(boost::shared_ptr<DevicePVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncDevUtility) {
 	// Time meassureing
 	clock_t start, end;
 	start = clock();
@@ -75,8 +75,14 @@ void runtimeValueGenerator::generateValues(shCSysPVManager csManager) {
 // 	std::cout << "bool_sine: " << bool_sine << std::endl;
 			
 		csManager->getProcessArray<double>("double_sine")->set(vector<double> {double_sine});
-		csManager->getProcessArray<int32_t>("int_sine")->set(vector<int32_t> {int_sine}); 			
-		csManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {(int32_t)((end - start)/(CLOCKS_PER_SEC/1000))});	
+		csManager->getProcessArray<double>("double_sine")->write();
+		
+		csManager->getProcessArray<int32_t>("int_sine")->set(vector<int32_t> {int_sine});
+		csManager->getProcessArray<int32_t>("int_sine")->write();
+		csManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {(int32_t)((end - start)/(CLOCKS_PER_SEC/1000))});
+		csManager->getProcessArray<int32_t>("t")->write();	
+		
+		syncDevUtility->receiveAll();
 		
 		usleep(csManager->getProcessArray<int32_t>("dt")->get().at(0));
 		end = clock();
@@ -86,7 +92,7 @@ void runtimeValueGenerator::generateValues(shCSysPVManager csManager) {
 void runtimeValueGenerator::workerThread() {
     bool run = true;
 	
-    thread *valueGeneratorThread = new std::thread(generateValues, this->csManager);
+    thread *valueGeneratorThread = new std::thread(generateValues, this->devManager, this->syncDevUtility);
 
     while (run == true) {
         if (! this->isRunning()) {

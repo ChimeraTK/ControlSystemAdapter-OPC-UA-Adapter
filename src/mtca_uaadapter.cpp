@@ -84,6 +84,11 @@ mtca_uaadapter::~mtca_uaadapter() {
 	}	
 	//UA_Server_delete(this->mappedServer);
 	this->fileHandler->~xml_file_handler();
+
+        for(auto ptr : variables) delete ptr;
+        for(auto ptr : constants) delete ptr;
+        for(auto ptr : additionalVariables) delete ptr;
+        for(auto ptr : mappedVariables) delete ptr;
 }
 
 /** @brief This Class contain all variables of the opcua server. 
@@ -132,8 +137,8 @@ void mtca_uaadapter::readConfig() {
 		
 		// There should be only one <config>-Tag in config file
 		if(nodeset->nodeNr > 1) {
-			cout << "More than one <config>-Tag was found in config file. Please provide only one Tag." << endl;
-			exit(0);
+			//cout << "More than one <config>-Tag was found in config file. Please provide only one Tag." << endl;
+			throw runtime_error ("To many <config>-Tags in config file");
 		}		
 		
 		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "rootFolder");
@@ -169,11 +174,20 @@ void mtca_uaadapter::readConfig() {
 		if(!opcuaPort.empty()) {
 			this->serverConfig.opcuaPort = std::stoi(opcuaPort);
 		}
+		else {
+			throw runtime_error ("No 'port'-Attribute is set in config file");
+		}
 		
 		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
 		if(!placeHolder.empty()) {
 			this->serverConfig.applicationName = placeHolder;
 		}
+		else {
+			throw runtime_error ("No 'applicationName'-Attribute is set in config file");
+		}
+	}
+	else {
+		throw runtime_error ("No <serverConfig>-Tag in config file");
 	}
 }
 /*
@@ -244,9 +258,9 @@ void mtca_uaadapter::workerThread() {
 
 }
 
-void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
+void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility) {
 	
-	this->variables.push_back(new mtca_processvariable(this->mappedServer, this->variablesListId, varName, csManager));
+	this->variables.push_back(new mtca_processvariable(this->mappedServer, this->variablesListId, varName, csManager, syncCsUtility));
 	
 	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
 	xmlNodeSetPtr nodeset;
@@ -332,7 +346,7 @@ void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlS
 						if(varPathVector.size() > 0) {
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 						}						
-						this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
+						this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager, syncCsUtility));
 						createdVar = true;
 				}
 				
@@ -342,7 +356,7 @@ void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlS
 					if(varPathVector.size() > 0) {
 						newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 					}
-					this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
+					this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager, syncCsUtility));
 				}
  			}
 		}
@@ -351,8 +365,8 @@ void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlS
 	xmlXPathFreeObject (result);
 }
 
-void mtca_uaadapter::addConstant(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
-    this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, csManager));
+void mtca_uaadapter::addConstant(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility) {
+    this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, csManager, syncCsUtility));
 }
 
 vector<mtca_processvariable *> mtca_uaadapter::getVariables() {

@@ -32,7 +32,7 @@ void CSAOPCUATest::testWithoutPVSet(){
 	csaOPCUA->start();
 	BOOST_CHECK(csaOPCUA->isRunning() == true);
 	// is csManager init
-	BOOST_CHECK(csaOPCUA->getControlSystemPVManager()->getAllProcessVariables().size() == 0);
+	BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 0);
 		
 	csaOPCUA->stop();
 	csaOPCUA->terminate();
@@ -50,7 +50,7 @@ void CSAOPCUATest::testWithPVSet(){
 	BOOST_CHECK(csaOPCUA->isRunning() == true);
 	
 	// is csManager init
-	BOOST_CHECK(csaOPCUA->getControlSystemPVManager()->getAllProcessVariables().size() == 16);
+	BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 16);
 			
 	BOOST_CHECK(csaOPCUA->getIPCManager() != NULL);
 	
