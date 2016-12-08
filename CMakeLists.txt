@@ -252,6 +252,9 @@ target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
+# install libopen62541.so.0 => TODO this is a temporarly work around!
+install(FILES ${PROJECT_SOURCE_DIR}/lib/libopen62541.so.0 DESTINATION lib)
+
 ##########################################################################################################
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
 ##########################################################################################################
@@ -262,7 +265,7 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_ope
                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_constants.py
                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_namespace.py
                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_node_types.py
-                           ${PROJECT_SOURCE_DIR}/lib/libopen62541.so
+                           ${PROJECT_SOURCE_DIR}/lib/libopen62541.so.0
                            ${PROJECT_SOURCE_DIR}/include/open62541/open62541.h
                    PRE_BUILD
                    COMMAND /bin/bash ${PROJECT_SOURCE_DIR}/tools/buildDependencies.sh ${PROJECT_SOURCE_DIR}
