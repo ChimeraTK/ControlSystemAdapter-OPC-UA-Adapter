@@ -25,7 +25,7 @@
  */
 
 /** @class mtca_processvariable 
- *	@brief This Class is for the information content of a OPC UA Server 
+ *	@brief This class is for the information content of a OPC UA Server 
  *   
  *  @author Chris Iatrou, Julian Rahm
  *  @date 22.11.2016

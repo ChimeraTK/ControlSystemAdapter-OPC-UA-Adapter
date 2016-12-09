@@ -22,8 +22,8 @@ void IPCManagerTest::testManagerConnection(){
 	
 	ipc_manager *manager = new ipc_manager();
 	
-	mtca_uaadapter *adapterOne = new mtca_uaadapter("../../tests/uamapping_test_1.xml");
-	mtca_uaadapter *adapterTwo = new mtca_uaadapter("../../tests/uamapping_test_2.xml");	
+	mtca_uaadapter *adapterOne = new mtca_uaadapter("../tests/uamapping_test_1.xml");
+	mtca_uaadapter *adapterTwo = new mtca_uaadapter("../tests/uamapping_test_2.xml");	
 	
 	BOOST_CHECK(adapterTwo->isManaged() == false);
 	
@@ -58,14 +58,14 @@ void IPCManagerTest::testManagerConnection(){
  	BOOST_CHECK(adapterTwo->terminate() == 0);
 
 	ipc_manager *mgr = adapterOne->getIpcManager();
-	manager->deleteObject(adapOneIpcId);
+
 	BOOST_CHECK(manager->deleteObject(adapOneIpcId) == 0);
-	
+
 	ipc_manager *newManager = new ipc_manager();
 	BOOST_CHECK(adapterOne->assignManager(newManager) == true);
  	BOOST_CHECK(adapterOne->assignManager(nullptr) == false);
+	adapterOne->assignManager(nullptr);
 	
-	//manager->~ipc_manager();
 };
 
 
@@ -82,9 +82,7 @@ class IPCManagerTestSuite: public test_suite {
 
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
-	
 	 framework::master_test_suite().add(new IPCManagerTestSuite);
-
-    return 0;
+	 return 0;
 }
 

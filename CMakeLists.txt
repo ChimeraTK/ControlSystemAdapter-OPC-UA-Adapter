@@ -179,16 +179,16 @@ if(ENABLE_COVERAGE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
   
 	add_custom_target(coverage ALL
-										${PROJECT_SOURCE_DIR}/cmake/makeGcov.sh ${CMAKE_CURRENT_BINARY_DIR}
+										${PROJECT_SOURCE_DIR}/cmake/makeGcov.sh ${PROJECT_SOURCE_DIR}
 										WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 										# Bad soulution to provide all depencys
 										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ControlSystemAdapterOPCUA
 										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
 										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
+										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
 										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_uaadapter
-										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler										
+										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler	
 										COMMENT "Generating test coverage documentation" VERBATIM)
-             
 endif()
 
 if(ENABLE_UNIT_TESTS)

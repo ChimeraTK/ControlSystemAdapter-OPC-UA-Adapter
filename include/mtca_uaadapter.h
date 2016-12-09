@@ -41,6 +41,13 @@
 using namespace ChimeraTK;
 using namespace std;
   
+/** @class FolderInfo
+ *	@brief This struct represents a folder in OPCUA with its own node id and with his parent and child node id. For this FolderInfo are a singly-linked list 
+ *   
+ *  @author Chris Iatrou, Julian Rahm
+ *  @date 03.12.2016
+ * 
+ */
 struct FolderInfo {
 	string folderName;
 	UA_NodeId folderNodeId = UA_NODEID_NULL;
@@ -48,6 +55,13 @@ struct FolderInfo {
 	UA_NodeId prevFolderNodeId = UA_NODEID_NULL;
 };
 
+/** @class ServerConfig
+ *	@brief This struct represents a server config. If the hole config file is prased, all information will be stored in die struct. 
+ *   
+ *  @author Chris Iatrou, Julian Rahm
+ *  @date 03.12.2016
+ * 
+ */
 struct ServerConfig {
 	string rootFolder = "DefaultRootFolder";
 	string descriptionFolder = "No description is set";

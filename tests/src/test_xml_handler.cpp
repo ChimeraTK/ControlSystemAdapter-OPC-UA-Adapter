@@ -15,7 +15,7 @@ class XMLFileHandlerTest {
    
 void XMLFileHandlerTest::readDocFile(){ 
 	std::cout << "Enter XMLFileHandlerTest - readDocFile" << std::endl;
-	xml_file_handler *xmlHandlerOne = new xml_file_handler("../../tests/uamapping_test_1.xml");
+	xml_file_handler *xmlHandlerOne = new xml_file_handler("../tests/uamapping_test_1.xml");
 	BOOST_CHECK(xmlHandlerOne != NULL);
 	
 	// Emtpy path
@@ -23,12 +23,12 @@ void XMLFileHandlerTest::readDocFile(){
 	BOOST_CHECK(xmlHandlerTwo->isDocSetted() == false);
 	BOOST_CHECK(xmlHandlerTwo->getNodeSet("//application") == NULL);
 	// Set a document
-	xmlHandlerTwo->createDoc("../../tests/uamapping_test_2.xml");
+	xmlHandlerTwo->createDoc("../tests/uamapping_test_2.xml");
 	BOOST_CHECK(xmlHandlerTwo->isDocSetted() == true);
 	BOOST_CHECK(xmlHandlerTwo->getNodeSet("//application") != NULL);
 	
 	// Set a not wellformed document
-	xml_file_handler *xmlHandlerThree = new xml_file_handler("../../tests/uamapping_test_notwellformed.xml");
+	xml_file_handler *xmlHandlerThree = new xml_file_handler("../tests/uamapping_test_notwellformed.xml");
 	BOOST_CHECK(xmlHandlerThree->isDocSetted() == false);
 	BOOST_CHECK(xmlHandlerThree->getNodeSet("//application") == NULL);
 	
@@ -41,7 +41,7 @@ void XMLFileHandlerTest::readDocFile(){
 
 void XMLFileHandlerTest::getContent(){ 
 	std::cout << "Enter XMLFileHandlerTest - getContent" << std::endl;
-	xml_file_handler *xmlHandler = new xml_file_handler("../../tests/uamapping_test_1.xml");
+	xml_file_handler *xmlHandler = new xml_file_handler("../tests/uamapping_test_1.xml");
 	
 	xmlXPathObjectPtr result = xmlHandler->getNodeSet("//application[@name='TestCaseForXMLFileHandlerTest::getContent']//map");
 	BOOST_CHECK(result != NULL);

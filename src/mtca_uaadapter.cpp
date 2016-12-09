@@ -204,7 +204,7 @@ void mtca_uaadapter::readAdditionalNodes() {
 			string folderName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "folderName"); 
 			string folderDescription = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "description");
 			if(folderName.empty()) {
-				cout << "There is no folder name specified. Please set a name" << endl;
+				cout << "There is no folder name specified, ignore <additionalNode>-Element. Please set a name" << endl;
 			}
 			else {
 				UA_NodeId folderNodeId = this->createFolder(this->ownNodeId, folderName, folderDescription);

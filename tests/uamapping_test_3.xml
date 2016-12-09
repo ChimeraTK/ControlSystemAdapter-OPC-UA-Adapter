@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<uamapping>
+	<config rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
+		<serverConfig applicationName="OPCUAServer" port="16661" />
+		<login username="test" password="test123" />
+	</config>
+	<config rootFolder="TestFolder_2" description="Ich bin die Beschreibung des TestFolders">
+		<serverConfig applicationName="OPCUAServer" port="16662" />
+		<login username="test" password="test123" />
+	</config>
+	
+	<additionalNodes folderName="" description="DescriptionOfEmptyFolder">
+	</additionalNodes>
+
+	<application name="EPICS">
+		<map sourceVariableName="Mein/Name/ist/uint32Scalar" rename="uint32S">
+			<unrollPath pathSep="/">True</unrollPath>
+		  <folder>EastSide/LINAC</folder>
+    </map>
+		<map sourceVariableName="Dein/Name/ist/int32Scalar">
+		  <folder>NorthSideLINAC/partA</folder>
+    </map>
+		<map sourceVariableName="Dieser/Name/ist/doubleScalar">
+			<unrollPath pathSep="/">True</unrollPath>
+    </map>
+	</application>
+</uamapping>
