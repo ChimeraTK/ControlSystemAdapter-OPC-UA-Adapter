@@ -6,6 +6,7 @@
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/ProcessArray.h"
+#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 
 #include "ipc_managed_object.h"
 
@@ -21,10 +22,11 @@ struct TestFixtureEmptySet {
   boost::shared_ptr<ControlSystemPVManager> csManager;
   boost::shared_ptr<DevicePVManager> devManager;
     
-  ControlSystemSynchronizationUtility csSyncUtil;
+	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
 
-  TestFixtureEmptySet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second), csSyncUtil(csManager) {
-		csSyncUtil.receiveAll();
+  TestFixtureEmptySet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second) {
+		syncDevUtility.reset(new ChimeraTK::DeviceSynchronizationUtility(devManager));
+		syncDevUtility->receiveAll();
 	}
 };
 
@@ -33,12 +35,12 @@ struct TestFixturePVSet {
 	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers;
 	boost::shared_ptr<ControlSystemPVManager> csManager;
 	boost::shared_ptr<DevicePVManager> devManager;
-		
-	ControlSystemSynchronizationUtility csSyncUtil;
+
+	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
 	
-  TestFixturePVSet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second), csSyncUtil(csManager) {
-		csSyncUtil.receiveAll();
-	ControlSystemSynchronizationUtility syncUtil(csManager);
+  TestFixturePVSet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second){
+		syncDevUtility.reset(new ChimeraTK::DeviceSynchronizationUtility(devManager));
+		syncDevUtility->receiveAll();
 	
 	// Testset
 	ProcessArray<int8_t>::SharedPtr intA8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Scalar", 1);

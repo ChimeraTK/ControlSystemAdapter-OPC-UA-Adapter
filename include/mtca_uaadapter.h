@@ -96,8 +96,8 @@ public:
 	UA_NodeId existFolder(UA_NodeId basenodeid, string folder);
 	
     
-	void addVariable(string name, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility);
-	void addConstant(string name, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility);
+	void addVariable(string name, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
+	void addConstant(string name, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
 	
 	UA_NodeId getOwnNodeId();
 	vector<mtca_processvariable *> getVariables();

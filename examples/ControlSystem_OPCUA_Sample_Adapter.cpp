@@ -136,9 +136,6 @@ int main() {
 	csManager->getProcessArray<int32_t>("int32Array_s15")->get().at(4) = 16;
 	csManager->getProcessArray<int32_t>("int32Array_s15")->write();
 	
-	syncDevUtility->receiveAll();
-	//syncDevUtility->sendAll();
-	
 	// start values
 	int32_t microseconds = 1000000;
 	int32_t period = 3.141;
@@ -152,7 +149,7 @@ int main() {
 	cout << "Dummy Daten geschrieben..." << std::endl;	
 	
 	string pathToConfig = "opcuaAdapter_mapping.xml";
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncCsUtility, pathToConfig);
+	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncDevUtility, pathToConfig);
 	
 	// Only for Sin ValueGenerator
 	mgr = new ipc_manager();
@@ -162,6 +159,7 @@ int main() {
 	
 	// Server is running
 	std::cout << "Server läuft..." << std::endl;
+	int32_t i = 0;
 	while(csaOPCUA->isRunning()) {
 // 		do something crazy shit
 // 		cout << "Part1: " << devManager->getProcessArray<int32_t>("int32Array_s15")->get().at(0) << endl;
@@ -170,7 +168,8 @@ int main() {
 // 		cout << "Part3: " << csManager->getProcessArray<int32_t>("int_sine")->get().at(0) << endl;
 // 		cout << "Part4: " << devManager->getProcessArray<int32_t>("int_sine")->get().at(0) << endl;
 		
-		sleep(2);
+// 		cout << "Part5: " << csManager->getProcessArray<int16_t>("int16Scalar")->get().at(0) << endl;
+// 		cout << "Part6: " << devManager->getProcessArray<int16_t>("int16Scalar")->get().at(0) << endl;
 	}
 	
 	return 0;
