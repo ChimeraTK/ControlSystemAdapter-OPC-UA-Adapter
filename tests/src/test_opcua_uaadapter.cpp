@@ -34,7 +34,7 @@ void UAAdapterTest::testExampleSet() {
 // 		cout << msg << endl;
 // 		BOOST_CHECK(true);
 // 	}
-	BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("../../tests/uamapping_test_3.xml"), runtime_error)
+	//BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("../../tests/uamapping_test_3.xml"), runtime_error)
 	
 	// is Server running?
 	adapter->doStart();

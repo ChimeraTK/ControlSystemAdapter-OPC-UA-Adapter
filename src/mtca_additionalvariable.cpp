@@ -73,28 +73,37 @@ UA_StatusCode mtca_additionalvariable::mapSelfToNamespace() {
     oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", (char*)this->name.c_str());
     oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", (char*)this->description.c_str());
 		    
-    UA_INSTATIATIONCALLBACK(icb);  
-    UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
-                            this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                            UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAADDITIONALVARIABLE), oAttr, &icb, &createdNodeId);
+		
+// 		UA_VariableAttributes vAttr;
+//     UA_VariableAttributes_init(&vAttr);
+// 		vAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", (char*)this->description.c_str());
+// 		vAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", (char*)this->name.c_str());
+// 		UA_String myInteger = UA_STRING((char*)this->value.c_str());
+// 		UA_Variant_setScalar(&vAttr.value, &myInteger, &UA_TYPES[UA_TYPES_STRING]);
+// 		vAttr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
+		
+		UA_INSTATIATIONCALLBACK(icb);  
+// 		UA_Server_addVariableNode(this->mappedServer, UA_NODEID_NUMERIC(1,0), this->baseNodeId,
+// 															UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()),
+//                               UA_NODEID_NULL, vAttr, &icb, &createdNodeId);
+		
+     UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
+                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                             UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAADDITIONALVARIABLE), oAttr, &icb, &createdNodeId);
     
-	/* Use a function map to map any local functioncalls to opcua methods (we do not own any methods) */
-	UA_FunctionCall_Map mapThis;
-	this->ua_mapFunctions(this, &mapThis, createdNodeId);
-	
 	// know your own nodeId
 	this->ownNodeId = createdNodeId;
-    
+		
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
 	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE), oAttr.description, .read=UA_RDPROXY_NAME(mtca_additionalvariable, getValue)});
-			
-
+	
 	this->ua_mapDataSources((void *) this, &mapDs);
 	
 	return UA_STATUSCODE_GOOD;
 }
 	
+
 UA_DateTime mtca_additionalvariable::getSourceTimeStamp() {
 	return UA_DateTime_now();
 }

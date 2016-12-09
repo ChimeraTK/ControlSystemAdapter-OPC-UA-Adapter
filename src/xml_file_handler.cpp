@@ -98,7 +98,7 @@ bool xml_file_handler::createDoc(std::string filePath) {
 	this->doc = xmlParseFile(filePath.c_str());
 	
  	if(this->doc == NULL ) {
-		std::cout << "Document not parsed successfully." << std::endl;
+		//std::cout << "Document not parsed successfully." << std::endl;
 		return false;
  	}
 
