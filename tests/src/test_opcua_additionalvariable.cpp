@@ -165,17 +165,6 @@ void AdditionalVariableTest::testClientSide(){
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) valueToCheck->data)), valName);
 										//cout << "Description: " << valName << endl;
 										BOOST_CHECK(valName == "Value");
-										// Write new engineering unit
-										UA_String newValue;
-										UA_String_init(&newValue);
-										string merker = "Beschreibung";
-										CPPSTRING_TO_UASTRING(newValue, merker);
-										UA_Variant_init(valueToCheck);
-										UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_STRING]);
-										UA_StatusCode retvalNewDesc = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
-										UA_String_deleteMembers(&newValue);
-										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) valueToCheck->data)), valName);
-										BOOST_CHECK(valName == "Beschreibung");
 										
 										BOOST_CHECK((datatypeId.identifier.numeric -1) == UA_TYPES_STRING);
 									}
