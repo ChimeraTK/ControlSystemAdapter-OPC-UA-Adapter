@@ -173,8 +173,14 @@ if(ENABLE_COVERAGE)
 endif()
 
 if(ENABLE_UNIT_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
+	file(COPY tests/uamapping_test_1.xml
+           tests/uamapping_test_2.xml
+           tests/uamapping_test_3.xml
+           tests/uamapping_test_notwellformed.xml
+           DESTINATION ${PROJECT_BINARY_DIR}/tests )
+
+	enable_testing()
+	add_subdirectory(tests)
 endif()
 
 if(BUILD_STATIC_ANALYSIS)
@@ -287,12 +293,6 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_THREAD_LIBRARY}
   ${Boost_CHRONO_LIBRARY}
 )
-
-file( COPY tests/uamapping_test_1.xml
-           tests/uamapping_test_2.xml
-           tests/uamapping_test_3.xml
-           tests/uamapping_test_notwellformed.xml
-      DESTINATION ${PROJECT_BINARY_DIR}/tests )
 
 if(ENABLE_LINTING)
 add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
