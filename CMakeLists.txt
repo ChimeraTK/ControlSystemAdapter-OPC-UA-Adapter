@@ -288,6 +288,12 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_CHRONO_LIBRARY}
 )
 
+file( COPY tests/uamapping_test_1.xml
+           tests/uamapping_test_2.xml
+           tests/uamapping_test_3.xml
+           tests/uamapping_test_notwellformed.xml
+      DESTINATION ${PROJECT_BINARY_DIR}/tests )
+
 if(ENABLE_LINTING)
 add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
                     PRE_BUILD
