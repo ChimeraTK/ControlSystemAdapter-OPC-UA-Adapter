@@ -38,6 +38,7 @@
 
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
+#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 #include "ControlSystemAdapterOPCUA.h"
 
 
@@ -68,7 +69,7 @@ void csa_opcua_prolog() {
 ControlSystemAdapterOPCUA* csa_opcua_main() {
 	
 	string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncDevUtility, pathToConfig);
+	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncCsUtility, pathToConfig);
 	
 	return csaOPCUA;
 }

@@ -73,10 +73,10 @@ extern "C" {
  * @param configFile Define the path to the mapping-file with config and mapping information
  * 
  */ 
-ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility, string configFile) {
+ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility, string configFile) {
 	
 	this->csManager = csManager; 	
-	this->syncDevUtility = syncDevUtility;
+	this->syncCsUtility = syncCsUtility;
 	this->ControlSystemAdapterOPCUA_InitServer(configFile);
 	this->ControlSystemAdapterOPCUA_InitVarMapping();
 	
@@ -113,7 +113,7 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping() {
     vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
   
     for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
-        adapter->addVariable(oneProcessVariable->getName(), this->csManager, this->syncDevUtility);
+        adapter->addVariable(oneProcessVariable->getName(), this->csManager, this->syncCsUtility);
     }
     
     vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();

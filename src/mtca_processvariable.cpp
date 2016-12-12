@@ -52,13 +52,13 @@ extern "C" {
  * @param csManager Provide the hole PVManager from control-system-adapter to map all processvariable to the OPC UA-Model
  * 
  */
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) : ua_mapped_class(server, basenodeid) {
+mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncDevUtility) : ua_mapped_class(server, basenodeid) {
   	
   	// FIXME Check if name member of a csManager Parameter
   	this->namePV = namePV;
   	this->nameNew = namePV;
   	this->csManager = csManager;
-		this->syncDevUtility = syncDevUtility;
+		this->syncCsUtility = syncCsUtility;
   	
   	this->mapSelfToNamespace();
 }
@@ -74,13 +74,13 @@ mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenode
  * @param csManager The hole PVManager from control-system-adapter 
  * 
  */
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) : ua_mapped_class(server, basenodeid) {
+mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncDevUtility) : ua_mapped_class(server, basenodeid) {
 	
 	// FIXME Check if name member of a csManager Parameter
 	this->namePV = namePV;
 	this->nameNew = nameNew;
 	this->csManager = csManager;
-	this->syncDevUtility = syncDevUtility;
+	this->syncCsUtility = syncCsUtility;
 	
 	if(!engineeringUnit.empty()) {
 		setEngineeringUnit(engineeringUnit);
@@ -177,7 +177,6 @@ _p_type    mtca_processvariable::getValue_##_p_type() { \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() == 1) { \
 			if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
 				this->csManager->getProcessArray<_p_type>(this->namePV)->readNonBlocking(); \
-				this->syncDevUtility->sendAll(); \
 			} \
 			v = this->csManager->getProcessArray<_p_type>(this->namePV)->get().at(0); \
 		} \
@@ -192,7 +191,6 @@ std::vector<_p_type>    mtca_processvariable::getValue_Array_##_p_type() { \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() > 1) { \
 			if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
 				this->csManager->getProcessArray<_p_type>(this->namePV)->readNonBlocking(); \
-				this->syncDevUtility->sendAll(); \
 			} \
 			v = this->csManager->getProcessArray<_p_type>(this->namePV)->get(); \
 		} \
@@ -207,7 +205,6 @@ void mtca_processvariable::setValue_##_p_type(_p_type value) { \
 			if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
 					this->csManager->getProcessArray<_p_type>(this->namePV)->set(vector<_p_type> {value});   \
 					this->csManager->getProcessArray<_p_type>(this->namePV)->write();       \
-					this->syncDevUtility->receiveAll(); \
 			}\
 		} \
     return; \
@@ -223,7 +220,6 @@ void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) 
 				value.resize(valueSize); \
 				this->csManager->getProcessArray<_p_type>(this->namePV)->set(value); \
 				this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
-				this->syncDevUtility->receiveAll(); \
 		} \
 	return; \
 }

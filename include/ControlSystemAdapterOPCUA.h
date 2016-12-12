@@ -35,7 +35,6 @@
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
-#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
 
 class ControlSystemAdapterOPCUA {
@@ -43,13 +42,13 @@ private:
 	ipc_manager    *mgr;
 	mtca_uaadapter *adapter;
 	boost::shared_ptr<ControlSystemPVManager> csManager;
-	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
+	boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
 	
 	void ControlSystemAdapterOPCUA_InitServer(string configFile);
 	void ControlSystemAdapterOPCUA_InitVarMapping();
     
 public:
-	ControlSystemAdapterOPCUA(boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility, string configFile);
+	ControlSystemAdapterOPCUA(boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility, string configFile);
 	~ControlSystemAdapterOPCUA();
     
 	boost::shared_ptr<ControlSystemPVManager> const & getControlSystemManager() const;
