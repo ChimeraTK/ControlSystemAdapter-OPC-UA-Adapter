@@ -26,6 +26,15 @@
  *
  */
 
+/** @class ua_proxies
+ *	@brief 
+ *   
+ *  @author Chris Iatrou
+ *	@author Julian Rahm
+ *  @date 22.11.2016
+ * 
+ */
+
 extern "C" 
 {
   #include "open62541.h"

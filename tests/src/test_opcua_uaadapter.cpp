@@ -34,7 +34,7 @@ void UAAdapterTest::testExampleSet() {
 // 		cout << msg << endl;
 // 		BOOST_CHECK(true);
 // 	}
-	//BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("../../tests/uamapping_test_3.xml"), runtime_error)
+	BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("../../tests/uamapping_test_3.xml"), runtime_error)
 	
 	// is Server running?
 	adapter->doStart();
@@ -82,10 +82,10 @@ void UAAdapterTest::testExampleSet() {
 	BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
 	
 	for(auto processVar:tfExampleSet.csManager.get()->getAllProcessVariables()) {
-		adapter->addVariable(processVar.get()->getName() , tfExampleSet.csManager, tfExampleSet.syncDevUtility);
+		adapter->addVariable(processVar.get()->getName() , tfExampleSet.csManager, tfExampleSet.syncCsUtility);
 	}
 
-	adapter->addConstant("int8Scalar", tfExampleSet.csManager, tfExampleSet.syncDevUtility);
+	adapter->addConstant("int8Scalar", tfExampleSet.csManager, tfExampleSet.syncCsUtility);
 
 	BOOST_CHECK(adapter->getConstants().size() > 0);
 	BOOST_CHECK(adapter->getVariables().size() > 0);

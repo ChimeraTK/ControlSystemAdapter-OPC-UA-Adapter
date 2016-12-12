@@ -24,8 +24,16 @@
  * 
  */
 
-#include "xml_file_handler.h"
+/** @class xml_file_handler
+ *	@brief 
+ *   
+ *  @author Chris Iatrou
+ *	@author Julian Rahm
+ *  @date 22.11.2016
+ * 
+ */
 
+#include "xml_file_handler.h"
 
 #include <iostream>
 

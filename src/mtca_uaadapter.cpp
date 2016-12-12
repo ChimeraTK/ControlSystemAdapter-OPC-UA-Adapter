@@ -24,6 +24,15 @@
  *
  */
 
+/** @class mtca_uaadapter
+ *	@brief 
+ *   
+ *  @author Chris Iatrou
+ *	@author Julian Rahm
+ *  @date 22.11.2016
+ * 
+ */
+
 extern "C" {
 #include "unistd.h"
 #include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers

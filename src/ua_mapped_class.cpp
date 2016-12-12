@@ -26,6 +26,15 @@
  *
  */
 
+/** @class ua_mapped_class
+ *	@brief 
+ *   
+ *  @author Chris Iatrou
+ *	@author Julian Rahm
+ *  @date 22.11.2016
+ * 
+ */
+
 #include "ua_mapped_class.h"
 #include <iostream>
 

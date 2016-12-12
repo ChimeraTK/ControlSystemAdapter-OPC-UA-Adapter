@@ -26,6 +26,15 @@
  *
  */
 
+/** @class ipc_managed_object
+ *	@brief 
+ *   
+ *  @author Chris Iatrou
+ *	@author Julian Rahm
+ *  @date 22.11.2016
+ * 
+ */
+
 #include "ipc_managed_object.h"
 #include <iostream>
 #include <time.h>

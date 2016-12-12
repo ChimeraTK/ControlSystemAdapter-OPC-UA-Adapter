@@ -22,11 +22,11 @@ struct TestFixtureEmptySet {
   boost::shared_ptr<ControlSystemPVManager> csManager;
   boost::shared_ptr<DevicePVManager> devManager;
     
-	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
+	boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
 
   TestFixtureEmptySet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second) {
-		syncDevUtility.reset(new ChimeraTK::DeviceSynchronizationUtility(devManager));
-		syncDevUtility->receiveAll();
+		syncCsUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
+		syncCsUtility->receiveAll();
 	}
 };
 
@@ -36,11 +36,11 @@ struct TestFixturePVSet {
 	boost::shared_ptr<ControlSystemPVManager> csManager;
 	boost::shared_ptr<DevicePVManager> devManager;
 
-	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
+	boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
 	
   TestFixturePVSet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second){
-		syncDevUtility.reset(new ChimeraTK::DeviceSynchronizationUtility(devManager));
-		syncDevUtility->receiveAll();
+		syncCsUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
+		syncCsUtility->receiveAll();
 	
 	// Testset
 	ProcessArray<int8_t>::SharedPtr intA8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Scalar", 1);
