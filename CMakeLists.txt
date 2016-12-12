@@ -160,7 +160,7 @@ if(ENABLE_COVERAGE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
   
 	add_custom_target(coverage ALL
-										${PROJECT_SOURCE_DIR}/cmake/makeGcov.sh ${PROJECT_SOURCE_DIR}
+										${PROJECT_SOURCE_DIR}/cmake/makeGcov.sh ${PROJECT_BINARY_DIR}
 										WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 										# Bad soulution to provide all depencys
 										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ControlSystemAdapterOPCUA
