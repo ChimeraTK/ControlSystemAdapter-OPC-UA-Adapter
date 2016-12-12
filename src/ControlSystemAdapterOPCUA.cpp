@@ -29,7 +29,7 @@
 /**
 * @mainpage This is the dokumentation of ControlSystemAdapter-OPC-UA-Adapter
 * 
-* @brief 
+* @brief In some weeks... maybe there will be here a fancy description of the project...
 *
 *
 * @author Chris Iatrou Chris_Paul.Iatrou@tu-dresden.de
@@ -80,9 +80,6 @@ ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(boost::shared_ptr<ControlSy
 	this->ControlSystemAdapterOPCUA_InitServer(configFile);
 	this->ControlSystemAdapterOPCUA_InitVarMapping();
 	
-	//this->syncCsUtility->sendAll();
-	//this->syncCsUtility->receiveAll();
-	
 }
 
 /**
@@ -118,7 +115,7 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping() {
     
     vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
 		if(allNotMappedVariables.size() > 0) {
-			cout << "The following VariableNodes cant be mapped, because they are not member in the PV-Manager:" << endl;
+			cout << "The following VariableNodes cant be mapped, because they are not member in PV-Manager:" << endl;
 			for(string var:allNotMappedVariables) {
 				cout << var << endl;
 			}

@@ -137,7 +137,7 @@ option(ENABLE_BUILDMODEL      "Create model from XML description"      ON)
 option(ENABLE_COVERAGE        "Enable coverage stats and tests for adapter build" OFF)
 option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static code analysis using clangs analyzer." OFF)
 option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prior to compilation." OFF)
-option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." OFF)
+option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
 
 if(ENABLE_BUILDMODEL)
