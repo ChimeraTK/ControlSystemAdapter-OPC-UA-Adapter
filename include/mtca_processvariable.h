@@ -30,7 +30,6 @@
 #include "ua_mapped_class.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
-#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 
 using namespace std;
 using namespace ChimeraTK;
@@ -44,12 +43,12 @@ private:
 	UA_NodeId ownNodeId;
 	
 	boost::shared_ptr<ControlSystemPVManager> csManager;
-	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
+	boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
 	UA_StatusCode mapSelfToNamespace();
 	
 public:
-	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
-	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
+	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility);
+	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility);
 	
 	~mtca_processvariable();
 	

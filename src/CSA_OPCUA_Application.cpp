@@ -44,6 +44,7 @@ extern "C" {
 
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
+#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 #include "ControlSystemAdapterOPCUA.h"
 
 boost::shared_ptr<ControlSystemPVManager> csManager;
@@ -82,7 +83,7 @@ int main() {
     ChimeraTK::ApplicationBase::getInstance().initialise();
 
     string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncDevUtility, pathToConfig);
+	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncCsUtility, pathToConfig);
 
 
     ChimeraTK::ApplicationBase::getInstance().run();

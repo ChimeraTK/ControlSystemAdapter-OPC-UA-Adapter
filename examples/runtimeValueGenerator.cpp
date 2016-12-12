@@ -33,18 +33,15 @@
 #include <sys/sysinfo.h> 
 #include <unistd.h>
 
-#include "open62541.h"
 #include "ControlSystemAdapterOPCUA.h"
 
-#include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 #include "ipc_manager.h"
 
 using std::cout;
 using std::endl;
 using namespace ChimeraTK;
 	 
-runtimeValueGenerator::runtimeValueGenerator(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncDevUtility) {
+runtimeValueGenerator::runtimeValueGenerator(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) {
 	this->devManager = devManager;
 	this->syncDevUtility = syncDevUtility;
 	this->doStart();
@@ -56,7 +53,7 @@ runtimeValueGenerator::~runtimeValueGenerator() {
 	}
 }
 
-void runtimeValueGenerator::generateValues(boost::shared_ptr<DevicePVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncDevUtility) {
+void runtimeValueGenerator::generateValues(boost::shared_ptr<DevicePVManager> csManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) {
 	// Time meassureing
 	clock_t start, end;
 	start = clock();

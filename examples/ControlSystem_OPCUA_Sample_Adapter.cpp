@@ -44,7 +44,6 @@ extern "C" {
 
 #include "open62541.h"
 
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
@@ -96,8 +95,8 @@ int main() {
 	 * Generate dummy data
 	 */
  	ProcessArray<int8_t>::SharedPtr intA8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Scalar", 1, "Iatrou^2/Rahm");
- 	ProcessArray<uint8_t>::SharedPtr intAu8dev = devManager->createProcessArray<uint8_t>(deviceToControlSystem, "uint8Scalar", 1, "mIatrou*Rahm");
- 	ProcessArray<int16_t>::SharedPtr intA16dev = devManager->createProcessArray<int16_t>(deviceToControlSystem, "int16Scalar", 1);
+ 	ProcessArray<uint8_t>::SharedPtr intAu8dev = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Scalar", 1, "mIatrou*Rahm");
+ 	ProcessArray<int16_t>::SharedPtr intA16dev = devManager->createProcessArray<int16_t>(controlSystemToDevice, "int16Scalar", 1);
  	ProcessArray<uint16_t>::SharedPtr intAu16dev = devManager->createProcessArray<uint16_t>(controlSystemToDevice, "uint16Scalar", 1);
  	ProcessArray<int32_t>::SharedPtr intA32dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "int32Scalar", 1);
  	ProcessArray<uint32_t>::SharedPtr intAu32dev = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "uint32Scalar", 1);
@@ -113,11 +112,11 @@ int main() {
 	ProcessArray<double>::SharedPtr intB15Afdev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleArray_s15", 15);
 	ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s10", 10);	
 	// data generation cycle time in ms
-	ProcessArray<int32_t>::SharedPtr dtDev = devManager->createProcessArray<int32_t>(deviceToControlSystem, "dt", 1);
+	ProcessArray<int32_t>::SharedPtr dtDev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "dt", 1);
 	// time since server start in ms
 	ProcessArray<int32_t>::SharedPtr tDev = devManager->createProcessArray<int32_t>(deviceToControlSystem, "t", 1);
-	ProcessArray<int32_t>::SharedPtr periodDev = devManager->createProcessArray<int32_t>(deviceToControlSystem, "period", 1);
-	ProcessArray<double>::SharedPtr amplitudeDev = devManager->createProcessArray<double>(deviceToControlSystem, "amplitude", 1);
+	ProcessArray<int32_t>::SharedPtr periodDev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "period", 1);
+	ProcessArray<double>::SharedPtr amplitudeDev = devManager->createProcessArray<double>(controlSystemToDevice, "amplitude", 1);
 	ProcessArray<double>::SharedPtr double_sineDev = devManager->createProcessArray<double>(deviceToControlSystem, "double_sine", 1);
 	ProcessArray<int32_t>::SharedPtr int_sineDev = devManager->createProcessArray<int32_t>(deviceToControlSystem, "int_sine", 1);
 	
@@ -149,11 +148,11 @@ int main() {
 	cout << "Dummy Daten geschrieben..." << std::endl;	
 	
 	string pathToConfig = "opcuaAdapter_mapping.xml";
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncDevUtility, pathToConfig);
+	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncCsUtility, pathToConfig);
 	
 	// Only for Sin ValueGenerator
 	mgr = new ipc_manager();
-	valGen = new runtimeValueGenerator(devManager, syncCsUtility);
+	valGen = new runtimeValueGenerator(devManager, syncDevUtility);
 	mgr->addObject(valGen);
 	mgr->doStart();	
 	
@@ -167,9 +166,11 @@ int main() {
 // 		
 // 		cout << "Part3: " << csManager->getProcessArray<int32_t>("int_sine")->get().at(0) << endl;
 // 		cout << "Part4: " << devManager->getProcessArray<int32_t>("int_sine")->get().at(0) << endl;
-		
+// 		
 // 		cout << "Part5: " << csManager->getProcessArray<int16_t>("int16Scalar")->get().at(0) << endl;
 // 		cout << "Part6: " << devManager->getProcessArray<int16_t>("int16Scalar")->get().at(0) << endl;
+// 		
+		sleep(2);
 	}
 	
 	return 0;
