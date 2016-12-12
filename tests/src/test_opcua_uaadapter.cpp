@@ -82,10 +82,10 @@ void UAAdapterTest::testExampleSet() {
 	BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
 	
 	for(auto processVar:tfExampleSet.csManager.get()->getAllProcessVariables()) {
-		adapter->addVariable(processVar.get()->getName() , tfExampleSet.csManager, tfExampleSet.syncCsUtility);
+		adapter->addVariable(processVar.get()->getName() , tfExampleSet.csManager);
 	}
 
-	adapter->addConstant("int8Scalar", tfExampleSet.csManager, tfExampleSet.syncCsUtility);
+	adapter->addConstant("int8Scalar", tfExampleSet.csManager);
 
 	BOOST_CHECK(adapter->getConstants().size() > 0);
 	BOOST_CHECK(adapter->getVariables().size() > 0);

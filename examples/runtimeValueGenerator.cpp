@@ -79,6 +79,7 @@ void runtimeValueGenerator::generateValues(boost::shared_ptr<DevicePVManager> cs
 		csManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {(int32_t)((end - start)/(CLOCKS_PER_SEC/1000))});
 		csManager->getProcessArray<int32_t>("t")->write();	
 		
+		// Refresh all ProcessVariable
 		syncDevUtility->receiveAll();
 		
 		usleep(csManager->getProcessArray<int32_t>("dt")->get().at(0));

@@ -49,6 +49,7 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PersistentDataStorage.h"
 #include "ChimeraTK/ControlSystemAdapter/ProcessArray.h"
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 
 #include "ipc_manager.h"
 #include "ControlSystemAdapterOPCUA.h"
@@ -148,7 +149,7 @@ int main() {
 	cout << "Dummy Daten geschrieben..." << std::endl;	
 	
 	string pathToConfig = "opcuaAdapter_mapping.xml";
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncCsUtility, pathToConfig);
+	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, pathToConfig);
 	
 	// Only for Sin ValueGenerator
 	mgr = new ipc_manager();
@@ -169,7 +170,7 @@ int main() {
 // 		
 // 		cout << "Part5: " << csManager->getProcessArray<int16_t>("int16Scalar")->get().at(0) << endl;
 // 		cout << "Part6: " << devManager->getProcessArray<int16_t>("int16Scalar")->get().at(0) << endl;
-// 		
+		
 		sleep(2);
 	}
 	

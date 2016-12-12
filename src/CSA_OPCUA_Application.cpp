@@ -69,7 +69,7 @@ void csa_opcua_prolog() {
 ControlSystemAdapterOPCUA* csa_opcua_main() {
 	
 	string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncCsUtility, pathToConfig);
+	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, pathToConfig);
 	
 	return csaOPCUA;
 }

@@ -267,9 +267,9 @@ void mtca_uaadapter::workerThread() {
 
 }
 
-void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility) {
+void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
 	
-	this->variables.push_back(new mtca_processvariable(this->mappedServer, this->variablesListId, varName, csManager, syncCsUtility));
+	this->variables.push_back(new mtca_processvariable(this->mappedServer, this->variablesListId, varName, csManager));
 	
 	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
 	xmlNodeSetPtr nodeset;
@@ -355,7 +355,7 @@ void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlS
 						if(varPathVector.size() > 0) {
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 						}						
-						this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager, syncCsUtility));
+						this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
 						createdVar = true;
 				}
 				
@@ -365,7 +365,7 @@ void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlS
 					if(varPathVector.size() > 0) {
 						newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 					}
-					this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager, syncCsUtility));
+					this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
 				}
  			}
 		}
@@ -374,8 +374,8 @@ void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlS
 	xmlXPathFreeObject (result);
 }
 
-void mtca_uaadapter::addConstant(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility) {
-    this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, csManager, syncCsUtility));
+void mtca_uaadapter::addConstant(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
+    this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, csManager));
 }
 
 vector<mtca_processvariable *> mtca_uaadapter::getVariables() {

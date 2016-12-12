@@ -52,13 +52,12 @@ extern "C" {
  * @param csManager Provide the hole PVManager from control-system-adapter to map all processvariable to the OPC UA-Model
  * 
  */
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility) : ua_mapped_class(server, basenodeid) {
+mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
   	
   	// FIXME Check if name member of a csManager Parameter
   	this->namePV = namePV;
   	this->nameNew = namePV;
   	this->csManager = csManager;
-		this->syncCsUtility = syncCsUtility;
   	
   	this->mapSelfToNamespace();
 }
@@ -74,13 +73,12 @@ mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenode
  * @param csManager The hole PVManager from control-system-adapter 
  * 
  */
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager, boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility) : ua_mapped_class(server, basenodeid) {
+mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
 	
 	// FIXME Check if name member of a csManager Parameter
 	this->namePV = namePV;
 	this->nameNew = nameNew;
 	this->csManager = csManager;
-	this->syncCsUtility = syncCsUtility;
 	
 	if(!engineeringUnit.empty()) {
 		setEngineeringUnit(engineeringUnit);
