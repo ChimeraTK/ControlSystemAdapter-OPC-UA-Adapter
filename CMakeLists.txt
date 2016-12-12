@@ -179,7 +179,7 @@ if(ENABLE_COVERAGE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
   
 	add_custom_target(coverage ALL
-										${PROJECT_SOURCE_DIR}/cmake/makeGcov.sh ${PROJECT_SOURCE_DIR}
+										${PROJECT_SOURCE_DIR}/cmake/makeGcov.sh ${PROJECT_BINARY_DIR}
 										WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 										# Bad soulution to provide all depencys
 										DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ControlSystemAdapterOPCUA
@@ -309,6 +309,12 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_THREAD_LIBRARY}
   ${Boost_CHRONO_LIBRARY}
 )
+
+file( COPY tests/uamapping_test_1.xml
+           tests/uamapping_test_2.xml
+           tests/uamapping_test_3.xml
+           tests/uamapping_test_notwellformed.xml
+      DESTINATION ${PROJECT_BINARY_DIR}/tests )
 
 if(ENABLE_LINTING)
 add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
