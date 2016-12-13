@@ -5,7 +5,7 @@ project(ControlSystemAdapterOPCUA)
 include(ExternalProject)
 
 SET(${PROJECT_NAME}_MAJOR_VERSION 01)
-SET(${PROJECT_NAME}_MINOR_VERSION 02)
+SET(${PROJECT_NAME}_MINOR_VERSION 03)
 SET(${PROJECT_NAME}_PATCH_VERSION 00)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
@@ -67,7 +67,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLA
 if(NOT open62541_FOUND)
   ExternalProject_Add(external-open62541
     GIT_REPOSITORY "https://github.com/open62541/open62541.git"
-    #When creationg a tag, base it on a tag of the ControlSystemAdapter so it stays stable
     #GIT_TAG "00.02.00"
     GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2"
     PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
