@@ -23,8 +23,6 @@ if(NOT mtca4u-deviceaccess_FOUND)
 			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess"
 			)
 			
-		list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-3.5/Modules/")
-		
 		set(ChimeraTK-DeviceAccess_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/include)
 		set(ChimeraTK-DeviceAccess_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/lib)
 		set(ChimeraTK-DeviceAccess_LIBRARIES mtca4u-deviceaccess)
@@ -43,7 +41,7 @@ if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
     GIT_TAG "master"
     DEPENDS external-ChimeraTK-DeviceAccess
     CMAKE_ARGS 
-    "-DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}"
+    "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/"
     "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter" 
     )
   #FIXME: Find a better name for this variable
