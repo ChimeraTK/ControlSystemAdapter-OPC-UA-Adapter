@@ -23,6 +23,7 @@ find_package(PythonInterp REQUIRED)
 find_package(ChimeraTK-ControlSystemAdapter)
 find_package(mtca4u-deviceaccess)
 
+#Install the DeviceAccess if it is not pre-installed
 if(NOT mtca4u-deviceaccess_FOUND)		
 		ExternalProject_Add(external-ChimeraTK-DeviceAccess
 			GIT_REPOSITORY "https://github.com/ChimeraTK/DeviceAccess.git"
@@ -35,9 +36,7 @@ if(NOT mtca4u-deviceaccess_FOUND)
 		set(ChimeraTK-DeviceAccess_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/lib)
 		set(ChimeraTK-DeviceAccess_LIBRARIES mtca4u-deviceaccess)
 	endif()
-	
-	#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-DeviceAccess_CXX_FLAGS}")
-	
+		
 #Install the ControlSystemAdapter if it is not pre-installed
 if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
   message("Installing ChimeraTK-ControlSystemAdapter as external dependency inside the build directory.")
@@ -54,14 +53,6 @@ if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
     )
   #FIXME: Find a better name for this variable
   set(USE_SELFINSTALLED_ControlSystemAdapter TRUE)
-  #As the external project is only condifured in the build step, we have to cheat the
-  #configuration here which otherwise is provided by find_package.
-  #Attention: This is a hack and can become inconsistent with the read config.
-  #
-  #ChimeraTK-ControlSystemAdapter_CXX_FLAGS currently only provides C++11, which is used anyway
-  #ChimeraTK-ControlSystemAdapter_LINKER_FLAGS provides the rpath, not needed for testing
-  #
-  #We leave out the boost flags as the OPCUA_Adapter uses them itself
   set(ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/include)
   set(ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/lib)
   set(ChimeraTK-ControlSystemAdapter_LIBRARIES ChimeraTK-ControlSystemAdapter)

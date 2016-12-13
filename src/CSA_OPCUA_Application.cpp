@@ -26,13 +26,6 @@
  *
  */
 
-/**
-* @mainpage Apllication
-*
-*
-* @author Julian Rahm
-*/ 
-
 extern "C" {
     #include <unistd.h>
     #include <signal.h>
@@ -49,8 +42,8 @@ extern "C" {
 
 boost::shared_ptr<ControlSystemPVManager> csManager;
 boost::shared_ptr<DevicePVManager> devManager;
-	boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
-	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
+boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
+boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
 ControlSystemAdapterOPCUA *csaOPCUA;
 
 std::atomic<bool> terminateMain;
@@ -83,7 +76,7 @@ int main() {
     ChimeraTK::ApplicationBase::getInstance().initialise();
 
     string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, syncCsUtility, pathToConfig);
+	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, pathToConfig);
 
 
     ChimeraTK::ApplicationBase::getInstance().run();

@@ -26,15 +26,6 @@
  *
  */
 
-/**
-* @mainpage This is the dokumentation of ControlSystemAdapter-OPC-UA-Adapter
-* 
-* @brief In some weeks... maybe there will be here a fancy description of the project...
-*
-*
-* @author Chris Iatrou Chris_Paul.Iatrou@tu-dresden.de
-* @author Julian Rahm Julian.Rahm@tu-dresden.de
-*/ 
 
 /** @class ControlSystemAdapterOPCUA
  *	@brief This class provide the two parts of the OPCUA Adapter. First of all the OPCUA server starts with a port number defined in config-file (recommended 16664),

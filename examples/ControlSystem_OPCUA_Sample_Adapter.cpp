@@ -142,10 +142,13 @@ int main() {
 	double amplitude = 10;
 		
 	// Set values
-	devManager->getProcessArray<int32_t>("dt")->set(vector<int32_t> {microseconds});
-	devManager->getProcessArray<int32_t>("period")->set(vector<int32_t> {period});
-	devManager->getProcessArray<double>("amplitude")->set(vector<double> {amplitude});
-	
+	csManager->getProcessArray<int32_t>("dt")->set(vector<int32_t> {microseconds});
+	csManager->getProcessArray<int32_t>("dt")->write();
+	csManager->getProcessArray<int32_t>("period")->set(vector<int32_t> {period});
+	csManager->getProcessArray<int32_t>("period")->write();
+	csManager->getProcessArray<double>("amplitude")->set(vector<double> {amplitude});
+	csManager->getProcessArray<double>("amplitude")->write();
+
 	cout << "Dummy Daten geschrieben..." << std::endl;	
 	
 	string pathToConfig = "opcuaAdapter_mapping.xml";
