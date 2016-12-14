@@ -78,12 +78,10 @@ UA_NodeId_copy(&_p_nodeid, & _p_nodeid##_tmp->targetNodeId);\
 this->ownedNodes.push_back(_p_nodeid##_tmp); } while(0);
 
 UA_NodeId *nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId remoteId);
-UA_NodeId *nodePairList_getSourceIdByTargetId(nodePairList pairList, UA_NodeId TargetId);
 
 // Node function and proxy mapping
 UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void *handle);
 
-UA_StatusCode ua_callProxy_mapFunctions(UA_Server* server, UA_NodeId objectId, UA_FunctionCall_Map *map, void* srcClass, int recursive);
 UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instantiatedNodesList, UA_DataSource_Map *map, void *srcClass);
 
 /* Instatiation NodeId gatherer Macro (because it's always the same...) */

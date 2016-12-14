@@ -315,11 +315,21 @@ void ProcessVariableTest::testClientSide(){
 									if(retvalValue == UA_STATUSCODE_GOOD) {
 										string datatype = "";
 										string valName = "";
+										string description = "";
+										string engineeringUnit = "";
 
+										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+										
 										// Check EngineeringUnit -> for all the same
-										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), valName);
+										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), engineeringUnit);
 										//cout << "EngineeringUnit: " << valName << endl;
-										BOOST_CHECK(valName != "");
+										if(valName.compare("int8Scalar") == 0) {
+											BOOST_CHECK(engineeringUnit == "Einheit");
+										}
+										else {
+											BOOST_CHECK(engineeringUnit == "n./a.");
+										}
+										
 										// Write new engineering unit
 										UA_String newEU;
 										UA_String_init(&newEU);
@@ -329,13 +339,18 @@ void ProcessVariableTest::testClientSide(){
 										UA_Variant_setScalarCopy(euToCheck, &newEU, &UA_TYPES[UA_TYPES_STRING]);
 										UA_StatusCode retvalNewEU = UA_Client_writeValueAttribute(client, engineeringUnitNodeId, euToCheck);
 										UA_String_deleteMembers(&newEU);
-										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), valName);
-										BOOST_CHECK(valName == "mHensel/Iatrou");
+										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), engineeringUnit);
+										BOOST_CHECK(engineeringUnit == "mHensel/Iatrou");
 										
 										// Check Description -> for all the same
-										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) descToCheck->data)), valName);
+										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) descToCheck->data)), description);
 										//cout << "Description: " << valName << endl;
-										BOOST_CHECK(valName == "");
+										if(valName.compare("int8Scalar") == 0) {
+											BOOST_CHECK(description == "Beschreibung der Variable");
+										}
+										else {
+											BOOST_CHECK(description == "");
+										}
 										// Write new engineering unit
 										UA_String newDesc;
 										UA_String_init(&newDesc);

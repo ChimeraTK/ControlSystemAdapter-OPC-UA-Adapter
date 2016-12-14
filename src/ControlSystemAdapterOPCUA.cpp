@@ -30,7 +30,7 @@
 /** @class ControlSystemAdapterOPCUA
  *	@brief This class provide the two parts of the OPCUA Adapter. First of all the OPCUA server starts with a port number defined in config-file (recommended 16664),
  * following the mapping process start. For this, the ProcessVariable from ControlSystemPVManager will be mapped to the OPCUA Model. During the mapping process also all 
- * <additionalNodes> will be mapped in OPC UA Model
+ * \<additionalNodes\> will be mapped in OPC UA Model
  *   
  *  @author Chris Iatrou
  *	@author Julian Rahm

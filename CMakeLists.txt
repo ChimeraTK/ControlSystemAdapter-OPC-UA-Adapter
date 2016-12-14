@@ -213,12 +213,12 @@ if(ENABLE_COVERAGE)
 endif()
 
 if(ENABLE_UNIT_TESTS)
-	file(COPY tests/uamapping_test_1.xml
-           tests/uamapping_test_2.xml
-           tests/uamapping_test_3.xml
-           tests/uamapping_test_notwellformed.xml
-           DESTINATION ${PROJECT_BINARY_DIR}/tests )
-
+	file(GLOB testFiles "${CMAKE_SOURCE_DIR}/tests/uamapping_test*.xml")
+	foreach(testFile ${testFiles})
+		file(COPY ${testFile} DESTINATION ${PROJECT_BINARY_DIR}/tests)
+		message("Copy ${testFile}")
+	endforeach(testFile)
+	
 	enable_testing()
 	add_subdirectory(tests)
 endif()

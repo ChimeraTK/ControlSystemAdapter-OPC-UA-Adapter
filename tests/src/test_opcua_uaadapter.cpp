@@ -17,24 +17,22 @@ using namespace std;
 class UAAdapterTest {
 	public:
 		static void testExampleSet();
-		static void testConfigHandling();
 };
    
 void UAAdapterTest::testExampleSet() { 
 	cout << "UAAdapterTest with ExampleSet started." << endl;
 	TestFixturePVSet tfExampleSet;
 	 // Create the managers
-	mtca_uaadapter *adapter = new mtca_uaadapter("../tests/uamapping_test_2.xml");
-	xml_file_handler *xmlHandler = new xml_file_handler("../tests/uamapping_test_2.xml");
-	
-// 	try {
-// 		mtca_uaadapter *adapter12 = new mtca_uaadapter("../../tests/uamapping_test_3.xml");
-// 	}
-// 	catch(char const* msg) {
-// 		cout << msg << endl;
-// 		BOOST_CHECK(true);
-// 	}
-	BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("../../tests/uamapping_test_3.xml"), runtime_error)
+	mtca_uaadapter *adapter = new mtca_uaadapter("./uamapping_test_2.xml");
+	xml_file_handler *xmlHandler = new xml_file_handler("./uamapping_test_2.xml");
+		
+	// Test config handling
+	BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("./uamapping_test_twoconfigs.xml"), runtime_error)
+	cout << "Eingetretten" << endl;
+	BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("./uamapping_test_applicationismissing.xml"), runtime_error)
+		cout << "EingetrettenTTTTTTTTTTTTTTTTTTTTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE" << endl;
+	BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("./uamapping_test_configismissing.xml"), runtime_error)
+	BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("./uamapping_test_portismissung.xml"), runtime_error)
 	
 	// is Server running?
 	adapter->doStart();
@@ -93,25 +91,14 @@ void UAAdapterTest::testExampleSet() {
 	/* Check if both var are not mapped */
 	cout << "Größe von: " << adapter->getAllNotMappableVariablesNames().size() << endl;
 	BOOST_CHECK(adapter->getAllNotMappableVariablesNames().size() == 6);
+	// Check if timestamp is not enmpty
+	string dateTime = "";
+	UASTRING_TO_CPPSTRING(UA_DateTime_toString(adapter->getSourceTimeStamp()), dateTime);
+	BOOST_CHECK(dateTime != "");
 		
 	adapter->~mtca_uaadapter();
 	free(adapter);
 };
-
-void UAAdapterTest::testConfigHandling() {
-// 	cout << "UAAdapterTest with ExampleSet started." << endl;
-// 	TestFixturePVSet tfExampleSet;
-// 	 // Create the managers
-// 	mtca_uaadapter *adapter = new mtca_uaadapter("../../tests/uamapping_test.xml", "10002");
-// 	xml_file_handler *xmlHandler = new xml_file_handler("../../tests/uamapping_test.xml");
-// 	
-// 	adapter->doStart();
-// 		
-	//while(true) {}
-
-	
-};
-
 
 /**
    * The boost test suite which executes the ProcessVariableTest.
@@ -120,7 +107,6 @@ class UAAdapterTestSuite: public test_suite {
 	public:
 		UAAdapterTestSuite() : test_suite("mtca_uaadapter Test Suite") {
 			add(BOOST_TEST_CASE(&UAAdapterTest::testExampleSet));
-			add(BOOST_TEST_CASE(&UAAdapterTest::testConfigHandling));
     }
 };
 

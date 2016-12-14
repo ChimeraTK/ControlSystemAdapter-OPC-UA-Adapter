@@ -93,16 +93,6 @@ UA_StatusCode ua_mapped_class::ua_unmapSelfFromNamespace()
   return UA_STATUSCODE_GOOD;
 }
 
-UA_StatusCode ua_mapped_class::ua_mapFunctions(void* srcClass, UA_FunctionCall_Map* map, UA_NodeId objectId) {
-	return ua_callProxy_mapFunctions(this->mappedServer, objectId, map, srcClass, false);
-}
-
-
 UA_StatusCode ua_mapped_class::ua_mapDataSources(void* srcClass, UA_DataSource_Map *map) {
   return ua_callProxy_mapDataSources(this->mappedServer, this->ownedNodes, map, srcClass);
-}
-
-	
-UA_DateTime ua_mapped_class::getSourceTimeStamp() {
-	return this->sourceTimeStamp;	
 }

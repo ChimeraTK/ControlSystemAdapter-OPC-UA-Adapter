@@ -143,7 +143,6 @@ void mtca_uaadapter::readConfig() {
 	string placeHolder = "";
 	if(result) {
 		xmlNodeSetPtr nodeset = result->nodesetval;
-		
 		// There should be only one <config>-Tag in config file
 		if(nodeset->nodeNr > 1) {
 			//cout << "More than one <config>-Tag was found in config file. Please provide only one Tag." << endl;
@@ -180,7 +179,7 @@ void mtca_uaadapter::readConfig() {
 	if(result) {
 		xmlNodeSetPtr nodeset = result->nodesetval;
 		string opcuaPort = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "port");
-		if(!opcuaPort.empty()) {
+		if(opcuaPort.compare("") != 0) {
 			this->serverConfig.opcuaPort = std::stoi(opcuaPort);
 		}
 		else {
@@ -188,7 +187,7 @@ void mtca_uaadapter::readConfig() {
 		}
 		
 		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
-		if(!placeHolder.empty()) {
+		if(placeHolder.compare("") != 0) {
 			this->serverConfig.applicationName = placeHolder;
 		}
 		else {

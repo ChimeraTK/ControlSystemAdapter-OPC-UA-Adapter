@@ -329,11 +329,7 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
     UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME_ALLOC(1, this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAPROCESSVARIABLE), oAttr, &icb, &createdNodeId);
-    
-	/* Use a function map to map any local functioncalls to opcua methods (we do not own any methods) */
-	UA_FunctionCall_Map mapThis;
-	this->ua_mapFunctions(this, &mapThis, createdNodeId);
-	
+    	
 	// know your own nodeId
 	this->ownNodeId = createdNodeId;
     
