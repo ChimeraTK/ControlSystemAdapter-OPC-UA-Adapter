@@ -19,13 +19,11 @@ build
 # If they are generally useful consider adding them to the 
 # project-template and the merge them in.
 ######################
-include/open62541
 include/ChimeraTK
 tools/dependencies/
 .kdev*
 .*
 ControlSystemAdapter-OPC-UA-Adapter.kdev4
-starteTestAndGcov.sh
 cov_htmp/
 app.info
 doc/html/

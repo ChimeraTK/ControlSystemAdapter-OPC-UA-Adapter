@@ -8,7 +8,7 @@ include_directories(${CMAKE_SOURCE_DIR}/tests/include)
 		add_executable(${executableName} ${testSourceFile} ${testAuxSources})
 		target_link_libraries(${executableName} ControlSystemAdapterOPCUA)
 	target_link_libraries(${executableName} ChimeraTK-ControlSystemAdapter)
-	target_link_libraries(${executableName} open62541)
+	target_link_libraries(${executableName} ${open62541_LIBRARIES})
 	target_link_libraries(${executableName} pthread)
 	target_link_libraries(${executableName}
 		${Boost_FILESYSTEM_LIBRARY}

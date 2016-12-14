@@ -37,7 +37,7 @@ if(NOT mtca4u-deviceaccess_FOUND)
 		set(ChimeraTK-DeviceAccess_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/lib)
 		set(ChimeraTK-DeviceAccess_LIBRARIES mtca4u-deviceaccess)
 	endif()
-		
+	
 #Install the ControlSystemAdapter if it is not pre-installed
 if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
   message("Installing ChimeraTK-ControlSystemAdapter as external dependency inside the build directory.")
@@ -61,35 +61,6 @@ if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
-
-#Install the open62541 if it is not pre-installed
-if(ENABLE_OPEN62541_BUILD)
-		ExternalProject_Add(external-open62541
-			GIT_REPOSITORY "https://github.com/open62541/open62541.git"
-			#GIT_TAG "00.02.00"
-			GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2"
-			PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
-			CMAKE_ARGS 
-			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/open62541" 
-			"-DUA_ENABLE_AMALGAMATION=On"
-			"-DBUILD_SHARED_LIBS=On" 
-			"-DUA_ENABLE_GENERATE_NAMESPACE0=On" 
-			"-DUA_ENABLE_METHODCALLS=ON" 
-			"-DUA_ENABLE_NODEMANAGEMENT=ON" 
-			"-DUA_ENABLE_SUBSCRIPTIONS=ON"
-		)
-		
-		set(open62541_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/open62541/include)
-		set(open62541_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/open62541/lib)
-		set(open62541_LIBRARIES open62541)
-		set(open62541_SOURCE_DIR "${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541")
-	else(ENABLE_OPEN62541_BUILD)
-		set(open62541_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include/)
-		set(open62541_LIBRARY_DIRS ${CMAKE_SOURCE_DIR}/open62541/lib)
-		set(open62541_LIBRARIES open62541)
-		set(open62541_SOURCE_DIR "${CMAKE_SOURCE_DIR}") 
-endif(ENABLE_OPEN62541_BUILD)
-
 
 ##########################################################################################################
 ## Set the build type to Release if none is specified
@@ -179,7 +150,7 @@ option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static co
 option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prior to compilation." OFF)
 option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
-option(ENABLE_OPEN62541_BUILD	"Build new open62541 from git repository" ON)
+option(ENABLE_OPEN62541_BUILD	"Build new open62541 from git repository" OFF)
 
 if(ENABLE_BUILDMODEL)
   set(MODEL_XML_FILE "templatemodel.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
@@ -189,6 +160,34 @@ else()
   include_directories(${CMAKE_SOURCE_DIR}/include/model_prebuilt/)
   list(APPEND objectSources ${CMAKE_SOURCE_DIR}/include/model_prebuilt/mtca_namespaceinit_generated.c)
 endif()
+
+#Install the open62541 if it is not pre-installed
+if(ENABLE_OPEN62541_BUILD)
+		ExternalProject_Add(external-open62541
+			GIT_REPOSITORY "https://github.com/open62541/open62541.git"
+			#GIT_TAG "00.02.00"
+			GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2"
+			PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
+			CMAKE_ARGS 
+			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/open62541" 
+			"-DUA_ENABLE_AMALGAMATION=On"
+			"-DBUILD_SHARED_LIBS=On" 
+			"-DUA_ENABLE_GENERATE_NAMESPACE0=On" 
+			"-DUA_ENABLE_METHODCALLS=ON" 
+			"-DUA_ENABLE_NODEMANAGEMENT=ON" 
+			"-DUA_ENABLE_SUBSCRIPTIONS=ON"
+		)
+		
+		set(open62541_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/open62541/include)
+		set(open62541_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/open62541/lib)
+		set(open62541_LIBRARIES open62541)
+		set(open62541_SOURCE_DIR "${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541")
+	else(NOT ENABLE_OPEN62541_BUILD)
+		set(open62541_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include/)
+		set(open62541_LIBRARY_DIRS ${CMAKE_SOURCE_DIR}/lib/open62541/)
+		set(open62541_LIBRARIES ${open62541_LIBRARY_DIRS}/libopen62541.so.0)
+		set(open62541_SOURCE_DIR "${CMAKE_SOURCE_DIR}") 
+endif(ENABLE_OPEN62541_BUILD)
 
 if(ENABLE_COVERAGE)
   set(CMAKE_BUILD_TYPE DEBUG)
@@ -265,7 +264,7 @@ endif()
 ## Create shared lib
 add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects>)
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION} SOVERSION ${${PROJECT_NAME}_SOVERSION})
-target_link_libraries(${PROJECT_NAME} ${open62541_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${open62541_LIBRARY_DIRS}/libopen62541.so.0)
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-DeviceAccess_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} pthread)
@@ -282,7 +281,7 @@ target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
 install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 # install libopen62541.so.0 => TODO this is a temporarly work around!
-install(FILES ${open62541_LIBRARIES}/libopen62541.so.0 DESTINATION lib)
+install(FILES ${open62541_LIBRARY_DIRS}/libopen62541.so.0 DESTINATION lib)
 
 ##########################################################################################################
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
