@@ -19,11 +19,9 @@ build
 # If they are generally useful consider adding them to the 
 # project-template and the merge them in.
 ######################
-lib
 include/open62541
 include/ChimeraTK
 tools/dependencies/
-tools/pyUANamespace/
 .kdev*
 .*
 ControlSystemAdapter-OPC-UA-Adapter.kdev4

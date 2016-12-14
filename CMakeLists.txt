@@ -22,7 +22,6 @@ find_package(PythonInterp REQUIRED)
 #Do not put any of the following packages as required. We will install it if it is not found.
 find_package(ChimeraTK-ControlSystemAdapter)
 find_package(mtca4u-deviceaccess)
-find_package(open62541)
 
 #Install the DeviceAccess if it is not pre-installed
 if(NOT mtca4u-deviceaccess_FOUND)		
@@ -64,27 +63,32 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
 
 #Install the open62541 if it is not pre-installed
-if(NOT open62541_FOUND)
-  ExternalProject_Add(external-open62541
-    GIT_REPOSITORY "https://github.com/open62541/open62541.git"
-    #GIT_TAG "00.02.00"
-    GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2"
-    PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
-    CMAKE_ARGS 
-    "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/open62541" 
-    "-DUA_ENABLE_AMALGAMATION=On"
-    "-DBUILD_SHARED_LIBS=On" 
-    "-DUA_ENABLE_GENERATE_NAMESPACE0=On" 
-    "-DUA_ENABLE_METHODCALLS=ON" 
-    "-DUA_ENABLE_NODEMANAGEMENT=ON" 
-    "-DUA_ENABLE_SUBSCRIPTIONS=ON"
-    )
-
-  set(open62541_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/open62541/include)
-  set(open62541_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/open62541/lib)
-  set(open62541_LIBRARIES open62541)
-  set(open62541_SOURCE_DIR "${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541")
-endif()
+if(ENABLE_OPEN62541_BUILD)
+		ExternalProject_Add(external-open62541
+			GIT_REPOSITORY "https://github.com/open62541/open62541.git"
+			#GIT_TAG "00.02.00"
+			GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2"
+			PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
+			CMAKE_ARGS 
+			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/open62541" 
+			"-DUA_ENABLE_AMALGAMATION=On"
+			"-DBUILD_SHARED_LIBS=On" 
+			"-DUA_ENABLE_GENERATE_NAMESPACE0=On" 
+			"-DUA_ENABLE_METHODCALLS=ON" 
+			"-DUA_ENABLE_NODEMANAGEMENT=ON" 
+			"-DUA_ENABLE_SUBSCRIPTIONS=ON"
+		)
+		
+		set(open62541_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/open62541/include)
+		set(open62541_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/open62541/lib)
+		set(open62541_LIBRARIES open62541)
+		set(open62541_SOURCE_DIR "${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541")
+	else(ENABLE_OPEN62541_BUILD)
+		set(open62541_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include/)
+		set(open62541_LIBRARY_DIRS ${CMAKE_SOURCE_DIR}/open62541/lib)
+		set(open62541_LIBRARIES open62541)
+		set(open62541_SOURCE_DIR "${CMAKE_SOURCE_DIR}") 
+endif(ENABLE_OPEN62541_BUILD)
 
 
 ##########################################################################################################
@@ -175,6 +179,7 @@ option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static co
 option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prior to compilation." OFF)
 option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
+option(ENABLE_OPEN62541_BUILD	"Build new open62541 from git repository" ON)
 
 if(ENABLE_BUILDMODEL)
   set(MODEL_XML_FILE "templatemodel.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
