@@ -28,7 +28,8 @@
 
 
 /** @class ControlSystemAdapterOPCUA
- *	@brief This class provide the two parts of the OPCUA Adapter. First of all the OPCUA server starts with a port number defined in config-file (recommended 16664),
+ *	@brief This class provide the two parts of the OPCUA Adapter. 
+ * First of all the OPCUA server starts with a port number defined in config-file (recommended 16664),
  * following the mapping process start. For this, the ProcessVariable from ControlSystemPVManager will be mapped to the OPCUA Model. During the mapping process also all 
  * \<additionalNodes\> will be mapped in OPC UA Model
  *   
@@ -127,6 +128,7 @@ ControlSystemAdapterOPCUA::~ControlSystemAdapterOPCUA() {
 /** 
  * @brief Return the ControlsystemPVManager
  * 
+ * @return Returns a ControlSystemPVManager
  */
 boost::shared_ptr<ControlSystemPVManager> const & ControlSystemAdapterOPCUA::getControlSystemManager() const {
     return this->csManager;
@@ -135,6 +137,8 @@ boost::shared_ptr<ControlSystemPVManager> const & ControlSystemAdapterOPCUA::get
 /**
  * @brief Return the uaadapter, hence the OPC UA server 
  * 
+ * @return Return the mtca_uaadapter
+ * 
  */
 mtca_uaadapter* ControlSystemAdapterOPCUA::getUAAdapter() {
 	return this->adapter;
@@ -142,6 +146,8 @@ mtca_uaadapter* ControlSystemAdapterOPCUA::getUAAdapter() {
 
 /**
  * @brief Return the ipc_manager
+ * 
+ * @return Return the ipc_manager
  *
  */
 ipc_manager* ControlSystemAdapterOPCUA::getIPCManager() {
@@ -179,6 +185,7 @@ void ControlSystemAdapterOPCUA::terminate() {
 /**
  * @brief Checks if the opcua server is still running and return the suitable bool value
  * 
+ * @return The current running state in form of true/false
  */
 bool ControlSystemAdapterOPCUA::isRunning() {
     return this->mgr->isRunning();

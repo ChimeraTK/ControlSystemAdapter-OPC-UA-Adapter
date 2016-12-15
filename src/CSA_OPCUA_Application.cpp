@@ -26,6 +26,22 @@
  *
  */
 
+/*! @mainpage 
+ *
+ * @section intro_sec Introduction
+ *
+ * In some week there will be here a detailed introduction about our opcua  adapter
+ *
+ * @section install_sec Installation
+ *
+ * Some detailed information about the compile process...
+ * 
+ * @section Miscellaneous
+ *  
+ * @author Julian Rahm \<Julian.Rahm@tu-dresden.de>
+ * @author Chris Iatrou \<Chris_Paul.Iatrou@tu-dresden.de>
+ * @date 22.11.2016
+ */
 extern "C" {
     #include <unistd.h>
     #include <signal.h>

@@ -57,14 +57,6 @@ ipc_managed_object::ipc_managed_object()
   this->thread_run = false;
 }
 
-/*ipc_managed_object::ipc_managed_object(uint32_t ipc_id)
-{
-  this->ipc_id = ipc_id;
-  this->threadTask = nullptr;
-  this->manager    = nullptr;
-  this->thread_run = false;
-}
-*/
 ipc_managed_object::~ipc_managed_object()
 {
   if (this->isRunning()) 
@@ -116,10 +108,6 @@ uint32_t ipc_managed_object::doStop()
 {
   cout << "ipc_managed_object being stopped" << endl;
   this->thread_run = false;
-// Allways nullptr... so maybe we need the current repo from gitlab "UAUtilitiyclasses"
-//   if (this->threadTask->joinable()) {
-//     this->threadTask->join();
-//   }
   cout << "ipc_managed_object was stopped" << endl;
   return 0;
 }
@@ -140,9 +128,3 @@ uint32_t ipc_managed_object::doStart()
 int32_t ipc_managed_object::terminate() {
   return 0;
 }
-
-/*
-ipc_managed_object_type ipc_managed_object::getManagedObjectType() {
-  return IPC_MANAGED_OBJECT_TYPE_GENERICOBJECT;
-}
-*/

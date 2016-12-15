@@ -48,9 +48,18 @@ using namespace std;
  * 
  */
 struct FolderInfo {
+	/** @brief Name of the folder
+	 * 
+	 */
 	string folderName;
+	/** @brief NodeId from the folder from opcua server
+	 */
 	UA_NodeId folderNodeId = UA_NODEID_NULL;
+	/** @brief NodeId from the child folder
+	 */
 	UA_NodeId nextFolderNodeId = UA_NODEID_NULL;
+	/** @brief NodeId from the parent folder
+	 */
 	UA_NodeId prevFolderNodeId = UA_NODEID_NULL;
 };
 

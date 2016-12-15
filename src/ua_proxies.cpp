@@ -27,9 +27,10 @@
  */
 
 /** @class ua_proxies
- *	@brief 
- *   
- *  @author Chris Iatrou
+ * 	@brief Helper class to interact with open62541
+ * 	This class is a kind of a proxy to interact with the open62541 stack. For this the class mapped all variables to the nodestore of the open62541
+ * 	
+ *	@author Chris Iatrou
  *	@author Julian Rahm
  *  @date 22.11.2016
  * 
@@ -68,6 +69,10 @@ UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId
   return UA_STATUSCODE_GOOD;
 }
 
+/**
+ * @brief This methode map all variables in sort of a <UA_DataSourceMap> from the called class to the open62541
+ * 
+ */
 UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instantiatedNodesList, UA_DataSource_Map *map, void *srcClass) 
 {
   UA_StatusCode retval = UA_STATUSCODE_GOOD;

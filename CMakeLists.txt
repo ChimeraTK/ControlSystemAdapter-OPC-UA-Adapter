@@ -143,7 +143,7 @@ include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 ##########################################################################################################
 
 ## Project specific options
-option(ENABLE_BUILDMODEL      "Create model from XML description"      ON)
+option(ENABLE_BUILDMODEL      "Create model from XML description"      OFF)
 ## Code quality control options
 option(ENABLE_COVERAGE        "Enable coverage stats and tests for adapter build" OFF)
 option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static code analysis using clangs analyzer." OFF)
@@ -176,6 +176,7 @@ if(ENABLE_OPEN62541_BUILD)
 			"-DUA_ENABLE_METHODCALLS=ON" 
 			"-DUA_ENABLE_NODEMANAGEMENT=ON" 
 			"-DUA_ENABLE_SUBSCRIPTIONS=ON"
+			"-DUA_LOGLEVEL=300"
 		)
 		
 		set(open62541_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/open62541/include)

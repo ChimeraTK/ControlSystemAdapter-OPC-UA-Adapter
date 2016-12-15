@@ -25,7 +25,9 @@
  */
 
 /** @class xml_file_handler
- *	@brief 
+ *	@brief This class support any file interaction with a xml file.
+ * 
+ * 	To use all config/mapping xml-files in a confortable way this class provides some useful methodes to read specal nodes, get attributes and so one
  *   
  *  @author Chris Iatrou
  *	@author Julian Rahm
@@ -44,11 +46,20 @@
 #include <libxml2/libxml/xpathInternals.h>
 #include <libxml2/libxml/tree.h>
 
+/** @brief The constructor of the class creates a doc pointer depending on the file path
+ */
 xml_file_handler::xml_file_handler(std::string filePath) {
 	// FIXME: Add some check routine if file realy exist
 	this->createDoc(filePath);
 }
 
+/** @brief This methode return a list of all nodes with the given name nodeName starting by the given startNode
+ * 
+ * @param startNode Start node, all child nodes will be searched by the given nodeName
+ * @param nodeName Is the name of the xml tag, we use to search for
+ * 
+ * @return Returns a list of all pointer from founded child nodes with nodeName
+ */
 std::vector<xmlNodePtr> xml_file_handler::getNodesByName(xmlNodePtr startNode, std::string nodeName) {
 	std::vector<xmlNodePtr> nodeVector;
 	while (startNode != NULL) {
@@ -61,6 +72,12 @@ std::vector<xmlNodePtr> xml_file_handler::getNodesByName(xmlNodePtr startNode, s
 	return nodeVector;
 }
 
+/** @brief This methode return a pointer of a xPath element depending of the given xPathString
+ * 
+ * @param xPathString A xPath string we seaching for
+ * 
+ * @return Returns a element pointer if some was found, in other cases it will return NULL
+ */
 xmlXPathObjectPtr xml_file_handler::getNodeSet(std::string xPathString) {
 	xmlChar *xpath = (xmlChar*) xPathString.c_str();
 	xmlXPathContextPtr context;
@@ -89,6 +106,10 @@ xmlXPathObjectPtr xml_file_handler::getNodeSet(std::string xPathString) {
 
 }
 
+/** @brief This Methode check if a document is currently setted
+ * 
+ * @return True or false depending if a document is set or not
+ */
 bool xml_file_handler::isDocSetted() {
 		if(this->doc != NULL) {
 			return true;
@@ -96,6 +117,12 @@ bool xml_file_handler::isDocSetted() {
 		return false;
 }
 
+/** @brief This methode set a document pointer to the file it ist given by the file path
+ * 
+ * @param filePath Path to a xml file which you want to read
+ * 
+ * @return Returns true if a document is setted, if not it returns false
+ */
 bool xml_file_handler::createDoc(std::string filePath) {
 	
 	if(filePath.empty()) {
@@ -113,7 +140,14 @@ bool xml_file_handler::createDoc(std::string filePath) {
 	return true;
 }
 
-// seperator can be a string of diffent seperators, like "_/:" and so on 
+
+/** @brief This methode splitt a given string bey the given seperators. You can use the seperator as string of seperators like "_/&" all characters will be used as single seperator
+ * 
+ * @param variablePath String which you want to seperate by the seperator
+ * @param seperator String of, if you want different, seperators, whicht this methode use to split the string
+ * 
+ * @return Returns a vector of every single splitet word
+ */
 std::vector<std::string> xml_file_handler::praseVariablePath(std::string variablePath, std::string seperator) {
 
 	std::vector<std::string> pathList;
@@ -125,6 +159,13 @@ std::vector<std::string> xml_file_handler::praseVariablePath(std::string variabl
 	return pathList;
 }
 
+/** @brief This methode returns a value of the given attribute from the given node you want to know
+ * 
+ * @param node Node with the attribute of interest
+ * @param attributeName Name of the wanted attribute
+ * 
+ * @return Returns a string of the attribute
+ */
 std::string xml_file_handler::getAttributeValueFromNode(xmlNode* node, std::string attributeName) {
 	
 	xmlAttrPtr attr = xmlHasProp(node, (xmlChar*)attributeName.c_str());
@@ -135,6 +176,12 @@ std::string xml_file_handler::getAttributeValueFromNode(xmlNode* node, std::stri
 	return "";
 }
 
+/** @brief This methode returns the value between a xml tag. For example \<tagelement>content\</tagelement> the returned value ist "content".
+ * 
+ * @param node Node with the content of interest
+ * 
+ * @return Returns a string of the inner content
+ */
 std::string xml_file_handler::getContentFromNode(xmlNode* node) {
 	if(node != NULL) {
 		xmlChar* content = xmlNodeGetContent(node->xmlChildrenNode);
@@ -148,7 +195,9 @@ std::string xml_file_handler::getContentFromNode(xmlNode* node) {
 	return "";
 }
 
-
+/** @brief Destructor of the class, frees the document and clean the parser.
+ * 
+ */
 xml_file_handler::~xml_file_handler() {
 	xmlFreeDoc(this->doc);
 	xmlCleanupParser();

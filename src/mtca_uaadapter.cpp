@@ -25,12 +25,17 @@
  */
 
 /** @class mtca_uaadapter
- *	@brief 
+ *	@brief This class provide the opcua server and manage the variable mapping.
+ * 
+ * This Class create and start the opcua server also it contain all variables of the server. 
+ * Especially it reads the config-file and add all Variables from 
+ * a pv-manager and additional variables. For config purpose. The 
+ * config-file parameter will parsed and set to the right variable.
  *   
  *  @author Chris Iatrou
  *	@author Julian Rahm
- *  @date 22.11.2016
  * 
+ *  @date 22.11.2016
  */
 
 extern "C" {
@@ -59,13 +64,12 @@ extern "C" {
 using namespace ChimeraTK;
 using namespace std;
 
-/** @brief Class which provide the server.
+/** @brief Constructor of the class. 
  * 
- * This Class create and start the opcua server also it contain all variables of the server. 
- * Especially it reads the config-file and add all Variables from 
- * a pv-manager and additional variables. For config purpose, the 
- * config-file parameter will parsed and are set to the right variable.
+ * During the construction of the class it instanciate a xml_file_handler and read the config, after that the server will be sonstructed and the namespace ist added to them. 
+ * Concluding all additional nodes which are defined in the configFile are mapped into the server.
  * 
+ * @param configFile This file provide the configuration and the mapping of the server
  */
 mtca_uaadapter::mtca_uaadapter(string configFile) : ua_mapped_class() {
 	// XML file handling for variable mapping, just an example...

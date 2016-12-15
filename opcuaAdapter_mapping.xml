@@ -34,8 +34,8 @@
   	</map>
 	</application>
 	<application name="WinBB">
-		<map sourceVariableName="Dein/Name/ist/uint8Array_s10" rename="">
-			<unrollPath pathSep="_">True</unrollPath>
+		<map sourceVariableName="/Dein/Name//ist/uint8Array_s10" rename="">
+			<unrollPath pathSep="/">True</unrollPath>
 		  <folder>NorthSideLINAC/partA</folder>
    	</map>
 		<map sourceVariableName="int16Array_s15">
