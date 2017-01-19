@@ -1,6 +1,6 @@
 /* THIS IS A SINGLE-FILE DISTRIBUTION CONCATENATED FROM THE OPEN62541 SOURCES
  * visit http://open62541.org/ for information about this software
- * Git-Revision: undefined
+ * Git-Revision: 0.2-rc2
  */
 
 /*
@@ -50,11 +50,7 @@ extern "C" {
 /**
  * Library Version
  * --------------- */
-#define UA_OPEN62541_VER_MAJOR 0
-#define UA_OPEN62541_VER_MINOR 2
-#define UA_OPEN62541_VER_PATCH 0
-#define UA_OPEN62541_VER_LABEL "-rc2" /* Release candidate label, etc. */
-#define UA_OPEN62541_VER_COMMIT "undefined"
+#define UA_GIT_COMMIT_ID "0.2-rc2"
 
 /**
  * Options
@@ -136,7 +132,7 @@ typedef uint8_t bool;
  * On Win32: Define ``UA_DYNAMIC_LINKING`` and ``UA_DYNAMIC_LINKING_EXPORT`` in
  * order to export symbols for a DLL. Define ``UA_DYNAMIC_LINKING`` only to
  * import symbols from a DLL.*/
-#define UA_DYNAMIC_LINKING
+/* #undef UA_DYNAMIC_LINKING */
 #if defined(_WIN32) && defined(UA_DYNAMIC_LINKING)
 # ifdef UA_DYNAMIC_LINKING_EXPORT /* export dll */
 #  ifdef __GNUC__
@@ -206,7 +202,7 @@ typedef uint8_t bool;
  * Integer Endianness
  * ^^^^^^^^^^^^^^^^^^ */
 #if defined(_WIN32) || (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && \
-                        (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))
+                        (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)) /* little endian detected */
 # define UA_BINARY_OVERLAYABLE_INTEGER true
 #elif defined(__ANDROID__) /* Andoid */
 # include <endian.h>
@@ -1778,7 +1774,7 @@ UA_Guid UA_EXPORT UA_Guid_random(void);     /* no cryptographic entropy */
  * /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541-build/src_generated/ua_nodeids.hgen -- do not modify
  **********************************************************
  * Generated from /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/schema/NodeIds.csv with script /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/generate_nodeids.py
- * on host WorkStation by user januil at 2016-12-14 11:14:20
+ * on host WorkStation by user januil at 2017-01-18 04:03:46
  **********************************************************/
  
 
@@ -3058,7 +3054,7 @@ UA_Guid UA_EXPORT UA_Guid_random(void);     /* no cryptographic entropy */
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541-build/src_generated/ua_types_generated.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd with script /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/generate_datatypes.py
- * on host WorkStation by user januil at 2016-12-14 11:14:20 */
+ * on host WorkStation by user januil at 2017-01-18 04:03:46 */
 
 
 #ifdef __cplusplus
@@ -5148,7 +5144,7 @@ typedef struct {
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541-build/src_generated/ua_types_generated_handling.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd with script /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/generate_datatypes.py
- * on host WorkStation by user januil at 2016-12-14 11:14:20 */
+ * on host WorkStation by user januil at 2017-01-18 04:03:46 */
 
 
 #ifdef __cplusplus

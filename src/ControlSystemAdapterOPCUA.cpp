@@ -81,13 +81,12 @@ ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(boost::shared_ptr<ControlSy
  *
  */ 
 void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(string configFile) {
-    this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
+	this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
 
-    // Create new server adapter
-     this->adapter = new mtca_uaadapter(configFile);
-  
-    this->mgr->addObject(this->adapter);
-    this->mgr->doStart(); // Implicit: Startet Worker-Threads aller ipc_managed_objects, die mit addObject registriert wurden  
+	// Create new server adapter
+	this->adapter = new mtca_uaadapter(configFile);
+	this->mgr->addObject(this->adapter);
+	this->mgr->doStart(); // Implicit: Startet Worker-Threads aller ipc_managed_objects, die mit addObject registriert wurden  
 }
 
 /**
@@ -118,10 +117,16 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping() {
  * 
  */
 ControlSystemAdapterOPCUA::~ControlSystemAdapterOPCUA() {
-	this->mgr->~ipc_manager();
-	free(this->mgr);
+	
+	//free(this->mgr);
+	//delete this->mgr;
+	//this->mgr = NULL;
 	this->adapter->~mtca_uaadapter();
-	free(this->adapter);	
+	//free(this->adapter);	
+	//delete this->adapter;
+	//this->adapter = NULL;
+	
+	this->mgr->~ipc_manager();
 }
 
 

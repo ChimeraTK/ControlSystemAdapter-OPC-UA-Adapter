@@ -1,0 +1,41 @@
+#!/bin/bash -e
+#######################################################################################################################
+#
+# Shell script for generating a code coverage report.
+#
+# Parameter to be set inside the CMake project:
+# EXCLUDE_FROM_COVERAGE (optional) Space separated list of directories in you source code which are excluded from the
+#                                  coverage report.
+#
+# CMAKE_SOURCE_DIR and PROJECT_BINARY_DIR are always automatically there.
+#
+#######################################################################################################################
+
+#######################################################################################################################
+#
+# IMPORTANT NOTE:
+#
+# DO NOT MODIFY THIS FILE inside a project. Instead update the project-template repository and pull the change from
+# there. Make sure to keep the file generic, since it will be used by other projects, too.
+#
+# If you have modified this file inside a project despite this warning, make sure to cherry-pick all your changes
+# into the project-template repository immediately.
+#
+#######################################################################################################################
+CMAKE_SOURCE_DIR=$1
+PROJECT_BINARY_DIR=$2
+
+if [ -d $PROJECT_BINARY_DIR/runtime_analysis ]; then
+  rm -R $PROJECT_BINARY_DIR/runtime_analysis
+fi
+
+mkdir $PROJECT_BINARY_DIR/runtime_analysis
+
+cd ./tests/
+
+valgrind -v --track-origins=yes --leak-resolution=high --log-file=$PROJECT_BINARY_DIR/runtime_analysis/valgrind.log /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/tests/test_xml_handler
+
+for file in $PROJECT_BINARY_DIR/tests/test_* ; do 
+	echo "Starte valgrind for: $file"
+	valgrind -v --track-origins=yes --leak-resolution=high --log-file=$PROJECT_BINARY_DIR/runtime_analysis/valgrind_$(basename $file).log $file
+done

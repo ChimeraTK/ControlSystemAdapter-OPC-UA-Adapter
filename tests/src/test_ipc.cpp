@@ -5,7 +5,6 @@
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 
 #include "mtca_uaadapter.h"
 
@@ -35,7 +34,7 @@ void IPCManagerTest::testManagerConnection(){
 	BOOST_CHECK(adapterOne->getIpcId() == adapOneIpcId);
 	BOOST_CHECK(adapterTwo->getIpcId() == adapTwoIpcId);
 	
- 	adapterTwo->setIpcId(20);
+	adapterTwo->setIpcId(20);
 	BOOST_CHECK(adapterTwo->getIpcId() == 20);
 	
 	BOOST_CHECK(adapterOne->isRunning() == true);
@@ -54,8 +53,8 @@ void IPCManagerTest::testManagerConnection(){
 
 	BOOST_CHECK(adapterOne->taskRunningAttached() == 1);
 	adapterOne->doStop();
- 	BOOST_CHECK(adapterOne->terminate() == 0);
- 	BOOST_CHECK(adapterTwo->terminate() == 0);
+
+	BOOST_CHECK(adapterTwo->terminate() == 0);
 
 	ipc_manager *mgr = adapterOne->getIpcManager();
 
@@ -63,10 +62,12 @@ void IPCManagerTest::testManagerConnection(){
 
 	ipc_manager *newManager = new ipc_manager();
 	BOOST_CHECK(adapterOne->assignManager(newManager) == true);
- 	BOOST_CHECK(adapterOne->assignManager(nullptr) == false);
-	adapterOne->assignManager(nullptr);
+	BOOST_CHECK(adapterOne->assignManager(nullptr) == false);
+	BOOST_CHECK(adapterOne->terminate() == 0);
 	
-};
+	newManager->~ipc_manager();
+	manager->~ipc_manager();
+}
 
 
 /**
@@ -79,8 +80,7 @@ class IPCManagerTestSuite: public test_suite {
     }
 };
 
-
-test_suite*
+test_suite* 
 init_unit_test_suite( int argc, char* argv[] ) {
 	 framework::master_test_suite().add(new IPCManagerTestSuite);
 	 return 0;

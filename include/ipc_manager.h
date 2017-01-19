@@ -37,8 +37,15 @@
 class ipc_managed_object;
 
 using namespace std;
-class ipc_manager : public ipc_managed_object
-{
+
+/** @class ipc_manager
+ *	@brief This class represent a additional variable from <variableMap.xml> in the information model of a OPC UA Server 
+ *   
+ *  @author Chris Iatrou, Julian Rahm
+ *  @date 22.11.2016
+ * 
+ */
+class ipc_manager : public ipc_managed_object {
 private:
   list<ipc_managed_object*> objects;
   uint32_t nxtId;
@@ -55,7 +62,6 @@ public:
   bool hasTaskCompleted(uint32_t ipc_id);
   uint32_t getUniqueIpcId() ;
   
-  std::list< ipc_managed_object* >* getAllObjectsByType(ipc_managed_object_type type);
   ipc_managed_object* getObjectById(uint32_t id);
   
   void startAll();

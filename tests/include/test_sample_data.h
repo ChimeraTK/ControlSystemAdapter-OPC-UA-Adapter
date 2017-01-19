@@ -47,7 +47,7 @@ struct TestFixturePVSet {
 	ProcessArray<uint8_t>::SharedPtr intAu8dev = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Scalar", 1);
 	ProcessArray<int16_t>::SharedPtr intA16dev = devManager->createProcessArray<int16_t>(controlSystemToDevice, "int16Scalar", 1);
 	ProcessArray<uint16_t>::SharedPtr intAu16dev = devManager->createProcessArray<uint16_t>(controlSystemToDevice, "uint16Scalar", 1);
-	ProcessArray<int32_t>::SharedPtr intA32devMap = devManager->createProcessArray<int32_t>(controlSystemToDevice, "Dein/Name/ist/int32Scalar", 1);
+	ProcessArray<int32_t>::SharedPtr intA3devMap = devManager->createProcessArray<int32_t>(controlSystemToDevice, "Dein/Name/ist/int32Scalar", 1);
 	ProcessArray<uint32_t>::SharedPtr intAu32devMap = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "Mein/Name/ist/uint32Scalar", 1);
 	ProcessArray<float>::SharedPtr intAfdev = devManager->createProcessArray<float>(controlSystemToDevice, "floatScalar", 1);
 	ProcessArray<double>::SharedPtr doubledevMap = devManager->createProcessArray<double>(controlSystemToDevice, "Dieser/Name/ist/doubleScalar", 1);
@@ -75,13 +75,12 @@ struct TestFixtureServerSet {
 	
 	TestFixtureServerSet() {
 		
-		opcuaPort = 16660;
+		opcuaPort = 16663;
 		server_config = UA_ServerConfig_standard;
 		server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, opcuaPort);
 		server_config.logger = UA_Log_Stdout;
 		server_config.networkLayers = &server_nl;
 		server_config.networkLayersSize = 1;
-		server_config.enableAnonymousLogin = UA_TRUE;
 		
 		runUAServer = UA_TRUE;
 		

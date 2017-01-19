@@ -26,20 +26,7 @@
  *
  */
 
-/** @class ua_proxies
- * 	@brief Helper class to interact with open62541
- * 	This class is a kind of a proxy to interact with the open62541 stack. For this the class mapped all variables to the nodestore of the open62541
- * 	
- *	@author Chris Iatrou
- *	@author Julian Rahm
- *  @date 22.11.2016
- * 
- */
-
-extern "C" 
-{
-  #include "open62541.h"
-}
+#include "open62541.h"
 
 #include "ua_proxies.h"
 
@@ -69,10 +56,6 @@ UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId
   return UA_STATUSCODE_GOOD;
 }
 
-/**
- * @brief This methode map all variables in sort of a <UA_DataSourceMap> from the called class to the open62541
- * 
- */
 UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instantiatedNodesList, UA_DataSource_Map *map, void *srcClass) 
 {
   UA_StatusCode retval = UA_STATUSCODE_GOOD;
@@ -116,13 +99,13 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
 		if(ele->write == NULL && ele->read != NULL) {
 			accessLevel = UA_ACCESSLEVELMASK_READ;
 		}
-		retval = UA_Server_writeAccessLevel(server, instantiatedId, accessLevel);
+		UA_Server_writeAccessLevel(server, instantiatedId, accessLevel);
 		// There is currently no high- level function to do this. (02.12.2016)
-		retval = __UA_Server_write(server, &instantiatedId, UA_ATTRIBUTEID_USERACCESSLEVEL, &UA_TYPES[UA_TYPES_BYTE], &accessLevel);
+		__UA_Server_write(server, &instantiatedId, UA_ATTRIBUTEID_USERACCESSLEVEL, &UA_TYPES[UA_TYPES_BYTE], &accessLevel);
 		
 		ds.handle = srcClass;
        
-    retval |= UA_Server_setVariableNode_dataSource(server, instantiatedId, ds);
+    UA_Server_setVariableNode_dataSource(server, instantiatedId, ds);
 		
 		UA_Server_writeDescription(server, instantiatedId, ele->description);
 		delete ele; // inhibit memleak warning during static analysis

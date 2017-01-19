@@ -1,0 +1,62 @@
+#######################################################################################################################
+#
+# cmake module for finding ControlSystemAdapterOPCUA
+#
+# returns:
+#   ControlSystemAdapterOPCUA_FOUND        : true or false, depending on whether the package was found
+#   ControlSystemAdapterOPCUA_VERSION      : the package version
+#   ControlSystemAdapterOPCUA_INCLUDE_DIRS : path to the include directory
+#   ControlSystemAdapterOPCUA_LIBRARY_DIRS : path to the library directory
+#   ControlSystemAdapterOPCUA_LIBRARIES    : libraries the depending project needs to link against
+#   ControlSystemAdapterOPCUA_CXX_FLAGS    : additional C++ compiler flags
+#   ControlSystemAdapterOPCUA_LINKER_FLAGS : additional linker flags
+#
+# @author Martin Killenberg, DESY
+#
+#######################################################################################################################
+
+#######################################################################################################################
+#
+# IMPORTANT NOTE:
+#
+# DO NOT MODIFY THIS FILE inside a project. Instead update the project-template repository and pull the change from
+# there. Make sure to keep the file generic, since it will be used by other projects, too.
+#
+# If you have modified this file inside a project despite this warning, make sure to cherry-pick all your changes
+# into the project-template repository immediately.
+#
+#######################################################################################################################
+
+# The library itself must be "searched" using the FIND_LIBRARY command in the known install directory, to set
+# the variable properly
+FIND_LIBRARY(ControlSystemAdapterOPCUA_LIBRARY ControlSystemAdapterOPCUA
+  /usr/local/lib
+  NO_DEFAULT_PATH
+)
+
+# Since this file is already part of the installation to be found, the configuration can be hard-coded at
+# installation time
+set(ControlSystemAdapterOPCUA_VERSION "@ControlSystemAdapterOPCUA_SOVERSION@")
+set(ControlSystemAdapterOPCUA_INCLUDE_DIRS @ControlSystemAdapterOPCUA_INCLUDE_DIRS@)
+set(ControlSystemAdapterOPCUA_LIBRARY_DIRS @ControlSystemAdapterOPCUA_LIBRARY_DIRS@)
+set(ControlSystemAdapterOPCUA_LIBRARIES ${ControlSystemAdapterOPCUA_LIBRARY} @ControlSystemAdapterOPCUA_LIBRARIES@)
+set(ControlSystemAdapterOPCUA_CXX_FLAGS "@ControlSystemAdapterOPCUA_CXX_FLAGS@")
+set(ControlSystemAdapterOPCUA_LINKER_FLAGS "@ControlSystemAdapterOPCUA_LINKER_FLAGS@ @ControlSystemAdapterOPCUA_LINK_FLAGS@")
+set(ControlSystemAdapterOPCUA_LINK_FLAGS "@ControlSystemAdapterOPCUA_LINKER_FLAGS@ @ControlSystemAdapterOPCUA_LINK_FLAGS@")
+set(ControlSystemAdapterOPCUA_PREFIX "/usr/local")
+
+# Use a macro provided by CMake to check if all the listed arguments are valid and set ControlSystemAdapterOPCUA_FOUND accordingly.
+# This is mainly important to check the version.
+set(ControlSystemAdapterOPCUA_FOUND 0)
+include(FindPackageHandleStandardArgs)
+
+# The FOUND_VAR option in FIND_PACKAGE_HANDLE_STANDARD_ARGS was introduced in cmake-2.8.11, but Ubuntu 12.04 has cmake-2.8.7 only.
+# Thus we use a work around here for older cmake versions.
+if("${CMAKE_VERSION}" VERSION_LESS 2.8.11)
+  # The old version always provides a variable with upper case project name, so we just copy that
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(ControlSystemAdapterOPCUA REQUIRED_VARS ControlSystemAdapterOPCUA_PREFIX VERSION_VAR ControlSystemAdapterOPCUA_VERSION)
+  STRING(TOUPPER "ControlSystemAdapterOPCUA" PROJECT_NAME_UPPERCASE)
+  set(ControlSystemAdapterOPCUA_FOUND ${${PROJECT_NAME_UPPERCASE}_FOUND})
+else()
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(ControlSystemAdapterOPCUA REQUIRED_VARS ControlSystemAdapterOPCUA_PREFIX VERSION_VAR ControlSystemAdapterOPCUA_VERSION FOUND_VAR ControlSystemAdapterOPCUA_FOUND)
+endif()

@@ -56,6 +56,7 @@ ipc_manager::ipc_manager() {
 ipc_manager::~ipc_manager() {
 	this->stopAll();
 	this->doStop();
+	//for(auto ptr : this->objects) delete ptr;
 }
 
 static void call_periodiclyKickWorkerThread(ipc_manager *mgr) {mgr->periodiclyKickWorkerThread();}
@@ -100,10 +101,9 @@ uint32_t ipc_manager::addObject(ipc_managed_object *object)
   return object->getIpcId();
 }
 
-uint32_t ipc_manager::deleteObject(uint32_t rpc_id) 
-{
+uint32_t ipc_manager::deleteObject(uint32_t rpc_id) {
   std::list<ipc_managed_object *> deleteThese;
-  for(list<ipc_managed_object*>::iterator j = this->objects.begin(); j != this->objects.end(); j++) {
+  for(list<ipc_managed_object*>::iterator j = this->objects.begin(); j != this->objects.end(); ++j) {
     ipc_managed_object *obj = *j;
 		
     if (obj->getIpcId() == rpc_id) {
@@ -121,6 +121,8 @@ uint32_t ipc_manager::deleteObject(uint32_t rpc_id)
     delete obj;
     j = deleteThese.begin();
   }
+  
+  for(auto ptr : deleteThese) delete ptr;
   return 0;
 }
 
@@ -138,9 +140,11 @@ void ipc_manager::startAll() {
 }
 
 void ipc_manager::stopAll() {
-  for(list<ipc_managed_object*>::iterator j = this->objects.begin(); j != this->objects.end(); j++) {
+  for(list<ipc_managed_object*>::iterator j = this->objects.begin(); j != this->objects.end(); ++j) {
     ipc_managed_object *obj = *j;
     (*obj).doStop();
+		//delete obj;
+		//obj = NULL;
   }
   
   // Stop our own thread
@@ -153,20 +157,3 @@ void ipc_manager::stopAll() {
   
   return;
 }
-
-/*
-list<ipc_managed_object*> *ipc_manager::getAllObjectsByType(ipc_managed_object_type typeMask) {
-  list<ipc_managed_object*> *objLst = new list<ipc_managed_object*>;
-  
-  // cppcheck-suppress postfixOperator                REASON: List iterator cannot be prefixed
-  for(list<ipc_managed_object*>::iterator j = this->objects.begin(); j != this->objects.end(); j++) {
-    ipc_managed_object *obj = *j;
-    if (obj->getManagedObjectType() & typeMask) {
-      objLst->push_back(obj);
-    }
-  }
-  
-  return objLst;
-}
-*/
-//ipc_managed_object* ipc_manager::getObjectById(uint32_t id) {return nullptr; }

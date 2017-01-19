@@ -4,6 +4,7 @@
 #include <test_sample_data.h>
 
 #include <boost/test/included/unit_test.hpp>
+#include <iostream>
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
@@ -16,6 +17,7 @@ extern "C" {
 }
 
 using namespace boost::unit_test_framework;
+using namespace std;
 
 class CSAOPCUATest {
 	public:
@@ -24,10 +26,11 @@ class CSAOPCUATest {
 };
    
 void CSAOPCUATest::testWithoutPVSet(){ 
-	std::cout << "Enter CSAOPCUATest without any pv" << std::endl;
+	cout << "Enter CSAOPCUATest without any pv" << std::endl;
 	TestFixtureEmptySet tfEmptySet;
 	 // Create the managers
 	ControlSystemAdapterOPCUA *csaOPCUA = new ControlSystemAdapterOPCUA(tfEmptySet.csManager, "../tests/uamapping_test_1.xml");
+
 	// is Server running?
 	csaOPCUA->start();
 	BOOST_CHECK(csaOPCUA->isRunning() == true);
@@ -39,7 +42,7 @@ void CSAOPCUATest::testWithoutPVSet(){
 	BOOST_CHECK(csaOPCUA->isRunning() != true);
 	
 	csaOPCUA->~ControlSystemAdapterOPCUA(); 
-};
+}
 
 void CSAOPCUATest::testWithPVSet(){ 
 	std::cout << "Enter CSAOPCUATest with ExampleSet" << std::endl;
@@ -61,7 +64,7 @@ void CSAOPCUATest::testWithPVSet(){
 	BOOST_CHECK(csaOPCUA->isRunning() != true);
 	
 	csaOPCUA->~ControlSystemAdapterOPCUA();
-};
+}
 
 
 /**
@@ -75,12 +78,8 @@ class CSAOPCUATestSuite: public test_suite {
     }
 };
 
-
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
-	
 	 framework::master_test_suite().add(new CSAOPCUATestSuite);
-
     return 0;
 }
-

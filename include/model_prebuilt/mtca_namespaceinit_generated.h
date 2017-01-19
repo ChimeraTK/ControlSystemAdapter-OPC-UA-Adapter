@@ -37,7 +37,6 @@
 #define UA_NS2ID_MTCAADDITIONALVARIABLE 1005
 #define UA_NS2ID_MTCAMODULE 1002
 #define UA_NS2ID_MTCAPROCESSVARIABLE 1001
-#define UA_NS2ID_MTCATIMESTAMP 1004
 extern UA_StatusCode mtca_namespaceinit_generated(UA_Server *server);
 
 #endif /* MTCA_NAMESPACEINIT_GENERATED_H_ */

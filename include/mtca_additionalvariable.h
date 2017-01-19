@@ -31,16 +31,42 @@
 
 using namespace std;
 
+/** @class mtca_additionalvariable
+ *	@brief This class represent a additional variable from <variableMap.xml> in the information model of a OPC UA Server 
+ *   
+ *  @author Chris Iatrou, Julian Rahm
+ *  @date 22.11.2016
+ * 
+ */
 class mtca_additionalvariable : ua_mapped_class {
 private:
+	/// Kurzbeschreibung Variable a
   string value;
 	string name;
 	string description;
 
+	/** @brief  Get node id of this processvariable instance
+	* 
+	* @return <UA_NodeId> of this processvariable
+	*/
 	UA_NodeId ownNodeId;
+	
+	/** @brief  This methode mapped all own nodes into the opcua server
+	* 
+	* @return <UA_StatusCode> 
+	*/
 	UA_StatusCode mapSelfToNamespace();
 	
 public:
+	
+	/** @brief Constructor from <mtca_additionalvariable> for generic creation
+	* 
+	* @param server A UA_Server type, with all server specific information from the used server
+	* @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
+	* @param name Name of the additinal node
+	* @param value Value of the additinal node
+	* @param description Descripption of the additinal node
+	*/
 	mtca_additionalvariable(UA_Server *server, UA_NodeId basenodeid, string name, string value, string description);
 	
 	~mtca_additionalvariable();

@@ -63,9 +63,9 @@ void runtimeValueGenerator::generateValues(boost::shared_ptr<DevicePVManager> de
 	while(true) {
 //  FIXME -Or maybe not: The Const M_PI from math.h generate senceless values, hence I use fix value 3.141
 // 	double double_sine = csManager->getProcessScalar<double>("amplitude")->get() * sin(((2*M_PI)/csManager->getProcessScalar<int32_t>("period")->get()) * csManager->getProcessScalar<int32_t>("t")->get());
-		double double_sine = devManager->getProcessArray<double>("amplitude")->get().at(0) * sin((2*3.141)/devManager->getProcessArray<int32_t>("period")->get().at(0) * devManager->getProcessArray<int32_t>("t")->get().at(0));
+		double double_sine = devManager->getProcessArray<double>("amplitude")->get().at(0) * sin((2*3.141)/devManager->getProcessArray<double>("period")->get().at(0) * devManager->getProcessArray<int32_t>("t")->get().at(0));
 		int32_t int_sine = round(double_sine);
-		bool bool_sine = (double_sine > 0)? true : false;
+// 	bool bool_sine = (double_sine > 0)? true : false;
 		
 // 	std::cout << "double_sine: " << double_sine << std::endl;
 // 	std::cout << "int_sine: " << int_sine << std::endl;

@@ -33,10 +33,12 @@ lcov --capture --directory . --output-file coverage_all.info
 #only extract the reports for this project
 lcov --extract coverage_all.info "$CMAKE_SOURCE_DIR*" -o coverage_only_source_tree.info
 
+
+EXCLUDE_FROM_COVERAGE=("src/open62541.c" "src/CSA_OPCUA_Application.cpp")
 #Some parts of the source code might be excluded. Set EXCLUDE_FROM_COVERAGE to contain 
 # a list of directories to be excluded from the coverage report.
 # Don't worry if this is empty. It just means there is nothing to exclude (the normal case).
-for exclude_dir in @EXCLUDE_FROM_COVERAGE@; do 
+for exclude_dir in ${EXCLUDE_FROM_COVERAGE[@]}; do 
     echo lcov --remove coverage_only_source_tree.info "$CMAKE_SOURCE_DIR/${exclude_dir}*" -o tmp.info
     lcov --remove coverage_only_source_tree.info "$CMAKE_SOURCE_DIR/${exclude_dir}*" -o tmp.info
     mv tmp.info coverage_only_source_tree.info

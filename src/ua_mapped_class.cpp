@@ -26,15 +26,6 @@
  *
  */
 
-/** @class ua_mapped_class
- *	@brief 
- *   
- *  @author Chris Iatrou
- *	@author Julian Rahm
- *  @date 22.11.2016
- * 
- */
-
 #include "ua_mapped_class.h"
 #include <iostream>
 
@@ -47,29 +38,17 @@ ua_mapped_class::ua_mapped_class() {
 	ua_mapSelfToNamespace();
 }
 
-/*
-ua_mapped_class::ua_mapped_class(UA_Server *server, UA_NodeId *baseNodeId)
-{ 
-  UA_NodeId_copy(baseNodeId, &this->baseNodeId);
-  this->mappedServer = server;
-}
-*/
-
-ua_mapped_class::ua_mapped_class(UA_Server *server, UA_NodeId baseNodeId)
-{
+ua_mapped_class::ua_mapped_class(UA_Server *server, UA_NodeId baseNodeId) {
   UA_NodeId_copy(&baseNodeId, &this->baseNodeId);
   this->mappedServer = server;
 	
 	ua_mapSelfToNamespace();
 }
 
-ua_mapped_class::~ua_mapped_class()
-{
-  cout << "ua mapped class being detroyed...";
+ua_mapped_class::~ua_mapped_class() {
   this->ua_unmapSelfFromNamespace();
   this->mappedServer = nullptr;
-  this->mappedClient = nullptr;
-  cout << "unmapped" << endl;
+	this->mappedClient = nullptr;
 }
 
 UA_StatusCode ua_mapped_class::ua_mapSelfToNamespace() {
@@ -87,7 +66,7 @@ UA_StatusCode ua_mapped_class::ua_unmapSelfFromNamespace()
 {
   for (nodePairList::reverse_iterator i = this->ownedNodes.rbegin(); i != this->ownedNodes.rend(); ++i) {
     UA_NodeId_pair *p = *(i);
-    UA_StatusCode retval = UA_Server_deleteNode(this->mappedServer, p->targetNodeId, UA_FALSE);
+    UA_Server_deleteNode(this->mappedServer, p->targetNodeId, UA_FALSE);
     this->ownedNodes.remove(*(i));
   }
   return UA_STATUSCODE_GOOD;

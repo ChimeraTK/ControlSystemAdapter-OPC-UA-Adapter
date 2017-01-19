@@ -1,5 +1,22 @@
 cmake_minimum_required(VERSION 2.8.0)
 
+if(BUILD_STATIC_ANALYSIS)
+  #set(CMAKE_C_COMPILER "clang")
+  #set(CMAKE_CXX_COMPILER "clang++")
+  #add_definitions(-Wall)
+  
+  set(CMAKE_C_COMPILER   /usr/share/clang/scan-build-3.8/libexec/ccc-analyzer)
+  set(CMAKE_CXX_COMPILER /usr/share/clang/scan-build-3.8/libexec/c++-analyzer)
+	#add_definitions(-o ${PROJECT_BINARY_DIR}/static-analysis})
+  
+	#file(COPY ${CMAKE_SOURCE_DIR}/cmake/make_cccanalyze.sh.in DESTINATION ${CMAKE_BINARY_DIR})
+	#add_custom_target(cccanalyze ALL
+#		${CMAKE_BINARY_DIR}/make_cccanalyze.sh.in ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}
+#		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#		COMMENT "Generating test cccanalyze documentation" VERBATIM
+#  )
+endif()
+
 project(ControlSystemAdapterOPCUA)
 
 include(ExternalProject)
@@ -26,11 +43,13 @@ find_package(mtca4u-deviceaccess)
 #Install the DeviceAccess if it is not pre-installed
 if(NOT mtca4u-deviceaccess_FOUND)		
 		ExternalProject_Add(external-ChimeraTK-DeviceAccess
-			GIT_REPOSITORY "https://github.com/ChimeraTK/DeviceAccess.git"
+			GIT_REPOSITORY "https://github.com/jmrahm/DeviceAccess" #"https://github.com/ChimeraTK/DeviceAccess.git"
 			GIT_TAG "master"
 			PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-DeviceAccess_src"
 			CMAKE_ARGS 
 			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess"
+			"-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+			"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
 			)
 			
 		set(ChimeraTK-DeviceAccess_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/include)
@@ -52,6 +71,8 @@ if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
     CMAKE_ARGS 
     "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/"
     "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter" 
+    "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+		"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
     )
   #FIXME: Find a better name for this variable
   set(USE_SELFINSTALLED_ControlSystemAdapter TRUE)
@@ -90,14 +111,15 @@ endif()
 ##########################################################################################################
 
 if(CMAKE_COMPILER_IS_GNUCC OR "x${CMAKE_C_COMPILER_ID}" STREQUAL "xClang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") 
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-  
+  add_definitions(-DMY_DEBUG=0)
   add_definitions(-fPIC)
+  add_definitions(-Wextra)
 endif()
-
 
 ##########################################################################################################
 ## Includes, Link dirs und Quellcode
@@ -106,7 +128,7 @@ endif()
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
-include_directories(SYSTEM ${open62541_INCLUDE_DIRS})
+#include_directories(${CMAKE_SOURCE_DIR}/include/open62541/)
 include_directories(SYSTEM ${ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS})
 include_directories(SYSTEM ${ChimeraTK-DeviceAccess_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/examples/)
@@ -116,7 +138,7 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 link_directories(${LIBXML2_LIBRARIES})
 link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
 link_directories(${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
-link_directories(${open62541_LIBRARY_DIRS})
+
                     
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
@@ -127,7 +149,6 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_processvariable.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_additionalvariable.cpp
                    ${CMAKE_SOURCE_DIR}/src/mtca_uaadapter.cpp
-                   
                    ${CMAKE_SOURCE_DIR}/src/CSA_OPCUA_Application.cpp
                    
                    # Example HelperClass
@@ -143,17 +164,18 @@ include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 ##########################################################################################################
 
 ## Project specific options
-option(ENABLE_BUILDMODEL      "Create model from XML description"      OFF)
+option(ENABLE_CREATEMODEL      "Create model from XML description"      OFF)
 ## Code quality control options
 option(ENABLE_COVERAGE        "Enable coverage stats and tests for adapter build" OFF)
 option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static code analysis using clangs analyzer." OFF)
 option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prior to compilation." OFF)
 option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
-option(ENABLE_OPEN62541_BUILD	"Build new open62541 from git repository" OFF)
+option(ENABLE_RUNTIME_ANALYSIS "Build Runtime analyses" OFF)
+option(UPDATE_OPEN62541	"Build new open62541 from git repository" OFF)
 
-if(ENABLE_BUILDMODEL)
-  set(MODEL_XML_FILE "templatemodel.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
+if(ENABLE_CREATEMODEL)
+  set(MODEL_XML_FILE "adapterim.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
   
   list(APPEND objectSources ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit_generated.c)
 else()
@@ -162,33 +184,56 @@ else()
 endif()
 
 #Install the open62541 if it is not pre-installed
-if(ENABLE_OPEN62541_BUILD)
+if(UPDATE_OPEN62541)
 		ExternalProject_Add(external-open62541
 			GIT_REPOSITORY "https://github.com/open62541/open62541.git"
-			#GIT_TAG "00.02.00"
-			GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2"
+			GIT_TAG "0.2-rc2"
+			#GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2"
 			PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
 			CMAKE_ARGS 
 			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/open62541" 
 			"-DUA_ENABLE_AMALGAMATION=On"
-			"-DBUILD_SHARED_LIBS=On" 
+			#"-DBUILD_SHARED_LIBS=On" 
 			"-DUA_ENABLE_GENERATE_NAMESPACE0=On" 
 			"-DUA_ENABLE_METHODCALLS=ON" 
 			"-DUA_ENABLE_NODEMANAGEMENT=ON" 
 			"-DUA_ENABLE_SUBSCRIPTIONS=ON"
 			"-DUA_LOGLEVEL=300"
+			"-DCMAKE_BUILD_TYPE=DEBUG"
 		)
 		
-		set(open62541_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/open62541/include)
-		set(open62541_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/open62541/lib)
-		set(open62541_LIBRARIES open62541)
-		set(open62541_SOURCE_DIR "${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541")
-	else(NOT ENABLE_OPEN62541_BUILD)
-		set(open62541_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include/)
-		set(open62541_LIBRARY_DIRS ${CMAKE_SOURCE_DIR}/lib/open62541/)
-		set(open62541_LIBRARIES ${open62541_LIBRARY_DIRS}/libopen62541.so.0)
-		set(open62541_SOURCE_DIR "${CMAKE_SOURCE_DIR}") 
-endif(ENABLE_OPEN62541_BUILD)
+		
+		
+		add_custom_target(copyOpen62541Header ALL
+				DEPENDS external-open62541
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.h
+                ${CMAKE_SOURCE_DIR}/include/open62541.h
+     )
+     add_custom_target(copyOpen62541Source ALL
+				DEPENDS external-open62541
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.c
+                ${CMAKE_SOURCE_DIR}/src/open62541.c
+     )		
+     
+     # file(RENAME <oldname> <newname>)
+     file(COPY ${CMAKE_SOURCE_DIR}/src/open62541.c DESTINATION ${CMAKE_SOURCE_DIR}/src/open62541.bak)
+     file(COPY ${CMAKE_SOURCE_DIR}/include/open62541.h DESTINATION ${CMAKE_SOURCE_DIR}/include/open62541.bak)
+    
+    list(APPEND objectSources ${CMAKE_SOURCE_DIR}/src/open62541.c)
+   # add_dependencies(copyOpen62541Header external-open62541)
+ #  add_dependencies(copyOpen62541Source external-open62541)
+    #list(APPEND objectSources ${CMAKE_SOURCE_DIR}/src/open62541/open62541.c)
+		#set(open62541_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/open62541/)
+		#set(open62541_INCLUDE_DIR ${CMAKE_BINARY_DIR}/open62541/include)
+		#set(open62541_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/open62541/lib)
+		#set(open62541_LIBRARIES open62541)
+		#set(open62541_SOURCE_DIR "${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541")
+	else(NOT UPDATE_OPEN62541)
+
+		list(APPEND objectSources ${CMAKE_SOURCE_DIR}/src/open62541.c)
+endif(UPDATE_OPEN62541)
 
 if(ENABLE_COVERAGE)
   set(CMAKE_BUILD_TYPE DEBUG)
@@ -199,7 +244,7 @@ if(ENABLE_COVERAGE)
   
 	file(COPY ${PROJECT_SOURCE_DIR}/cmake/make_coverage.sh.in DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	add_custom_target(coverage ALL
-		${CMAKE_CURRENT_BINARY_DIR}/make_coverage.sh.in ${CMAKE_SOURCE_DIR} ${PROJECT_BINARY_DIR}
+		${CMAKE_CURRENT_BINARY_DIR}/make_coverage.sh.in ${CMAKE_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 			# Bad soulution to provide all depencys
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ControlSystemAdapterOPCUA
@@ -224,10 +269,20 @@ if(ENABLE_UNIT_TESTS)
 	add_subdirectory(tests)
 endif()
 
-if(BUILD_STATIC_ANALYSIS)
-  set(CMAKE_C_COMPILER   clang)
-  set(CMAKE_CXX_COMPILER clang++)
-  add_definitions(-o ${PROJECT_BINARY_DIR}/static-analysis})
+if(ENABLE_RUNTIME_ANALYSIS)
+	file(COPY ${PROJECT_SOURCE_DIR}/cmake/make_valgrind.sh.in DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+	add_custom_target(valgrind ALL
+		${CMAKE_CURRENT_BINARY_DIR}/make_valgrind.sh.in ${CMAKE_SOURCE_DIR} ${PROJECT_BINARY_DIR}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			# Bad soulution to provide all depencys
+			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ControlSystemAdapterOPCUA
+			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
+			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
+			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
+			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_uaadapter
+			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler	
+      COMMENT "Generating valgrind runtime test" VERBATIM
+     )
 endif()
 
 if(ENABLE_DOCUMENTATION)
@@ -257,17 +312,19 @@ configure_file (
 ## Object Files
 add_library(mtca_objects OBJECT ${objectSources})
 if(USE_SELFINSTALLED_ControlSystemAdapter)
-   ADD_DEPENDENCIES(mtca_objects external-ChimeraTK-ControlSystemAdapter) 
-   ADD_DEPENDENCIES(mtca_objects external-ChimeraTK-DeviceAccess) 
+   add_dependencies(mtca_objects external-ChimeraTK-ControlSystemAdapter) 
+   add_dependencies(mtca_objects external-ChimeraTK-DeviceAccess) 
+   #add_dependencies(mtca_objects external-open62541)
 endif()
 
 ## Early declaration due to the requirement to run the dependencies update prior to building
 ## Create shared lib
 add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects>)
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION} SOVERSION ${${PROJECT_NAME}_SOVERSION})
-target_link_libraries(${PROJECT_NAME} ${open62541_LIBRARY_DIRS}/libopen62541.so.0)
+target_link_libraries(${PROJECT_NAME} ${open62541_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-DeviceAccess_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} pthread)
 target_link_libraries(${PROJECT_NAME} dl)
 target_link_libraries(${PROJECT_NAME}
@@ -279,10 +336,12 @@ target_link_libraries(${PROJECT_NAME}
 )
 target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
 
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
-# install libopen62541.so.0 => TODO this is a temporarly work around!
-install(FILES ${open62541_LIBRARY_DIRS}/libopen62541.so.0 DESTINATION lib)
+##########################################################################################################
+## Install all Libraries
+##########################################################################################################
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 ##########################################################################################################
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
@@ -291,7 +350,7 @@ install(FILES ${open62541_LIBRARY_DIRS}/libopen62541.so.0 DESTINATION lib)
 add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit_generated.c
                           ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit_generated.h
                    PRE_BUILD
-                   COMMAND ${PYTHON_EXECUTABLE} ${open62541_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
+                   COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
                                                 -i ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist_FullNS0.txt
                                                 -b ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist.txt
                                                 ${PROJECT_SOURCE_DIR}/model/Opc.Ua.NodeSet2.xml
@@ -301,12 +360,12 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit
                            ${PROJECT_SOURCE_DIR}/model/${MODEL_XML_FILE}
                            ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist_FullNS0.txt
                            ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist.txt
-                           ${open62541_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
-                           ${open62541_SOURCE_DIR}/tools/pyUANamespace/open62541_MacroHelper.py
-                           ${open62541_SOURCE_DIR}/tools/pyUANamespace/ua_builtin_types.py
-                           ${open62541_SOURCE_DIR}/tools/pyUANamespace/ua_constants.py
-                           ${open62541_SOURCE_DIR}/tools/pyUANamespace/ua_namespace.py
-                           ${open62541_SOURCE_DIR}/tools/pyUANamespace/ua_node_types.py)
+                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
+                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/open62541_MacroHelper.py
+                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_builtin_types.py
+                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_constants.py
+                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_namespace.py
+                           ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_node_types.py)
 
                            
 ##########################################################################################################
@@ -325,10 +384,13 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_CHRONO_LIBRARY}
 )
 
+file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
+
 if(ENABLE_LINTING)
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/static_analysis")
 add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
                     PRE_BUILD
-                    COMMAND /usr/bin/cppcheck --std=c++11 --inline-suppr --enable=all ${objectSources}
+                    COMMAND /usr/bin/cppcheck --std=c++11 --inline-suppr --force --template=gcc --enable=all ${objectSources} 2> ${CMAKE_BINARY_DIR}/static_analysis/cppcheck.log
                     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                     COMMENT "Running CppCheck on all CPP Sources" VERBATIM)
 endif()

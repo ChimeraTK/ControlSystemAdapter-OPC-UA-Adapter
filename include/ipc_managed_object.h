@@ -38,18 +38,7 @@ using namespace std;
 // Early definition of manager class
 class ipc_manager;
 
-typedef enum {
-  IPC_MANAGED_OBJECT_TYPE_GENERICOBJECT      = 0x01,
-  IPC_MANAGED_OBJECT_TYPE_GENERICTASK        = 0x02,
-  IPC_MANAGED_OBJECT_TYPE_AGGREGATINGSERVER  = 0x04,
-  IPC_MANAGED_OBJECT_TYPE_AGGREGATEDSYSTEM   = 0x08,
-  IPC_MANAGED_OBJECT_TYPE_SIMULATOR          = 0x10,
-  IPC_MANAGED_OBJECT_TYPE_BENCHMARKSIMULATOR = 0x20,
-  IPC_MANAGED_OBJECT_TYPE_UDPBEACON          = 0x40
-} ipc_managed_object_type;
-
-class ipc_managed_object
-{
+class ipc_managed_object {
 protected:
   uint32_t     ipc_id;
   bool         thread_run;
@@ -67,7 +56,6 @@ public:
 	void setIpcId(uint32_t ipc_id);
   bool isManaged();
   bool assignManager(ipc_manager *manager);
-  //virtual ipc_managed_object_type getManagedObjectType();
   
   bool taskRunningAttached();
   bool isRunning();

@@ -67,7 +67,6 @@ UA_StatusCode UA_CALLPROXY_NAME(_CLASS_P,_CLASS_F)(void *methodHandle, const UA_
 #define UA_RDPROXY_NAME(_p_class, _p_method) ua_readproxy_ ##_p_class## _ ##_p_method
 #define UA_WRPROXY_NAME(_p_class, _p_method) ua_writeproxy_ ##_p_class## _ ##_p_method
 
-//value->sourceTimestamp = thisObj->getTimeStampSeconds(); \
 // Generate Proxy tails (common function end)
 #define UA_RDPROXY_TAIL() \
 value->hasValue = UA_TRUE; \
@@ -101,7 +100,7 @@ theClass->_p_method (value);
 #define UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, _p_ctype) \
 _p_ctype* v = (_p_ctype *) data->data; \
 std::vector<_p_ctype> vectorizedValue(data->arrayLength); \
-for(int i=0; i < vectorizedValue.size(); i++) vectorizedValue.at(i) = v[i]; \
+for(uint32_t i=0; i < vectorizedValue.size(); i++) vectorizedValue.at(i) = v[i]; \
 theClass->_p_method(vectorizedValue); \
 
 #define UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, _p_ctype, _p_uatype) \

@@ -1,18 +1,10 @@
-#include <open62541.h>
-
 #include <string.h>
 #include <test_sample_data.h>
 #include <ua_proxies_typeconversion.h>
 #include <mtca_additionalvariable.h>
+#include "open62541.h"
 
 #include <boost/test/included/unit_test.hpp>
-
-
-extern "C" {
-	#include "unistd.h"
-	#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
-}
-
 
 using namespace boost::unit_test_framework;
 
@@ -30,12 +22,34 @@ class AdditionalVariableTest {
    
 void AdditionalVariableTest::testEmptySet(){ 
 	std::cout << "Enter AdditionalVariableTest with EmptySet" << std::endl;
-	TestFixtureServerSet *serverSet = new TestFixtureServerSet;
-
-	thread *serverThread = new std::thread(UA_Server_run, serverSet->mappedServer, &serverSet->runUAServer);
 	
+	TestFixtureServerSet *serverSet = new TestFixtureServerSet;	
+// 	uint32_t opcuaPort;
+// 	/* Create new Server */
+// 	UA_ServerConfig       server_config;
+// 	UA_ServerNetworkLayer server_nl;
+// 	UA_Server *mappedServer;
+// 	UA_NodeId baseNodeId;
+// 	UA_Boolean runUAServer;
+// 	opcuaPort = 16663;
+// 	server_config = UA_ServerConfig_standard;
+// 	server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, opcuaPort);
+// 	server_config.logger = UA_Log_Stdout;
+// 	server_config.networkLayers = &server_nl;
+// 	server_config.networkLayersSize = 1;
+// 	server_config.enableAnonymousLogin = UA_TRUE;
+// 	
+// 	runUAServer = UA_TRUE;
+// 		
+// 	mappedServer = UA_Server_new(server_config);
+// 	baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+// 		
+// 		mtca_namespaceinit_generated(mappedServer);
+	
+	thread *serverThread = new std::thread(UA_Server_run, serverSet->mappedServer, &serverSet->runUAServer);
+		
 	// check server
-	if (serverSet->mappedServer == nullptr) {
+	if(serverSet->mappedServer == nullptr) {
 		BOOST_CHECK(false);
 	}
 	
@@ -44,34 +58,40 @@ void AdditionalVariableTest::testEmptySet(){
 	BOOST_CHECK(addVar1->getSourceTimeStamp() != 0);
 	BOOST_CHECK(addVar1->getValue() == "Value");
 	
-	addVar1->~mtca_additionalvariable();
-	
+		
 	serverSet->runUAServer = UA_FALSE;
+		
+ 	if (serverThread->joinable()) {
+  		serverThread->join();
+  	}
+	
 	UA_Server_delete(serverSet->mappedServer);
 
-	if (serverThread->joinable()) {
-		serverThread->join();
-	}
+	serverSet->server_nl.deleteMembers(&serverSet->server_nl);
 
-	delete serverThread;
-	delete(serverSet); 
-};
+	delete serverSet;
+	serverSet = NULL;
+	
+ 	delete serverThread;
+ 	serverThread = NULL;
+
+}
 
 void AdditionalVariableTest::testClientSide(){ 
 	std::cout << "Enter AdditionalVariableTest with ExampleSet and ClientSide testing" << std::endl;
-
+		
 	TestFixtureServerSet *serverSet = new TestFixtureServerSet;	
-	TestFixturePVSet pvSet;
+			
 	thread *serverThread = new std::thread(UA_Server_run, serverSet->mappedServer, &serverSet->runUAServer);
 
 	// check server
-	if (serverSet->mappedServer == nullptr) {
+	if(serverSet->mappedServer == nullptr) {
 		BOOST_CHECK(false);
 	}
 
 	// add set
 	mtca_additionalvariable *addVar1 = new mtca_additionalvariable(serverSet->mappedServer, serverSet->baseNodeId, "Name", "Value", "Description"); 
-		
+
 	// Create client to connect to server
 	UA_Client *client = UA_Client_new(UA_ClientConfig_standard);
 	string endpointURL = "opc.tcp://localhost:" + to_string(serverSet->opcuaPort);
@@ -111,88 +131,97 @@ void AdditionalVariableTest::testClientSide(){
 			UA_NodeId valueNodeId = UA_NODEID_NULL;
 			string name = "";
 			
-					UA_ReferenceDescription *refe;
-					for (size_t m = 0; m < bResp2.resultsSize; ++m) {
-						for (size_t k = 0; k < bResp2.results[m].referencesSize; ++k) {
-							refe = &(bResp2.results[m].references[k]);
-							if(refe->nodeId.nodeId.identifierType == UA_NODEIDTYPE_NUMERIC) {
+			UA_ReferenceDescription *refe;
+			for (size_t m = 0; m < bResp2.resultsSize; ++m) {
+				for (size_t k = 0; k < bResp2.results[m].referencesSize; ++k) {
+					refe = &(bResp2.results[m].references[k]);
+					if(refe->nodeId.nodeId.identifierType == UA_NODEIDTYPE_NUMERIC) {			
+						size_t lenBrowseName2 = (int)refe->browseName.name.length;
+						string browseNameFound2(reinterpret_cast<char const*>(refe->browseName.name.data), lenBrowseName2);
 							
-								size_t lenBrowseName2 = (int)refe->browseName.name.length;
-								string browseNameFound2(reinterpret_cast<char const*>(refe->browseName.name.data), lenBrowseName2);
-								
-								if(browseNameFound2 == "Value") {
-									valueNodeId = refe->nodeId.nodeId;
-									name = browseNameFound;
-									//cout << "Checking ProcessVariable: " <<  name << endl;
-								}
-							}
+						if(browseNameFound2 == "Value") {
+							valueNodeId = refe->nodeId.nodeId;
+							name = browseNameFound;
+							//cout << "Checking ProcessVariable: " <<  name << endl;
 						}
 					}
-					UA_BrowseRequest_deleteMembers(&bReq2);
-					UA_BrowseResponse_deleteMembers(&bResp2);
+				}
+			}
+			UA_BrowseRequest_deleteMembers(&bReq2);
+			UA_BrowseResponse_deleteMembers(&bResp2);
 					
-					if(!UA_NodeId_isNull(&valueNodeId)) {
-									UA_Variant *valueToCheck = UA_Variant_new();
-									UA_Variant_init(valueToCheck);
-									UA_StatusCode retvalValue = UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-									if(retvalValue != UA_STATUSCODE_GOOD) {
-										BOOST_CHECK(false);
-									}
+				if(!UA_NodeId_isNull(&valueNodeId)) {
+					UA_Variant valueToCheck;
+					UA_Variant_init(&valueToCheck);
+					UA_StatusCode retvalValue = UA_Client_readValueAttribute(client, valueNodeId, &valueToCheck);
+					if(retvalValue != UA_STATUSCODE_GOOD) {
+						BOOST_CHECK(false);
+					}
 									
-									UA_Variant *datatypeToCheck = UA_Variant_new();
-									UA_Variant_init(datatypeToCheck);
-									UA_StatusCode retvalValueDatatype = UA_Client_readValueAttribute(client, valueNodeId, datatypeToCheck);
-									if(retvalValueDatatype != UA_STATUSCODE_GOOD) {
-										BOOST_CHECK(false);
-									}
+					UA_Variant datatypeToCheck;
+					UA_Variant_init(&datatypeToCheck);
+					UA_StatusCode retvalValueDatatype = UA_Client_readValueAttribute(client, valueNodeId, &datatypeToCheck);
+					if(retvalValueDatatype != UA_STATUSCODE_GOOD) {
+						BOOST_CHECK(false);
+					}
 									
-									UA_NodeId datatypeId;
-									if(retvalValue == UA_STATUSCODE_GOOD) {
-										UA_StatusCode retvalDatatype = UA_Client_readDataTypeAttribute(client, valueNodeId, &datatypeId);
-										if(retvalDatatype != UA_STATUSCODE_GOOD) {
-											BOOST_CHECK(false);
-										}
-									}
-									else {
-										BOOST_CHECK(false);
-									}
-									
-									if(retvalValue == UA_STATUSCODE_GOOD) {
-										string datatype = "";
-										string valName = "";
-										
-										// Check Description -> for all the same
-										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) valueToCheck->data)), valName);
-										//cout << "Description: " << valName << endl;
-										BOOST_CHECK(valName == "Value");
-										
-										BOOST_CHECK((datatypeId.identifier.numeric -1) == UA_TYPES_STRING);
-									}
-									else {
-										BOOST_CHECK(false);
-									}
-									UA_Variant_delete(valueToCheck);
-									UA_Variant_delete(datatypeToCheck);
+					UA_NodeId datatypeId;
+					if(retvalValue == UA_STATUSCODE_GOOD) {
+						UA_StatusCode retvalDatatype = UA_Client_readDataTypeAttribute(client, valueNodeId, &datatypeId);
+						if(retvalDatatype != UA_STATUSCODE_GOOD) {
+							BOOST_CHECK(false);
 						}
 					}
+					else {
+						BOOST_CHECK(false);
+					}
+					
+					if(retvalValue == UA_STATUSCODE_GOOD) {
+						string datatype = "";
+						string valName = "";
+									
+						// Check Description -> for all the same
+						UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) valueToCheck.data)), valName);
+						//cout << "Description: " << valName << endl;
+						BOOST_CHECK(valName == "Value");
+						
+						BOOST_CHECK((datatypeId.identifier.numeric -1) == UA_TYPES_STRING);
+					}
+					else {
+						BOOST_CHECK(false);
+					}
+					UA_Variant_deleteMembers(&valueToCheck);
+					UA_Variant_deleteMembers(&datatypeToCheck);
+				}
+			}
 		}
 	}
-
+	
 	UA_BrowseRequest_deleteMembers(&bReq);
 	UA_BrowseResponse_deleteMembers(&bResp);
-	  
+
+	UA_Client_disconnect(client);
+	/* Some times there occure a double free corruption. */
+	BOOST_CHECK(true);
+	UA_Client_delete(client);
 	
 	serverSet->runUAServer = UA_FALSE;
+	
+	if (serverThread->joinable()) {
+		serverThread->join();
+	}
+	
 	UA_Server_delete(serverSet->mappedServer);
- 	
- 	if (serverThread->joinable()) {
-  		serverThread->join();
-  	}
- 
- 	delete serverThread;
-	delete(serverSet); 
 
-};
+	serverSet->server_nl.deleteMembers(&serverSet->server_nl);
+
+	delete serverSet;
+	serverSet = NULL;
+	
+ 	delete serverThread;
+ 	serverThread = NULL;
+
+}
 
 
 class AdditionalVariableTestSuite: public test_suite {
@@ -205,8 +234,6 @@ class AdditionalVariableTestSuite: public test_suite {
 
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
-
 	 framework::master_test_suite().add(new AdditionalVariableTestSuite);
-
-    return 0;
+	 return 0;
 }

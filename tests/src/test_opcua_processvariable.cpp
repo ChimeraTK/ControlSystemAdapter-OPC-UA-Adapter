@@ -158,17 +158,23 @@ void ProcessVariableTest::testEmptySet(){
 		BOOST_CHECK(test->getName() != "");
 		
 		test->~mtca_processvariable();
-  }  	
-
-  serverSet->runUAServer = UA_FALSE;
+	}
+  
+	serverSet->runUAServer = UA_FALSE;
+	
+	if (serverThread->joinable()) {
+		serverThread->join();
+	}
+	
 	UA_Server_delete(serverSet->mappedServer);
 
- 	if (serverThread->joinable()) {
-  	serverThread->join();
-  }
+	serverSet->server_nl.deleteMembers(&serverSet->server_nl);
 
+	delete serverSet;
+	serverSet = NULL;
+	
  	delete serverThread;
-	delete(serverSet); 
+ 	serverThread = NULL;
 };
 
 void ProcessVariableTest::testClientSide(){ 
@@ -338,6 +344,9 @@ void ProcessVariableTest::testClientSide(){
 										UA_Variant_init(euToCheck);
 										UA_Variant_setScalarCopy(euToCheck, &newEU, &UA_TYPES[UA_TYPES_STRING]);
 										UA_StatusCode retvalNewEU = UA_Client_writeValueAttribute(client, engineeringUnitNodeId, euToCheck);
+										if(retvalNewEU != UA_STATUSCODE_GOOD) {
+											BOOST_CHECK(false);
+										}
 										UA_String_deleteMembers(&newEU);
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), engineeringUnit);
 										BOOST_CHECK(engineeringUnit == "mHensel/Iatrou");
@@ -359,6 +368,9 @@ void ProcessVariableTest::testClientSide(){
 										UA_Variant_init(descToCheck);
 										UA_Variant_setScalarCopy(descToCheck, &newDesc, &UA_TYPES[UA_TYPES_STRING]);
 										UA_StatusCode retvalNewDesc = UA_Client_writeValueAttribute(client, descriptionNodeId, descToCheck);
+										if(retvalNewDesc != UA_STATUSCODE_GOOD) {
+											BOOST_CHECK(false);
+										}
 										UA_String_deleteMembers(&newDesc);
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) descToCheck->data)), valName);
 										BOOST_CHECK(valName == "Beschreibung");
@@ -381,8 +393,7 @@ void ProcessVariableTest::testClientSide(){
 													uint8_t newValue = 123;
 													UA_Variant_init(valueToCheck);
 													UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_SBYTE]);
-													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
-													value = (uint8_t) *((uint8_t*) valueToCheck->data);
+													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);													
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server
 														UA_Variant_init(valueToCheck);
@@ -613,13 +624,13 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value							
 													size_t arrayLength = valueToCheck->arrayLength;
 													int8_t* value = (int8_t*) valueToCheck->data; 
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}
 													// set new value
 													int8_t varArray[arrayLength];
 													int8_t* newValue = varArray;
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														newValue[i] = i;
 													}
 													
@@ -631,7 +642,7 @@ void ProcessVariableTest::testClientSide(){
 														UA_Variant_init(valueToCheck);
 														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (int8_t*) valueToCheck->data; 
-														for(int i=0; i < arrayLength; i++) {
+														for(uint32_t i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
 														}
 													}		
@@ -651,13 +662,13 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													uint8_t* value = (uint8_t*) valueToCheck->data; 
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}
 													// set new value
 													uint8_t varArray[arrayLength];
 													uint8_t* newValue = varArray;
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														newValue[i] = i;
 													}
 													
@@ -669,7 +680,7 @@ void ProcessVariableTest::testClientSide(){
 														UA_Variant_init(valueToCheck); 
 														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (uint8_t*) valueToCheck->data; 
-														for(int i=0; i < arrayLength; i++) {
+														for(uint32_t i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
 														}
 													}
@@ -688,18 +699,18 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													int16_t* value = (int16_t*) valueToCheck->data; 
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}
 													// set new value
 													value = (int16_t*) valueToCheck->data; 
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}
 													// set new value
 													int16_t varArray[arrayLength];
 													int16_t* newValue = varArray;
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														newValue[i] = i;
 													}
 													
@@ -711,7 +722,7 @@ void ProcessVariableTest::testClientSide(){
 														UA_Variant_init(valueToCheck);
 														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (int16_t*) valueToCheck->data; 
-														for(int i=0; i < arrayLength; i++) {
+														for(uint32_t i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
 														}
 													}
@@ -730,19 +741,19 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													uint16_t* value = (uint16_t*) valueToCheck->data; 
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}
 													// set new value
 													value = (uint16_t*) valueToCheck->data; 
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}
 													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													uint16_t varArray[arrayLength];
 													uint16_t* newValue = varArray;
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														newValue[i] = i;
 													}
 													
@@ -754,7 +765,7 @@ void ProcessVariableTest::testClientSide(){
 														UA_Variant_init(valueToCheck);
 														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (uint16_t*) valueToCheck->data; 
-														for(int i=0; i < arrayLength; i++) {
+														for(uint32_t i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
 														}
 													}
@@ -773,19 +784,19 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													int32_t* value = (int32_t*) valueToCheck->data; 
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}													
 													// set new value
 													value = (int32_t*) valueToCheck->data; 
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}
 													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													int32_t varArray[arrayLength];
 													int32_t* newValue = varArray;
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														newValue[i] = i;
 													}
 													
@@ -797,7 +808,7 @@ void ProcessVariableTest::testClientSide(){
 														UA_Variant_init(valueToCheck);
 														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (int32_t*) valueToCheck->data; 
-														for(int i=0; i < arrayLength; i++) {
+														for(uint32_t i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
 														}
 													}
@@ -817,13 +828,13 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													uint32_t* value = (uint32_t*) valueToCheck->data; 
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}
 													// set new value
 													uint32_t varArray[arrayLength];
 													uint32_t* newValue = varArray;
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														newValue[i] = i;
 													}
 													
@@ -835,7 +846,7 @@ void ProcessVariableTest::testClientSide(){
 														UA_Variant_init(valueToCheck);
 														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (uint32_t*) valueToCheck->data; 
-														for(int i=0; i < arrayLength; i++) {
+														for(uint32_t i=0; i < arrayLength; i++) {
 															BOOST_CHECK(value[i] == newValue[i]);
 														}
 													}
@@ -855,14 +866,14 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													double* value = (double*) valueToCheck->data; 
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}
 													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													double varArray[arrayLength];
 													double* newValue = varArray;
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														newValue[i] = i*0.5;
 													}
 													
@@ -874,7 +885,7 @@ void ProcessVariableTest::testClientSide(){
 														UA_Variant_init(valueToCheck);
 														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (double*) valueToCheck->data; 
-														for(int i=0; i < arrayLength; i++) {
+														for(uint32_t i=0; i < arrayLength; i++) {
 															BOOST_CHECK(((int32_t)(value[i]*100)) == ((int32_t)(newValue[i]*100)));
 														}
 													}
@@ -893,14 +904,14 @@ void ProcessVariableTest::testClientSide(){
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													float* value = (float*) valueToCheck->data; 
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														BOOST_CHECK(value[i] == 0);
 													}
 													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
 													float varArray[arrayLength];
 													float* newValue = varArray;
-													for(int i=0; i < arrayLength; i++) {
+													for(uint32_t i=0; i < arrayLength; i++) {
 														newValue[i] = i*0.5;
 													}
 													
@@ -912,7 +923,7 @@ void ProcessVariableTest::testClientSide(){
 														UA_Variant_init(valueToCheck);
 														UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
 														value = (float*) valueToCheck->data; 
-														for(int i=0; i < arrayLength; i++) {
+														for(uint32_t i=0; i < arrayLength; i++) {
 															BOOST_CHECK(((int32_t)(value[i]*100)) == ((int32_t)(newValue[i]*100)));
 														}
 													}
@@ -940,19 +951,31 @@ void ProcessVariableTest::testClientSide(){
 
 	UA_BrowseRequest_deleteMembers(&bReq);
 	UA_BrowseResponse_deleteMembers(&bResp);
-	  
+	UA_Client_disconnect(client);
+	/* Some times there is a double free corruption. */
+	BOOST_CHECK(true);
+	UA_Client_delete(client);
 	
 	serverSet->runUAServer = UA_FALSE;
+	
+	if (serverThread->joinable()) {
+		serverThread->join();
+	}
+	
+	BOOST_CHECK(true);  
 	UA_Server_delete(serverSet->mappedServer);
- 	
- 	if (serverThread->joinable()) {
-  		serverThread->join();
-  	}
- 
+	BOOST_CHECK(true);  
+	serverSet->server_nl.deleteMembers(&serverSet->server_nl);
+	BOOST_CHECK(true);  
+	delete serverSet;
+	BOOST_CHECK(true);  
+	serverSet = NULL;
+	
  	delete serverThread;
-	delete(serverSet); 
-
-};
+ 	serverThread = NULL;
+	
+	//for(auto ptr : varList) delete ptr;
+}
 
 
 class ProcessVariableTestSuite: public test_suite {
@@ -965,8 +988,6 @@ class ProcessVariableTestSuite: public test_suite {
 
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
-
 	 framework::master_test_suite().add(new ProcessVariableTestSuite);
-
-    return 0;
+	 return 0;
 }

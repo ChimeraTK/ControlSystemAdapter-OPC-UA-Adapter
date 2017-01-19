@@ -1,29 +1,11 @@
-/*
- * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
- * Chair for Process Systems Engineering
- * Technical University of Dresden
+/** @class ua_proxies
+ * 	@brief Helper class to interact with open62541
+ * 	This class is a kind of a proxy to interact with the open62541 stack. For this, the class mapped all variables to the nodestore of the open62541
+ * 	
+ *	@author Chris Iatrou
+ *	@author Julian Rahm
+ *  @date 22.11.2016
  * 
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- *
  */
 
 #ifndef HAVE_UA_PROXIES_H
@@ -35,13 +17,20 @@
 #include "ua_proxies_typeconversion.h"
 #include "ua_proxies_callback.h"
 
+/** @struct UA_NodeId_pair_t
+ * @brief
+ * 
+ */
 typedef struct UA_NodeId_pair_t {
   UA_NodeId sourceNodeId;
   UA_NodeId targetNodeId;
 } UA_NodeId_pair;
 typedef std::list<UA_NodeId_pair*> nodePairList; 
 
-// Lookup Table: Multiple instances of the object may exist, a lookup for their respecive Id must be performed
+/** @struct UA_FunctionCall_InstanceLookupTable_Element_t
+ * @brief Lookup Table: Multiple instances of the object may exist, a lookup for their respecive Id must be performed
+ * 
+ */
 typedef struct UA_FunctionCall_InstanceLookupTable_Element_t {
     UA_Server         *server;            // Server instance the node lives in (might have multiple servers with the same object/methodId)
     void              *classInstance;     // Object instance Id
@@ -49,6 +38,10 @@ typedef struct UA_FunctionCall_InstanceLookupTable_Element_t {
 } UA_FunctionCall_InstanceLookupTable_Element;
 typedef std::list<UA_FunctionCall_InstanceLookupTable_Element*> UA_FunctionCall_InstanceLookUpTable; 
 
+/** @struct UA_FunctionCall_Map_Element_t
+ * @brief
+ * 
+ */
 typedef struct UA_FunctionCall_Map_Element_t {
   UA_NodeId                             typeTemplateId;
   UA_FunctionCall_InstanceLookUpTable  *lookupTable;
@@ -56,6 +49,10 @@ typedef struct UA_FunctionCall_Map_Element_t {
 } UA_FunctionCall_Map_Element;
 typedef std::list<UA_FunctionCall_Map_Element> UA_FunctionCall_Map;
 
+/** @struct UA_DataSource_Map_Element_t
+ * @brief
+ * 
+ */
 typedef struct UA_DataSource_Map_Element_t {
   UA_NodeId     typeTemplateId;
 	UA_LocalizedText description; // individuell description for every variable
@@ -77,11 +74,38 @@ UA_NodeId_copy(&UA_NODEID_NULL, & _p_nodeid##_tmp->sourceNodeId);\
 UA_NodeId_copy(&_p_nodeid, & _p_nodeid##_tmp->targetNodeId);\
 this->ownedNodes.push_back(_p_nodeid##_tmp); } while(0);
 
+/**
+ * @brief Searching for NodeId's in <pairList> with the same NodeId from <remoteId>
+ * 
+ * @param pairList
+ * @param remoteId
+ *
+ * @return UA_NodeId from the found node
+ * 
+ */
 UA_NodeId *nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId remoteId);
 
-// Node function and proxy mapping
+/**
+ * @brief Node function and proxy mapping for new nodes
+ * 
+ * @param objectId targetNodeId
+ * @param defintionId sourceNodeId
+ * @param handle read and write handel for the node
+ *
+ * @return UA_StatusCode 
+ */
 UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void *handle);
 
+/**
+ * @brief This methode map all variables in sort of a <UA_DataSourceMap> from the called class to the open62541
+ * 
+ * @param server	This param provides the OPC UA server
+ * @param instantiatedNodesList Contains all instantiated nodes
+ * @param map	Contains all Node from the class the should instantiated into the server 
+ * @param scrClass Pointer to our class instance 
+ * 
+ * @return UA_StatusCode 
+ */
 UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instantiatedNodesList, UA_DataSource_Map *map, void *srcClass);
 
 /* Instatiation NodeId gatherer Macro (because it's always the same...) */

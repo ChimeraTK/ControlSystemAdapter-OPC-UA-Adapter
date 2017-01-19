@@ -1,0 +1,22 @@
+###########################
+# UaModeler Project File  #
+# Generated at 13.01.2017 #
+###########################
+
+PROJECTNAME = adapterIMm
+
+TEMPLATESET = ($TEMPLATES)/ansi_c/v1_6/t2/ansi_c.tt2set
+
+MODELS += ($MODELS)/Opc.Ua.NodeSet2.ua \
+    adapterim.ua
+
+COLORS = ($MODELS)/Opc.Ua.NodeSet2.ua: #0000ff\
+    adapterim.ua: #008000
+
+PROJECTVARIABLES += ProviderName = templatemodel \
+    alarmAndEvents = false
+
+OUTPUTPATH = ../../../../../../../../../../home/januil/Schreibtisch
+
+GENERATE += adapterim.ua
+

@@ -24,20 +24,6 @@
  *
  */
 
-/** @class mtca_uaadapter
- *	@brief This class provide the opcua server and manage the variable mapping.
- * 
- * This Class create and start the opcua server also it contain all variables of the server. 
- * Especially it reads the config-file and add all Variables from 
- * a pv-manager and additional variables. For config purpose. The 
- * config-file parameter will parsed and set to the right variable.
- *   
- *  @author Chris Iatrou
- *	@author Julian Rahm
- * 
- *  @date 22.11.2016
- */
-
 extern "C" {
 #include "unistd.h"
 #include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
@@ -64,20 +50,11 @@ extern "C" {
 using namespace ChimeraTK;
 using namespace std;
 
-/** @brief Constructor of the class. 
- * 
- * During the construction of the class it instanciate a xml_file_handler and read the config, after that the server will be sonstructed and the namespace ist added to them. 
- * Concluding all additional nodes which are defined in the configFile are mapped into the server.
- * 
- * @param configFile This file provide the configuration and the mapping of the server
- */
 mtca_uaadapter::mtca_uaadapter(string configFile) : ua_mapped_class() {
-	// XML file handling for variable mapping, just an example...
 	this->fileHandler = new xml_file_handler(configFile);
 	
 	this->readConfig();
-	
-	this->mtca_uaadapter_constructserver();
+	this->constructServer();
 	
 	this->mapSelfToNamespace();
 	
@@ -85,11 +62,6 @@ mtca_uaadapter::mtca_uaadapter(string configFile) : ua_mapped_class() {
 	
 }
 
-/** @brief Destrructor of the class. 
- * 
- * It stop the server and delete the managed object.
- * 
- */
 mtca_uaadapter::~mtca_uaadapter() {
 	
 	if (this->isRunning()) {
@@ -97,20 +69,15 @@ mtca_uaadapter::~mtca_uaadapter() {
 	}	
 	//UA_Server_delete(this->mappedServer);
 	this->fileHandler->~xml_file_handler();
-
-        for(auto ptr : variables) delete ptr;
-        for(auto ptr : constants) delete ptr;
-        for(auto ptr : additionalVariables) delete ptr;
-        for(auto ptr : mappedVariables) delete ptr;
+	
+	for(auto ptr : variables) delete ptr;
+	for(auto ptr : additionalVariables) delete ptr;
+	for(auto ptr : mappedVariables) delete ptr;
+	
+	
 }
 
-/** @brief This Class contain all variables of the opcua server. 
- * Especially it reads the config-file and add all Variables from 
- * a pv-manager and additional variables. For config purpose the 
- * config-file parameter will parsed and are set to the right variable.
- * @return
- */
-void mtca_uaadapter::mtca_uaadapter_constructserver() {
+void mtca_uaadapter::constructServer() {
 
     this->server_config = UA_ServerConfig_standard;
     this->server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, this->serverConfig.opcuaPort);
@@ -136,8 +103,8 @@ void mtca_uaadapter::mtca_uaadapter_constructserver() {
 		
     this->mappedServer = UA_Server_new(this->server_config);
 		this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-  
-    mtca_namespaceinit_generated(this->mappedServer);
+		
+		mtca_namespaceinit_generated(this->mappedServer);
 }
 
 void mtca_uaadapter::readConfig() {
@@ -202,11 +169,7 @@ void mtca_uaadapter::readConfig() {
 		throw runtime_error ("No <serverConfig>-Tag in config file");
 	}
 }
-/*
- * Function generate new VariableNodes
- * 
- * 
- */
+
 void mtca_uaadapter::readAdditionalNodes() {
 	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//additionalNodes");	
 	if(result) {
@@ -224,7 +187,7 @@ void mtca_uaadapter::readAdditionalNodes() {
 				vector<xmlNodePtr> variableNodeList = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "variable");
 				
 				for(auto variableNode: variableNodeList) {
-					string name = this->fileHandler->getAttributeValueFromNode(variableNode, "browseName").c_str();
+					string name = this->fileHandler->getAttributeValueFromNode(variableNode, "name").c_str();
 					string value = this->fileHandler->getAttributeValueFromNode(variableNode, "value");
 					string description = this->fileHandler->getAttributeValueFromNode(variableNode, "description");
 					this->additionalVariables.push_back(new mtca_additionalvariable(this->mappedServer, folderNodeId, name, value, description));
@@ -267,7 +230,7 @@ void mtca_uaadapter::workerThread() {
   }
  
  	delete serverThread;
-
+	serverThread = NULL;
 }
 
 void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
@@ -377,16 +340,8 @@ void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlS
 	xmlXPathFreeObject (result);
 }
 
-void mtca_uaadapter::addConstant(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
-    this->constants.push_back(new mtca_processvariable(this->mappedServer, this->constantsListId, varName, csManager));
-}
-
 vector<mtca_processvariable *> mtca_uaadapter::getVariables() {
 	return this->variables;
-}
-
-vector<mtca_processvariable *> mtca_uaadapter::getConstants() {
-	return this->constants;
 }
 
 UA_NodeId mtca_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderName, std::string description) {
@@ -398,17 +353,17 @@ UA_NodeId mtca_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folde
 		return createdNodeId; // Something went UA_WRING (initializer should have set this!)
 	}
     
-    // Create our toplevel instance
-    UA_ObjectAttributes oAttr; 
-		UA_ObjectAttributes_init(&oAttr);
-    // Classcast to prevent Warnings
-    oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)folderName.c_str());
-    oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str());    
+	// Create our toplevel instance
+	UA_ObjectAttributes oAttr; 
+	UA_ObjectAttributes_init(&oAttr);
+	// Classcast to prevent Warnings
+	oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)folderName.c_str());
+	oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str());    
 	
-    UA_INSTATIATIONCALLBACK(icb);
-    UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
-                             basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-                             UA_QUALIFIEDNAME(1, (char*)folderName.c_str()), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr, &icb, &createdNodeId);
+	UA_INSTATIATIONCALLBACK(icb);
+	UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
+                          basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
+                          UA_QUALIFIEDNAME(1, (char*)folderName.c_str()), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr, &icb, &createdNodeId);
     
 	return createdNodeId;
 }
@@ -435,7 +390,6 @@ UA_StatusCode mtca_uaadapter::mapSelfToNamespace() {
     
 	this->ownNodeId = createdNodeId;
 	// Nodes "Variables" and "Constants" where created on object instantiation, we need these IDs to add new process variables to them...
-	UA_NodeId_copy(nodePairList_getTargetIdBySourceId(this->ownedNodes, UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_CONSTANTS)), &this->constantsListId);
 	UA_NodeId_copy(nodePairList_getTargetIdBySourceId(this->ownedNodes, UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLES)), &this->variablesListId);
 		
     return UA_STATUSCODE_GOOD;
@@ -458,7 +412,7 @@ UA_NodeId mtca_uaadapter::existFolderPath(UA_NodeId basenodeid, std::vector<stri
 
 UA_NodeId mtca_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
 	UA_NodeId lastNodeId = UA_NODEID_NULL;
-	for(int32_t i=0; i < this->folderVector.size(); i++) {
+	for(uint32_t i=0; i < this->folderVector.size(); i++) {
 		if((this->folderVector.at(i).folderName.compare(folder) == 0) && (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &basenodeid))) {
 			return this->folderVector.at(i).folderNodeId;
 		}
@@ -466,9 +420,6 @@ UA_NodeId mtca_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
 	return UA_NODEID_NULL;
 }
 
-/*
- * 
- */
 UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath) {
 		
  	if(UA_NodeId_isNull(&basenodeid)){
@@ -480,11 +431,11 @@ UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<str
 	int32_t starter4Folder = 0;
 	UA_NodeId nextNodeId = basenodeid;
 	UA_NodeId startNodeId = basenodeid;
-	bool setted = false;
  	if(UA_NodeId_isNull(&toCheckNodeId)) {
+		bool setted = false;
 		// Check if path exist partly 
-		for(int32_t m=0; m < folderPath.size(); m++) {
-			for(int32_t i=0; i < this->folderVector.size(); i++) {
+		for(uint32_t m=0; m < folderPath.size(); m++) {
+			for(uint32_t i=0; i < this->folderVector.size(); i++) {
 				// get correct folder NodeId from first folderPath element
 				if(!setted && (folderPath.at(m).compare(this->folderVector.at(i).folderName) == 0) && (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &nextNodeId)) && ((m+1) < folderPath.size())) {
 					// remember on witch position the folder still exist
@@ -506,7 +457,7 @@ UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<str
 
 	UA_NodeId prevNodeId = nextNodeId;
 	// use the remembered position to start the loop
-	for(int32_t m=starter4Folder; m < folderPath.size(); m++) {
+	for(uint32_t m=starter4Folder; m < folderPath.size(); m++) {
 		prevNodeId = this->createFolder(prevNodeId, folderPath.at(m));		
 	}
 	// return last created folder UA_NodeId
@@ -532,13 +483,6 @@ UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName, 
 	return newFolder.folderNodeId;
 }
 
-
-/** @brief Methode to get all names from all potential VarableNodes from XML-Mappingfile which could not allocated.
- * 
- * 
- * @return vector<string> notMappableVariablesNames List with all VariableNodes which could not allocated a Varaible in PV-Manager.
- * 
- */
 vector<string> mtca_uaadapter::getAllNotMappableVariablesNames() {
 	
 	vector<string> notMappableVariablesNames;

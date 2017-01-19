@@ -65,39 +65,38 @@ ControlSystemAdapterOPCUA *csaOPCUA;
 std::atomic<bool> terminateMain;
 
 static void SigHandler_Int(int sign) {
-    cout << "Received SIGINT... terminating" << endl;
-    terminateMain = true;
-    csaOPCUA->stop();
-    csaOPCUA->terminate();
-    csaOPCUA->~ControlSystemAdapterOPCUA();
-    cout << "OPC UA adapter termianted." << endl;
+	cout << "Received SIGINT... terminating" << endl;
+	terminateMain = true;
+	csaOPCUA->stop();
+	csaOPCUA->terminate();
+	csaOPCUA->~ControlSystemAdapterOPCUA();
+	cout << "OPC UA adapter termianted." << endl;
 }
 
 int main() {
-    signal(SIGINT,  SigHandler_Int); // Registriert CTRL-C/SIGINT
-    signal(SIGTERM, SigHandler_Int); // Registriert SIGTERM
+	signal(SIGINT,  SigHandler_Int); // Registriert CTRL-C/SIGINT
+	signal(SIGTERM, SigHandler_Int); // Registriert SIGTERM
+	
+	// Create the managers
+	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers = createPVManager();
 
-    // Create the managers
-    std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers = createPVManager();
-
-    devManager = pvManagers.second;
-    csManager = pvManagers.first;
+	devManager = pvManagers.second;
+	csManager = pvManagers.first;
 
 	syncCsUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
 	syncDevUtility.reset(new ChimeraTK::DeviceSynchronizationUtility(devManager));
 
-    csManager->enablePersistentDataStorage();
+	csManager->enablePersistentDataStorage();
 
-    ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
-    ChimeraTK::ApplicationBase::getInstance().initialise();
+	ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
+	ChimeraTK::ApplicationBase::getInstance().initialise();
 
-    string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
+	string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
 	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, pathToConfig);
+	
+	ChimeraTK::ApplicationBase::getInstance().run();
 
-
-    ChimeraTK::ApplicationBase::getInstance().run();
-
-    while(!terminateMain) sleep(3600);  // sleep will be interrupted when signal is received
-    csManager.reset();
-    cout << "Application termianted." << endl;
+	while(!terminateMain) sleep(3600);  // sleep will be interrupted when signal is received
+	csManager.reset();
+	cout << "Application termianted." << endl;
 }

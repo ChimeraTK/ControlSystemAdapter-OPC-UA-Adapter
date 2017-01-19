@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <uamapping>
 	<config rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
-		<serverConfig applicationName="OPCUAServer" port="16660" />
+		<serverConfig applicationName="OPCUAServer" port="16664" />
 		<login username="test" password="test123" /> 
 	</config>
 
 	<additionalNodes folderName="AdditionalNodesFolder" description="DescriptionOfAdditionalNodes">
-		<variable browseName="BrowseName1" displayname="displayName1" description="myDescription1" value="Wert1" />
-		<variable browseName="BrowseName2" displayname="displayName2" description="myDescription2" value="Wert2" />
-		<variable browseName="BrowseName3" displayname="displayName3" description="myDescription3" value="Wert3" />
-		<variable browseName="BrowseName4" displayname="displayName4" description="myDescription4" value="Wert4" />
-		<variable browseName="BrowseName5" displayname="displayName5" description="myDescription5" value="Wert5" />
+		<variable name="BrowseName1" description="myDescription1" value="Wert1" />
+		<variable name="BrowseName2" description="myDescription2" value="Wert2" />
+		<variable name="BrowseName3" description="myDescription3" value="Wert3" />
+		<variable name="BrowseName4" description="myDescription4" value="Wert4" />
+		<variable name="BrowseName5" description="myDescription5" value="Wert5" />
 	</additionalNodes>
 	<additionalNodes folderName="ConfigFolder" description="DescriptionOfConfigFolder">
-		<variable browseName="BrowseNameA" displayname="displayNameA" description="myDescriptionA" value="WertA" />
-		<variable browseName="BrowseNameB" displayname="displayNameB" description="myDescriptionB" value="WertB" />
-	</additionalNodes>
-	<additionalNodes folderName="" description="DescriptionOfEmptyFolder">
+		<variable name="BrowseNameA" description="myDescriptionA" value="WertA" />
+		<variable name="BrowseNameB" description="myDescriptionB" value="WertB" />
 	</additionalNodes>
 
 	<application name="TestCaseForXMLFileHandlerTest::getContent">

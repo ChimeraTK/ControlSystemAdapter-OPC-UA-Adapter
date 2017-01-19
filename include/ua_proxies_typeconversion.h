@@ -70,6 +70,7 @@ strncpy(s, (char*) _p_cppstring.c_str(), _p_cppstring.length()); \
 _p_uastring.length = _p_cppstring.length(); \
 _p_uastring.data = (UA_Byte *) malloc(_p_uastring.length); \
 memcpy(_p_uastring.data, s, _p_uastring.length); \
+free(s); \
 }
 
 #define NODE_BROWSENAME_AS_STRING(_p_server, _p_nodeid, _p_strbuffer) { \

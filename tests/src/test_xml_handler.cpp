@@ -31,12 +31,12 @@ void XMLFileHandlerTest::readDocFile(){
 	xml_file_handler *xmlHandlerThree = new xml_file_handler("../tests/uamapping_test_notwellformed.xml");
 	BOOST_CHECK(xmlHandlerThree->isDocSetted() == false);
 	BOOST_CHECK(xmlHandlerThree->getNodeSet("//application") == NULL);
-	
+ 
 	xmlHandlerOne->~xml_file_handler();
 	xmlHandlerTwo->~xml_file_handler();
 	xmlHandlerThree->~xml_file_handler();
 		
-};
+}
 
 
 void XMLFileHandlerTest::getContent(){ 
@@ -45,7 +45,7 @@ void XMLFileHandlerTest::getContent(){
 	
 	xmlXPathObjectPtr result = xmlHandler->getNodeSet("//application[@name='TestCaseForXMLFileHandlerTest::getContent']//map");
 	BOOST_CHECK(result != NULL);
-	xmlNodeSetPtr nodeset;
+	xmlNodeSetPtr nodeset = NULL;
 	
 	if(result) {
 		nodeset = result->nodesetval;
@@ -78,7 +78,9 @@ void XMLFileHandlerTest::getContent(){
 	
 	// We want to get an nodeset from a node which not exist
 	BOOST_CHECK(xmlHandler->getNodeSet("//test") == NULL);	
-};
+	
+	xmlHandler->~xml_file_handler();
+}
 
 
 /**
@@ -86,12 +88,11 @@ void XMLFileHandlerTest::getContent(){
    */
 class XMLFileHandlerTestSuite: public test_suite {
 	public:
-		XMLFileHandlerTestSuite() : test_suite("IPCManager Test Suite") {
+		XMLFileHandlerTestSuite() : test_suite("XMLFileHandler Test Suite") {
 			add(BOOST_TEST_CASE(&XMLFileHandlerTest::readDocFile));
 			add(BOOST_TEST_CASE(&XMLFileHandlerTest::getContent));			
     }
 };
-
 
 test_suite*
 init_unit_test_suite( int argc, char* argv[] ) {
