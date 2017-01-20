@@ -27,7 +27,7 @@
  */
 
 
-/** @class ControlSystemAdapterOPCUA
+/** @class csa_opcua_adapter
  *	@brief This class provide the two parts of the OPCUA Adapter. 
  * First of all the OPCUA server starts with a port number defined in config-file (recommended 16664),
  * following the mapping process start. For this, the ProcessVariable from ControlSystemPVManager will be mapped to the OPCUA Model. During the mapping process also all 
@@ -43,15 +43,15 @@ extern "C" {
 #include "unistd.h"
 }
 
-#include "ControlSystemAdapterOPCUA.h"
+#include "csa_opcua_adapter.h"
 
 #include <iostream>
 #include <math.h>
 #include <typeinfo>       // std::bad_cast
 
 #include "ipc_manager.h"
-#include "mtca_uaadapter.h"
-#include "mtca_processvariable.h"
+#include "ua_adapter.h"
+#include "ua_processvariable.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
@@ -65,11 +65,11 @@ extern "C" {
  * @param configFile Define the path to the mapping-file with config and mapping information
  * 
  */ 
-ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
+csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
 	
 	this->csManager = csManager; 	
-	this->ControlSystemAdapterOPCUA_InitServer(configFile);
-	this->ControlSystemAdapterOPCUA_InitVarMapping();
+	this->csa_opcua_adapter_InitServer(configFile);
+	this->csa_opcua_adapter_InitVarMapping();
 	
 }
 
@@ -80,11 +80,11 @@ ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA(boost::shared_ptr<ControlSy
  * @param configFile Define the path to the mapping-file with config and mapping information
  *
  */ 
-void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(string configFile) {
+void csa_opcua_adapter::csa_opcua_adapter_InitServer(string configFile) {
 	this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
 
 	// Create new server adapter
-	this->adapter = new mtca_uaadapter(configFile);
+	this->adapter = new ua_uaadapter(configFile);
 	this->mgr->addObject(this->adapter);
 	this->mgr->doStart(); // Implicit: Startet Worker-Threads aller ipc_managed_objects, die mit addObject registriert wurden  
 }
@@ -95,7 +95,7 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitServer(string conf
  * processvaribale are mapped in special folder, will be renamed, get description or a other engineering unit.
  * 
  */
-void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping() {
+void csa_opcua_adapter::csa_opcua_adapter_InitVarMapping() {
     // Get all ProcessVariables
     vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
   
@@ -116,12 +116,12 @@ void ControlSystemAdapterOPCUA::ControlSystemAdapterOPCUA_InitVarMapping() {
  * @brief Destructor to stop the running thread, hence it stops the OPC UA server 
  * 
  */
-ControlSystemAdapterOPCUA::~ControlSystemAdapterOPCUA() {
+csa_opcua_adapter::~csa_opcua_adapter() {
 	
 	//free(this->mgr);
 	//delete this->mgr;
 	//this->mgr = NULL;
-	this->adapter->~mtca_uaadapter();
+	this->adapter->~ua_uaadapter();
 	//free(this->adapter);	
 	//delete this->adapter;
 	//this->adapter = NULL;
@@ -135,17 +135,17 @@ ControlSystemAdapterOPCUA::~ControlSystemAdapterOPCUA() {
  * 
  * @return Returns a ControlSystemPVManager
  */
-boost::shared_ptr<ControlSystemPVManager> const & ControlSystemAdapterOPCUA::getControlSystemManager() const {
+boost::shared_ptr<ControlSystemPVManager> const & csa_opcua_adapter::getControlSystemManager() const {
     return this->csManager;
 }
 
 /**
  * @brief Return the uaadapter, hence the OPC UA server 
  * 
- * @return Return the mtca_uaadapter
+ * @return Return the ua_uaadapter
  * 
  */
-mtca_uaadapter* ControlSystemAdapterOPCUA::getUAAdapter() {
+ua_uaadapter* csa_opcua_adapter::getUAAdapter() {
 	return this->adapter;
 }
 
@@ -155,7 +155,7 @@ mtca_uaadapter* ControlSystemAdapterOPCUA::getUAAdapter() {
  * @return Return the ipc_manager
  *
  */
-ipc_manager* ControlSystemAdapterOPCUA::getIPCManager() {
+ipc_manager* csa_opcua_adapter::getIPCManager() {
     return this->mgr;
 }
 
@@ -164,7 +164,7 @@ ipc_manager* ControlSystemAdapterOPCUA::getIPCManager() {
  * @brief Start all objects in single threads for this case only the opc ua server
  * 
  */
-void ControlSystemAdapterOPCUA::start() {
+void csa_opcua_adapter::start() {
     this->mgr->startAll();
     return;
 }
@@ -173,7 +173,7 @@ void ControlSystemAdapterOPCUA::start() {
  * @brief Stop all objects in single threads for this case only the opc ua server
  * 
  */
-void ControlSystemAdapterOPCUA::stop() {
+void csa_opcua_adapter::stop() {
     this->mgr->stopAll();
     return;
 }
@@ -182,7 +182,7 @@ void ControlSystemAdapterOPCUA::stop() {
  * @brief Terminate all objects in single threads for this case only the opc ua server
  * 
  */
-void ControlSystemAdapterOPCUA::terminate() {
+void csa_opcua_adapter::terminate() {
     this->mgr->terminate();
     return;
 }
@@ -192,6 +192,6 @@ void ControlSystemAdapterOPCUA::terminate() {
  * 
  * @return The current running state in form of true/false
  */
-bool ControlSystemAdapterOPCUA::isRunning() {
+bool csa_opcua_adapter::isRunning() {
     return this->mgr->isRunning();
 }

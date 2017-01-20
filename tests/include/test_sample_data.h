@@ -12,7 +12,7 @@
 
 extern "C" {
 	#include "unistd.h"
-	#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
+	#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
 
 using namespace ChimeraTK;
@@ -87,7 +87,7 @@ struct TestFixtureServerSet {
 		mappedServer = UA_Server_new(server_config);
     baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
 		
-		mtca_namespaceinit_generated(mappedServer);
+		csa_namespaceinit_generated(mappedServer);
 	}
 };
 

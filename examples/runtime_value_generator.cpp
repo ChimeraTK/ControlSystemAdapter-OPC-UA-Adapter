@@ -26,14 +26,14 @@
  *
  */
 
-#include "runtimeValueGenerator.h"
+#include "runtime_value_generator.h"
 
 #include <iostream>
 #include <math.h>
 #include <sys/sysinfo.h> 
 #include <unistd.h>
 
-#include "ControlSystemAdapterOPCUA.h"
+#include "csa_opcua_adapter.h"
 
 #include "ipc_manager.h"
 

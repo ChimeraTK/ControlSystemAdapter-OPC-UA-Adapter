@@ -33,14 +33,14 @@
 using namespace std;
 using namespace ChimeraTK;
 
-/** @class mtca_processvariable 
+/** @class ua_processvariable 
  *	@brief This class represent a processvariable of the controlsystemadapter in the information model of a OPC UA Server 
  *   
  *  @author Chris Iatrou, Julian Rahm
  *  @date 22.11.2016
  * 
  */
-class mtca_processvariable : ua_mapped_class {
+class ua_processvariable : ua_mapped_class {
 private:
   string namePV;
 	string nameNew;
@@ -58,16 +58,16 @@ private:
 	UA_StatusCode mapSelfToNamespace();
 	
 public:
-	/** @brief Constructor from mtca_processvaribale for generic creation
+	/** @brief Constructor from ua_processvaribale for generic creation
 	* 
 	* @param server A UA_Server type, with all server specific information from the used server
 	* @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
 	* @param namePV Name of the process variable from control-system-adapter, is needed to fetch the rigth process varibale from PV-Manager
 	* @param csManager Provide the hole PVManager from control-system-adapter to map all processvariable to the OPC UA-Model
 	*/
-	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager);
+	ua_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager);
 	
-	/** @brief Constructor from mtca_processvaribale for mapped process variables
+	/** @brief Constructor from ua_processvaribale for mapped process variables
 	* 
 	* @param server A UA_Server type, with all server specific information from the used server
 	* @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
@@ -78,12 +78,12 @@ public:
 	* @param csManager The hole PVManager from control-system-adapter 
 	* 
 	*/
-	mtca_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager);
+	ua_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager);
 	
-	/** @brief Destructor for mtca_processvariable
+	/** @brief Destructor for ua_processvariable
 	* 
 	*/
-	~mtca_processvariable();
+	~ua_processvariable();
 	
 	/** @brief Reimplement the sourcetimestamp for every processvariable
 	* 

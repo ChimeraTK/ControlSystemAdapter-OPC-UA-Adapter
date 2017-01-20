@@ -6,7 +6,7 @@
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
 
-#include "mtca_uaadapter.h"
+#include "ua_adapter.h"
 
 
 using namespace boost::unit_test_framework;
@@ -21,8 +21,8 @@ void IPCManagerTest::testManagerConnection(){
 	
 	ipc_manager *manager = new ipc_manager();
 	
-	mtca_uaadapter *adapterOne = new mtca_uaadapter("../tests/uamapping_test_1.xml");
-	mtca_uaadapter *adapterTwo = new mtca_uaadapter("../tests/uamapping_test_2.xml");	
+	ua_uaadapter *adapterOne = new ua_uaadapter("../tests/uamapping_test_1.xml");
+	ua_uaadapter *adapterTwo = new ua_uaadapter("../tests/uamapping_test_2.xml");	
 	
 	BOOST_CHECK(adapterTwo->isManaged() == false);
 	
@@ -57,6 +57,7 @@ void IPCManagerTest::testManagerConnection(){
 	BOOST_CHECK(adapterTwo->terminate() == 0);
 
 	ipc_manager *mgr = adapterOne->getIpcManager();
+	BOOST_CHECK(mgr != NULL);
 
 	BOOST_CHECK(manager->deleteObject(adapOneIpcId) == 0);
 

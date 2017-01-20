@@ -2,8 +2,8 @@
  * Any manual changes will be overwritten.
 
  */
-#include "mtca_namespaceinit_generated.h"
-UA_INLINE UA_StatusCode mtca_namespaceinit_generated(UA_Server *server) {
+#include "csa_namespaceinit_generated.h"
+UA_INLINE UA_StatusCode csa_namespaceinit_generated(UA_Server *server) {
 UA_StatusCode retval = UA_STATUSCODE_GOOD; 
 if(retval == UA_STATUSCODE_GOOD){retval = UA_STATUSCODE_GOOD;} //ensure that retval is used
 if (UA_Server_addNamespace(server, "http://adapterIM/") != 2)

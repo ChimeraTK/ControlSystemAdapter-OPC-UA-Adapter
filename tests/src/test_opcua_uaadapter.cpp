@@ -1,4 +1,4 @@
-#include <mtca_uaadapter.h>
+#include <ua_adapter.h>
 #include <xml_file_handler.h>
 
 #include <test_sample_data.h>
@@ -22,14 +22,14 @@ void UAAdapterTest::testExampleSet() {
 	cout << "UAAdapterTest with ExampleSet started." << endl;
 	TestFixturePVSet tfExampleSet;
 	 // Create the managers
-	mtca_uaadapter *adapter = new mtca_uaadapter("./uamapping_test_2.xml");
+	ua_uaadapter *adapter = new ua_uaadapter("./uamapping_test_2.xml");
 	xml_file_handler *xmlHandler = new xml_file_handler("./uamapping_test_2.xml");
 		
 	// Test config handling
-	BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("./uamapping_test_twoconfigs.xml"), runtime_error);
-	BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("./uamapping_test_applicationismissing.xml"), runtime_error);
-	BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("./uamapping_test_configismissing.xml"), runtime_error);
-	BOOST_CHECK_THROW(mtca_uaadapter mtca_uaadapter("./uamapping_test_portismissung.xml"), runtime_error);
+	BOOST_CHECK_THROW(ua_uaadapter ua_uaadapter("./uamapping_test_twoconfigs.xml"), runtime_error);
+	BOOST_CHECK_THROW(ua_uaadapter ua_uaadapter("./uamapping_test_applicationismissing.xml"), runtime_error);
+	BOOST_CHECK_THROW(ua_uaadapter ua_uaadapter("./uamapping_test_configismissing.xml"), runtime_error);
+	BOOST_CHECK_THROW(ua_uaadapter ua_uaadapter("./uamapping_test_portismissung.xml"), runtime_error);
 	
 	// is Server running?
 	adapter->doStart();
@@ -90,14 +90,14 @@ void UAAdapterTest::testExampleSet() {
 	UASTRING_TO_CPPSTRING(UA_DateTime_toString(adapter->getSourceTimeStamp()), dateTime);
 	BOOST_CHECK(dateTime != "");
 		
-	adapter->~mtca_uaadapter();
+	adapter->~ua_uaadapter();
 	xmlHandler->~xml_file_handler();
 
 }
 
 class UAAdapterTestSuite: public test_suite {
 	public:
-		UAAdapterTestSuite() : test_suite("mtca_uaadapter Test Suite") {
+		UAAdapterTestSuite() : test_suite("ua_uaadapter Test Suite") {
 			add(BOOST_TEST_CASE(&UAAdapterTest::testExampleSet));
     }
 };

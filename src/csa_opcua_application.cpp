@@ -54,13 +54,13 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
-#include "ControlSystemAdapterOPCUA.h"
+#include "csa_opcua_adapter.h"
 
 boost::shared_ptr<ControlSystemPVManager> csManager;
 boost::shared_ptr<DevicePVManager> devManager;
 boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
 boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
-ControlSystemAdapterOPCUA *csaOPCUA;
+csa_opcua_adapter *csaOPCUA;
 
 std::atomic<bool> terminateMain;
 
@@ -69,7 +69,7 @@ static void SigHandler_Int(int sign) {
 	terminateMain = true;
 	csaOPCUA->stop();
 	csaOPCUA->terminate();
-	csaOPCUA->~ControlSystemAdapterOPCUA();
+	csaOPCUA->~csa_opcua_adapter();
 	cout << "OPC UA adapter termianted." << endl;
 }
 
@@ -92,7 +92,7 @@ int main() {
 	ChimeraTK::ApplicationBase::getInstance().initialise();
 
 	string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, pathToConfig);
+	csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
 	
 	ChimeraTK::ApplicationBase::getInstance().run();
 

@@ -2,8 +2,8 @@
  * Any manual changes will be overwritten.
 
  */
-#ifndef MTCA_NAMESPACEINIT_GENERATED_H_
-#define MTCA_NAMESPACEINIT_GENERATED_H_
+#ifndef CSA_NAMESPACEINIT_GENERATED_H_
+#define CSA_NAMESPACEINIT_GENERATED_H_
 #ifdef UA_NO_AMALGAMATION
 #include "server/ua_server_internal.h"
 #include "server/ua_nodes.h"
@@ -37,6 +37,6 @@
 #define UA_NS2ID_MTCAADDITIONALVARIABLE 1005
 #define UA_NS2ID_MTCAMODULE 1002
 #define UA_NS2ID_MTCAPROCESSVARIABLE 1001
-extern UA_StatusCode mtca_namespaceinit_generated(UA_Server *server);
+extern UA_StatusCode csa_namespaceinit_generated(UA_Server *server);
 
-#endif /* MTCA_NAMESPACEINIT_GENERATED_H_ */
+#endif /* CSA_NAMESPACEINIT_GENERATED_H_ */

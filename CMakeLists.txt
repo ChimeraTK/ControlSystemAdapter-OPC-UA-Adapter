@@ -1,23 +1,18 @@
 cmake_minimum_required(VERSION 2.8.0)
 
+##########################################################################################################
+## Definition for compiler for static analysis
+##########################################################################################################
 if(BUILD_STATIC_ANALYSIS)
-  #set(CMAKE_C_COMPILER "clang")
-  #set(CMAKE_CXX_COMPILER "clang++")
-  #add_definitions(-Wall)
-  
-  set(CMAKE_C_COMPILER   /usr/share/clang/scan-build-3.8/libexec/ccc-analyzer)
-  set(CMAKE_CXX_COMPILER /usr/share/clang/scan-build-3.8/libexec/c++-analyzer)
-	#add_definitions(-o ${PROJECT_BINARY_DIR}/static-analysis})
-  
-	#file(COPY ${CMAKE_SOURCE_DIR}/cmake/make_cccanalyze.sh.in DESTINATION ${CMAKE_BINARY_DIR})
-	#add_custom_target(cccanalyze ALL
-#		${CMAKE_BINARY_DIR}/make_cccanalyze.sh.in ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR}
-#		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#		COMMENT "Generating test cccanalyze documentation" VERBATIM
-#  )
+  set(CMAKE_C_COMPILER   ccc-analyzer)
+  set(CMAKE_CXX_COMPILER c++-analyzer)
+	add_definitions(-o ${PROJECT_BINARY_DIR}/static-analysis})
 endif()
 
-project(ControlSystemAdapterOPCUA)
+##########################################################################################################
+## Project specification
+##########################################################################################################
+project(ControlSystemAdapterOPCUAAdapter)
 
 include(ExternalProject)
 
@@ -63,8 +58,6 @@ if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
 	message("You will not be able to make a proper installation of the OPCUA_Adapter. Only use this for testing and development.\n")
   ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
     GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
-    #When creationg a tag, base it on a tag of the ControlSystemAdapter so it stays stable
-    #GIT_TAG "00.02.00"
     GIT_TAG "master"
     PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-ControlSystemAdapter_src"
     DEPENDS external-ChimeraTK-DeviceAccess
@@ -74,8 +67,7 @@ if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
     "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
 		"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
     )
-  #FIXME: Find a better name for this variable
-  set(USE_SELFINSTALLED_ControlSystemAdapter TRUE)
+  set(USE_ControlSystemAdapter TRUE)
   set(ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/include)
   set(ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/lib)
   set(ChimeraTK-ControlSystemAdapter_LIBRARIES ChimeraTK-ControlSystemAdapter)
@@ -104,6 +96,8 @@ if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
 		file(COPY ${mappingFile} DESTINATION ${CMAKE_BINARY_DIR}/)
 		message("Copy ${mappingFile}")
 	endforeach(mappingFile)
+	
+	file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
 endif()         
 
 ##########################################################################################################
@@ -116,7 +110,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR "x${CMAKE_C_COMPILER_ID}" STREQUAL "xClang")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-  add_definitions(-DMY_DEBUG=0)
+  add_definitions(-DNDEBUG)
   add_definitions(-fPIC)
   add_definitions(-Wextra)
 endif()
@@ -128,7 +122,6 @@ endif()
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
-#include_directories(${CMAKE_SOURCE_DIR}/include/open62541/)
 include_directories(SYSTEM ${ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS})
 include_directories(SYSTEM ${ChimeraTK-DeviceAccess_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/examples/)
@@ -138,21 +131,21 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 link_directories(${LIBXML2_LIBRARIES})
 link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
 link_directories(${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
-
                     
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
                    ${CMAKE_SOURCE_DIR}/src/ipc_managed_object.cpp
                    ${CMAKE_SOURCE_DIR}/src/ipc_manager.cpp
-                   ${CMAKE_SOURCE_DIR}/src/ControlSystemAdapterOPCUA.cpp
+                   ${CMAKE_SOURCE_DIR}/src/csa_opcua_adapter.cpp
                    ${CMAKE_SOURCE_DIR}/src/xml_file_handler.cpp
-                   ${CMAKE_SOURCE_DIR}/src/mtca_processvariable.cpp
-                   ${CMAKE_SOURCE_DIR}/src/mtca_additionalvariable.cpp
-                   ${CMAKE_SOURCE_DIR}/src/mtca_uaadapter.cpp
-                   ${CMAKE_SOURCE_DIR}/src/CSA_OPCUA_Application.cpp
+                   ${CMAKE_SOURCE_DIR}/src/ua_processvariable.cpp
+                   ${CMAKE_SOURCE_DIR}/src/ua_additionalvariable.cpp
+                   ${CMAKE_SOURCE_DIR}/src/ua_adapter.cpp
+                   ${CMAKE_SOURCE_DIR}/src/csa_opcua_application.cpp
                    
+                   ${CMAKE_SOURCE_DIR}/src/open62541.c
                    # Example HelperClass
-                   ${CMAKE_SOURCE_DIR}/examples/runtimeValueGenerator.cpp
+                   #${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp
 )
 
 # Create the target directory for model initializers, open62541 and ControlSystemAdapter libraries/headers
@@ -177,10 +170,10 @@ option(UPDATE_OPEN62541	"Build new open62541 from git repository" OFF)
 if(ENABLE_CREATEMODEL)
   set(MODEL_XML_FILE "adapterim.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
   
-  list(APPEND objectSources ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit_generated.c)
+  list(APPEND objectSources ${PROJECT_BINARY_DIR}/src_generated/csa_namespaceinit_generated.c)
 else()
   include_directories(${CMAKE_SOURCE_DIR}/include/model_prebuilt/)
-  list(APPEND objectSources ${CMAKE_SOURCE_DIR}/include/model_prebuilt/mtca_namespaceinit_generated.c)
+  list(APPEND objectSources ${CMAKE_SOURCE_DIR}/include/model_prebuilt/csa_namespaceinit_generated.c)
 endif()
 
 #Install the open62541 if it is not pre-installed
@@ -188,12 +181,11 @@ if(UPDATE_OPEN62541)
 		ExternalProject_Add(external-open62541
 			GIT_REPOSITORY "https://github.com/open62541/open62541.git"
 			GIT_TAG "0.2-rc2"
-			#GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2"
+			#GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2" // Tag during the first integration Meeting
 			PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
 			CMAKE_ARGS 
 			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/open62541" 
 			"-DUA_ENABLE_AMALGAMATION=On"
-			#"-DBUILD_SHARED_LIBS=On" 
 			"-DUA_ENABLE_GENERATE_NAMESPACE0=On" 
 			"-DUA_ENABLE_METHODCALLS=ON" 
 			"-DUA_ENABLE_NODEMANAGEMENT=ON" 
@@ -201,38 +193,26 @@ if(UPDATE_OPEN62541)
 			"-DUA_LOGLEVEL=300"
 			"-DCMAKE_BUILD_TYPE=DEBUG"
 		)
-		
-		
+				
+		set(UPDATE_Open62541 TRUE)
 		
 		add_custom_target(copyOpen62541Header ALL
 				DEPENDS external-open62541
-        COMMAND ${CMAKE_COMMAND} -E copy
+				COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.h
                 ${CMAKE_SOURCE_DIR}/include/open62541.h
-     )
-     add_custom_target(copyOpen62541Source ALL
+		)
+		add_custom_target(copyOpen62541Source ALL
 				DEPENDS external-open62541
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.c
                 ${CMAKE_SOURCE_DIR}/src/open62541.c
-     )		
-     
-     # file(RENAME <oldname> <newname>)
-     file(COPY ${CMAKE_SOURCE_DIR}/src/open62541.c DESTINATION ${CMAKE_SOURCE_DIR}/src/open62541.bak)
-     file(COPY ${CMAKE_SOURCE_DIR}/include/open62541.h DESTINATION ${CMAKE_SOURCE_DIR}/include/open62541.bak)
-    
-    list(APPEND objectSources ${CMAKE_SOURCE_DIR}/src/open62541.c)
-   # add_dependencies(copyOpen62541Header external-open62541)
- #  add_dependencies(copyOpen62541Source external-open62541)
-    #list(APPEND objectSources ${CMAKE_SOURCE_DIR}/src/open62541/open62541.c)
-		#set(open62541_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include/open62541/)
-		#set(open62541_INCLUDE_DIR ${CMAKE_BINARY_DIR}/open62541/include)
-		#set(open62541_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/open62541/lib)
-		#set(open62541_LIBRARIES open62541)
-		#set(open62541_SOURCE_DIR "${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541")
-	else(NOT UPDATE_OPEN62541)
+		)
 
-		list(APPEND objectSources ${CMAKE_SOURCE_DIR}/src/open62541.c)
+		# file(RENAME <oldname> <newname>)
+		file(COPY ${CMAKE_SOURCE_DIR}/src/open62541.c DESTINATION ${CMAKE_SOURCE_DIR}/src/open62541.bak)
+		file(COPY ${CMAKE_SOURCE_DIR}/include/open62541.h DESTINATION ${CMAKE_SOURCE_DIR}/include/open62541.bak)
+		
 endif(UPDATE_OPEN62541)
 
 if(ENABLE_COVERAGE)
@@ -247,7 +227,7 @@ if(ENABLE_COVERAGE)
 		${CMAKE_CURRENT_BINARY_DIR}/make_coverage.sh.in ${CMAKE_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 			# Bad soulution to provide all depencys
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ControlSystemAdapterOPCUA
+			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_adapter
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
@@ -275,7 +255,7 @@ if(ENABLE_RUNTIME_ANALYSIS)
 		${CMAKE_CURRENT_BINARY_DIR}/make_valgrind.sh.in ${CMAKE_SOURCE_DIR} ${PROJECT_BINARY_DIR}
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 			# Bad soulution to provide all depencys
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ControlSystemAdapterOPCUA
+			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_adapter
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
@@ -311,17 +291,19 @@ configure_file (
 
 ## Object Files
 add_library(mtca_objects OBJECT ${objectSources})
-if(USE_SELFINSTALLED_ControlSystemAdapter)
-   add_dependencies(mtca_objects external-ChimeraTK-ControlSystemAdapter) 
-   add_dependencies(mtca_objects external-ChimeraTK-DeviceAccess) 
-   #add_dependencies(mtca_objects external-open62541)
+if(USE_ControlSystemAdapter)
+	add_dependencies(mtca_objects external-ChimeraTK-ControlSystemAdapter) 
+	add_dependencies(mtca_objects external-ChimeraTK-DeviceAccess) 
+endif()
+
+if(UPDATE_Open62541)
+	add_dependencies(mtca_objects external-open62541)
 endif()
 
 ## Early declaration due to the requirement to run the dependencies update prior to building
 ## Create shared lib
 add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects>)
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION} SOVERSION ${${PROJECT_NAME}_SOVERSION})
-target_link_libraries(${PROJECT_NAME} ${open62541_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-DeviceAccess_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
@@ -347,15 +329,15 @@ install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
 ##########################################################################################################
 
-add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit_generated.c
-                          ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit_generated.h
+add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/csa_namespaceinit_generated.c
+                          ${PROJECT_BINARY_DIR}/src_generated/csa_namespaceinit_generated.h
                    PRE_BUILD
                    COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
                                                 -i ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist_FullNS0.txt
                                                 -b ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist.txt
                                                 ${PROJECT_SOURCE_DIR}/model/Opc.Ua.NodeSet2.xml
                                                 ${PROJECT_SOURCE_DIR}/model/${MODEL_XML_FILE}
-                                                ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit_generated
+                                                ${PROJECT_BINARY_DIR}/src_generated/csa_namespaceinit_generated
                    DEPENDS ${PROJECT_SOURCE_DIR}/model/Opc.Ua.NodeSet2.xml
                            ${PROJECT_SOURCE_DIR}/model/${MODEL_XML_FILE}
                            ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist_FullNS0.txt
@@ -374,7 +356,7 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/mtca_namespaceinit
 
 link_directories(${CMAKE_BINARY_DIR})
 
-add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/ControlSystem_OPCUA_Sample_Adapter.cpp)
+add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter

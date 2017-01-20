@@ -66,8 +66,6 @@ ipc_managed_object::~ipc_managed_object()
 //   this->threadTask->~thread();
 //   delete this->threadTask;
 // 	this->threadTask = NULL;
-// 	delete this->manager;
-// 	this->manager = NULL;
 	
   this->terminate();
 }

@@ -1,5 +1,5 @@
-#include <mtca_uaadapter.h>
-#include <ControlSystemAdapterOPCUA.h>
+#include <ua_adapter.h>
+#include <csa_opcua_adapter.h>
 #include <ipc_manager.h>
 #include <test_sample_data.h>
 
@@ -13,7 +13,7 @@
 
 extern "C" {
 	#include "unistd.h"
-	#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
+	#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
 
 using namespace boost::unit_test_framework;
@@ -29,7 +29,7 @@ void CSAOPCUATest::testWithoutPVSet(){
 	cout << "Enter CSAOPCUATest without any pv" << std::endl;
 	TestFixtureEmptySet tfEmptySet;
 	 // Create the managers
-	ControlSystemAdapterOPCUA *csaOPCUA = new ControlSystemAdapterOPCUA(tfEmptySet.csManager, "../tests/uamapping_test_1.xml");
+	csa_opcua_adapter *csaOPCUA = new csa_opcua_adapter(tfEmptySet.csManager, "../tests/uamapping_test_1.xml");
 
 	// is Server running?
 	csaOPCUA->start();
@@ -41,14 +41,14 @@ void CSAOPCUATest::testWithoutPVSet(){
 	csaOPCUA->terminate();
 	BOOST_CHECK(csaOPCUA->isRunning() != true);
 	
-	csaOPCUA->~ControlSystemAdapterOPCUA(); 
+	csaOPCUA->~csa_opcua_adapter(); 
 }
 
 void CSAOPCUATest::testWithPVSet(){ 
 	std::cout << "Enter CSAOPCUATest with ExampleSet" << std::endl;
 	TestFixturePVSet tfExampleSet;
 	 // Create the managers
-	ControlSystemAdapterOPCUA *csaOPCUA = new ControlSystemAdapterOPCUA(tfExampleSet.csManager, "../tests/uamapping_test_2.xml");
+	csa_opcua_adapter *csaOPCUA = new csa_opcua_adapter(tfExampleSet.csManager, "../tests/uamapping_test_2.xml");
 	// is Server running?
 	BOOST_CHECK(csaOPCUA->isRunning() == true);
 	
@@ -63,7 +63,7 @@ void CSAOPCUATest::testWithPVSet(){
 	csaOPCUA->terminate();
 	BOOST_CHECK(csaOPCUA->isRunning() != true);
 	
-	csaOPCUA->~ControlSystemAdapterOPCUA();
+	csaOPCUA->~csa_opcua_adapter();
 }
 
 
@@ -72,7 +72,7 @@ void CSAOPCUATest::testWithPVSet(){
    */
 class CSAOPCUATestSuite: public test_suite {
 	public:
-		CSAOPCUATestSuite() : test_suite("ControlSystemAdapterOPCUA Test Suite") {
+		CSAOPCUATestSuite() : test_suite("csa_opcua_adapter Test Suite") {
 			add(BOOST_TEST_CASE(&CSAOPCUATest::testWithoutPVSet));
 			add(BOOST_TEST_CASE(&CSAOPCUATest::testWithPVSet));
     }

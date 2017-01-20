@@ -119,6 +119,7 @@ uint32_t ipc_manager::deleteObject(uint32_t rpc_id) {
     this->objects.remove(obj);
     deleteThese.remove(obj);
     delete obj;
+		obj = NULL;
     j = deleteThese.begin();
   }
   

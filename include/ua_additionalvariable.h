@@ -31,14 +31,14 @@
 
 using namespace std;
 
-/** @class mtca_additionalvariable
+/** @class ua_additionalvariable
  *	@brief This class represent a additional variable from <variableMap.xml> in the information model of a OPC UA Server 
  *   
  *  @author Chris Iatrou, Julian Rahm
  *  @date 22.11.2016
  * 
  */
-class mtca_additionalvariable : ua_mapped_class {
+class ua_additionalvariable : ua_mapped_class {
 private:
 	/// Kurzbeschreibung Variable a
   string value;
@@ -59,7 +59,7 @@ private:
 	
 public:
 	
-	/** @brief Constructor from <mtca_additionalvariable> for generic creation
+	/** @brief Constructor from <ua_additionalvariable> for generic creation
 	* 
 	* @param server A UA_Server type, with all server specific information from the used server
 	* @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
@@ -67,9 +67,9 @@ public:
 	* @param value Value of the additinal node
 	* @param description Descripption of the additinal node
 	*/
-	mtca_additionalvariable(UA_Server *server, UA_NodeId basenodeid, string name, string value, string description);
+	ua_additionalvariable(UA_Server *server, UA_NodeId basenodeid, string name, string value, string description);
 	
-	~mtca_additionalvariable();
+	~ua_additionalvariable();
 	
 	UA_DateTime getSourceTimeStamp();
 		

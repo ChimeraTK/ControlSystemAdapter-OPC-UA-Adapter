@@ -1024,7 +1024,7 @@ typedef struct {
 
 /* Returns the description of the StatusCode. Never returns NULL, but a generic
  * description for invalid StatusCodes instead. */
-UA_EXPORT const UA_StatusCodeDescription *
+ const UA_StatusCodeDescription *
 UA_StatusCode_description(UA_StatusCode code);
 
 static UA_INLINE const char *
@@ -1047,11 +1047,11 @@ typedef struct {
 } UA_String;
 
 /* Copies the content on the heap. Returns a null-string when alloc fails */
-UA_String UA_EXPORT UA_String_fromChars(char const src[]) UA_FUNC_ATTR_WARN_UNUSED_RESULT;
+UA_String  UA_String_fromChars(char const src[]) UA_FUNC_ATTR_WARN_UNUSED_RESULT;
 
-UA_Boolean UA_EXPORT UA_String_equal(const UA_String *s1, const UA_String *s2);
+UA_Boolean  UA_String_equal(const UA_String *s1, const UA_String *s2);
 
-UA_EXPORT extern const UA_String UA_STRING_NULL;
+extern const UA_String UA_STRING_NULL;
 
 /**
  * ``UA_STRING`` returns a string pointing to the preallocated char-array.
@@ -1082,11 +1082,11 @@ typedef int64_t UA_DateTime;
 #define UA_DATETIME_UNIX_EPOCH (11644473600LL * UA_SEC_TO_DATETIME)
 
 /* The current time */
-UA_DateTime UA_EXPORT UA_DateTime_now(void);
+UA_DateTime UA_DateTime_now(void);
 
 /* CPU clock invariant to system time changes. Use only for time diffs, not
  * current time */
-UA_DateTime UA_EXPORT UA_DateTime_nowMonotonic(void);
+UA_DateTime UA_DateTime_nowMonotonic(void);
 
 typedef struct UA_DateTimeStruct {
     UA_UInt16 nanoSec;
@@ -1100,9 +1100,9 @@ typedef struct UA_DateTimeStruct {
     UA_UInt16 year;
 } UA_DateTimeStruct;
 
-UA_DateTimeStruct UA_EXPORT UA_DateTime_toStruct(UA_DateTime t);
+UA_DateTimeStruct UA_DateTime_toStruct(UA_DateTime t);
 
-UA_String UA_EXPORT UA_DateTime_toString(UA_DateTime t);
+UA_String UA_DateTime_toString(UA_DateTime t);
 
 /**
  * Guid
@@ -1115,9 +1115,9 @@ typedef struct {
     UA_Byte   data4[8];
 } UA_Guid;
 
-UA_Boolean UA_EXPORT UA_Guid_equal(const UA_Guid *g1, const UA_Guid *g2);
+UA_Boolean UA_Guid_equal(const UA_Guid *g1, const UA_Guid *g2);
 
-UA_EXPORT extern const UA_Guid UA_GUID_NULL;
+extern const UA_Guid UA_GUID_NULL;
 
 /**
  * ByteString
@@ -1135,7 +1135,7 @@ UA_ByteString_equal(const UA_ByteString *string1, const UA_ByteString *string2) 
 UA_StatusCode UA_EXPORT
 UA_ByteString_allocBuffer(UA_ByteString *bs, size_t length);
 
-UA_EXPORT extern const UA_ByteString UA_BYTESTRING_NULL;
+extern const UA_ByteString UA_BYTESTRING_NULL;
 
 static UA_INLINE UA_ByteString
 UA_BYTESTRING(char *chars) {
@@ -1181,11 +1181,11 @@ typedef struct {
     } identifier;
 } UA_NodeId;
 
-UA_EXPORT extern const UA_NodeId UA_NODEID_NULL;
+extern const UA_NodeId UA_NODEID_NULL;
 
-UA_Boolean UA_EXPORT UA_NodeId_isNull(const UA_NodeId *p);
+UA_Boolean UA_NodeId_isNull(const UA_NodeId *p);
 
-UA_Boolean UA_EXPORT UA_NodeId_equal(const UA_NodeId *n1, const UA_NodeId *n2);
+UA_Boolean UA_NodeId_equal(const UA_NodeId *n1, const UA_NodeId *n2);
 
 /** The following functions are shorthand for creating NodeIds. */
 static UA_INLINE UA_NodeId
@@ -1636,7 +1636,7 @@ struct UA_DataType {
  * following method to retrieve the data type description. */
 /* Returns the data type description for the type's identifier or NULL if no
  * matching data type was found. */
-const UA_DataType UA_EXPORT *
+const UA_DataType *
 UA_findDataType(const UA_NodeId *typeId);
 
 /** The following functions are used for generic handling of data types. */
@@ -1646,7 +1646,7 @@ UA_findDataType(const UA_NodeId *typeId);
  * @param type The datatype description
  * @return Returns the memory location of the variable or NULL if no
  *         memory could be allocated */
-void UA_EXPORT * UA_new(const UA_DataType *type) UA_FUNC_ATTR_MALLOC;
+void * UA_new(const UA_DataType *type) UA_FUNC_ATTR_MALLOC;
 
 /* Initializes a variable to default values
  *
@@ -1675,13 +1675,13 @@ UA_copy(const void *src, void *dst, const UA_DataType *type);
  *
  * @param p The memory location of the variable
  * @param type The datatype description of the variable */
-void UA_EXPORT UA_deleteMembers(void *p, const UA_DataType *type);
+void UA_deleteMembers(void *p, const UA_DataType *type);
 
 /* Frees a variable and all of its content.
  *
  * @param p The memory location of the variable
  * @param type The datatype description of the variable */
-void UA_EXPORT UA_delete(void *p, const UA_DataType *type);
+void UA_delete(void *p, const UA_DataType *type);
 
 /**
  * .. _array-handling:
@@ -1701,7 +1701,7 @@ void UA_EXPORT UA_delete(void *p, const UA_DataType *type);
  * @param type The datatype description
  * @return Returns the memory location of the variable or NULL if no memory
            could be allocated */
-void UA_EXPORT * UA_Array_new(size_t size, const UA_DataType *type) UA_FUNC_ATTR_MALLOC;
+void * UA_Array_new(size_t size, const UA_DataType *type) UA_FUNC_ATTR_MALLOC;
 
 /* Allocates and copies an array
  *
@@ -1719,7 +1719,7 @@ UA_Array_copy(const void *src, size_t size, void **dst,
  * @param p The memory location of the array
  * @param size The size of the array
  * @param type The datatype of the array members */
-void UA_EXPORT UA_Array_delete(void *p, size_t size, const UA_DataType *type);
+void UA_Array_delete(void *p, size_t size, const UA_DataType *type);
 
 /**
  * .. _numericrange:
@@ -1748,9 +1748,9 @@ struct UA_NumericRange {
  * If UA_ENABLE_MULTITHREADING is defined, then the seed is stored in thread
  * local storage. The seed is initialized for every thread in the
  * server/client. */
-void UA_EXPORT UA_random_seed(UA_UInt64 seed);
-UA_UInt32 UA_EXPORT UA_UInt32_random(void); /* no cryptographic entropy */
-UA_Guid UA_EXPORT UA_Guid_random(void);     /* no cryptographic entropy */
+void UA_random_seed(UA_UInt64 seed);
+UA_UInt32 UA_UInt32_random(void); /* no cryptographic entropy */
+UA_Guid UA_Guid_random(void);     /* no cryptographic entropy */
 
 /**
  * .. _generated-types:
@@ -3067,7 +3067,7 @@ extern "C" {
  * These descriptions are used during type handling (copying, deletion,
  * binary encoding, ...). */
 #define UA_TYPES_COUNT 163
-extern UA_EXPORT const UA_DataType UA_TYPES[UA_TYPES_COUNT];
+extern const UA_DataType UA_TYPES[UA_TYPES_COUNT];
 
 /**
  * Boolean
@@ -9420,7 +9420,7 @@ typedef struct {
     UA_UInt32 maxChunkCount;
 } UA_ConnectionConfig;
 
-extern const UA_EXPORT UA_ConnectionConfig UA_ConnectionConfig_standard;
+extern const UA_ConnectionConfig UA_ConnectionConfig_standard;
 
 /**
  * Connection Structure
@@ -9489,7 +9489,7 @@ struct UA_Connection {
     void (*close)(UA_Connection *connection);
 };
 
-void UA_EXPORT UA_Connection_deleteMembers(UA_Connection *connection);
+void UA_Connection_deleteMembers(UA_Connection *connection);
 
 /**
  * EndpointURL Helper
@@ -9831,13 +9831,13 @@ typedef struct {
 } UA_ServerConfig;
 
 /* Add a new namespace to the server. Returns the index of the new namespace */
-UA_UInt16 UA_EXPORT UA_Server_addNamespace(UA_Server *server, const char* name);
+UA_UInt16 UA_Server_addNamespace(UA_Server *server, const char* name);
 
 /**
  * Server Lifecycle
  * ---------------- */
-UA_Server UA_EXPORT * UA_Server_new(const UA_ServerConfig config);
-void UA_EXPORT UA_Server_delete(UA_Server *server);
+UA_Server * UA_Server_new(const UA_ServerConfig config);
+void UA_Server_delete(UA_Server *server);
 
 /* Runs the main loop of the server. In each iteration, this calls into the
  * networklayers to see if jobs have arrived and checks if repeated jobs need to
@@ -9852,7 +9852,7 @@ UA_Server_run(UA_Server *server, volatile UA_Boolean *running);
 
 /* The prologue part of UA_Server_run (no need to use if you call
  * UA_Server_run) */
-UA_StatusCode UA_EXPORT UA_Server_run_startup(UA_Server *server);
+UA_StatusCode UA_Server_run_startup(UA_Server *server);
 
 /* Executes a single iteration of the server's main loop.
  *
@@ -9867,7 +9867,7 @@ UA_Server_run_iterate(UA_Server *server, UA_Boolean waitInternal);
 
 /* The epilogue part of UA_Server_run (no need to use if you call
  * UA_Server_run) */
-UA_StatusCode UA_EXPORT UA_Server_run_shutdown(UA_Server *server);
+UA_StatusCode UA_Server_run_shutdown(UA_Server *server);
 
 /**
  * Repeated jobs
@@ -10737,16 +10737,16 @@ typedef struct UA_Client UA_Client;
  * @param logger function pointer to a logger function. See
  *        examples/logger_stdout.c for a simple implementation
  * @return return the new Client object */
-UA_Client UA_EXPORT * UA_Client_new(UA_ClientConfig config);
+UA_Client * UA_Client_new(UA_ClientConfig config);
 
 /* Get the client connection status */
-UA_ClientState UA_EXPORT UA_Client_getState(UA_Client *client);
+UA_ClientState UA_Client_getState(UA_Client *client);
 
 /* Reset a client */
-void UA_EXPORT UA_Client_reset(UA_Client *client);
+void UA_Client_reset(UA_Client *client);
 
 /* Delete a client */
-void UA_EXPORT UA_Client_delete(UA_Client *client);
+void UA_Client_delete(UA_Client *client);
 
 /**
  * Manage the Connection
@@ -10784,10 +10784,10 @@ UA_Client_connect_username(UA_Client *client, const char *endpointUrl,
                            const char *username, const char *password);
 
 /* Close a connection to the selected server */
-UA_StatusCode UA_EXPORT UA_Client_disconnect(UA_Client *client);
+UA_StatusCode UA_Client_disconnect(UA_Client *client);
 
 /* Renew the underlying secure channel */
-UA_StatusCode UA_EXPORT UA_Client_manuallyRenewSecureChannel(UA_Client *client);
+UA_StatusCode UA_Client_manuallyRenewSecureChannel(UA_Client *client);
 
 /**
  * .. _client-services:
@@ -11592,7 +11592,7 @@ typedef struct {
     UA_Byte priority;
 } UA_SubscriptionSettings;
 
-extern const UA_EXPORT UA_SubscriptionSettings UA_SubscriptionSettings_standard;
+extern const UA_SubscriptionSettings UA_SubscriptionSettings_standard;
 
 UA_StatusCode UA_EXPORT
 UA_Client_Subscriptions_new(UA_Client *client, UA_SubscriptionSettings settings,
@@ -11689,7 +11689,7 @@ UA_ClientConnectionTCP(UA_ConnectionConfig conf, const char *endpointUrl, UA_Log
 extern "C" {
 #endif
 
-UA_EXPORT void UA_Log_Stdout(UA_LogLevel level, UA_LogCategory category, const char *msg, ...);
+void UA_Log_Stdout(UA_LogLevel level, UA_LogCategory category, const char *msg, ...);
 
 #ifdef __cplusplus
 }
@@ -11707,8 +11707,8 @@ UA_EXPORT void UA_Log_Stdout(UA_LogLevel level, UA_LogCategory category, const c
 extern "C" {
 #endif
 
-extern UA_EXPORT const UA_ServerConfig UA_ServerConfig_standard;
-extern UA_EXPORT const UA_ClientConfig UA_ClientConfig_standard;
+extern const UA_ServerConfig UA_ServerConfig_standard;
+extern const UA_ClientConfig UA_ClientConfig_standard;
 
 #ifdef __cplusplus
 }

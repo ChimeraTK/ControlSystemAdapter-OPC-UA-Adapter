@@ -26,7 +26,7 @@
 
 extern "C" {
 #include "unistd.h"
-#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
+#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 #include <stdio.h>
 #include <stdlib.h>
 }
@@ -37,10 +37,11 @@ extern "C" {
 
 #include "csa_config.h"
 
-#include "mtca_uaadapter.h"
-#include "mtca_processvariable.h"
-#include "mtca_additionalvariable.h"
+#include "ua_adapter.h"
+#include "ua_processvariable.h"
+#include "ua_additionalvariable.h"
 #include "xml_file_handler.h"
+#include <ipc_manager.h>
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
@@ -50,7 +51,7 @@ extern "C" {
 using namespace ChimeraTK;
 using namespace std;
 
-mtca_uaadapter::mtca_uaadapter(string configFile) : ua_mapped_class() {
+ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
 	this->fileHandler = new xml_file_handler(configFile);
 	
 	this->readConfig();
@@ -62,22 +63,20 @@ mtca_uaadapter::mtca_uaadapter(string configFile) : ua_mapped_class() {
 	
 }
 
-mtca_uaadapter::~mtca_uaadapter() {
+ua_uaadapter::~ua_uaadapter() {
 	
 	if (this->isRunning()) {
 		this->doStop();
 	}	
 	//UA_Server_delete(this->mappedServer);
 	this->fileHandler->~xml_file_handler();
-	
 	for(auto ptr : variables) delete ptr;
 	for(auto ptr : additionalVariables) delete ptr;
 	for(auto ptr : mappedVariables) delete ptr;
-	
-	
+
 }
 
-void mtca_uaadapter::constructServer() {
+void ua_uaadapter::constructServer() {
 
     this->server_config = UA_ServerConfig_standard;
     this->server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, this->serverConfig.opcuaPort);
@@ -97,17 +96,17 @@ void mtca_uaadapter::constructServer() {
 		this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
 		this->server_config.applicationDescription.applicationUri = UA_STRING((char*)"opc.tcp://localhost");
 		this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
-		this->server_config.buildInfo.productName = UA_STRING((char*)"ControlSystemAdapterOPCUA");
+		this->server_config.buildInfo.productName = UA_STRING((char*)"csa_opcua_adapter");
 		this->server_config.buildInfo.productUri = UA_STRING((char*)"HZDR OPCUA Server");
 		this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"TU Dresden - Professur für Prozessleittechnik");
 		
     this->mappedServer = UA_Server_new(this->server_config);
 		this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
 		
-		mtca_namespaceinit_generated(this->mappedServer);
+		csa_namespaceinit_generated(this->mappedServer);
 }
 
-void mtca_uaadapter::readConfig() {
+void ua_uaadapter::readConfig() {
 	
 	string xpath = "//config";
 	xmlXPathObjectPtr result = this->fileHandler->getNodeSet(xpath);	
@@ -170,7 +169,7 @@ void mtca_uaadapter::readConfig() {
 	}
 }
 
-void mtca_uaadapter::readAdditionalNodes() {
+void ua_uaadapter::readAdditionalNodes() {
 	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//additionalNodes");	
 	if(result) {
 		xmlNodeSetPtr nodeset = result->nodesetval;
@@ -190,14 +189,14 @@ void mtca_uaadapter::readAdditionalNodes() {
 					string name = this->fileHandler->getAttributeValueFromNode(variableNode, "name").c_str();
 					string value = this->fileHandler->getAttributeValueFromNode(variableNode, "value");
 					string description = this->fileHandler->getAttributeValueFromNode(variableNode, "description");
-					this->additionalVariables.push_back(new mtca_additionalvariable(this->mappedServer, folderNodeId, name, value, description));
+					this->additionalVariables.push_back(new ua_additionalvariable(this->mappedServer, folderNodeId, name, value, description));
 				}
 			}
 		}
 	}
 }
 
-void mtca_uaadapter::workerThread() {
+void ua_uaadapter::workerThread() {
 	if (this->mappedServer == nullptr) {
 		return;
 	}
@@ -218,9 +217,9 @@ void mtca_uaadapter::workerThread() {
 //  			exit(0);
 //   		}
 
-	while (runUAServer == UA_TRUE) {
+	while (runUAServer == true) {
 		 if (! this->isRunning()) {
-			 runUAServer = UA_FALSE;
+			 runUAServer = false;
 		}
 		sleep(1);
 	}
@@ -233,9 +232,9 @@ void mtca_uaadapter::workerThread() {
 	serverThread = NULL;
 }
 
-void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
+void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
 	
-	this->variables.push_back(new mtca_processvariable(this->mappedServer, this->variablesListId, varName, csManager));
+	this->variables.push_back(new ua_processvariable(this->mappedServer, this->variablesListId, varName, csManager));
 	
 	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
 	xmlNodeSetPtr nodeset;
@@ -321,7 +320,7 @@ void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlS
 						if(varPathVector.size() > 0) {
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 						}						
-						this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
+						this->mappedVariables.push_back(new ua_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
 						createdVar = true;
 				}
 				
@@ -331,7 +330,7 @@ void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlS
 					if(varPathVector.size() > 0) {
 						newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 					}
-					this->mappedVariables.push_back(new mtca_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
+					this->mappedVariables.push_back(new ua_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
 				}
  			}
 		}
@@ -340,11 +339,11 @@ void mtca_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlS
 	xmlXPathFreeObject (result);
 }
 
-vector<mtca_processvariable *> mtca_uaadapter::getVariables() {
+vector<ua_processvariable *> ua_uaadapter::getVariables() {
 	return this->variables;
 }
 
-UA_NodeId mtca_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderName, std::string description) {
+UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderName, std::string description) {
 	// FIXME: Check if folder name a possible name or should it be escaped (?!"§%-:, etc)
 	UA_StatusCode retval = UA_STATUSCODE_GOOD;
 	UA_NodeId createdNodeId = UA_NODEID_NULL;
@@ -368,7 +367,7 @@ UA_NodeId mtca_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folde
 	return createdNodeId;
 }
 
-UA_StatusCode mtca_uaadapter::mapSelfToNamespace() {
+UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
 	UA_StatusCode retval = UA_STATUSCODE_GOOD;
 	UA_NodeId createdNodeId = UA_NODEID_NULL;
 	
@@ -395,11 +394,11 @@ UA_StatusCode mtca_uaadapter::mapSelfToNamespace() {
     return UA_STATUSCODE_GOOD;
 }
 
-UA_NodeId mtca_uaadapter::getOwnNodeId() {
+UA_NodeId ua_uaadapter::getOwnNodeId() {
 	return this->ownNodeId;
 }
 
-UA_NodeId mtca_uaadapter::existFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath) {
+UA_NodeId ua_uaadapter::existFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath) {
 	UA_NodeId lastNodeId = basenodeid;
 	for(std::string t : folderPath) {
 		lastNodeId = this->existFolder(lastNodeId, t);
@@ -410,7 +409,7 @@ UA_NodeId mtca_uaadapter::existFolderPath(UA_NodeId basenodeid, std::vector<stri
 	return lastNodeId;
 }
 
-UA_NodeId mtca_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
+UA_NodeId ua_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
 	UA_NodeId lastNodeId = UA_NODEID_NULL;
 	for(uint32_t i=0; i < this->folderVector.size(); i++) {
 		if((this->folderVector.at(i).folderName.compare(folder) == 0) && (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &basenodeid))) {
@@ -420,7 +419,7 @@ UA_NodeId mtca_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
 	return UA_NODEID_NULL;
 }
 
-UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath) {
+UA_NodeId ua_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath) {
 		
  	if(UA_NodeId_isNull(&basenodeid)){
  		return UA_NODEID_NULL;
@@ -464,7 +463,7 @@ UA_NodeId mtca_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<str
 	return prevNodeId;
 }
 
-UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName, string description) {
+UA_NodeId ua_uaadapter::createFolder(UA_NodeId basenodeid, string folderName, string description) {
 	
 	if(UA_NodeId_isNull(&basenodeid)){
 		return UA_NODEID_NULL;
@@ -483,7 +482,7 @@ UA_NodeId mtca_uaadapter::createFolder(UA_NodeId basenodeid, string folderName, 
 	return newFolder.folderNodeId;
 }
 
-vector<string> mtca_uaadapter::getAllNotMappableVariablesNames() {
+vector<string> ua_uaadapter::getAllNotMappableVariablesNames() {
 	
 	vector<string> notMappableVariablesNames;
 	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
@@ -508,6 +507,6 @@ vector<string> mtca_uaadapter::getAllNotMappableVariablesNames() {
 	return notMappableVariablesNames;
 }
 
-UA_DateTime mtca_uaadapter::getSourceTimeStamp() {
+UA_DateTime ua_uaadapter::getSourceTimeStamp() {
 	return UA_DateTime_now();
 }

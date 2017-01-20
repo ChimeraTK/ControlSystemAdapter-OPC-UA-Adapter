@@ -1,7 +1,7 @@
 #include <string.h>
 #include <test_sample_data.h>
 #include <ua_proxies_typeconversion.h>
-#include <mtca_additionalvariable.h>
+#include <ua_additionalvariable.h>
 #include "open62541.h"
 
 #include <boost/test/included/unit_test.hpp>
@@ -23,29 +23,7 @@ class AdditionalVariableTest {
 void AdditionalVariableTest::testEmptySet(){ 
 	std::cout << "Enter AdditionalVariableTest with EmptySet" << std::endl;
 	
-	TestFixtureServerSet *serverSet = new TestFixtureServerSet;	
-// 	uint32_t opcuaPort;
-// 	/* Create new Server */
-// 	UA_ServerConfig       server_config;
-// 	UA_ServerNetworkLayer server_nl;
-// 	UA_Server *mappedServer;
-// 	UA_NodeId baseNodeId;
-// 	UA_Boolean runUAServer;
-// 	opcuaPort = 16663;
-// 	server_config = UA_ServerConfig_standard;
-// 	server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, opcuaPort);
-// 	server_config.logger = UA_Log_Stdout;
-// 	server_config.networkLayers = &server_nl;
-// 	server_config.networkLayersSize = 1;
-// 	server_config.enableAnonymousLogin = UA_TRUE;
-// 	
-// 	runUAServer = UA_TRUE;
-// 		
-// 	mappedServer = UA_Server_new(server_config);
-// 	baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-// 		
-// 		mtca_namespaceinit_generated(mappedServer);
-	
+	TestFixtureServerSet *serverSet = new TestFixtureServerSet;		
 	thread *serverThread = new std::thread(UA_Server_run, serverSet->mappedServer, &serverSet->runUAServer);
 		
 	// check server
@@ -53,7 +31,7 @@ void AdditionalVariableTest::testEmptySet(){
 		BOOST_CHECK(false);
 	}
 	
-	mtca_additionalvariable *addVar1 = new mtca_additionalvariable(serverSet->mappedServer, serverSet->baseNodeId, "Name", "Value", "Description"); 
+	ua_additionalvariable *addVar1 = new ua_additionalvariable(serverSet->mappedServer, serverSet->baseNodeId, "Name", "Value", "Description"); 
 	
 	BOOST_CHECK(addVar1->getSourceTimeStamp() != 0);
 	BOOST_CHECK(addVar1->getValue() == "Value");
@@ -74,6 +52,8 @@ void AdditionalVariableTest::testEmptySet(){
 	
  	delete serverThread;
  	serverThread = NULL;
+	
+	addVar1->~ua_additionalvariable();
 
 }
 
@@ -90,7 +70,7 @@ void AdditionalVariableTest::testClientSide(){
 	}
 
 	// add set
-	mtca_additionalvariable *addVar1 = new mtca_additionalvariable(serverSet->mappedServer, serverSet->baseNodeId, "Name", "Value", "Description"); 
+	ua_additionalvariable *addVar1 = new ua_additionalvariable(serverSet->mappedServer, serverSet->baseNodeId, "Name", "Value", "Description"); 
 
 	// Create client to connect to server
 	UA_Client *client = UA_Client_new(UA_ClientConfig_standard);
@@ -201,9 +181,10 @@ void AdditionalVariableTest::testClientSide(){
 	UA_BrowseResponse_deleteMembers(&bResp);
 
 	UA_Client_disconnect(client);
-	/* Some times there occure a double free corruption. */
-	BOOST_CHECK(true);
 	UA_Client_delete(client);
+	
+	
+	addVar1->~ua_additionalvariable();
 	
 	serverSet->runUAServer = UA_FALSE;
 	
@@ -226,7 +207,7 @@ void AdditionalVariableTest::testClientSide(){
 
 class AdditionalVariableTestSuite: public test_suite {
 	public:
-		AdditionalVariableTestSuite() : test_suite("mtca_additionalvariable Test Suite") {
+		AdditionalVariableTestSuite() : test_suite("ua_additionalvariable Test Suite") {
 			add(BOOST_TEST_CASE(&AdditionalVariableTest::testEmptySet));
 			add(BOOST_TEST_CASE(&AdditionalVariableTest::testClientSide));
     }

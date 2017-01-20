@@ -33,8 +33,6 @@ mkdir $PROJECT_BINARY_DIR/runtime_analysis
 
 cd ./tests/
 
-valgrind -v --track-origins=yes --leak-resolution=high --log-file=$PROJECT_BINARY_DIR/runtime_analysis/valgrind.log /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/tests/test_xml_handler
-
 for file in $PROJECT_BINARY_DIR/tests/test_* ; do 
 	echo "Starte valgrind for: $file"
 	valgrind -v --track-origins=yes --leak-resolution=high --log-file=$PROJECT_BINARY_DIR/runtime_analysis/valgrind_$(basename $file).log $file

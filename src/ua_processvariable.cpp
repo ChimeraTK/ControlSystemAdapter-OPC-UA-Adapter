@@ -25,11 +25,11 @@
  */
 
 
-#include "mtca_processvariable.h"
+#include "ua_processvariable.h"
 #include "csa_config.h"
 
 extern "C" {
-#include "mtca_namespaceinit_generated.h"
+#include "csa_namespaceinit_generated.h"
 }
 
 #include "ua_proxies.h"
@@ -37,7 +37,7 @@ extern "C" {
 
 #include <iostream>
 
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
+ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
   	
   	// FIXME Check if name member of a csManager Parameter
   	this->namePV = namePV;
@@ -47,7 +47,7 @@ mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenode
   	this->mapSelfToNamespace();
 }
 
-mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
+ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
 	
 	// FIXME Check if name member of a csManager Parameter
 	this->namePV = namePV;
@@ -64,30 +64,30 @@ mtca_processvariable::mtca_processvariable(UA_Server* server, UA_NodeId basenode
 	this->mapSelfToNamespace();
 }
 
-mtca_processvariable::~mtca_processvariable()
+ua_processvariable::~ua_processvariable()
 {
   //* Our ua_mapped_class destructor will take care of deleting our opcua footprint as long as all variables are mapped in this->ownedNodes
 }
 
 // Name
-UA_RDPROXY_STRING(mtca_processvariable, getName)
-string mtca_processvariable::getName() {
+UA_RDPROXY_STRING(ua_processvariable, getName)
+string ua_processvariable::getName() {
   return this->namePV;
 }
 
-// UA_WRPROXY_STRING(mtca_processvariable, setName)
-// void mtca_processvariable::setName(std::string name) {
+// UA_WRPROXY_STRING(ua_processvariable, setName)
+// void ua_processvariable::setName(std::string name) {
 // 	return; // Change of name is not possible
 // }
 
 // EngineeringUnit
-UA_WRPROXY_STRING(mtca_processvariable, setEngineeringUnit)
-void mtca_processvariable::setEngineeringUnit(string engineeringUnit) {
+UA_WRPROXY_STRING(ua_processvariable, setEngineeringUnit)
+void ua_processvariable::setEngineeringUnit(string engineeringUnit) {
 	this->engineeringUnit = engineeringUnit;
 }
 
-UA_RDPROXY_STRING(mtca_processvariable, getEngineeringUnit)
-string mtca_processvariable::getEngineeringUnit() {
+UA_RDPROXY_STRING(ua_processvariable, getEngineeringUnit)
+string ua_processvariable::getEngineeringUnit() {
 	if(!this->engineeringUnit.empty()) {
 		return this->engineeringUnit;
 	}
@@ -99,13 +99,13 @@ string mtca_processvariable::getEngineeringUnit() {
 }
 
 // Description
-UA_WRPROXY_STRING(mtca_processvariable, setDescription)
-void mtca_processvariable::setDescription(string description) {
+UA_WRPROXY_STRING(ua_processvariable, setDescription)
+void ua_processvariable::setDescription(string description) {
 	this->description = description;
 }
 
-UA_RDPROXY_STRING(mtca_processvariable, getDescription)
-string mtca_processvariable::getDescription() {
+UA_RDPROXY_STRING(ua_processvariable, getDescription)
+string ua_processvariable::getDescription() {
 	if(!this->description.empty()) {
 		return this->description;
 	}
@@ -117,8 +117,8 @@ string mtca_processvariable::getDescription() {
 }
 
 // Type
-UA_RDPROXY_STRING(mtca_processvariable, getType)
-string mtca_processvariable::getType() {		
+UA_RDPROXY_STRING(ua_processvariable, getType)
+string ua_processvariable::getType() {		
     // Note: typeid().name() may return the name; may as well return the symbol's name from the binary though...
     std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
     if (valueType == typeid(int8_t))        return "int8_t";
@@ -133,14 +133,14 @@ string mtca_processvariable::getType() {
 // 		this->syncCsUtility->send<ProcessArry<_p_type>>(this->csManager->getProcessArray<_p_type>(this->namePV));
 }
 
-//UA_WRPROXY_STRING(mtca_processvariable, setType)
-//void mtca_processvariable::setType(std::string type) {
+//UA_WRPROXY_STRING(ua_processvariable, setType)
+//void ua_processvariable::setType(std::string type) {
   //return; // Change of Type is not possible
 //}
 
 /* Multivariant Read Functions for Value (without template-Foo) */
 #define CREATE_READ_FUNCTION(_p_type) \
-_p_type    mtca_processvariable::getValue_##_p_type() { \
+_p_type    ua_processvariable::getValue_##_p_type() { \
 		_p_type v = 0; \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return 0; \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() == 1) { \
@@ -154,7 +154,7 @@ _p_type    mtca_processvariable::getValue_##_p_type() { \
 
 
 #define CREATE_READ_FUNCTION_ARRAY(_p_type) \
-std::vector<_p_type>    mtca_processvariable::getValue_Array_##_p_type() { \
+std::vector<_p_type>    ua_processvariable::getValue_Array_##_p_type() { \
     std::vector<_p_type> v; \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return v; \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() > 1) { \
@@ -168,7 +168,7 @@ std::vector<_p_type>    mtca_processvariable::getValue_Array_##_p_type() { \
 
 
 #define CREATE_WRITE_FUNCTION(_p_type) \
-void mtca_processvariable::setValue_##_p_type(_p_type value) { \
+void ua_processvariable::setValue_##_p_type(_p_type value) { \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() == 1) {   \
 			if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
@@ -181,7 +181,7 @@ void mtca_processvariable::setValue_##_p_type(_p_type value) { \
 
 
 #define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
-void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
+void ua_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() <= 1) return; \
 			if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
@@ -193,88 +193,88 @@ void mtca_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) 
 	return; \
 }
 
- UA_RDPROXY_INT8(mtca_processvariable, getValue_int8_t);
+ UA_RDPROXY_INT8(ua_processvariable, getValue_int8_t);
  CREATE_READ_FUNCTION(int8_t)
- UA_RDPROXY_UINT8(mtca_processvariable, getValue_uint8_t);
+ UA_RDPROXY_UINT8(ua_processvariable, getValue_uint8_t);
  CREATE_READ_FUNCTION(uint8_t)
- UA_RDPROXY_INT16(mtca_processvariable, getValue_int16_t);
+ UA_RDPROXY_INT16(ua_processvariable, getValue_int16_t);
  CREATE_READ_FUNCTION(int16_t)
- UA_RDPROXY_UINT16(mtca_processvariable, getValue_uint16_t);
+ UA_RDPROXY_UINT16(ua_processvariable, getValue_uint16_t);
  CREATE_READ_FUNCTION(uint16_t)
- UA_RDPROXY_INT32(mtca_processvariable, getValue_int32_t);
+ UA_RDPROXY_INT32(ua_processvariable, getValue_int32_t);
  CREATE_READ_FUNCTION(int32_t)
- UA_RDPROXY_UINT32(mtca_processvariable, getValue_uint32_t);
+ UA_RDPROXY_UINT32(ua_processvariable, getValue_uint32_t);
  CREATE_READ_FUNCTION(uint32_t)
- UA_RDPROXY_FLOAT(mtca_processvariable, getValue_float);
+ UA_RDPROXY_FLOAT(ua_processvariable, getValue_float);
  CREATE_READ_FUNCTION(float)
- UA_RDPROXY_DOUBLE(mtca_processvariable, getValue_double);
+ UA_RDPROXY_DOUBLE(ua_processvariable, getValue_double);
  CREATE_READ_FUNCTION(double)
  
- UA_WRPROXY_INT8(mtca_processvariable, setValue_int8_t);
+ UA_WRPROXY_INT8(ua_processvariable, setValue_int8_t);
  CREATE_WRITE_FUNCTION(int8_t)
- UA_WRPROXY_UINT8(mtca_processvariable, setValue_uint8_t);
+ UA_WRPROXY_UINT8(ua_processvariable, setValue_uint8_t);
  CREATE_WRITE_FUNCTION(uint8_t)
- UA_WRPROXY_INT16(mtca_processvariable, setValue_int16_t);
+ UA_WRPROXY_INT16(ua_processvariable, setValue_int16_t);
  CREATE_WRITE_FUNCTION(int16_t)
- UA_WRPROXY_UINT16(mtca_processvariable, setValue_uint16_t);
+ UA_WRPROXY_UINT16(ua_processvariable, setValue_uint16_t);
  CREATE_WRITE_FUNCTION(uint16_t)
- UA_WRPROXY_INT32(mtca_processvariable, setValue_int32_t);
+ UA_WRPROXY_INT32(ua_processvariable, setValue_int32_t);
  CREATE_WRITE_FUNCTION(int32_t)
- UA_WRPROXY_UINT32(mtca_processvariable, setValue_uint32_t);
+ UA_WRPROXY_UINT32(ua_processvariable, setValue_uint32_t);
  CREATE_WRITE_FUNCTION(uint32_t)
- UA_WRPROXY_FLOAT(mtca_processvariable, setValue_float);
+ UA_WRPROXY_FLOAT(ua_processvariable, setValue_float);
  CREATE_WRITE_FUNCTION(float)
- UA_WRPROXY_DOUBLE(mtca_processvariable, setValue_double);
+ UA_WRPROXY_DOUBLE(ua_processvariable, setValue_double);
  CREATE_WRITE_FUNCTION(double)
 
 // Array
-UA_RDPROXY_ARRAY_INT8(mtca_processvariable, getValue_Array_int8_t);
+UA_RDPROXY_ARRAY_INT8(ua_processvariable, getValue_Array_int8_t);
 CREATE_READ_FUNCTION_ARRAY(int8_t)
-UA_RDPROXY_ARRAY_UINT8(mtca_processvariable, getValue_Array_uint8_t);
+UA_RDPROXY_ARRAY_UINT8(ua_processvariable, getValue_Array_uint8_t);
 CREATE_READ_FUNCTION_ARRAY(uint8_t)
-UA_RDPROXY_ARRAY_INT16(mtca_processvariable, getValue_Array_int16_t);
+UA_RDPROXY_ARRAY_INT16(ua_processvariable, getValue_Array_int16_t);
 CREATE_READ_FUNCTION_ARRAY(int16_t)
-UA_RDPROXY_ARRAY_UINT16(mtca_processvariable, getValue_Array_uint16_t);
+UA_RDPROXY_ARRAY_UINT16(ua_processvariable, getValue_Array_uint16_t);
 CREATE_READ_FUNCTION_ARRAY(uint16_t)
-UA_RDPROXY_ARRAY_INT32(mtca_processvariable, getValue_Array_int32_t);
+UA_RDPROXY_ARRAY_INT32(ua_processvariable, getValue_Array_int32_t);
 CREATE_READ_FUNCTION_ARRAY(int32_t)
-UA_RDPROXY_ARRAY_UINT32(mtca_processvariable, getValue_Array_uint32_t);
+UA_RDPROXY_ARRAY_UINT32(ua_processvariable, getValue_Array_uint32_t);
 CREATE_READ_FUNCTION_ARRAY(uint32_t)
-UA_RDPROXY_ARRAY_FLOAT(mtca_processvariable, getValue_Array_float);
+UA_RDPROXY_ARRAY_FLOAT(ua_processvariable, getValue_Array_float);
 CREATE_READ_FUNCTION_ARRAY(float)
-UA_RDPROXY_ARRAY_DOUBLE(mtca_processvariable, getValue_Array_double);
+UA_RDPROXY_ARRAY_DOUBLE(ua_processvariable, getValue_Array_double);
 CREATE_READ_FUNCTION_ARRAY(double)
 
-UA_WRPROXY_ARRAY_INT8(mtca_processvariable, setValue_Array_int8_t);
+UA_WRPROXY_ARRAY_INT8(ua_processvariable, setValue_Array_int8_t);
 CREATE_WRITE_FUNCTION_ARRAY(int8_t)
-UA_WRPROXY_ARRAY_UINT8(mtca_processvariable, setValue_Array_uint8_t);
+UA_WRPROXY_ARRAY_UINT8(ua_processvariable, setValue_Array_uint8_t);
 CREATE_WRITE_FUNCTION_ARRAY(uint8_t)
-UA_WRPROXY_ARRAY_INT16(mtca_processvariable, setValue_Array_int16_t);
+UA_WRPROXY_ARRAY_INT16(ua_processvariable, setValue_Array_int16_t);
 CREATE_WRITE_FUNCTION_ARRAY(int16_t)
-UA_WRPROXY_ARRAY_UINT16(mtca_processvariable, setValue_Array_uint16_t);
+UA_WRPROXY_ARRAY_UINT16(ua_processvariable, setValue_Array_uint16_t);
 CREATE_WRITE_FUNCTION_ARRAY(uint16_t)
-UA_WRPROXY_ARRAY_INT32(mtca_processvariable, setValue_Array_int32_t);
+UA_WRPROXY_ARRAY_INT32(ua_processvariable, setValue_Array_int32_t);
 CREATE_WRITE_FUNCTION_ARRAY(int32_t)
-UA_WRPROXY_ARRAY_UINT32(mtca_processvariable, setValue_Array_uint32_t);
+UA_WRPROXY_ARRAY_UINT32(ua_processvariable, setValue_Array_uint32_t);
 CREATE_WRITE_FUNCTION_ARRAY(uint32_t)
-UA_WRPROXY_ARRAY_FLOAT(mtca_processvariable, setValue_Array_float);
+UA_WRPROXY_ARRAY_FLOAT(ua_processvariable, setValue_Array_float);
 CREATE_WRITE_FUNCTION_ARRAY(float)
-UA_WRPROXY_ARRAY_DOUBLE(mtca_processvariable, setValue_Array_double);
+UA_WRPROXY_ARRAY_DOUBLE(ua_processvariable, setValue_Array_double);
 CREATE_WRITE_FUNCTION_ARRAY(double)
 
 // Just a macro to easy pushing different types of dataSources
 // ... and make sure we lock down writing to receivers in this stage already
  #define PUSH_RDVALUE_TYPE(_p_typeName) { \
- if(this->csManager->getProcessVariable(this->namePV)->isWriteable())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_##_p_typeName) }); } \
-     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_##_p_typeName) }); }\
+ if(this->csManager->getProcessVariable(this->namePV)->isWriteable())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_##_p_typeName) }); } \
+     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName) }); }\
  }
     
 #define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) { \
-if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(mtca_processvariable, setValue_Array_##_p_typeName) }); } \
-    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(mtca_processvariable, getValue_Array_##_p_typeName) }); } \
+if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_Array_##_p_typeName) }); } \
+    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName) }); } \
 }
 
-UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
+UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
     UA_NodeId createdNodeId = UA_NODEID_NULL;
 		
@@ -342,10 +342,10 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
 		}
 	else std::cout << "Cannot proxy unknown type " << typeid(valueType).name()  << std::endl;
 	
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(mtca_processvariable, getName)});
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(mtca_processvariable, getDescription), .write=UA_WRPROXY_NAME(mtca_processvariable, setDescription)});
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(mtca_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(mtca_processvariable, setEngineeringUnit)});
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(mtca_processvariable, getType)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getName)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getDescription), .write=UA_WRPROXY_NAME(ua_processvariable, setDescription)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(ua_processvariable, setEngineeringUnit)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getType)});
 
  	this->ua_mapDataSources((void *) this, &mapDs);
 	
@@ -355,10 +355,10 @@ UA_StatusCode mtca_processvariable::mapSelfToNamespace() {
 /** @brief Reimplement the SourceTimeStamp to timestamp of csa_config
  *
  */
-UA_DateTime mtca_processvariable::getSourceTimeStamp() {
+UA_DateTime ua_processvariable::getSourceTimeStamp() {
 	return (this->csManager->getProcessVariable(this->namePV)->getTimeStamp().seconds * UA_SEC_TO_DATETIME) + (this->csManager->getProcessVariable(this->namePV)->getTimeStamp().nanoSeconds * UA_USEC_TO_DATETIME / 1000LL) + UA_DATETIME_UNIX_EPOCH;
 }
 
-UA_NodeId mtca_processvariable::getOwnNodeId() {
+UA_NodeId ua_processvariable::getOwnNodeId() {
 	return this->ownNodeId;
 }

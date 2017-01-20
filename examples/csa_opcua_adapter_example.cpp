@@ -29,7 +29,7 @@
 extern "C" {
     #include <unistd.h>
     #include <signal.h>
-		#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
+		#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
 
 #include <iostream>
@@ -52,15 +52,15 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 
 #include "ipc_manager.h"
-#include "ControlSystemAdapterOPCUA.h"
-#include "runtimeValueGenerator.h"
+#include "csa_opcua_adapter.h"
+#include "runtime_value_generator.h"
 
 using namespace std;
 using namespace ChimeraTK;
 
 	ipc_manager *mgr;
 	runtimeValueGenerator *valGen;
-		ControlSystemAdapterOPCUA *csaOPCUA;
+		csa_opcua_adapter *csaOPCUA;
 	
 /* FUNCTIONS */
 static void SigHandler_Int(int sign) {
@@ -70,7 +70,7 @@ static void SigHandler_Int(int sign) {
 		valGen->~runtimeValueGenerator();
 		csaOPCUA->stop();
 		csaOPCUA->terminate();
-		csaOPCUA->~ControlSystemAdapterOPCUA();
+		csaOPCUA->~csa_opcua_adapter();
     cout << "terminated threads" << endl;
 }
 	
@@ -150,7 +150,7 @@ int main() {
 	cout << "Dummy Daten geschrieben..." << std::endl;	
 	
 	string pathToConfig = "opcuaAdapter_mapping.xml";
-	csaOPCUA = new ControlSystemAdapterOPCUA(csManager, pathToConfig);
+	csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
 	
 	// Only for Sin ValueGenerator
 	mgr = new ipc_manager();

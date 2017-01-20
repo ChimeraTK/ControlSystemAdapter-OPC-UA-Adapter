@@ -31,8 +31,8 @@
 
 #include "ua_mapped_class.h"
 #include "ipc_managed_object.h"
-#include "mtca_processvariable.h"
-#include "mtca_additionalvariable.h"
+#include "ua_processvariable.h"
+#include "ua_additionalvariable.h"
 #include "xml_file_handler.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
@@ -81,7 +81,7 @@ struct ServerConfig {
 };
 
 
-/** @class mtca_uaadapter
+/** @class ua_uaadapter
  *	@brief This class provide the opcua server and manage the variable mapping.
  * 
  * This Class create and start the opcua server also it contain all variables of the server. 
@@ -94,7 +94,7 @@ struct ServerConfig {
  * 
  *  @date 22.11.2016
  */
-class mtca_uaadapter : ua_mapped_class, public ipc_managed_object {
+class ua_uaadapter : ua_mapped_class, public ipc_managed_object {
 private:	 
 	UA_ServerConfig					server_config;
 	UA_ServerNetworkLayer 	server_nl;
@@ -108,9 +108,9 @@ private:
 	
 	ServerConfig 						serverConfig;
 	
-	vector<mtca_processvariable *> 			variables;
-	vector<mtca_additionalvariable *> 	additionalVariables;
-	vector<mtca_processvariable *>			mappedVariables;
+	vector<ua_processvariable *> 			variables;
+	vector<ua_additionalvariable *> 	additionalVariables;
+	vector<ua_processvariable *>			mappedVariables;
 	
 	xml_file_handler *fileHandler;
 	
@@ -142,14 +142,14 @@ public:
  * 
  * @param configFile This file provide the configuration and the mapping of the server
  */
-	mtca_uaadapter(string configPath);
+	ua_uaadapter(string configPath);
 	
 	/** @brief Destrructor of the class.  
 	*
 	* It stop the server and delete the managed object.
 	* 
 	*/
-	~mtca_uaadapter();
+	~ua_uaadapter();
 	
 	/** @brief Return the timestamp of the node 
 	* 
@@ -199,11 +199,11 @@ public:
 	*/
 	UA_NodeId getOwnNodeId();
 	
-	/** @brief Methode that returns all <mtca_processvariable> of the class.
+	/** @brief Methode that returns all <ua_processvariable> of the class.
 	* 
-	* @return A vector of all <mtca_processvariable>
+	* @return A vector of all <ua_processvariable>
 	*/
-	vector<mtca_processvariable *> getVariables();
+	vector<ua_processvariable *> getVariables();
 	
 	/** @brief Create and start a thread for the opcua server instance
 	* 

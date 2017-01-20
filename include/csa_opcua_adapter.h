@@ -24,33 +24,33 @@
  *
  */
 
-#ifndef CONTROLSYSTEMADAPTER_OPCUA_H
-#define CONTROLSYSTEMADAPTER_OPCUA_H
+#ifndef CSA_OPCUA_ADAPTER_H
+#define CSA_OPCUA_ADAPTER_H
 
 #include <vector>
 #include "ipc_managed_object.h"
 
-#include "mtca_uaadapter.h"
-#include "mtca_processvariable.h"
+#include "ua_adapter.h"
+#include "ua_processvariable.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
 
-class ControlSystemAdapterOPCUA {
+class csa_opcua_adapter {
 private:
 	ipc_manager    *mgr;
-	mtca_uaadapter *adapter;
+	ua_uaadapter *adapter;
 	boost::shared_ptr<ControlSystemPVManager> csManager;
 	
-	void ControlSystemAdapterOPCUA_InitServer(string configFile);
-	void ControlSystemAdapterOPCUA_InitVarMapping();
+	void csa_opcua_adapter_InitServer(string configFile);
+	void csa_opcua_adapter_InitVarMapping();
     
 public:
-	ControlSystemAdapterOPCUA(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile);
-	~ControlSystemAdapterOPCUA();
+	csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile);
+	~csa_opcua_adapter();
     
 	boost::shared_ptr<ControlSystemPVManager> const & getControlSystemManager() const;
-	mtca_uaadapter* getUAAdapter();
+	ua_uaadapter* getUAAdapter();
 	
 	ipc_manager* getIPCManager();
 	void start();
@@ -59,4 +59,4 @@ public:
 	bool isRunning();
 };
 
-#endif // CONTROLSYSTEMADAPTER_H
+#endif // CSA_OPCUA_ADAPTER_H

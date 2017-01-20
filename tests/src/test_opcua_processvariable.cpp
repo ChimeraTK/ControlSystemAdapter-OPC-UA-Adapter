@@ -1,5 +1,5 @@
-#include <mtca_uaadapter.h>
-#include <ControlSystemAdapterOPCUA.h>
+#include <ua_adapter.h>
+#include <csa_opcua_adapter.h>
 #include <ipc_manager.h>
 #include <open62541.h>
 
@@ -15,7 +15,7 @@
 
 extern "C" {
 	#include "unistd.h"
-	#include "mtca_namespaceinit_generated.h" // Output des pyUANamespacecompilers
+	#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
 
 
@@ -46,10 +46,10 @@ void ProcessVariableTest::testEmptySet(){
 		BOOST_CHECK(false);
 	}
 	
-	//mtca_processvariable *test;
+	//ua_processvariable *test;
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
 		//std::cout << "Checking ProcessVariable: " <<  oneProcessVariable->getName() << std::endl;
-		mtca_processvariable *test = new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), oneProcessVariable->getName(), "", "", pvSet.csManager);
+		ua_processvariable *test = new ua_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), oneProcessVariable->getName(), "", "", pvSet.csManager);
 
 		BOOST_CHECK(test->getName() == oneProcessVariable->getName());
 		
@@ -157,7 +157,7 @@ void ProcessVariableTest::testEmptySet(){
 		// Should not being changed
 		BOOST_CHECK(test->getName() != "");
 		
-		test->~mtca_processvariable();
+		test->~ua_processvariable();
 	}
   
 	serverSet->runUAServer = UA_FALSE;
@@ -190,9 +190,9 @@ void ProcessVariableTest::testClientSide(){
 	}
 
 	// add set
-	vector<mtca_processvariable*> varList;
+	vector<ua_processvariable*> varList;
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-		varList.push_back(new mtca_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager)); 
+		varList.push_back(new ua_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager)); 
 	}
 	
 	// Create client to connect to server
@@ -980,7 +980,7 @@ void ProcessVariableTest::testClientSide(){
 
 class ProcessVariableTestSuite: public test_suite {
 	public:
-		ProcessVariableTestSuite() : test_suite("mtca_processvariable Test Suite") {
+		ProcessVariableTestSuite() : test_suite("ua_processvariable Test Suite") {
 			add(BOOST_TEST_CASE(&ProcessVariableTest::testEmptySet));
 			add(BOOST_TEST_CASE(&ProcessVariableTest::testClientSide));
     }
