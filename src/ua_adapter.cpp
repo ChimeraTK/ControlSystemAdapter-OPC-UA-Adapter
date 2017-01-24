@@ -41,7 +41,8 @@ extern "C" {
 #include "ua_processvariable.h"
 #include "ua_additionalvariable.h"
 #include "xml_file_handler.h"
-#include <ipc_manager.h>
+#include "ipc_manager.h"
+#include "ua_proxies.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
@@ -304,6 +305,8 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 				vector<xmlNodePtr> nodeVectorFolderPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "folder");
 				vector<string> folderPathVector;
 				bool createdVar = false;
+				UA_NodeId newFolderNodeId = UA_NODEID_NULL;
+				vector<UA_NodeId> mappedVariables; 
 				for(auto nodeFolderPath: nodeVectorFolderPath) {
 						
 						string folderPath = this->fileHandler->getContentFromNode(nodeFolderPath);
@@ -313,7 +316,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 			
 						folderPathVector = this->fileHandler->praseVariablePath(folderPath);
 						// Create folders
-						UA_NodeId newFolderNodeId = appliFolderNodeId;
+						newFolderNodeId = appliFolderNodeId;
 						if(folderPathVector.size() > 0) {
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, folderPathVector);
 						}
@@ -321,64 +324,32 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 						if(varPathVector.size() > 0) {
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 						}
-					
-						UA_NodeId createdNodeId = UA_NODEID_NULL;
-						
-						// Create our toplevel instance
-						UA_ObjectAttributes oAttr; 
-						UA_ObjectAttributes_init(&oAttr);
-						oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str());
-						oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", description.c_str());
-						//oAttr.writeMask = ;
-						//oAttr.userWriteMask = ;
-						
-						UA_INSTATIATIONCALLBACK(icb);  
-						UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),
-															newFolderNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-															UA_QUALIFIEDNAME_ALLOC(1, renameVar.c_str()), UA_NODEID_NULL, oAttr, &icb, &createdNodeId);
-						
-						UA_ExpandedNodeId *targetNodeId = UA_ExpandedNodeId_new();
-						targetNodeId->nodeId = createdNodeId;
-						
-						UA_BrowseDescription bDesc;
-						UA_BrowseDescription_init(&bDesc);
-						bDesc.browseDirection = UA_BROWSEDIRECTION_FORWARD;
-						bDesc.includeSubtypes = false;
-						bDesc.nodeClassMask = UA_NODECLASS_VARIABLE;
-						bDesc.nodeId = processvariable->getOwnNodeId();
-						bDesc.resultMask = UA_BROWSERESULTMASK_ALL;
-						
-						UA_BrowseResult bRes;
-						UA_BrowseResult_init(&bRes);
-						
-						bRes = UA_Server_browse(this->mappedServer, 10, &bDesc);
-						for(uint32_t i=0; i < bRes.referencesSize; i++) {
-							UA_Server_addReference(this->mappedServer, bRes.references[i].nodeId.nodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), *targetNodeId, false);
-						}
-						
-						UA_BrowseDescription_deleteMembers(&bDesc);
-						UA_BrowseResult_deleteMembers(&bRes);
+						mappedVariables.push_back(newFolderNodeId);
 						createdVar = true;
 				}
 				
 				// in case no <folder> or <unrollpath> is set
 				if(!createdVar) {
-					UA_NodeId newFolderNodeId = appliFolderNodeId;
+					newFolderNodeId = appliFolderNodeId;
 					if(varPathVector.size() > 0) {
-						newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
+						mappedVariables.push_back(this->createFolderPath(newFolderNodeId, varPathVector));
 					}
-					
+				}
+				
+				// Create all nessesary mapped ObjectVaraibles with inner variables (reference or attribute, depending attributes are set (engineeringUnit, dexcription) 
+				for(auto objectNodeId:mappedVariables) {
 					UA_NodeId createdNodeId = UA_NODEID_NULL;
-					
-					// Create our toplevel instance
+						
+					// Create our new "Value" Variable
 					UA_ObjectAttributes oAttr; 
 					UA_ObjectAttributes_init(&oAttr);
 					oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str());
-		
+					oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", description.c_str());
+					
 					UA_INSTATIATIONCALLBACK(icb);  
- 					UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),
-                             newFolderNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                             UA_QUALIFIEDNAME_ALLOC(1, renameVar.c_str()), UA_NODEID_NULL, oAttr, &icb, &createdNodeId);
+					UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),
+													objectNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+													UA_QUALIFIEDNAME_ALLOC(1, renameVar.c_str()), UA_NODEID_NULL, oAttr, &icb, &createdNodeId);
 					
 					UA_ExpandedNodeId *targetNodeId = UA_ExpandedNodeId_new();
 					targetNodeId->nodeId = createdNodeId;
@@ -394,14 +365,51 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 					UA_BrowseResult bRes;
 					UA_BrowseResult_init(&bRes);
 					
+					UA_VariableAttributes vAttr;
+					UA_VariableAttributes_init(&vAttr);
+					vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
+					vAttr.accessLevel = UA_ACCESSLEVELMASK_WRITE^UA_ACCESSLEVELMASK_READ;
+					vAttr.userAccessLevel = UA_ACCESSLEVELMASK_WRITE^UA_ACCESSLEVELMASK_READ;
+					vAttr.valueRank = -1;
+					
+					
 					bRes = UA_Server_browse(this->mappedServer, 10, &bDesc);
+					
 					for(uint32_t i=0; i < bRes.referencesSize; i++) {
-						UA_Server_addReference(this->mappedServer, bRes.references[i].nodeId.nodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), *targetNodeId, false);
+						UA_NodeId newNodeId = UA_NODEID_NULL;
+						
+						UA_String varName = UA_String_fromChars("EngineeringUnit");
+						if(UA_String_equal(&bRes.references[i].browseName.name, &varName) && !engineeringUnit.empty()) {
+							vAttr.description = UA_LOCALIZEDTEXT("en_US","EngineeringUnit");
+							vAttr.displayName = UA_LOCALIZEDTEXT("en_US","EngineeringUnit");
+							
+							UA_String engineringUnit = UA_String_fromChars(engineeringUnit.c_str());
+							UA_Variant_setScalar(&vAttr.value, &engineringUnit, &UA_TYPES[UA_TYPES_STRING]);
+							UA_Server_addVariableNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0), createdNodeId,
+																	UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, "EngineeringUnit"),
+																	UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &newNodeId);
+						}
+						
+						varName = UA_String_fromChars("Description");
+						if(UA_String_equal(&bRes.references[i].browseName.name, &varName) && !description.empty()) {
+							vAttr.description = UA_LOCALIZEDTEXT("en_US","Description");
+							vAttr.displayName = UA_LOCALIZEDTEXT("en_US","Description");
+							
+							UA_String engineringUnit = UA_String_fromChars(description.c_str());
+							UA_Variant_setScalar(&vAttr.value, &engineringUnit, &UA_TYPES[UA_TYPES_STRING]);
+							UA_Server_addVariableNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0), createdNodeId,
+																	UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, "Description"),
+																	UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &newNodeId);
+						}
+						
+						if(UA_NodeId_isNull(&newNodeId)) {
+							UA_Server_addReference(this->mappedServer, bRes.references[i].nodeId.nodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), *targetNodeId, false);
+						}
 					}
 					
 					UA_BrowseDescription_deleteMembers(&bDesc);
 					UA_BrowseResult_deleteMembers(&bRes);
-				}
+				}				
  			}
 		}
 	}

@@ -326,7 +326,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 	UA_BrowseDescription_deleteMembers(&bDesc);
 	UA_BrowseResult_deleteMembers(&bRes);
 	
-	UA_NodeId merk = UA_NODEID_NULL;
+	UA_NodeId valueNodeId = UA_NODEID_NULL;
 	UA_VariableAttributes vAttr;
 	UA_VariableAttributes_init(&vAttr);
 	vAttr.description = UA_LOCALIZEDTEXT("en_US","Value");
@@ -381,10 +381,10 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 	
 	UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char*)this->getName().c_str()), createdNodeId,
 														UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, "Value"),
-                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &merk);
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &valueNodeId);
 
 	UA_NodeId nodeIdVariableType = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
-	NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, merk)
+	NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, valueNodeId)
 	
 	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getName)});
 	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getDescription), .write=UA_WRPROXY_NAME(ua_processvariable, setDescription)});
