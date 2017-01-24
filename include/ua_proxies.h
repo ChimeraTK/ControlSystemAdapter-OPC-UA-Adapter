@@ -13,9 +13,12 @@
 
 #include "open62541.h"
 #include <list>
+#include <iostream>
 
 #include "ua_proxies_typeconversion.h"
 #include "ua_proxies_callback.h"
+
+using namespace std;
 
 /** @struct UA_NodeId_pair_t
  * @brief

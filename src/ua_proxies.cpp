@@ -29,6 +29,7 @@
 #include "open62541.h"
 
 #include "ua_proxies.h"
+#include "csa_config.h"
 
 #include <iostream>
 
@@ -61,12 +62,12 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
   UA_StatusCode retval = UA_STATUSCODE_GOOD;
   if (map == nullptr || server == nullptr)
     return retval;
-  
+	
   // Functions are not instantiated... they are just linked to the node. 
   for (nodePairList::iterator l = instantiatedNodesList.begin(); l != instantiatedNodesList.end(); ++l) {
     UA_NodeId typeTemplateId = (*l)->sourceNodeId;
     UA_NodeId instantiatedId = (*l)->targetNodeId;
-    
+   
     // Check if we have this node in our map
     UA_DataSource_Map_Element *ele = nullptr;
     // cppcheck-suppress postfixOperator                REASON: List iterator cannot be prefixed
@@ -85,6 +86,7 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
     UA_DataSource ds;
     ds.read = ele->read;		
     ds.write = ele->write;
+		
 		// Set accesslevel depending on callback functions
 		UA_Byte accessLevel;
 		if(ele->write == NULL && ele->read == NULL) {
@@ -99,6 +101,7 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
 		if(ele->write == NULL && ele->read != NULL) {
 			accessLevel = UA_ACCESSLEVELMASK_READ;
 		}
+
 		UA_Server_writeAccessLevel(server, instantiatedId, accessLevel);
 		// There is currently no high- level function to do this. (02.12.2016)
 		__UA_Server_write(server, &instantiatedId, UA_ATTRIBUTEID_USERACCESSLEVEL, &UA_TYPES[UA_TYPES_BYTE], &accessLevel);
@@ -122,7 +125,6 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
 			UA_Variant_init(&variantVal);
 			retval = UA_Server_readValue(server, instantiatedId, &variantVal);
 			if(UA_NodeId_equal(&datatTypeNodeId, &basedatatype) && retval == UA_STATUSCODE_GOOD) {
-				retval = UA_Server_writeDataType(server, instantiatedId, variantVal.type->typeId);
 				
 				// See IEC 62541-3: OPC Unified Architecture - Part 3: Address space model -> Page 75
 				UA_Int32 valueRank = -2;	
@@ -144,6 +146,9 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
 				}
 				UA_Server_writeValueRank(server, instantiatedId, valueRank);
 			}
+			
+			retval = UA_Server_writeDataType(server, instantiatedId, variantVal.type->typeId);
+			
 		}
 	}
   

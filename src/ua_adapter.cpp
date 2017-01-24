@@ -234,7 +234,8 @@ void ua_uaadapter::workerThread() {
 
 void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
 	
-	this->variables.push_back(new ua_processvariable(this->mappedServer, this->variablesListId, varName, csManager));
+	ua_processvariable *processvariable = new ua_processvariable(this->mappedServer, this->variablesListId, varName, csManager);
+	this->variables.push_back(processvariable);
 	
 	xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
 	xmlNodeSetPtr nodeset;
@@ -319,8 +320,44 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 						
 						if(varPathVector.size() > 0) {
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
-						}						
-						this->mappedVariables.push_back(new ua_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
+						}
+					
+						UA_NodeId createdNodeId = UA_NODEID_NULL;
+						
+						// Create our toplevel instance
+						UA_ObjectAttributes oAttr; 
+						UA_ObjectAttributes_init(&oAttr);
+						oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str());
+						oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", description.c_str());
+						//oAttr.writeMask = ;
+						//oAttr.userWriteMask = ;
+						
+						UA_INSTATIATIONCALLBACK(icb);  
+						UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),
+															newFolderNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+															UA_QUALIFIEDNAME_ALLOC(1, renameVar.c_str()), UA_NODEID_NULL, oAttr, &icb, &createdNodeId);
+						
+						UA_ExpandedNodeId *targetNodeId = UA_ExpandedNodeId_new();
+						targetNodeId->nodeId = createdNodeId;
+						
+						UA_BrowseDescription bDesc;
+						UA_BrowseDescription_init(&bDesc);
+						bDesc.browseDirection = UA_BROWSEDIRECTION_FORWARD;
+						bDesc.includeSubtypes = false;
+						bDesc.nodeClassMask = UA_NODECLASS_VARIABLE;
+						bDesc.nodeId = processvariable->getOwnNodeId();
+						bDesc.resultMask = UA_BROWSERESULTMASK_ALL;
+						
+						UA_BrowseResult bRes;
+						UA_BrowseResult_init(&bRes);
+						
+						bRes = UA_Server_browse(this->mappedServer, 10, &bDesc);
+						for(uint32_t i=0; i < bRes.referencesSize; i++) {
+							UA_Server_addReference(this->mappedServer, bRes.references[i].nodeId.nodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), *targetNodeId, false);
+						}
+						
+						UA_BrowseDescription_deleteMembers(&bDesc);
+						UA_BrowseResult_deleteMembers(&bRes);
 						createdVar = true;
 				}
 				
@@ -330,7 +367,40 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 					if(varPathVector.size() > 0) {
 						newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
 					}
-					this->mappedVariables.push_back(new ua_processvariable(this->mappedServer, newFolderNodeId, varName, renameVar, engineeringUnit, description, csManager));
+					
+					UA_NodeId createdNodeId = UA_NODEID_NULL;
+					
+					// Create our toplevel instance
+					UA_ObjectAttributes oAttr; 
+					UA_ObjectAttributes_init(&oAttr);
+					oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str());
+		
+					UA_INSTATIATIONCALLBACK(icb);  
+ 					UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),
+                             newFolderNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                             UA_QUALIFIEDNAME_ALLOC(1, renameVar.c_str()), UA_NODEID_NULL, oAttr, &icb, &createdNodeId);
+					
+					UA_ExpandedNodeId *targetNodeId = UA_ExpandedNodeId_new();
+					targetNodeId->nodeId = createdNodeId;
+					
+					UA_BrowseDescription bDesc;
+					UA_BrowseDescription_init(&bDesc);
+					bDesc.browseDirection = UA_BROWSEDIRECTION_FORWARD;
+					bDesc.includeSubtypes = false;
+					bDesc.nodeClassMask = UA_NODECLASS_VARIABLE;
+					bDesc.nodeId = processvariable->getOwnNodeId();
+					bDesc.resultMask = UA_BROWSERESULTMASK_ALL;
+					
+					UA_BrowseResult bRes;
+					UA_BrowseResult_init(&bRes);
+					
+					bRes = UA_Server_browse(this->mappedServer, 10, &bDesc);
+					for(uint32_t i=0; i < bRes.referencesSize; i++) {
+						UA_Server_addReference(this->mappedServer, bRes.references[i].nodeId.nodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), *targetNodeId, false);
+					}
+					
+					UA_BrowseDescription_deleteMembers(&bDesc);
+					UA_BrowseResult_deleteMembers(&bRes);
 				}
  			}
 		}
@@ -388,7 +458,7 @@ UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
                             UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAMODULE), oAttr, &icb, &createdNodeId);
     
 	this->ownNodeId = createdNodeId;
-	// Nodes "Variables" and "Constants" where created on object instantiation, we need these IDs to add new process variables to them...
+	// Nodes "Variables" where created on object instantiation, we need these IDs to add new process variables to them...
 	UA_NodeId_copy(nodePairList_getTargetIdBySourceId(this->ownedNodes, UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLES)), &this->variablesListId);
 		
     return UA_STATUSCODE_GOOD;

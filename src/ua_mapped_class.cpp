@@ -62,8 +62,7 @@ UA_StatusCode ua_mapped_class::ua_mapSelfToNamespace() {
    return retval;
 }
 
-UA_StatusCode ua_mapped_class::ua_unmapSelfFromNamespace()
-{
+UA_StatusCode ua_mapped_class::ua_unmapSelfFromNamespace() {
   for (nodePairList::reverse_iterator i = this->ownedNodes.rbegin(); i != this->ownedNodes.rend(); ++i) {
     UA_NodeId_pair *p = *(i);
     UA_Server_deleteNode(this->mappedServer, p->targetNodeId, UA_FALSE);
