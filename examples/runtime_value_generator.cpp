@@ -41,19 +41,19 @@ using std::cout;
 using std::endl;
 using namespace ChimeraTK;
 	 
-runtimeValueGenerator::runtimeValueGenerator(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) {
+runtime_value_generator::runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager) {
 	this->devManager = devManager;
 	this->syncDevUtility = syncDevUtility;
 	this->doStart();
 }
 
-runtimeValueGenerator::~runtimeValueGenerator() {
+runtime_value_generator::~runtime_value_generator() {
 	if (this->isRunning()) {
 		this->doStop();
 	}
 }
 
-void runtimeValueGenerator::generateValues(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) {
+void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> devManager) {
 	// Time meassureing
 	clock_t start, end;
 	start = clock();
@@ -76,20 +76,17 @@ void runtimeValueGenerator::generateValues(boost::shared_ptr<DevicePVManager> de
 		devManager->getProcessArray<int32_t>("int_sine")->set(vector<int32_t> {int_sine});
 		devManager->getProcessArray<int32_t>("int_sine")->write();
 		devManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {(int32_t)((end - start)/(CLOCKS_PER_SEC/1000))});
-		devManager->getProcessArray<int32_t>("t")->write();	
-		
-		// Refresh all ProcessVariable
-		syncDevUtility->receiveAll();
+		devManager->getProcessArray<int32_t>("t")->write();
 		
 		usleep(devManager->getProcessArray<int32_t>("dt")->get().at(0));
 		end = clock();
 	}
 }
 
-void runtimeValueGenerator::workerThread() {
+void runtime_value_generator::workerThread() {
     bool run = true;
 	
-    thread *valueGeneratorThread = new std::thread(generateValues, this->devManager, this->syncDevUtility);
+    thread *valueGeneratorThread = new std::thread(generateValues, this->devManager);
 
     while (run == true) {
         if (! this->isRunning()) {

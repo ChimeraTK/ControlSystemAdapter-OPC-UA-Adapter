@@ -4,8 +4,8 @@ cmake_minimum_required(VERSION 2.8.0)
 ## Definition for compiler for static analysis
 ##########################################################################################################
 if(BUILD_STATIC_ANALYSIS)
-  set(CMAKE_C_COMPILER   ccc-analyzer)
-  set(CMAKE_CXX_COMPILER c++-analyzer)
+	set(CMAKE_C_COMPILER   ccc-analyzer)
+	set(CMAKE_CXX_COMPILER c++-analyzer)
 	add_definitions(-o ${PROJECT_BINARY_DIR}/static-analysis})
 endif()
 
@@ -38,7 +38,7 @@ find_package(mtca4u-deviceaccess)
 #Install the DeviceAccess if it is not pre-installed
 if(NOT mtca4u-deviceaccess_FOUND)		
 		ExternalProject_Add(external-ChimeraTK-DeviceAccess
-			GIT_REPOSITORY "https://github.com/jmrahm/DeviceAccess" #"https://github.com/ChimeraTK/DeviceAccess.git"
+			GIT_REPOSITORY "https://github.com/jmrahm/DeviceAccess" #"https://github.com/jmrahm/DeviceAccess" #"https://github.com/ChimeraTK/DeviceAccess.git"
 			GIT_TAG "master"
 			PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-DeviceAccess_src"
 			CMAKE_ARGS 
@@ -54,23 +54,23 @@ if(NOT mtca4u-deviceaccess_FOUND)
 	
 #Install the ControlSystemAdapter if it is not pre-installed
 if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
-  message("Installing ChimeraTK-ControlSystemAdapter as external dependency inside the build directory.")
+	message("Installing ChimeraTK-ControlSystemAdapter as external dependency inside the build directory.")
 	message("You will not be able to make a proper installation of the OPCUA_Adapter. Only use this for testing and development.\n")
-  ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
-    GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
-    GIT_TAG "master"
-    PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-ControlSystemAdapter_src"
-    DEPENDS external-ChimeraTK-DeviceAccess
-    CMAKE_ARGS 
-    "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/"
-    "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter" 
-    "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-		"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-    )
-  set(USE_ControlSystemAdapter TRUE)
-  set(ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/include)
-  set(ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/lib)
-  set(ChimeraTK-ControlSystemAdapter_LIBRARIES ChimeraTK-ControlSystemAdapter)
+	ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
+		GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
+		GIT_TAG "master"
+		PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-ControlSystemAdapter_src"
+		DEPENDS external-ChimeraTK-DeviceAccess
+		CMAKE_ARGS 
+			"-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/"
+			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter" 
+			"-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+			"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+	)
+	set(USE_ControlSystemAdapter TRUE)
+	set(ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/include)
+	set(ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/lib)
+	set(ChimeraTK-ControlSystemAdapter_LIBRARIES ChimeraTK-ControlSystemAdapter)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
@@ -81,9 +81,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLA
 ##########################################################################################################
 
 if(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "None")
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-      "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
-      FORCE)
+	set(CMAKE_BUILD_TYPE "Release" CACHE STRING 
+		"Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
+		FORCE
+	)
 endif(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "None")
 
 ##########################################################################################################

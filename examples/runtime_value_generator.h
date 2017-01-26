@@ -32,18 +32,16 @@
 
 using namespace ChimeraTK;
 
-class runtimeValueGenerator : public ipc_managed_object {
+class runtime_value_generator : public ipc_managed_object {
 private:   
 	boost::shared_ptr<DevicePVManager> devManager;
 	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
-	
-	void runtimeValueGenerator_constructserver(boost::shared_ptr<DevicePVManager> devManager);
     
 public:
-	runtimeValueGenerator(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
-	~runtimeValueGenerator();
+	runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager);
+	~runtime_value_generator();
 	void workerThread();
-	static void generateValues(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
+	static void generateValues(boost::shared_ptr<DevicePVManager> devManager);
     
 };
 

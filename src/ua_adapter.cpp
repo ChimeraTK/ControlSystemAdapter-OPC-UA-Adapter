@@ -300,7 +300,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 						}
 					}
 				}
-				std::cout << "Variable '" << srcVarName << "' wird unter '" << renameVar << "' in Application Name '" << applicName << "' eingetragen." << std::endl;
+				std::cout << "Variable '" << srcVarName << "' wird unter '" << renameVar << "' im Ordner Namens '" << applicName << "' eingetragen." << std::endl;
 				
 				vector<xmlNodePtr> nodeVectorFolderPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "folder");
 				vector<string> folderPathVector;
@@ -393,7 +393,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 						varName = UA_String_fromChars("Description");
 						if(UA_String_equal(&bRes.references[i].browseName.name, &varName) && !description.empty()) {
 							vAttr.description = UA_LOCALIZEDTEXT("en_US",(char*) "Description");
-							vAttr.displayName = UA_LOCALIZEDTEXT("en_US",(char*) "Description");
+							vAttr.displayName = UA_LOCALIZEDTEXT("en_US", "Description");
 							
 							UA_String engineringUnit = UA_String_fromChars(description.c_str());
 							UA_Variant_setScalar(&vAttr.value, &engineringUnit, &UA_TYPES[UA_TYPES_STRING]);

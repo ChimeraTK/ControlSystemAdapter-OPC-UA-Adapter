@@ -53,7 +53,7 @@ void AdditionalVariableTest::testEmptySet(){
  	delete serverThread;
  	serverThread = NULL;
 	
-	addVar1->~ua_additionalvariable();
+	//addVar1->~ua_additionalvariable();
 
 }
 
@@ -183,9 +183,6 @@ void AdditionalVariableTest::testClientSide(){
 	UA_Client_disconnect(client);
 	UA_Client_delete(client);
 	
-	
-	addVar1->~ua_additionalvariable();
-	
 	serverSet->runUAServer = UA_FALSE;
 	
 	if (serverThread->joinable()) {
@@ -201,6 +198,8 @@ void AdditionalVariableTest::testClientSide(){
 	
  	delete serverThread;
  	serverThread = NULL;
+	
+	//addVar1->~ua_additionalvariable();
 
 }
 
