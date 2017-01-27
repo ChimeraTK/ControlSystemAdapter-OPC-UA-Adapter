@@ -183,6 +183,12 @@ void AdditionalVariableTest::testClientSide(){
 	UA_Client_disconnect(client);
 	UA_Client_delete(client);
 	
+<<<<<<< HEAD
+=======
+	
+	//addVar1->~ua_additionalvariable();
+	
+>>>>>>> 48674c6ebffd86b02cb22145da6d2eccc4307b53
 	serverSet->runUAServer = UA_FALSE;
 	
 	if (serverThread->joinable()) {
