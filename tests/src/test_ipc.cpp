@@ -66,8 +66,6 @@ void IPCManagerTest::testManagerConnection(){
 	BOOST_CHECK(adapterOne->assignManager(nullptr) == false);
 	BOOST_CHECK(adapterOne->terminate() == 0);
 	
-	newManager->~ipc_manager();
-	manager->~ipc_manager();
 }
 
 
