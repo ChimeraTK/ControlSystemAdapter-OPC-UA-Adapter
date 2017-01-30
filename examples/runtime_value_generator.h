@@ -38,10 +38,10 @@ private:
 	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
     
 public:
-	runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager);
+	runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
 	~runtime_value_generator();
 	void workerThread();
-	static void generateValues(boost::shared_ptr<DevicePVManager> devManager);
+	static void generateValues(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
     
 };
 

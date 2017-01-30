@@ -41,7 +41,7 @@ using std::cout;
 using std::endl;
 using namespace ChimeraTK;
 	 
-runtime_value_generator::runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager) {
+runtime_value_generator::runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) {
 	this->devManager = devManager;
 	this->syncDevUtility = syncDevUtility;
 	this->doStart();
@@ -53,7 +53,7 @@ runtime_value_generator::~runtime_value_generator() {
 	}
 }
 
-void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> devManager) {
+void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) {
 	// Time meassureing
 	clock_t start, end;
 	start = clock();
@@ -66,7 +66,6 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
 		double double_sine = devManager->getProcessArray<double>("amplitude")->get().at(0) * sin((2*3.141)/devManager->getProcessArray<double>("period")->get().at(0) * devManager->getProcessArray<int32_t>("t")->get().at(0));
 		int32_t int_sine = round(double_sine);
 // 	bool bool_sine = (double_sine > 0)? true : false;
-		
 // 	std::cout << "double_sine: " << double_sine << std::endl;
 // 	std::cout << "int_sine: " << int_sine << std::endl;
 // 	std::cout << "bool_sine: " << bool_sine << std::endl;
@@ -115,13 +114,16 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
 		}
 		testDoubleArray->write();
 		testIntArray->write();
+		
+		syncDevUtility->receiveAll();
 	}
+	
 }
 
 void runtime_value_generator::workerThread() {
 	bool run = true;
 	
-	thread *valueGeneratorThread = new std::thread(generateValues, this->devManager);
+	thread *valueGeneratorThread = new std::thread(generateValues, this->devManager, this->syncDevUtility);
 	
 	while (run == true) {
 		if (! this->isRunning()) {

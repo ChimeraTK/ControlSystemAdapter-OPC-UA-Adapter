@@ -190,7 +190,7 @@ int main() {
 	
 	// Only for Sin ValueGenerator
 	mgr = new ipc_manager();
-	valGen = new runtime_value_generator(devManager);
+	valGen = new runtime_value_generator(devManager, syncDevUtility);
 	mgr->addObject(valGen);
 	mgr->doStart();	
 	
