@@ -38,6 +38,14 @@ using namespace std;
 // Early definition of manager class
 class ipc_manager;
 
+/** @class ipc_managed_object
+ *	@brief 
+ *   
+ *  @author Chris Iatrou
+ *	@author Julian Rahm
+ *  @date 22.11.2016
+ * 
+ */
 class ipc_managed_object {
 protected:
   uint32_t     ipc_id;

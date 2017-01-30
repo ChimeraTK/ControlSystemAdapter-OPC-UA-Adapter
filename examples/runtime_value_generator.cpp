@@ -80,22 +80,57 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
 		
 		usleep(devManager->getProcessArray<int32_t>("dt")->get().at(0));
 		end = clock();
+		
+		
+		for(int32_t i=1000; i < 65535; i=i+1000) {
+			string nameDouble = "testDoubleArray_" + to_string(i);
+			string nameInt = "testIntArray_" + to_string(i);
+			ProcessArray<double>::SharedPtr testDoubleArray = devManager->getProcessArray<double>(nameDouble);
+			ProcessArray<int32_t>::SharedPtr testIntArray = devManager->getProcessArray<int32_t>(nameInt);
+			for(int32_t k = 0; k < i; k++) {
+				if(k % 2 == 0) {
+					testDoubleArray->get().at(k) = rand() % 6 + 1;
+					testIntArray->get().at(k) = rand() % 6 + 1;
+				}
+				else {
+					testDoubleArray->get().at(k) = rand() % 50 + 10;
+					testIntArray->get().at(k) = rand() % 50 + 10;
+				}
+			}
+			testDoubleArray->write();
+			testIntArray->write();
+		}
+		
+		ProcessArray<double>::SharedPtr testDoubleArray = devManager->getProcessArray<double>("testDoubleArray_65535");
+		ProcessArray<int32_t>::SharedPtr testIntArray = devManager->getProcessArray<int32_t>("testIntArray_65535");
+		for(int32_t i = 0; i < 65535; i++) {
+			if(i % 2 == 0) {
+				testDoubleArray->get().at(i) = rand() % 6 + 1;
+				testIntArray->get().at(i) = rand() % 6 + 1;
+			}
+			else {
+				testDoubleArray->get().at(i) = rand() % 50 + 10;
+				testIntArray->get().at(i) = rand() % 50 + 10;
+			}
+		}
+		testDoubleArray->write();
+		testIntArray->write();
 	}
 }
 
 void runtime_value_generator::workerThread() {
-    bool run = true;
+	bool run = true;
 	
-    thread *valueGeneratorThread = new std::thread(generateValues, this->devManager);
-
-    while (run == true) {
-        if (! this->isRunning()) {
-					run = false;
-        }
-        sleep(1);
-    }
-    
-    if (valueGeneratorThread->joinable()) {
+	thread *valueGeneratorThread = new std::thread(generateValues, this->devManager);
+	
+	while (run == true) {
+		if (! this->isRunning()) {
+			run = false;
+		}
+		sleep(1);
+	}
+	
+	if(valueGeneratorThread->joinable()) {
 		valueGeneratorThread->join();
 	}
 	delete valueGeneratorThread;

@@ -26,15 +26,6 @@
  *
  */
 
-/** @class ipc_managed_object
- *	@brief 
- *   
- *  @author Chris Iatrou
- *	@author Julian Rahm
- *  @date 22.11.2016
- * 
- */
-
 #include "ipc_managed_object.h"
 #include <iostream>
 #include <time.h>
@@ -62,11 +53,7 @@ ipc_managed_object::~ipc_managed_object()
   if (this->isRunning()) 
   {
     this->doStop();
-  }
-//   this->threadTask->~thread();
-//   delete this->threadTask;
-// 	this->threadTask = NULL;
-	
+  }	
   this->terminate();
 }
 

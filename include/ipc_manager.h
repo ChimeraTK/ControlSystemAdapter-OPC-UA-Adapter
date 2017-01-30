@@ -39,7 +39,7 @@ class ipc_managed_object;
 using namespace std;
 
 /** @class ipc_manager
- *	@brief This class represent a additional variable from <variableMap.xml> in the information model of a OPC UA Server 
+ *	@brief  
  *   
  *  @author Chris Iatrou, Julian Rahm
  *  @date 22.11.2016

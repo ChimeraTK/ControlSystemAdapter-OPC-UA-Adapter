@@ -131,45 +131,45 @@ int main() {
 	
 	
 	/* Some big size arrays for test purpose 
-	 * 
-	 */
-	time_t t;
-	time(&t);
-	srand((unsigned int)t);
-	for(int32_t i=1000; i < 65535; i=i+1000) {
-		string nameDouble = "testDoubleArray_" + to_string(i);
-		string nameInt = "testIntArray_" + to_string(i);
-		ProcessArray<double>::SharedPtr testDoubleArray = devManager->createProcessArray<double>(deviceToControlSystem, nameDouble, i);
-		ProcessArray<int32_t>::SharedPtr testIntArray = devManager->createProcessArray<int32_t>(deviceToControlSystem, nameInt, i);
-		for(int32_t k = 0; k < i; k++) {
-			if(k % 2 == 0) {
-				testDoubleArray->get().at(k) = rand() % 6 + 1;
-				testIntArray->get().at(k) = rand() % 6 + 1;
+		* 
+		*/
+		time_t t;
+		time(&t);
+		srand((unsigned int)t);
+		for(int32_t i=1000; i < 65535; i=i+1000) {
+			string nameDouble = "testDoubleArray_" + to_string(i);
+			string nameInt = "testIntArray_" + to_string(i);
+			ProcessArray<double>::SharedPtr testDoubleArray = devManager->createProcessArray<double>(deviceToControlSystem, nameDouble, i);
+			ProcessArray<int32_t>::SharedPtr testIntArray = devManager->createProcessArray<int32_t>(deviceToControlSystem, nameInt, i);
+			for(int32_t k = 0; k < i; k++) {
+				if(k % 2 == 0) {
+					testDoubleArray->get().at(k) = rand() % 6 + 1;
+					testIntArray->get().at(k) = rand() % 6 + 1;
+				}
+				else {
+					testDoubleArray->get().at(k) = rand() % 50 + 10;
+					testIntArray->get().at(k) = rand() % 50 + 10;
+				}
+			}
+			testDoubleArray->write();
+			testIntArray->write();
+		}
+		
+		ProcessArray<double>::SharedPtr testDoubleArray = devManager->createProcessArray<double>(deviceToControlSystem, "testDoubleArray_65535", 65535);
+		ProcessArray<int32_t>::SharedPtr testIntArray = devManager->createProcessArray<int32_t>(deviceToControlSystem, "testIntArray_65535", 65535);
+		for(int32_t i = 0; i < 65535; i++) {
+			if(i % 2 == 0) {
+				testDoubleArray->get().at(i) = rand() % 6 + 1;
+				testIntArray->get().at(i) = rand() % 6 + 1;
 			}
 			else {
-				testDoubleArray->get().at(k) = rand() % 50 + 10;
-				testIntArray->get().at(k) = rand() % 50 + 10;
+				testDoubleArray->get().at(i) = rand() % 50 + 10;
+				testIntArray->get().at(i) = rand() % 50 + 10;
 			}
 		}
 		testDoubleArray->write();
 		testIntArray->write();
-	}
 	
-	ProcessArray<double>::SharedPtr testDoubleArray = devManager->createProcessArray<double>(deviceToControlSystem, "testDoubleArray_65535", 65535);
-	ProcessArray<int32_t>::SharedPtr testIntArray = devManager->createProcessArray<int32_t>(deviceToControlSystem, "testIntArray_65535", 65535);
-	for(int32_t i = 0; i < 65535; i++) {
-		if(i % 2 == 0) {
-			testDoubleArray->get().at(i) = rand() % 6 + 1;
-			testIntArray->get().at(i) = rand() % 6 + 1;
-		}
-		else {
-			testDoubleArray->get().at(i) = rand() % 50 + 10;
-			testIntArray->get().at(i) = rand() % 50 + 10;
-		}
-	}
-	testDoubleArray->write();
-	testIntArray->write();
-		
 	// start values
 	int32_t microseconds = 1000000;
 	double period = 3.141;

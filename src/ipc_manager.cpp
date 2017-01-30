@@ -26,16 +26,6 @@
  *
  */
 
-/** @class ipc_manager
- *	@brief 
- *   
- *  @author Chris Iatrou
- *	@author Julian Rahm
- *  @date 22.11.2016
- * 
- */
-
-
 #include "csa_config.h"
 
 #include "ipc_manager.h"
