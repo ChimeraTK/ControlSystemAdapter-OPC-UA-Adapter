@@ -67,19 +67,6 @@ public:
 	*/
 	ua_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager);
 	
-	/** @brief Constructor from ua_processvaribale for mapped process variables
-	* 
-	* @param server A UA_Server type, with all server specific information from the used server
-	* @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
-	* @param namePV Name of the process variable from control-system-adapter, is needed to fetch the rigth process varibale from PV-Manager
-	* @param nameNew Display name for the new UA_ObjectNode, only used for changing the Name form mapped-xml
-	* @param engineeringUnit Change the current engineering unit of process variable
-	* @param description Change the current description of process varibale
-	* @param csManager The hole PVManager from control-system-adapter 
-	* 
-	*/
-	ua_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager);
-	
 	/** @brief Destructor for ua_processvariable
 	* 
 	*/

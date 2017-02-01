@@ -20,6 +20,7 @@ extern "C" {
 
 
 using namespace boost::unit_test_framework;
+using namespace std;
 
 /*
  * ProcessVariableTest
@@ -49,13 +50,18 @@ void ProcessVariableTest::testEmptySet(){
 	//ua_processvariable *test;
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
 		//std::cout << "Checking ProcessVariable: " <<  oneProcessVariable->getName() << std::endl;
-		ua_processvariable *test = new ua_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), oneProcessVariable->getName(), "", "", pvSet.csManager);
+		ua_processvariable *test = new ua_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager);
 
 		BOOST_CHECK(test->getName() == oneProcessVariable->getName());
 		
-		BOOST_CHECK(test->getEngineeringUnit() != "");
+		BOOST_CHECK(test->getEngineeringUnit() == oneProcessVariable->getUnit());
 		test->setEngineeringUnit("test");
 		BOOST_CHECK(test->getEngineeringUnit() == "test");
+		
+		// Description
+		string description = "";
+		description = test->getDescription();
+		BOOST_CHECK(description == oneProcessVariable->getDescription());
 		
 		BOOST_CHECK(test->getSourceTimeStamp() == ((oneProcessVariable->getTimeStamp().seconds * UA_SEC_TO_DATETIME) + (oneProcessVariable->getTimeStamp().nanoSeconds * UA_USEC_TO_DATETIME / 1000LL) + UA_DATETIME_UNIX_EPOCH));
 				
@@ -140,7 +146,7 @@ void ProcessVariableTest::testEmptySet(){
 			else if (valueType == "double") {
 				BOOST_CHECK(valueType == "double");
 				int32_t i = 0;
-				std::vector<double> newVector(test->getValue_Array_double().size());
+				vector<double> newVector(test->getValue_Array_double().size());
 				for(double value: test->getValue_Array_double()) {
 					BOOST_CHECK(value == 0);
 					newVector.at(i) = 100-i;
@@ -152,7 +158,7 @@ void ProcessVariableTest::testEmptySet(){
 		const UA_NodeId nodeId = test->getOwnNodeId();
 		BOOST_CHECK(!UA_NodeId_isNull(&nodeId));
 		
-		std::string newName = "";
+		string newName = "";
 		newName = oneProcessVariable->getName();
 		// Should not being changed
 		BOOST_CHECK(test->getName() != "");
@@ -242,30 +248,30 @@ void ProcessVariableTest::testClientSide(){
 					for (size_t m = 0; m < bResp2.resultsSize; ++m) {
 						for (size_t k = 0; k < bResp2.results[m].referencesSize; ++k) {
 							refe = &(bResp2.results[m].references[k]);
-							if(refe->nodeId.nodeId.identifierType == UA_NODEIDTYPE_NUMERIC) {
+							if(refe->nodeId.nodeId.identifierType == UA_NODEIDTYPE_NUMERIC || refe->nodeId.nodeId.identifierType == UA_NODEIDTYPE_STRING) {
 							
 								size_t lenBrowseName2 = (int)refe->browseName.name.length;
 								string browseNameFound2(reinterpret_cast<char const*>(refe->browseName.name.data), lenBrowseName2);
 								
 								if(browseNameFound2 == "Type") {
-									typeNodeId = refe->nodeId.nodeId;
+									UA_NodeId_copy(&refe->nodeId.nodeId, &typeNodeId);
 								}
 								
 								if(browseNameFound2 == "Name") {
-									nameNodeId  = refe->nodeId.nodeId;
+									UA_NodeId_copy(&refe->nodeId.nodeId, &nameNodeId);
 								}
 								
 								if(browseNameFound2 == "Value") {
-									valueNodeId = refe->nodeId.nodeId;
+									UA_NodeId_copy(&refe->nodeId.nodeId, &valueNodeId);
 									name = browseNameFound;
 									cout << "Checking ProcessVariable: " <<  name << endl;
 								}
 								if(browseNameFound2 == "EngineeringUnit") {
-									engineeringUnitNodeId = refe->nodeId.nodeId;
+									UA_NodeId_copy(&refe->nodeId.nodeId, &engineeringUnitNodeId);
 								}
 								
 								if(browseNameFound2 == "Description") {
-									descriptionNodeId = refe->nodeId.nodeId;
+									UA_NodeId_copy(&refe->nodeId.nodeId, &descriptionNodeId);
 								}
 							}
 						}

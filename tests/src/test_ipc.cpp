@@ -54,17 +54,21 @@ void IPCManagerTest::testManagerConnection(){
 	BOOST_CHECK(adapterOne->taskRunningAttached() == 1);
 	adapterOne->doStop();
 
-	BOOST_CHECK(adapterTwo->terminate() == 0);
-
 	ipc_manager *mgr = adapterOne->getIpcManager();
 	BOOST_CHECK(mgr != NULL);
 
+	manager->deleteObject(adapOneIpcId);
 	BOOST_CHECK(manager->deleteObject(adapOneIpcId) == 0);
 
-	ipc_manager *newManager = new ipc_manager();
-	BOOST_CHECK(adapterOne->assignManager(newManager) == true);
-	BOOST_CHECK(adapterOne->assignManager(nullptr) == false);
-	BOOST_CHECK(adapterOne->terminate() == 0);
+ 	ipc_manager *newManager = new ipc_manager();
+ 	BOOST_CHECK(adapterOne->assignManager(newManager) == true);
+ 	BOOST_CHECK(adapterOne->assignManager(nullptr) == false);
+	
+ 	newManager->~ipc_manager();
+ 	BOOST_CHECK(true);
+ 	manager->~ipc_manager();
+ 	BOOST_CHECK(true);
+ 	mgr = NULL;
 	
 }
 

@@ -114,11 +114,6 @@ void csa_opcua_adapter::stop() {
     return;
 }
 
-void csa_opcua_adapter::terminate() {
-    this->mgr->terminate();
-    return;
-}
-
 bool csa_opcua_adapter::isRunning() {
     return this->mgr->isRunning();
 }

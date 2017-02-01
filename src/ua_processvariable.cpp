@@ -47,23 +47,6 @@ ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, 
   	this->mapSelfToNamespace();
 }
 
-ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, string nameNew, string engineeringUnit, string description, boost::shared_ptr<ControlSystemPVManager> csManager) : ua_mapped_class(server, basenodeid) {
-	
-	// FIXME Check if name member of a csManager Parameter
-	this->namePV = namePV;
-	this->nameNew = nameNew;
-	this->csManager = csManager;
-	
-	if(!engineeringUnit.empty()) {
-		setEngineeringUnit(engineeringUnit);
-	}
-	if(!description.empty()) {
-		setDescription(description);
-	}
-	
-	this->mapSelfToNamespace();
-}
-
 ua_processvariable::~ua_processvariable()
 {
   //* Our ua_mapped_class destructor will take care of deleting our opcua footprint as long as all variables are mapped in this->ownedNodes

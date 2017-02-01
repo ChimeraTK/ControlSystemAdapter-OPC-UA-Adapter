@@ -30,8 +30,7 @@
 #include <iostream>
 #include <time.h>
 
-void ipc_managed_object_callWorker(ipc_managed_object *theClass)
-{
+void ipc_managed_object_callWorker(ipc_managed_object *theClass) {
   try {
     theClass->workerThread();
   }
@@ -40,25 +39,21 @@ void ipc_managed_object_callWorker(ipc_managed_object *theClass)
   }
 }
 
-ipc_managed_object::ipc_managed_object()
-{
+ipc_managed_object::ipc_managed_object() {
   this->ipc_id = 0;
   this->threadTask = nullptr;
   this->manager    = nullptr;
   this->thread_run = false;
 }
 
-ipc_managed_object::~ipc_managed_object()
-{
+ipc_managed_object::~ipc_managed_object() {
   if (this->isRunning()) 
   {
     this->doStop();
   }	
-  this->terminate();
 }
 
-ipc_manager *ipc_managed_object::getIpcManager()
-{
+ipc_manager *ipc_managed_object::getIpcManager() {
   return this->manager;
 }
 
@@ -113,9 +108,5 @@ uint32_t ipc_managed_object::doStart()
   this->thread_run = true;
   this->threadTask = new std::thread(ipc_managed_object_callWorker, this);
   this->mtx_threadOperations.unlock();
-  return 0;
-}
-
-int32_t ipc_managed_object::terminate() {
   return 0;
 }

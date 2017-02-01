@@ -1,6 +1,6 @@
 /** @class ua_proxies
- * 	@brief Helper class to interact with open62541
- * 	This class is a kind of a proxy to interact with the open62541 stack. For this, the class mapped all variables to the nodestore of the open62541
+ * 	@brief Helper class to interact with open62541 in a easy way.
+ * 	This class is a kind of a proxy to interact with the open62541 stack. For this, the class mapped all variables to the nodestore of the open62541.
  * 	
  *	@author Chris Iatrou
  *	@author Julian Rahm
@@ -20,17 +20,19 @@
 
 using namespace std;
 
-/** @struct UA_NodeId_pair_t
- * @brief
+/** 
+ * @struct UA_NodeId_pair_t
+ * @brief This struct contains a NodeId generated from the open62541-stack and the NodeId of the model side
  * 
  */
 typedef struct UA_NodeId_pair_t {
-  UA_NodeId sourceNodeId;
-  UA_NodeId targetNodeId;
+  UA_NodeId sourceNodeId;	// Model NodeId
+  UA_NodeId targetNodeId;	// Stack NodeId
 } UA_NodeId_pair;
 typedef std::list<UA_NodeId_pair*> nodePairList; 
 
-/** @struct UA_FunctionCall_InstanceLookupTable_Element_t
+/** 
+ * @struct UA_FunctionCall_InstanceLookupTable_Element_t
  * @brief Lookup Table: Multiple instances of the object may exist, a lookup for their respecive Id must be performed
  * 
  */
@@ -41,19 +43,9 @@ typedef struct UA_FunctionCall_InstanceLookupTable_Element_t {
 } UA_FunctionCall_InstanceLookupTable_Element;
 typedef std::list<UA_FunctionCall_InstanceLookupTable_Element*> UA_FunctionCall_InstanceLookUpTable; 
 
-/** @struct UA_FunctionCall_Map_Element_t
- * @brief
- * 
- */
-typedef struct UA_FunctionCall_Map_Element_t {
-  UA_NodeId                             typeTemplateId;
-  UA_FunctionCall_InstanceLookUpTable  *lookupTable;
-  UA_MethodCallback                     callback;
-} UA_FunctionCall_Map_Element;
-typedef std::list<UA_FunctionCall_Map_Element> UA_FunctionCall_Map;
-
-/** @struct UA_DataSource_Map_Element_t
- * @brief
+/** 
+ * @struct UA_DataSource_Map_Element_t
+ * @brief For generic callback use, this sturct contains the methode pointer and a NodeId of the model. Additinaly a description from controlSystemAdapter can be setted here.
  * 
  */
 typedef struct UA_DataSource_Map_Element_t {

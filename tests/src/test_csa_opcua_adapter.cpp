@@ -1,4 +1,5 @@
 #include <ua_adapter.h>
+
 #include <csa_opcua_adapter.h>
 #include <ipc_manager.h>
 #include <test_sample_data.h>
@@ -26,6 +27,7 @@ class CSAOPCUATest {
 };
    
 void CSAOPCUATest::testWithoutPVSet(){ 
+	
 	cout << "Enter CSAOPCUATest without any pv" << std::endl;
 	TestFixtureEmptySet tfEmptySet;
 	 // Create the managers
@@ -38,7 +40,6 @@ void CSAOPCUATest::testWithoutPVSet(){
 	BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 0);
 		
 	csaOPCUA->stop();
-	csaOPCUA->terminate();
 	BOOST_CHECK(csaOPCUA->isRunning() != true);
 	
 	csaOPCUA->~csa_opcua_adapter(); 
@@ -60,7 +61,6 @@ void CSAOPCUATest::testWithPVSet(){
 	BOOST_CHECK(csaOPCUA->getUAAdapter() != NULL);
 	
 	csaOPCUA->stop();
-	csaOPCUA->terminate();
 	BOOST_CHECK(csaOPCUA->isRunning() != true);
 	
 	csaOPCUA->~csa_opcua_adapter();
