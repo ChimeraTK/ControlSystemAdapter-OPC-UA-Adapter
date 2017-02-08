@@ -335,7 +335,7 @@ void ProcessVariableTest::testClientSide(){
 										// Check EngineeringUnit -> for all the same
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), engineeringUnit);
 										//cout << "EngineeringUnit: " << valName << endl;
-										if(valName.compare("int8Scalar") == 0) {
+										if((valName.compare("int8Scalar") == 0) || (valName.compare("Mein/Name_ist#int8Array_s15") == 0) || (valName.compare("Unser/Name/ist_uint8Array_s10") == 0)) {
 											BOOST_CHECK(engineeringUnit == "Einheit");
 										}
 										else {
@@ -360,7 +360,7 @@ void ProcessVariableTest::testClientSide(){
 										// Check Description -> for all the same
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) descToCheck->data)), description);
 										//cout << "Description: " << valName << endl;
-										if(valName.compare("int8Scalar") == 0) {
+										if((valName.compare("int8Scalar") == 0) || (valName.compare("Mein/Name_ist#int8Array_s15") == 0) || (valName.compare("Unser/Name/ist_uint8Array_s10") == 0)) {
 											BOOST_CHECK(description == "Beschreibung der Variable");
 										}
 										else {

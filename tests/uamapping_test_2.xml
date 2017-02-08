@@ -35,7 +35,7 @@
 		  <folder>NorthSide/LINAC/partA</folder>
 			<folder>NorthSide/LINAC/partX</folder>
   	</map>
-		<map sourceVariableName="Mein/Name_ist#int16Array_s15" rename="Array">
+		<map sourceVariableName="Mein/Name_ist#int8Array_s15" rename="Array" engineeringUnit="Einheit" description="Beschreibung der Variable">
 			<unrollPath pathSep="_">True</unrollPath>
 			<unrollPath pathSep="/">True</unrollPath>
 			<unrollPath pathSep="#">True</unrollPath>
@@ -73,7 +73,7 @@
    	</map>
 	</application>
 	<application name="EPICS">
-		<map sourceVariableName="Mein/Name/ist/uint32Scalar" rename="uint32S">
+		<map sourceVariableName="Mein/Name_ist#int8Array_s15" rename="uint32S">
 			<unrollPath pathSep="/">True</unrollPath>
 		  <folder>EastSide/LINAC</folder>
     </map>

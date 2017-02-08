@@ -38,7 +38,7 @@ find_package(mtca4u-deviceaccess)
 #Install the DeviceAccess if it is not pre-installed
 if(NOT mtca4u-deviceaccess_FOUND)		
 		ExternalProject_Add(external-ChimeraTK-DeviceAccess
-			GIT_REPOSITORY "https://github.com/jmrahm/DeviceAccess" #"https://github.com/ChimeraTK/DeviceAccess.git" 
+			GIT_REPOSITORY  "https://github.com/jmrahm/DeviceAccess" #"https://github.com/ChimeraTK/DeviceAccess.git"
 
 			GIT_TAG "master"
 			PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-DeviceAccess_src"
@@ -362,6 +362,16 @@ add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/c
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
+  ${Boost_CHRONO_LIBRARY}
+)
+
+add_executable(ControlSystem-OPCUA_Sample_Application ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example2.cpp)
+target_link_libraries(ControlSystem-OPCUA_Sample_Application ${PROJECT_NAME})
+target_link_libraries(ControlSystem-OPCUA_Sample_Application pthread)
+target_link_libraries(ControlSystem-OPCUA_Sample_Application
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}

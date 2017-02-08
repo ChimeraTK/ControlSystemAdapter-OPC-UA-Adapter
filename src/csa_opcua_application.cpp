@@ -95,11 +95,11 @@ int main() {
 	syncDevUtility.reset(new ChimeraTK::DeviceSynchronizationUtility(devManager));
 
 	csManager->enablePersistentDataStorage();
-
 	ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
 	ChimeraTK::ApplicationBase::getInstance().initialise();
 
 	string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
+	cout << pathToConfig << endl;
 	csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
 	
 	ChimeraTK::ApplicationBase::getInstance().run();

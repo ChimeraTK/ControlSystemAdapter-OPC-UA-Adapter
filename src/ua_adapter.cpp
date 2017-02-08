@@ -380,8 +380,8 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 						
 						UA_String varName = UA_String_fromChars("EngineeringUnit");
 						if(UA_String_equal(&bRes.references[i].browseName.name, &varName) && !engineeringUnit.empty()) {
-							vAttr.description = UA_LOCALIZEDTEXT("en_US",(char*) "EngineeringUnit");
-							vAttr.displayName = UA_LOCALIZEDTEXT("en_US",(char*) "EngineeringUnit");
+							vAttr.description = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "EngineeringUnit");
+							vAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "EngineeringUnit");
 							
 							UA_String engineringUnit = UA_String_fromChars(engineeringUnit.c_str());
 							UA_Variant_setScalar(&vAttr.value, &engineringUnit, &UA_TYPES[UA_TYPES_STRING]);
@@ -392,8 +392,8 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 						
 						varName = UA_String_fromChars("Description");
 						if(UA_String_equal(&bRes.references[i].browseName.name, &varName) && !description.empty()) {
-							vAttr.description = UA_LOCALIZEDTEXT("en_US",(char*) "Description");
-							vAttr.displayName = UA_LOCALIZEDTEXT("en_US", "Description");
+							vAttr.description = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "Description");
+							vAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "Description");
 							
 							UA_String engineringUnit = UA_String_fromChars(description.c_str());
 							UA_Variant_setScalar(&vAttr.value, &engineringUnit, &UA_TYPES[UA_TYPES_STRING]);
