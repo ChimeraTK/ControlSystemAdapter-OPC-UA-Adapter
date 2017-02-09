@@ -38,7 +38,7 @@ find_package(mtca4u-deviceaccess)
 #Install the DeviceAccess if it is not pre-installed
 if(NOT mtca4u-deviceaccess_FOUND)		
 		ExternalProject_Add(external-ChimeraTK-DeviceAccess
-			GIT_REPOSITORY  "https://github.com/jmrahm/DeviceAccess" #"https://github.com/ChimeraTK/DeviceAccess.git"
+			GIT_REPOSITORY "https://github.com/ChimeraTK/DeviceAccess.git" #"https://github.com/jmrahm/DeviceAccess"
 
 			GIT_TAG "master"
 			PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-DeviceAccess_src"
