@@ -70,8 +70,8 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
     UA_ObjectAttributes oAttr; 
 		UA_ObjectAttributes_init(&oAttr);
 		
-    oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", (char*)this->name.c_str());
-    oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", (char*)this->description.c_str());
+    oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->name.c_str());
+    oAttr.description = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->description.c_str());
 		    		
 		UA_INSTATIATIONCALLBACK(icb);  		
 		UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
@@ -83,7 +83,7 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
 		
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE), oAttr.description, .read=UA_RDPROXY_NAME(ua_additionalvariable, getValue)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE), oAttr.description, .read=UA_RDPROXY_NAME(ua_additionalvariable, getValue), .write=NULL});
 	
 	this->ua_mapDataSources((void *) this, &mapDs);
 	

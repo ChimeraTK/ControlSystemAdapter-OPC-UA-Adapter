@@ -238,12 +238,12 @@ CREATE_WRITE_FUNCTION_ARRAY(double)
 // ... and make sure we lock down writing to receivers in this stage already
  #define PUSH_RDVALUE_TYPE(_p_typeName) { \
  if(this->csManager->getProcessVariable(this->namePV)->isWriteable())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_##_p_typeName) }); } \
-     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName) }); }\
+     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName), .write=NULL}); }\
  }
     
 #define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) { \
 if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_Array_##_p_typeName) }); } \
-    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName) }); } \
+    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName), .write=NULL}); } \
 }
 
 UA_StatusCode ua_processvariable::mapSelfToNamespace() {
@@ -312,8 +312,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 	UA_NodeId valueNodeId = UA_NODEID_NULL;
 	UA_VariableAttributes vAttr;
 	UA_VariableAttributes_init(&vAttr);
-	vAttr.description = UA_LOCALIZEDTEXT("en_US","Value");
-  vAttr.displayName = UA_LOCALIZEDTEXT("en_US","Value");
+	vAttr.description = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
+  vAttr.displayName = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
 	vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
 	
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
@@ -363,16 +363,16 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 	else std::cout << "Cannot proxy unknown type " << typeid(valueType).name()  << std::endl;
 	
 	UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char*)this->getName().c_str()), createdNodeId,
-														UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, "Value"),
+														UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*) "Value"),
                               UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &valueNodeId);
 
 	UA_NodeId nodeIdVariableType = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
 	NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, valueNodeId)
 	
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getName)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getName), .write=NULL});
 	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getDescription), .write=UA_WRPROXY_NAME(ua_processvariable, setDescription)});
 	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(ua_processvariable, setEngineeringUnit)});
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getType)});
+	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getType), .write=NULL});
 
  	this->ua_mapDataSources((void *) this, &mapDs);
 	
