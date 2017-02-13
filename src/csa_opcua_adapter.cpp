@@ -81,13 +81,7 @@ void csa_opcua_adapter::csa_opcua_adapter_InitVarMapping() {
 
 csa_opcua_adapter::~csa_opcua_adapter() {
 	
-	//free(this->mgr);
-	//delete this->mgr;
-	//this->mgr = NULL;
 	this->adapter->~ua_uaadapter();
-	//free(this->adapter);	
-	//delete this->adapter;
-	//this->adapter = NULL;
 	
 	this->mgr->~ipc_manager();
 }

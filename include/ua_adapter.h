@@ -71,13 +71,13 @@ struct FolderInfo {
  * 
  */
 struct ServerConfig {
-	string rootFolder = "DefaultRootFolder";
+	string rootFolder = "mtcaModule";
 	string descriptionFolder = "No description is set";
 	UA_Boolean	UsernamePasswordLogin = UA_FALSE;
-	string password;
-	string username;
-	string applicationName;
-	uint16_t opcuaPort;
+	string password = "";
+	string username = "";
+	string applicationName = "OPCUA Application";
+	uint16_t opcuaPort = 16664;
 };
 
 

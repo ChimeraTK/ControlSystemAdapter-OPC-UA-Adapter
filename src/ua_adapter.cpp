@@ -53,14 +53,21 @@ using namespace ChimeraTK;
 using namespace std;
 
 ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
-	this->fileHandler = new xml_file_handler(configFile);
+	if(!configFile.empty()) {
+		this->fileHandler = new xml_file_handler(configFile);
+		this->readConfig();
+	}
+	else {
+		cout << "No <serverConfig>-Tag in config file. Use default server configuration." << endl;
+	}
 	
-	this->readConfig();
 	this->constructServer();
 	
 	this->mapSelfToNamespace();
 	
-	this->readAdditionalNodes();
+	if(!configFile.empty()) {
+		this->readAdditionalNodes();
+	}
 	
 }
 
@@ -154,7 +161,7 @@ void ua_uaadapter::readConfig() {
 			this->serverConfig.opcuaPort = std::stoi(opcuaPort);
 		}
 		else {
-			throw runtime_error ("No 'port'-Attribute is set in config file");
+			cout << "No 'port'-Attribute in config file is set. Use default Port: 16664" << endl;
 		}
 		
 		placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
@@ -162,11 +169,11 @@ void ua_uaadapter::readConfig() {
 			this->serverConfig.applicationName = placeHolder;
 		}
 		else {
-			throw runtime_error ("No 'applicationName'-Attribute is set in config file");
+			cout << "No 'applicationName'-Attribute is set in config file. Use default Applicationname." << endl;
 		}
 	}
 	else {
-		throw runtime_error ("No <serverConfig>-Tag in config file");
+		cout << "No <serverConfig>-Tag in config file. Use default server configuration." << endl;
 	}
 }
 
@@ -267,23 +274,22 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 					appliFolderNodeId = newFolder.folderNodeId;
 				}
 				
-					vector<string> varPathVector;
-					vector<xmlNodePtr> nodeVectorUnrollPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "unrollPath");
-					string seperator = "";
-					bool unrollPathIs = false;
-					for(auto nodeUnrollPath: nodeVectorUnrollPath) {
-						string shouldUnrollPath = this->fileHandler->getContentFromNode(nodeUnrollPath);
-						if(shouldUnrollPath.compare("True") == 0) {
-							seperator = seperator + this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
-							unrollPathIs = true;
-						}	
-					}
-					
-					if(!seperator.empty()) {
-						vector<string> newPathVector = this->fileHandler->praseVariablePath(srcVarName, seperator);
-						varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
-					}
-						
+				vector<string> varPathVector;
+				vector<xmlNodePtr> nodeVectorUnrollPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "unrollPath");
+				string seperator = "";
+				bool unrollPathIs = false;
+				for(auto nodeUnrollPath: nodeVectorUnrollPath) {
+					string shouldUnrollPath = this->fileHandler->getContentFromNode(nodeUnrollPath);
+					if(shouldUnrollPath.compare("True") == 0) {
+						seperator = seperator + this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
+						unrollPathIs = true;
+					}	
+				}
+				
+				if(!seperator.empty()) {
+					vector<string> newPathVector = this->fileHandler->praseVariablePath(srcVarName, seperator);
+					varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
+				}
 			
 				// assumption last element is name of variable, hence no folder for name is needed
 				if(renameVar.compare("") == 0 && !unrollPathIs) {
@@ -334,6 +340,8 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 					if(varPathVector.size() > 0) {
 						mappedVariables.push_back(this->createFolderPath(newFolderNodeId, varPathVector));
 					}
+					// No <folder>
+					mappedVariables.push_back(appliFolderNodeId);
 				}
 				
 				// Create all nessesary mapped ObjectVaraibles with inner variables (reference or attribute, depending attributes are set (engineeringUnit, dexcription) 
