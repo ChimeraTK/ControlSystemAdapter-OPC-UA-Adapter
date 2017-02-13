@@ -230,7 +230,7 @@ if(ENABLE_COVERAGE)
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 			# Bad soulution to provide all depencys
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_adapter
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_application
+			#DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_application
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
@@ -259,7 +259,7 @@ if(ENABLE_RUNTIME_ANALYSIS)
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 			# Bad soulution to provide all depencys
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_adapter
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_application
+			#DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_application
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
 			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
