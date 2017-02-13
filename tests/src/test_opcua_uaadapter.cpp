@@ -27,9 +27,6 @@ void UAAdapterTest::testExampleSet() {
 		
 	// Test config handling
 	BOOST_CHECK_THROW(ua_uaadapter ua_uaadapter("./uamapping_test_twoconfigs.xml"), runtime_error);
-	BOOST_CHECK_THROW(ua_uaadapter ua_uaadapter("./uamapping_test_applicationismissing.xml"), runtime_error);
-	BOOST_CHECK_THROW(ua_uaadapter ua_uaadapter("./uamapping_test_configismissing.xml"), runtime_error);
-	BOOST_CHECK_THROW(ua_uaadapter ua_uaadapter("./uamapping_test_portismissung.xml"), runtime_error);
 	
 	// is Server running?
 	adapter->doStart();
