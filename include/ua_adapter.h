@@ -76,7 +76,7 @@ struct ServerConfig {
 	UA_Boolean	UsernamePasswordLogin = UA_FALSE;
 	string password = "";
 	string username = "";
-	string applicationName = "OPCUA Application";
+	string applicationName = "OPCUA Adapter";
 	uint16_t opcuaPort = 16664;
 };
 

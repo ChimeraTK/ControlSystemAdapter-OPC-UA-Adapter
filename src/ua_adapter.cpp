@@ -543,7 +543,7 @@ UA_NodeId ua_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<strin
 	UA_NodeId prevNodeId = nextNodeId;
 	// use the remembered position to start the loop
 	for(uint32_t m=starter4Folder; m < folderPath.size(); m++) {
-		prevNodeId = this->createFolder(prevNodeId, folderPath.at(m));		
+		prevNodeId = this->createFolder(prevNodeId, folderPath.at(m));
 	}
 	// return last created folder UA_NodeId
 	return prevNodeId;
@@ -560,7 +560,7 @@ UA_NodeId ua_uaadapter::createFolder(UA_NodeId basenodeid, string folderName, st
 	FolderInfo newFolder;
  	if(UA_NodeId_isNull(&toCheckNodeId)) {
 		newFolder.folderName = folderName;
-		newFolder.folderNodeId = this->createUAFolder(basenodeid, folderName);	
+		newFolder.folderNodeId = this->createUAFolder(basenodeid, folderName, description);	
 		newFolder.prevFolderNodeId = basenodeid;
 		this->folderVector.push_back(newFolder);
 	}
