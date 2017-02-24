@@ -18,13 +18,12 @@ extern "C" {
 using namespace ChimeraTK;
 
 struct TestFixtureEmptySet {
-  std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers;
-  boost::shared_ptr<ControlSystemPVManager> csManager;
-  boost::shared_ptr<DevicePVManager> devManager;
-    
+	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers;
+	boost::shared_ptr<ControlSystemPVManager> csManager;
+	boost::shared_ptr<DevicePVManager> devManager;   
 	boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
-
-  TestFixtureEmptySet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second) {
+ 
+	TestFixtureEmptySet() : pvManagers(createPVManager()),csManager(pvManagers.first), devManager(pvManagers.second) {
 		syncCsUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
 		syncCsUtility->receiveAll();
 	}

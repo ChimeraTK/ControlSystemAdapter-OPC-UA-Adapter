@@ -181,6 +181,7 @@ int main() {
 	csManager->getProcessArray<double>("amplitude")->set(vector<double> {amplitude});
 	csManager->getProcessArray<double>("amplitude")->write();
 
+	csManager->getProcessArray<int8_t>("int8Scalar")->set(vector<int8_t> {12});
 	cout << "Dummy Daten geschrieben..." << std::endl;	
 	
 	string pathToConfig = "opcuaAdapter_mapping.xml";

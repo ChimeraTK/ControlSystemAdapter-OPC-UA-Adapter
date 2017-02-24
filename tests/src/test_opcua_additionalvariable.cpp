@@ -14,13 +14,11 @@ using namespace boost::unit_test_framework;
  */
 class AdditionalVariableTest {
 	public:
-		static void testEmptySet();
+		static void testClassSide();
 		static void testClientSide();
-		static void testExampleSet();
-		
 };
    
-void AdditionalVariableTest::testEmptySet(){ 
+void AdditionalVariableTest::testClassSide(){ 
 	std::cout << "Enter AdditionalVariableTest with EmptySet" << std::endl;
 	
 	TestFixtureServerSet *serverSet = new TestFixtureServerSet;		
@@ -207,7 +205,7 @@ void AdditionalVariableTest::testClientSide(){
 class AdditionalVariableTestSuite: public test_suite {
 	public:
 		AdditionalVariableTestSuite() : test_suite("ua_additionalvariable Test Suite") {
-			add(BOOST_TEST_CASE(&AdditionalVariableTest::testEmptySet));
+			add(BOOST_TEST_CASE(&AdditionalVariableTest::testClassSide));
 			add(BOOST_TEST_CASE(&AdditionalVariableTest::testClientSide));
     }
 };

@@ -144,9 +144,11 @@ void ua_processvariable::setValue_##_p_type(_p_type value) { \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() == 1) {   \
 			if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
-					this->csManager->getProcessArray<_p_type>(this->namePV)->set(vector<_p_type> {value});   \
-					this->csManager->getProcessArray<_p_type>(this->namePV)->write();       \
-			}\
+				vector<_p_type> valueArray; \
+				valueArray.push_back(value); \
+				this->csManager->getProcessArray<_p_type>(this->namePV)->set(valueArray); \
+				this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
+			} \
 		} \
     return; \
 }

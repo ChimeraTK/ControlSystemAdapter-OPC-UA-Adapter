@@ -28,15 +28,12 @@ using namespace std;
  */
 class ProcessVariableTest {
 	public:
-		static void testEmptySet();
+		static void testClassSide();
 		static void testClientSide();
-		static void testExampleSet();
-		
-		static void checkTimeStamp(UA_NodeId test);
 };
    
-void ProcessVariableTest::testEmptySet(){ 
-	std::cout << "Enter ProcessVariableTest with EmptySet" << std::endl;
+void ProcessVariableTest::testClassSide(){ 
+	std::cout << "Enter ProcessVariableTest with ClassSide" << std::endl;
 	TestFixtureServerSet *serverSet = new TestFixtureServerSet;
 	TestFixturePVSet pvSet;
 	
@@ -49,7 +46,6 @@ void ProcessVariableTest::testEmptySet(){
 	
 	//ua_processvariable *test;
 	for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-		//std::cout << "Checking ProcessVariable: " <<  oneProcessVariable->getName() << std::endl;
 		ua_processvariable *test = new ua_processvariable(serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager);
 
 		BOOST_CHECK(test->getName() == oneProcessVariable->getName());
@@ -64,32 +60,94 @@ void ProcessVariableTest::testEmptySet(){
 		BOOST_CHECK(description == oneProcessVariable->getDescription());
 		
 		BOOST_CHECK(test->getSourceTimeStamp() == ((oneProcessVariable->getTimeStamp().seconds * UA_SEC_TO_DATETIME) + (oneProcessVariable->getTimeStamp().nanoSeconds * UA_USEC_TO_DATETIME / 1000LL) + UA_DATETIME_UNIX_EPOCH));
-				
 		std::string valueType = test->getType();
-			if (valueType == "int8_t") {
-				BOOST_CHECK(valueType == "int8_t");
-				int32_t i = 0;
+		
+		cout << "Check Processvariable: " << test->getName() << endl;
+		if (valueType == "int8_t") {
+			BOOST_CHECK(valueType == "int8_t");		
+			vector<int8_t> valueArray = pvSet.csManager->getProcessArray<int8_t>(oneProcessVariable->getName())->get();
+				
+			if(valueArray.size() == 1) {
+				int8_t newValue;
+				BOOST_CHECK(test->getValue_int8_t() == 0);
+				newValue = 100;
+
+				test->setValue_int8_t(newValue);
+				// Check value on controlsystemmanager side
+				vector<int8_t> csValueArray = pvSet.csManager->getProcessArray<int8_t>(oneProcessVariable->getName())->get();
+				BOOST_CHECK(csValueArray.size() == 1);
+				BOOST_CHECK(csValueArray.at(0) == 100);
+			}
+			else {
+				// if Array
 				std::vector<int8_t> newVector(test->getValue_Array_int8_t().size());
-				for(int8_t value: test->getValue_Array_int8_t()) {
+				int32_t i = 0;
+				for(auto value : test->getValue_Array_int8_t()) {
 					BOOST_CHECK(value == 0);
-					newVector.at(i) = 100-i;
+					newVector.at(i) = (100-i);
 					i++;
 				}
 				test->setValue_Array_int8_t(newVector);
+
+				// Check value on controlsystemmanager side
+				vector<int8_t> valueArray = pvSet.csManager->getProcessArray<int8_t>(oneProcessVariable->getName())->get();
+				i = 0;
+				for(auto value : valueArray) {
+					BOOST_CHECK(value == (100-i));
+					i++;
+				}
 			}
-			else if (valueType == "uint8_t") {
-				BOOST_CHECK(valueType == "uint8_t");
-				int32_t i = 0;
+		}
+		else if (valueType == "uint8_t") {
+			BOOST_CHECK(valueType == "uint8_t");
+			vector<uint8_t> valueArray = pvSet.csManager->getProcessArray<uint8_t>(oneProcessVariable->getName())->get();
+				
+			if(valueArray.size() == 1) {
+				uint8_t newValue;
+				BOOST_CHECK(test->getValue_uint8_t() == 0);
+				newValue = 100;
+
+				test->setValue_uint8_t(newValue);
+				// Check value on controlsystemmanager side
+				vector<uint8_t> csValueArray = pvSet.csManager->getProcessArray<uint8_t>(oneProcessVariable->getName())->get();
+				BOOST_CHECK(csValueArray.size() == 1);
+				BOOST_CHECK(csValueArray.at(0) == 100);
+			} 
+			else {
+				// if Array
 				std::vector<uint8_t> newVector(test->getValue_Array_uint8_t().size());
+				int32_t i = 0;
 				for(uint8_t value: test->getValue_Array_uint8_t()) {
 					BOOST_CHECK(value == 0);
 					newVector.at(i) = 100-i;
 					i++;
 				}
 				test->setValue_Array_uint8_t(newVector);
+				vector<uint8_t> valueArray = pvSet.csManager->getProcessArray<uint8_t>(oneProcessVariable->getName())->get();
+				i = 0;
+				for(auto value : valueArray) {
+					BOOST_CHECK(value == (100-i));
+					i++;
+				}
 			}
-			else if (valueType == "int16_t") {
-				BOOST_CHECK(valueType == "int16_t");
+		}
+		else if (valueType == "int16_t") {
+			BOOST_CHECK(valueType == "int16_t");
+			vector<int16_t> valueArray = pvSet.csManager->getProcessArray<int16_t>(oneProcessVariable->getName())->get();
+				
+			if(valueArray.size() == 1) {
+				int16_t newValue;
+				BOOST_CHECK(test->getValue_int16_t() == 0);
+				newValue = 100;
+
+				test->setValue_int16_t(newValue);
+				// Check value on controlsystemmanager side
+				vector<int16_t> csValueArray = pvSet.csManager->getProcessArray<int16_t>(oneProcessVariable->getName())->get();
+				BOOST_CHECK(csValueArray.size() == 1);
+				BOOST_CHECK(csValueArray.at(0) == 100);					
+			} 
+			else {
+				// if Array
 				int32_t i = 0;
 				std::vector<int16_t> newVector(test->getValue_Array_int16_t().size());
 				for(int16_t value: test->getValue_Array_int16_t()) {
@@ -98,9 +156,31 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_int16_t(newVector);
+				vector<int16_t> valueArray = pvSet.csManager->getProcessArray<int16_t>(oneProcessVariable->getName())->get();
+				i = 0;
+				for(auto value : valueArray) {
+					BOOST_CHECK(value == (100-i));
+					i++;
+				}
 			}
-			else if (valueType == "uint16_t") {
-				BOOST_CHECK(valueType == "uint16_t");
+		}
+		else if (valueType == "uint16_t") {
+			BOOST_CHECK(valueType == "uint16_t");
+			vector<uint16_t> valueArray = pvSet.csManager->getProcessArray<uint16_t>(oneProcessVariable->getName())->get();
+				
+			if(valueArray.size() == 1) {
+				uint16_t newValue;
+				BOOST_CHECK(test->getValue_uint16_t() == 0);
+				newValue = 100;
+
+				test->setValue_uint16_t(newValue);
+				// Check value on controlsystemmanager side
+				vector<uint16_t> csValueArray = pvSet.csManager->getProcessArray<uint16_t>(oneProcessVariable->getName())->get();
+				BOOST_CHECK(csValueArray.size() == 1);
+				BOOST_CHECK(csValueArray.at(0) == 100);					
+			} 
+			else {
+				// if Array
 				int32_t i = 0;
 				std::vector<uint16_t> newVector(test->getValue_Array_uint16_t().size());
 				for(uint16_t value: test->getValue_Array_uint16_t()) {
@@ -109,9 +189,31 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_uint16_t(newVector);
+				vector<uint16_t> valueArray = pvSet.csManager->getProcessArray<uint16_t>(oneProcessVariable->getName())->get();
+				i = 0;
+				for(auto value : valueArray) {
+					BOOST_CHECK(value == (100-i));
+					i++;
+				}
 			}
-			else if (valueType == "int32_t") {
-				BOOST_CHECK(valueType == "int32_t");
+		}
+		else if (valueType == "int32_t") {
+			BOOST_CHECK(valueType == "int32_t");
+			vector<int32_t> valueArray = pvSet.csManager->getProcessArray<int32_t>(oneProcessVariable->getName())->get();
+				
+			if(valueArray.size() == 1) {
+				int32_t newValue;
+				BOOST_CHECK(test->getValue_int32_t() == 0);
+				newValue = 100;
+
+				test->setValue_int32_t(newValue);
+				// Check value on controlsystemmanager side
+				vector<int32_t> csValueArray = pvSet.csManager->getProcessArray<int32_t>(oneProcessVariable->getName())->get();
+				BOOST_CHECK(csValueArray.size() == 1);
+				BOOST_CHECK(csValueArray.at(0) == 100);					
+			} 
+			else {
+				// if Array
 				int32_t i = 0;
 				std::vector<int32_t> newVector(test->getValue_Array_int32_t().size());
 				for(int32_t value : test->getValue_Array_int32_t()){
@@ -120,9 +222,31 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_int32_t(newVector);
+				vector<int32_t> valueArray = pvSet.csManager->getProcessArray<int32_t>(oneProcessVariable->getName())->get();
+				i = 0;
+				for(auto value : valueArray) {
+					BOOST_CHECK(value == (100-i));
+					i++;
+				}
 			}
-			else if (valueType == "uint32_t") {
-				BOOST_CHECK(valueType == "uint32_t");
+		}
+		else if (valueType == "uint32_t") {
+			BOOST_CHECK(valueType == "uint32_t");
+			vector<uint32_t> valueArray = pvSet.csManager->getProcessArray<uint32_t>(oneProcessVariable->getName())->get();
+				
+			if(valueArray.size() == 1) {
+				uint32_t newValue;
+				BOOST_CHECK(test->getValue_uint32_t() == 0);
+				newValue = 100;
+
+				test->setValue_uint32_t(newValue);
+				// Check value on controlsystemmanager side
+				vector<uint32_t> csValueArray = pvSet.csManager->getProcessArray<uint32_t>(oneProcessVariable->getName())->get();
+				BOOST_CHECK(csValueArray.size() == 1);
+				BOOST_CHECK(csValueArray.at(0) == 100);					
+			} 
+			else {
+				// if Array
 				int32_t i = 0;
 				std::vector<uint32_t> newVector(test->getValue_Array_uint32_t().size());
 				for(uint32_t value: test->getValue_Array_uint32_t()) {
@@ -131,9 +255,32 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_uint32_t(newVector);
+				vector<uint32_t> valueArray = pvSet.csManager->getProcessArray<uint32_t>(oneProcessVariable->getName())->get();
+				i = 0;
+				for(auto value : valueArray) {
+					uint32_t merk = 100-i;
+					BOOST_CHECK(value == merk);
+					i++;
+				}
 			}
-			else if (valueType == "float") {
-				BOOST_CHECK(valueType == "float");
+		}
+		else if (valueType == "float") {
+			BOOST_CHECK(valueType == "float");
+			vector<float> valueArray = pvSet.csManager->getProcessArray<float>(oneProcessVariable->getName())->get();
+				
+			if(valueArray.size() == 1) {
+				float newValue;
+				BOOST_CHECK(test->getValue_float() == 0);
+				newValue = 100;
+
+				test->setValue_float(newValue);
+				// Check value on controlsystemmanager side
+				vector<float> csValueArray = pvSet.csManager->getProcessArray<float>(oneProcessVariable->getName())->get();
+				BOOST_CHECK(csValueArray.size() == 1);
+				BOOST_CHECK(csValueArray.at(0) == 100);
+			} 
+			else {
+				// if Array
 				int32_t i = 0;
 				std::vector<float> newVector(test->getValue_Array_float().size());
 				for(float value: test->getValue_Array_float()) {
@@ -142,9 +289,31 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_float(newVector);
+				vector<float> valueArray = pvSet.csManager->getProcessArray<float>(oneProcessVariable->getName())->get();
+				i = 0;
+				for(auto value : valueArray) {
+					BOOST_CHECK(value == (100-i));
+					i++;
+				}
 			}
-			else if (valueType == "double") {
-				BOOST_CHECK(valueType == "double");
+		}
+		else if (valueType == "double") {
+			BOOST_CHECK(valueType == "double");
+			vector<double> valueArray = pvSet.csManager->getProcessArray<double>(oneProcessVariable->getName())->get();
+
+			if(valueArray.size() == 1) {
+				double newValue;
+				BOOST_CHECK(test->getValue_double() == 0);
+				newValue = 100;
+				
+				test->setValue_double(newValue);
+				// Check value on controlsystemmanager side
+				vector<double> csValueArray = pvSet.csManager->getProcessArray<double>(oneProcessVariable->getName())->get();
+				BOOST_CHECK(csValueArray.size() == 1);
+				BOOST_CHECK(csValueArray.at(0) == 100);
+			} 
+			else {
+				// if Array
 				int32_t i = 0;
 				vector<double> newVector(test->getValue_Array_double().size());
 				for(double value: test->getValue_Array_double()) {
@@ -153,17 +322,25 @@ void ProcessVariableTest::testEmptySet(){
 					i++;
 				}
 				test->setValue_Array_double(newVector);
+				vector<double> valueArray = pvSet.csManager->getProcessArray<double>(oneProcessVariable->getName())->get();
+				i = 0;
+				for(auto value : valueArray) {
+					BOOST_CHECK(value == (100-i));
+					i++;
+				}
 			}
-			else BOOST_CHECK(false);
-		const UA_NodeId nodeId = test->getOwnNodeId();
-		BOOST_CHECK(!UA_NodeId_isNull(&nodeId));
+		}
+		else BOOST_CHECK(false);	
+	
+	const UA_NodeId nodeId = test->getOwnNodeId();
+	BOOST_CHECK(!UA_NodeId_isNull(&nodeId));
 		
-		string newName = "";
-		newName = oneProcessVariable->getName();
-		// Should not being changed
-		BOOST_CHECK(test->getName() != "");
+	string newName = "";
+	newName = oneProcessVariable->getName();
+	// Should not being changed
+	BOOST_CHECK(test->getName() != "");
 		
-		test->~ua_processvariable();
+	test->~ua_processvariable();
 	}
   
 	serverSet->runUAServer = UA_FALSE;
@@ -182,6 +359,7 @@ void ProcessVariableTest::testEmptySet(){
  	delete serverThread;
  	serverThread = NULL;
 };
+
 
 void ProcessVariableTest::testClientSide(){ 
 	std::cout << "Enter ProcessVariableTest with ExampleSet and ClientSide testing" << std::endl;
@@ -564,7 +742,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(value == 0);
 													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
-													double newValue = 123.123;
+													double newValue = 123.12;
 													UA_Variant_init(valueToCheck);
 													UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_DOUBLE]);
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
@@ -592,7 +770,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(value == 0);
 													//cout << "Wert: " << std::to_string(value) << endl;
 													// set new value
-													float newValue = 123.123;
+													float newValue = 123.12;
 													UA_Variant_init(valueToCheck);
 													UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_FLOAT]);
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
@@ -987,7 +1165,7 @@ void ProcessVariableTest::testClientSide(){
 class ProcessVariableTestSuite: public test_suite {
 	public:
 		ProcessVariableTestSuite() : test_suite("ua_processvariable Test Suite") {
-			add(BOOST_TEST_CASE(&ProcessVariableTest::testEmptySet));
+			add(BOOST_TEST_CASE(&ProcessVariableTest::testClassSide));
 			add(BOOST_TEST_CASE(&ProcessVariableTest::testClientSide));
     }
 };

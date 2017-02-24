@@ -53,13 +53,8 @@ using namespace ChimeraTK;
 using namespace std;
 
 ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
-	if(!configFile.empty()) {
-		this->fileHandler = new xml_file_handler(configFile);
-		this->readConfig();
-	}
-	else {
-		cout << "No <serverConfig>-Tag in config file. Use default server configuration." << endl;
-	}
+	this->fileHandler = new xml_file_handler(configFile);
+	this->readConfig();
 	
 	this->constructServer();
 	
@@ -152,6 +147,9 @@ void ua_uaadapter::readConfig() {
 			this->serverConfig.username = placeHolder;
 		}
 	}
+	else {
+			cout << "Login aktiviert" << endl;
+	}
 	
 	result = this->fileHandler->getNodeSet(xpath +"//serverConfig");	
 	if(result) {
@@ -173,7 +171,7 @@ void ua_uaadapter::readConfig() {
 		}
 	}
 	else {
-		cout << "No <serverConfig>-Tag in config file. Use default server configuration." << endl;
+		cout << "No <serverConfig>-Tag in config file. Use default port and application name configuration." << endl;
 	}
 }
 

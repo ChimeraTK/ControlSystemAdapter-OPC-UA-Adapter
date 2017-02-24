@@ -26,8 +26,13 @@ void UAAdapterTest::testExampleSet() {
 	xml_file_handler *xmlHandler = new xml_file_handler("./uamapping_test_2.xml");
 		
 	// Test config handling
-	BOOST_CHECK_THROW(ua_uaadapter ua_uaadapter("./uamapping_test_twoconfigs.xml"), runtime_error);
+	BOOST_CHECK_THROW(ua_uaadapter("./uamapping_test_twoconfigs.xml"), runtime_error);
 	
+	ua_uaadapter *ad1 = new ua_uaadapter("./uamapping_test_applicationismissing.xml");
+	ad1 = new ua_uaadapter("./uamapping_test_configismissing.xml");
+	ad1 = new ua_uaadapter("./uamapping_test_notwellformed.xml");
+	ad1 = new ua_uaadapter("./uamapping_test_portismissung.xml");
+
 	// is Server running?
 	adapter->doStart();
 	BOOST_CHECK(adapter->isRunning() == true);
