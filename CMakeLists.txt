@@ -318,7 +318,6 @@ target_link_libraries(${PROJECT_NAME}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
   ${Boost_CHRONO_LIBRARY}
-  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
 )
 target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
 
