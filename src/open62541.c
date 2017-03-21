@@ -1,21 +1,18 @@
 /* THIS IS A SINGLE-FILE DISTRIBUTION CONCATENATED FROM THE OPEN62541 SOURCES
  * visit http://open62541.org/ for information about this software
- * Git-Revision: 0.2-rc2
+ * Git-Revision: undefined
  */
 
 /*
  * Copyright (C) 2014-2016 the contributors as stated in the AUTHORS file
  *
  * This file is part of open62541. open62541 is free software: you can
- * redistribute it and/or modify it under the terms of the GNU Lesser General
- * Public License, version 3 (as published by the Free Software Foundation) with
- * a static linking exception as stated in the LICENSE file provided with
- * open62541.
+ * redistribute it and/or modify it under the terms of the Mozilla Public
+ * License v2.0 as stated in the LICENSE file provided with open62541.
  *
  * open62541 is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
+ * A PARTICULAR PURPOSE.
  */
 
 #ifndef UA_DYNAMIC_LINKING_EXPORT
@@ -731,6 +728,10 @@ int __secs_to_tm(long long t, struct tm *tm);
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/ua_util.h" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 
 /* Assert */
@@ -823,13 +824,17 @@ UA_atomic_add(volatile uint32_t *addr, uint32_t increase) {
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/ua_types_encoding_binary.h" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 
 typedef UA_StatusCode (*UA_exchangeEncodeBuffer)(void *handle, UA_ByteString *buf, size_t offset);
 
 UA_StatusCode UA_EXPORT
 UA_encodeBinary(const void *src, const UA_DataType *type,
-                UA_exchangeEncodeBuffer exchangeBufferCallback, void *exchangeBufferCallbackHandle,
+                UA_exchangeEncodeBuffer exchangeCallback, void *exchangeHandle,
                 UA_ByteString *dst, size_t *offset) UA_FUNC_ATTR_WARN_UNUSED_RESULT;
 
 UA_StatusCode UA_EXPORT
@@ -842,7 +847,7 @@ size_t UA_calcSizeBinary(void *p, const UA_DataType *type);
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541-build/src_generated/ua_types_generated_encoding_binary.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd with script /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/generate_datatypes.py
- * on host WorkStation by user januil at 2017-01-18 04:03:46 */
+ * on host WorkStation by user januil at 2017-03-21 10:45:30 */
 
 
 /* Boolean */
@@ -2478,7 +2483,7 @@ UA_QueryFirstRequest_decodeBinary(const UA_ByteString *src, size_t *offset, UA_Q
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541-build/src_generated/ua_transport_generated.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd, Custom.Opc.Ua.Transport.bsd with script /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/generate_datatypes.py
- * on host WorkStation by user januil at 2017-01-18 04:03:46 */
+ * on host WorkStation by user januil at 2017-03-21 10:45:30 */
 
 
 #ifdef __cplusplus
@@ -2491,7 +2496,7 @@ extern "C" {
  * Every type is assigned an index in an array containing the type descriptions.
  * These descriptions are used during type handling (copying, deletion,
  * binary encoding, ...). */
-#define UA_TRANSPORT_COUNT 11
+#define UA_TRANSPORT_COUNT 12
 extern UA_EXPORT const UA_DataType UA_TRANSPORT[UA_TRANSPORT_COUNT];
 
 /**
@@ -2533,6 +2538,17 @@ typedef struct {
 #define UA_TRANSPORT_TCPHELLOMESSAGE 2
 
 /**
+ * TcpErrorMessage
+ * ^^^^^^^^^^^^^^^
+ * Error Message */
+typedef struct {
+    UA_UInt32 error;
+    UA_String reason;
+} UA_TcpErrorMessage;
+
+#define UA_TRANSPORT_TCPERRORMESSAGE 3
+
+/**
  * MessageType
  * ^^^^^^^^^^^
  * Message Type and whether the message contains an intermediate chunk */
@@ -2541,10 +2557,11 @@ typedef enum {
     UA_MESSAGETYPE_HEL = 0x4C4548,
     UA_MESSAGETYPE_MSG = 0x47534D,
     UA_MESSAGETYPE_OPN = 0x4E504F,
-    UA_MESSAGETYPE_CLO = 0x4F4C43
+    UA_MESSAGETYPE_CLO = 0x4F4C43,
+    UA_MESSAGETYPE_ERR = 0x525245
 } UA_MessageType;
 
-#define UA_TRANSPORT_MESSAGETYPE 3
+#define UA_TRANSPORT_MESSAGETYPE 4
 
 /**
  * AsymmetricAlgorithmSecurityHeader
@@ -2556,7 +2573,7 @@ typedef struct {
     UA_ByteString receiverCertificateThumbprint;
 } UA_AsymmetricAlgorithmSecurityHeader;
 
-#define UA_TRANSPORT_ASYMMETRICALGORITHMSECURITYHEADER 4
+#define UA_TRANSPORT_ASYMMETRICALGORITHMSECURITYHEADER 5
 
 /**
  * TcpAcknowledgeMessage
@@ -2570,7 +2587,7 @@ typedef struct {
     UA_UInt32 maxChunkCount;
 } UA_TcpAcknowledgeMessage;
 
-#define UA_TRANSPORT_TCPACKNOWLEDGEMESSAGE 5
+#define UA_TRANSPORT_TCPACKNOWLEDGEMESSAGE 6
 
 /**
  * SequenceHeader
@@ -2581,7 +2598,7 @@ typedef struct {
     UA_UInt32 requestId;
 } UA_SequenceHeader;
 
-#define UA_TRANSPORT_SEQUENCEHEADER 6
+#define UA_TRANSPORT_SEQUENCEHEADER 7
 
 /**
  * TcpMessageHeader
@@ -2592,7 +2609,7 @@ typedef struct {
     UA_UInt32 messageSize;
 } UA_TcpMessageHeader;
 
-#define UA_TRANSPORT_TCPMESSAGEHEADER 7
+#define UA_TRANSPORT_TCPMESSAGEHEADER 8
 
 /**
  * ChunkType
@@ -2604,7 +2621,7 @@ typedef enum {
     UA_CHUNKTYPE_ABORT = 0x41000000
 } UA_ChunkType;
 
-#define UA_TRANSPORT_CHUNKTYPE 8
+#define UA_TRANSPORT_CHUNKTYPE 9
 
 /**
  * SymmetricAlgorithmSecurityHeader
@@ -2614,7 +2631,7 @@ typedef struct {
     UA_UInt32 tokenId;
 } UA_SymmetricAlgorithmSecurityHeader;
 
-#define UA_TRANSPORT_SYMMETRICALGORITHMSECURITYHEADER 9
+#define UA_TRANSPORT_SYMMETRICALGORITHMSECURITYHEADER 10
 
 /**
  * SecureConversationMessageHeader
@@ -2625,7 +2642,7 @@ typedef struct {
     UA_UInt32 secureChannelId;
 } UA_SecureConversationMessageHeader;
 
-#define UA_TRANSPORT_SECURECONVERSATIONMESSAGEHEADER 10
+#define UA_TRANSPORT_SECURECONVERSATIONMESSAGEHEADER 11
 
 #ifdef __cplusplus
 } // extern "C"
@@ -2635,7 +2652,7 @@ typedef struct {
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541-build/src_generated/ua_transport_generated_handling.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd, Custom.Opc.Ua.Transport.bsd with script /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/generate_datatypes.py
- * on host WorkStation by user januil at 2017-01-18 04:03:46 */
+ * on host WorkStation by user januil at 2017-03-21 10:45:30 */
 
 
 #ifdef __cplusplus
@@ -2726,6 +2743,32 @@ UA_TcpHelloMessage_deleteMembers(UA_TcpHelloMessage *p) {
 static UA_INLINE void
 UA_TcpHelloMessage_delete(UA_TcpHelloMessage *p) {
     UA_delete(p, &UA_TRANSPORT[UA_TRANSPORT_TCPHELLOMESSAGE]);
+}
+
+/* TcpErrorMessage */
+static UA_INLINE void
+UA_TcpErrorMessage_init(UA_TcpErrorMessage *p) {
+    memset(p, 0, sizeof(UA_TcpErrorMessage));
+}
+
+static UA_INLINE UA_TcpErrorMessage *
+UA_TcpErrorMessage_new(void) {
+    return (UA_TcpErrorMessage*)UA_new(&UA_TRANSPORT[UA_TRANSPORT_TCPERRORMESSAGE]);
+}
+
+static UA_INLINE UA_StatusCode
+UA_TcpErrorMessage_copy(const UA_TcpErrorMessage *src, UA_TcpErrorMessage *dst) {
+    return UA_copy(src, dst, &UA_TRANSPORT[UA_TRANSPORT_TCPERRORMESSAGE]);
+}
+
+static UA_INLINE void
+UA_TcpErrorMessage_deleteMembers(UA_TcpErrorMessage *p) {
+    UA_deleteMembers(p, &UA_TRANSPORT[UA_TRANSPORT_TCPERRORMESSAGE]);
+}
+
+static UA_INLINE void
+UA_TcpErrorMessage_delete(UA_TcpErrorMessage *p) {
+    UA_delete(p, &UA_TRANSPORT[UA_TRANSPORT_TCPERRORMESSAGE]);
 }
 
 /* MessageType */
@@ -2941,7 +2984,7 @@ UA_SecureConversationMessageHeader_delete(UA_SecureConversationMessageHeader *p)
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541-build/src_generated/ua_transport_generated_encoding_binary.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd, Custom.Opc.Ua.Transport.bsd with script /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/generate_datatypes.py
- * on host WorkStation by user januil at 2017-01-18 04:03:46 */
+ * on host WorkStation by user januil at 2017-03-21 10:45:30 */
 
 
 /* SecureConversationMessageAbortBody */
@@ -2972,6 +3015,16 @@ UA_TcpHelloMessage_encodeBinary(const UA_TcpHelloMessage *src, UA_ByteString *ds
 static UA_INLINE UA_StatusCode
 UA_TcpHelloMessage_decodeBinary(const UA_ByteString *src, size_t *offset, UA_TcpHelloMessage *dst) {
     return UA_decodeBinary(src, offset, dst, &UA_TRANSPORT[UA_TRANSPORT_TCPHELLOMESSAGE]);
+}
+
+/* TcpErrorMessage */
+static UA_INLINE UA_StatusCode
+UA_TcpErrorMessage_encodeBinary(const UA_TcpErrorMessage *src, UA_ByteString *dst, size_t *offset) {
+    return UA_encodeBinary(src, &UA_TRANSPORT[UA_TRANSPORT_TCPERRORMESSAGE], NULL, NULL, dst, offset);
+}
+static UA_INLINE UA_StatusCode
+UA_TcpErrorMessage_decodeBinary(const UA_ByteString *src, size_t *offset, UA_TcpErrorMessage *dst) {
+    return UA_decodeBinary(src, offset, dst, &UA_TRANSPORT[UA_TRANSPORT_TCPERRORMESSAGE]);
 }
 
 /* MessageType */
@@ -3056,10 +3109,13 @@ UA_SecureConversationMessageHeader_decodeBinary(const UA_ByteString *src, size_t
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/ua_connection_internal.h" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
-/**
- * The network layer may receive chopped up messages since TCP is a streaming
+
+/* The network layer may receive chopped up messages since TCP is a streaming
  * protocol. Furthermore, the networklayer may operate on ringbuffers or
  * statically assigned memory.
  *
@@ -3074,31 +3130,53 @@ UA_SecureConversationMessageHeader_decodeBinary(const UA_ByteString *src, size_t
  * @param realloced The Boolean value is set to true if the outgoing message has
  *        been reallocated from the network layer.
  * @return Returns UA_STATUSCODE_GOOD or an error code. When an error occurs, the ingoing message
- *         and the current buffer in the connection are freed.
+ *         and the current buffer in the connection are freed. */
+UA_StatusCode
+UA_Connection_completeMessages(UA_Connection *connection, UA_ByteString *message,
+                               UA_Boolean *realloced);
+
+/* Try to receive at least one complete chunk on the connection. This blocks the
+ * current thread up to the given timeout.
+ *
+ * @param connection The connection
+ * @param chunk The received chunk. The memory is allocated either by the
+ *        networklayer or internally.
+ * @param realloced The Boolean value is set to true if the chunk has been
+ *        reallocated from the network layer.
+ * @param timeout The timeout (in milliseconds) the method will block at most.
+ * @return Returns UA_STATUSCODE_GOOD or an error code. When an error occurs,
+ *         the chunk buffer is returned empty. Upon a timeout,
+ *         UA_STATUSCODE_GOODNONCRITICALTIMEOUT is returned.
  */
 UA_StatusCode
-UA_Connection_completeMessages(UA_Connection *connection, UA_ByteString * UA_RESTRICT message,
-                               UA_Boolean * UA_RESTRICT realloced);
+UA_Connection_receiveChunksBlocking(UA_Connection *connection, UA_ByteString *chunks,
+                                    UA_Boolean *realloced, UA_UInt32 timeout);
 
-void UA_EXPORT UA_Connection_detachSecureChannel(UA_Connection *connection);
-void UA_EXPORT UA_Connection_attachSecureChannel(UA_Connection *connection, UA_SecureChannel *channel);
+void UA_Connection_detachSecureChannel(UA_Connection *connection);
+void UA_Connection_attachSecureChannel(UA_Connection *connection, UA_SecureChannel *channel);
 
-/**
- * EndpointURL helper
- */
-
-/**
- * Split the given endpoint url into hostname and port. Some of the chunks are returned as pointer.
+/* Split the given endpoint url into hostname and port. Some of the chunks are
+ * returned as pointer.
  * @param endpointUrl The endpoint URL to split up
  * @param hostname the target array for hostname. Has to be at least 256 size.
- * @param port if url contains port, it will point to the beginning of port. NULL otherwise. It may also include the path part, thus stop at position of path pointer, if it is not NULL.
- * @param path points to the first occurance of '/' after the port or NULL if no path in url
- * @return UA_STATUSCODE_BADOUTOFRANGE if url too long, UA_STATUSCODE_BADATTRIBUTEIDINVALID if url not starting with 'opc.tcp://', UA_STATUSCODE_GOOD on success
- */
-UA_StatusCode UA_EXPORT UA_EndpointUrl_split_ptr(const char *endpointUrl, char *hostname, const char ** port, const char ** path);
+ * @param port if url contains port, it will point to the beginning of port.
+ *        NULL otherwise. It may also include the path part, thus stop at
+ *        position of path pointer, if it is not NULL.
+ * @param path points to the first occurance of '/' after the port or NULL if no
+ *        path in url
+ * @return UA_STATUSCODE_BADOUTOFRANGE if url too long,
+ *         UA_STATUSCODE_BADATTRIBUTEIDINVALID if url not starting with
+ *         'opc.tcp://', UA_STATUSCODE_GOOD on success */
+UA_StatusCode
+UA_EndpointUrl_split_ptr(const char *endpointUrl, char *hostname,
+                         const char ** port, const char ** path);
 
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/ua_securechannel.h" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 
@@ -3204,6 +3282,10 @@ UA_SecureChannel_processChunks(UA_SecureChannel *channel, const UA_ByteString *c
 
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_nodes.h" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 #ifdef __cplusplus
@@ -3590,6 +3672,10 @@ typedef struct {
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/ua_session.h" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 
 #define UA_MAXCONTINUATIONPOINTS 5
@@ -3705,6 +3791,10 @@ UA_Session_getUniqueSubscriptionID(UA_Session *session);
 
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_subscription.h" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 
@@ -3833,6 +3923,10 @@ UA_Subscription_answerPublishRequestsNoSubscription(UA_Server *server,
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_nodestore.h" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -3927,6 +4021,10 @@ void UA_NodeStore_iterate(UA_NodeStore *ns, UA_NodeStore_nodeVisitor visitor);
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_session_manager.h" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 
 typedef struct session_list_entry {
@@ -3943,22 +4041,26 @@ typedef struct UA_SessionManager {
 UA_StatusCode
 UA_SessionManager_init(UA_SessionManager *sm, UA_Server *server);
 
-void UA_SessionManager_deleteMembers(UA_SessionManager *sessionManager);
+void UA_SessionManager_deleteMembers(UA_SessionManager *sm);
 
-void UA_SessionManager_cleanupTimedOut(UA_SessionManager *sessionManager, UA_DateTime nowMonotonic);
+void UA_SessionManager_cleanupTimedOut(UA_SessionManager *sm, UA_DateTime nowMonotonic);
 
 UA_StatusCode
-UA_SessionManager_createSession(UA_SessionManager *sessionManager, UA_SecureChannel *channel,
+UA_SessionManager_createSession(UA_SessionManager *sm, UA_SecureChannel *channel,
                                 const UA_CreateSessionRequest *request, UA_Session **session);
 
 UA_StatusCode
-UA_SessionManager_removeSession(UA_SessionManager *sessionManager, const UA_NodeId *token);
+UA_SessionManager_removeSession(UA_SessionManager *sm, const UA_NodeId *token);
 
 UA_Session *
-UA_SessionManager_getSession(UA_SessionManager *sessionManager, const UA_NodeId *token);
+UA_SessionManager_getSession(UA_SessionManager *sm, const UA_NodeId *token);
 
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_securechannel_manager.h" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 
@@ -4001,12 +4103,20 @@ UA_SecureChannelManager_close(UA_SecureChannelManager *cm, UA_UInt32 channelId);
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_server_internal.h" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 
 #define ANONYMOUS_POLICY "open62541-anonymous-policy"
 #define USERNAME_POLICY "open62541-username-policy"
 
-/* liburcu includes */
+/* The general idea of RCU is to delay freeing nodes (or any callback invoked
+ * with call_rcu) until all threads have left their critical section. Thus we
+ * can delete nodes safely in concurrent operations. The macros UA_RCU_LOCK and
+ * UA_RCU_UNLOCK are used to test during debugging that we do not nest read-side
+ * critical sections (although this is generally allowed). */
 #ifdef UA_ENABLE_MULTITHREADING
 # define _LGPL_SOURCE
 # include <urcu.h>
@@ -4027,7 +4137,7 @@ UA_SecureChannelManager_close(UA_SecureChannelManager *cm, UA_UInt32 channelId);
 #   define UA_RCU_UNLOCK() do {                   \
         UA_ASSERT_RCU_LOCKED();                   \
         rcu_locked = false;                       \
-        rcu_read_lock(); } while(0)
+        rcu_read_unlock(); } while(0)
 # endif
 #else
 # define UA_RCU_LOCK()
@@ -4037,8 +4147,8 @@ UA_SecureChannelManager_close(UA_SecureChannelManager *cm, UA_UInt32 channelId);
 #endif
 
 #ifdef UA_ENABLE_EXTERNAL_NAMESPACES
-/** Mapping of namespace-id and url to an external nodestore. For namespaces
-    that have no mapping defined, the internal nodestore is used by default. */
+/* Mapping of namespace-id and url to an external nodestore. For namespaces that
+ * have no mapping defined, the internal nodestore is used by default. */
 typedef struct UA_ExternalNamespace {
     UA_UInt16 index;
     UA_String url;
@@ -4096,6 +4206,7 @@ struct UA_Server {
                                           by worker threads */
     struct DelayedJobs *delayedJobs;
     pthread_cond_t dispatchQueue_condition; /* so the workers don't spin if the queue is empty */
+    pthread_mutex_t dispatchQueue_mutex; /* mutex for access to condition variable */
     struct cds_wfcq_tail dispatchQueue_tail; /* Dispatch queue tail for the worker threads */
 #endif
 
@@ -4118,7 +4229,8 @@ typedef UA_StatusCode (*UA_EditNodeCallback)(UA_Server*, UA_Session*, UA_Node*, 
 UA_StatusCode UA_Server_editNode(UA_Server *server, UA_Session *session, const UA_NodeId *nodeId,
                                  UA_EditNodeCallback callback, const void *data);
 
-void UA_Server_processBinaryMessage(UA_Server *server, UA_Connection *connection, const UA_ByteString *msg);
+void UA_Server_processBinaryMessage(UA_Server *server, UA_Connection *connection,
+                                    const UA_ByteString *message);
 
 UA_StatusCode UA_Server_delayedCallback(UA_Server *server, UA_ServerCallback callback, void *data);
 UA_StatusCode UA_Server_delayedFree(UA_Server *server, void *data);
@@ -4142,6 +4254,8 @@ Service_AddNodes_existing(UA_Server *server, UA_Session *session, UA_Node *node,
 UA_StatusCode
 parse_numericrange(const UA_String *str, UA_NumericRange *range);
 
+UA_UInt16 addNamespace(UA_Server *server, const UA_String name);
+
 UA_Boolean
 UA_Node_hasSubTypeOrInstances(const UA_Node *node);
 
@@ -4159,8 +4273,9 @@ UA_StatusCode
 getTypeHierarchy(UA_NodeStore *ns, const UA_Node *rootRef, UA_Boolean inverse,
                  UA_NodeId **typeHierarchy, size_t *typeHierarchySize);
 
+/* Recursively searches "upwards" in the tree following specific reference types */
 UA_Boolean
-isNodeInTree(UA_NodeStore *ns, const UA_NodeId *rootNode,
+isNodeInTree(UA_NodeStore *ns, const UA_NodeId *leafNode,
              const UA_NodeId *nodeToFind, const UA_NodeId *referenceTypeIds,
              size_t referenceTypeIdsSize);
 
@@ -4172,13 +4287,13 @@ getNodeType(UA_Server *server, const UA_Node *node);
 /***************************************/
 
 UA_StatusCode
-readValueAttribute(const UA_VariableNode *vn, UA_DataValue *v);
+readValueAttribute(UA_Server *server, const UA_VariableNode *vn, UA_DataValue *v);
 
 UA_StatusCode
-typeCheckValue(UA_Server *server, const UA_NodeId *variableDataTypeId,
-               UA_Int32 variableValueRank, size_t variableArrayDimensionsSize,
-               const UA_UInt32 *variableArrayDimensions, const UA_Variant *value,
-               const UA_NumericRange *range, UA_Variant *equivalent);
+typeCheckValue(UA_Server *server, const UA_NodeId *targetDataTypeId,
+               UA_Int32 targetValueRank, size_t targetArrayDimensionsSize,
+               const UA_UInt32 *targetArrayDimensions, const UA_Variant *value,
+               const UA_NumericRange *range, UA_Variant *editableValue);
 
 UA_StatusCode
 writeDataTypeAttribute(UA_Server *server, UA_VariableNode *node,
@@ -4191,7 +4306,7 @@ compatibleArrayDimensions(size_t constraintArrayDimensionsSize,
                           const UA_UInt32 *testArrayDimensions);
 
 UA_StatusCode
-writeValueRankAttribute(UA_VariableNode *node, UA_Int32 valueRank,
+writeValueRankAttribute(UA_Server *server, UA_VariableNode *node, UA_Int32 valueRank,
                         UA_Int32 constraintValueRank);
 
 UA_StatusCode
@@ -4237,6 +4352,10 @@ void Service_Call_single(UA_Server *server, UA_Session *session,
 
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_services.h" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 #ifdef __cplusplus
@@ -4538,6 +4657,10 @@ void Service_DeleteSubscriptions(UA_Server *server, UA_Session *session,
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/client/ua_client_internal.h" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 
 /**************************/
@@ -4546,37 +4669,38 @@ void Service_DeleteSubscriptions(UA_Server *server, UA_Session *session,
 
 #ifdef UA_ENABLE_SUBSCRIPTIONS
 
-typedef struct UA_Client_NotificationsAckNumber_s {
-    LIST_ENTRY(UA_Client_NotificationsAckNumber_s) listEntry;
+typedef struct UA_Client_NotificationsAckNumber {
+    LIST_ENTRY(UA_Client_NotificationsAckNumber) listEntry;
     UA_SubscriptionAcknowledgement subAck;
 } UA_Client_NotificationsAckNumber;
 
-typedef struct UA_Client_MonitoredItem_s {
-    LIST_ENTRY(UA_Client_MonitoredItem_s)  listEntry;
-    UA_UInt32 MonitoredItemId;
-    UA_UInt32 MonitoringMode;
+typedef struct UA_Client_MonitoredItem {
+    LIST_ENTRY(UA_Client_MonitoredItem)  listEntry;
+    UA_UInt32 monitoredItemId;
+    UA_UInt32 monitoringMode;
     UA_NodeId monitoredNodeId;
-    UA_UInt32 AttributeID;
-    UA_UInt32 ClientHandle;
-    UA_Double SamplingInterval;
-    UA_UInt32 QueueSize;
-    UA_Boolean DiscardOldest;
+    UA_UInt32 attributeID;
+    UA_UInt32 clientHandle;
+    UA_Double samplingInterval;
+    UA_UInt32 queueSize;
+    UA_Boolean discardOldest;
     void (*handler)(UA_UInt32 monId, UA_DataValue *value, void *context);
     void *handlerContext;
 } UA_Client_MonitoredItem;
 
-typedef struct UA_Client_Subscription_s {
-    LIST_ENTRY(UA_Client_Subscription_s) listEntry;
-    UA_UInt32 LifeTime;
-    UA_UInt32 KeepAliveCount;
-    UA_Double PublishingInterval;
-    UA_UInt32 SubscriptionID;
-    UA_UInt32 NotificationsPerPublish;
-    UA_UInt32 Priority;
-    LIST_HEAD(UA_ListOfClientMonitoredItems, UA_Client_MonitoredItem_s) MonitoredItems;
+typedef struct UA_Client_Subscription {
+    LIST_ENTRY(UA_Client_Subscription) listEntry;
+    UA_UInt32 lifeTime;
+    UA_UInt32 keepAliveCount;
+    UA_Double publishingInterval;
+    UA_UInt32 subscriptionID;
+    UA_UInt32 notificationsPerPublish;
+    UA_UInt32 priority;
+    LIST_HEAD(UA_ListOfClientMonitoredItems, UA_Client_MonitoredItem) monitoredItems;
 } UA_Client_Subscription;
 
 void UA_Client_Subscriptions_forceDelete(UA_Client *client, UA_Client_Subscription *sub);
+
 #endif
 
 /**********/
@@ -4591,12 +4715,16 @@ typedef enum {
 struct UA_Client {
     /* State */
     UA_ClientState state;
+    UA_ClientConfig config;
 
     /* Connection */
-    UA_Connection *connection;
-    UA_SecureChannel *channel;
+    UA_Connection connection;
     UA_String endpointUrl;
+
+    /* SecureChannel */
+    UA_SecureChannel channel;
     UA_UInt32 requestId;
+    UA_DateTime nextChannelRenewal;
 
     /* Authentication */
     UA_Client_Authentication authenticationMethod;
@@ -4608,18 +4736,13 @@ struct UA_Client {
     UA_NodeId authenticationToken;
     UA_UInt32 requestHandle;
     
+    /* Subscriptions */
 #ifdef UA_ENABLE_SUBSCRIPTIONS
     UA_UInt32 monitoredItemHandles;
-    LIST_HEAD(UA_ListOfUnacknowledgedNotificationNumbers, UA_Client_NotificationsAckNumber_s) pendingNotificationsAcks;
-    LIST_HEAD(UA_ListOfClientSubscriptionItems, UA_Client_Subscription_s) subscriptions;
+    LIST_HEAD(ListOfUnacknowledgedNotifications, UA_Client_NotificationsAckNumber) pendingNotificationsAcks;
+    LIST_HEAD(ListOfClientSubscriptionItems, UA_Client_Subscription) subscriptions;
 #endif
-    
-    /* Config */
-    UA_ClientConfig config;
-    UA_DateTime scRenewAt;
 };
-
-
 
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541-build/src_generated/ua_namespaceinit_generated.h" ***********************************/
@@ -4659,90 +4782,11 @@ struct UA_Client {
 extern UA_StatusCode ua_namespaceinit_generated(UA_Server *server);
 
 
-/*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_nodestore_hash.inc" ***********************************/
-
-typedef UA_UInt32 hash_t;
-
-static hash_t mod(hash_t h, hash_t size) { return h % size; }
-static hash_t mod2(hash_t h, hash_t size) { return 1 + (h % (size - 2)); }
-
-/* Based on Murmur-Hash 3 by Austin Appleby (public domain, freely usable) */
-static hash_t hash_array(const UA_Byte *data, UA_UInt32 len, UA_UInt32 seed) {
-    if(data == NULL)
-        return 0;
-
-    const int32_t nblocks = (int32_t)(len / 4);
-    const uint32_t *blocks;
-    static const uint32_t c1 = 0xcc9e2d51;
-    static const uint32_t c2 = 0x1b873593;
-    static const uint32_t r1 = 15;
-    static const uint32_t r2 = 13;
-    static const uint32_t m  = 5;
-    static const uint32_t n  = 0xe6546b64;
-    hash_t hash = seed;
-    /* Somce compilers emit a warning when casting from a byte array to ints. */
-#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 6) || __GNUC__ > 4 || defined(__clang__))
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-align"
-#endif
-    blocks = (const uint32_t *)data;
-#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 6) || __GNUC__ > 4 || defined(__clang__))
-#pragma GCC diagnostic pop
-#endif
-    for(int32_t i = 0;i < nblocks;i++) {
-        uint32_t k = blocks[i];
-        k    *= c1;
-        k     = (k << r1) | (k >> (32 - r1));
-        k    *= c2;
-        hash ^= k;
-        hash  = ((hash << r2) | (hash >> (32 - r2))) * m + n;
-    }
-
-    const uint8_t *tail = (const uint8_t *)(data + nblocks * 4);
-    uint32_t k1 = 0;
-    switch(len & 3) {
-    case 3:
-        k1 ^= (uint32_t)(tail[2] << 16);
-    case 2:
-        k1 ^= (uint32_t)(tail[1] << 8);
-    case 1:
-        k1   ^= tail[0];
-        k1   *= c1;
-        k1    = (k1 << r1) | (k1 >> (32 - r1));
-        k1   *= c2;
-        hash ^= k1;
-    }
-
-    hash ^= len;
-    hash ^= (hash >> 16);
-    hash *= 0x85ebca6b;
-    hash ^= (hash >> 13);
-    hash *= 0xc2b2ae35;
-    hash ^= (hash >> 16);
-    return hash;
-}
-
-static hash_t hash(const UA_NodeId *n) {
-    switch(n->identifierType) {
-    case UA_NODEIDTYPE_NUMERIC:
-        /*  Knuth's multiplicative hashing */
-        return (hash_t)((n->identifier.numeric + n->namespaceIndex) * 2654435761); // mod(2^32) is implicit
-    case UA_NODEIDTYPE_STRING:
-        return hash_array(n->identifier.string.data, (UA_UInt32)n->identifier.string.length,
-                          n->namespaceIndex);
-    case UA_NODEIDTYPE_GUID:
-        return hash_array((const UA_Byte*)&(n->identifier.guid), sizeof(UA_Guid), n->namespaceIndex);
-    case UA_NODEIDTYPE_BYTESTRING:
-        return hash_array((const UA_Byte*)n->identifier.byteString.data,
-                          (UA_UInt32)n->identifier.byteString.length, n->namespaceIndex);
-    default:
-        UA_assert(false);
-        return 0;
-    }
-}
-
-
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/ua_types.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 
@@ -4792,8 +4836,8 @@ UA_UInt32_random(void) {
 /* Builtin Types */
 /*****************/
 
-static void deleteMembers_noInit(void *, const UA_DataType *);
-static UA_StatusCode copy_noInit(const void *, void *, const UA_DataType *);
+static void deleteMembers_noInit(void *p, const UA_DataType *type);
+static UA_StatusCode copy_noInit(const void *src, void *dst, const UA_DataType *type);
 
 UA_String
 UA_String_fromChars(char const src[]) {
@@ -4812,11 +4856,11 @@ UA_String_fromChars(char const src[]) {
 }
 
 UA_Boolean
-UA_String_equal(const UA_String *string1, const UA_String *string2) {
-    if(string1->length != string2->length)
+UA_String_equal(const UA_String *s1, const UA_String *s2) {
+    if(s1->length != s2->length)
         return false;
-    UA_Int32 is = memcmp((char const*)string1->data,
-                         (char const*)string2->data, string1->length);
+    UA_Int32 is = memcmp((char const*)s1->data,
+                         (char const*)s2->data, s1->length);
     return (is == 0) ? true : false;
 }
 
@@ -5010,6 +5054,32 @@ UA_NodeId_equal(const UA_NodeId *n1, const UA_NodeId *n2) {
                                    &n2->identifier.byteString);
     }
     return false;
+}
+
+/* FNV non-cryptographic hash function. See
+ * https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function */
+#define FNV_PRIME_32 16777619
+static UA_UInt32
+fnv32(UA_UInt32 fnv, const UA_Byte *buf, size_t size) {
+    for(size_t i = 0; i < size; ++i) {
+        fnv = fnv ^ (buf[i]);
+        fnv = fnv * FNV_PRIME_32;
+    }
+    return fnv;
+}
+
+UA_UInt32
+UA_NodeId_hash(const UA_NodeId *n) {
+    switch(n->identifierType) {
+    case UA_NODEIDTYPE_NUMERIC:
+    default:
+        return (UA_UInt32)(n->namespaceIndex + (n->identifier.numeric * 2654435761)); /*  Knuth's multiplicative hashing */
+    case UA_NODEIDTYPE_STRING:
+    case UA_NODEIDTYPE_BYTESTRING:
+        return fnv32(n->namespaceIndex, n->identifier.string.data, n->identifier.string.length);
+    case UA_NODEIDTYPE_GUID:
+        return fnv32(n->namespaceIndex, (const UA_Byte*)&n->identifier.guid, sizeof(UA_Guid));
+    }
 }
 
 /* ExpandedNodeId */
@@ -5250,11 +5320,10 @@ copySubString(const UA_String *src, UA_String *dst,
 }
 
 UA_StatusCode
-UA_Variant_copyRange(const UA_Variant *orig_src, UA_Variant *dst,
+UA_Variant_copyRange(const UA_Variant *src, UA_Variant *dst,
                      const UA_NumericRange range) {
-    UA_Boolean isScalar = UA_Variant_isScalar(orig_src);
-    UA_Boolean stringLike = isStringLike(orig_src->type);
-    const UA_Variant *src = orig_src;
+    UA_Boolean isScalar = UA_Variant_isScalar(src);
+    UA_Boolean stringLike = isStringLike(src->type);
     UA_Variant arraySrc;
 
     /* Extract the range for copying at this level. The remaining range is dealt
@@ -5698,9 +5767,9 @@ UA_Array_new(size_t size, const UA_DataType *type) {
 }
 
 UA_StatusCode
-UA_Array_copy(const void *src, size_t src_size,
+UA_Array_copy(const void *src, size_t size,
               void **dst, const UA_DataType *type) {
-    if(src_size == 0) {
+    if(size == 0) {
         if(src == NULL)
             *dst = NULL;
         else
@@ -5712,25 +5781,25 @@ UA_Array_copy(const void *src, size_t src_size,
         return UA_STATUSCODE_BADINTERNALERROR;
 
     /* calloc, so we don't have to check retval in every iteration of copying */
-    *dst = UA_calloc(src_size, type->memSize);
+    *dst = UA_calloc(size, type->memSize);
     if(!*dst)
         return UA_STATUSCODE_BADOUTOFMEMORY;
 
     if(type->fixedSize) {
-        memcpy(*dst, src, type->memSize * src_size);
+        memcpy(*dst, src, type->memSize * size);
         return UA_STATUSCODE_GOOD;
     }
 
     uintptr_t ptrs = (uintptr_t)src;
     uintptr_t ptrd = (uintptr_t)*dst;
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
-    for(size_t i = 0; i < src_size; ++i) {
+    for(size_t i = 0; i < size; ++i) {
         retval |= UA_copy((void*)ptrs, (void*)ptrd, type);
         ptrs += type->memSize;
         ptrd += type->memSize;
     }
     if(retval != UA_STATUSCODE_GOOD) {
-        UA_Array_delete(*dst, src_size, type);
+        UA_Array_delete(*dst, size, type);
         *dst = NULL;
     }
     return retval;
@@ -5750,10 +5819,13 @@ UA_Array_delete(void *p, size_t size, const UA_DataType *type) {
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/ua_types_encoding_binary.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 /* Type Encoding
  * -------------
-
  * This file contains encoding functions for the builtin data types and generic
  * functions that operate on all types and arrays. This requires the type
  * description from a UA_DataType structure. Note that some internal (static)
@@ -5767,9 +5839,6 @@ UA_Array_delete(void *p, size_t size, const UA_DataType *type) {
  * encoding. This enables fast sending of large messages as spurious copying is
  * avoided. */
 
-/* There is no robust way to detect float endianness in clang. This warning can
- * be removed if the target is known to be little endian with floats in the IEEE
- * 754 format. */
 #if defined(__clang__)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic warning "-W#warnings"
@@ -5778,6 +5847,9 @@ UA_Array_delete(void *p, size_t size, const UA_DataType *type) {
 #ifndef UA_BINARY_OVERLAYABLE_INTEGER
 # warning Integer endianness could not be detected to be little endian. Use slow generic encoding.
 #endif
+
+/* There is no robust way to detect float endianness in clang. This warning can be removed
+ * if the target is known to be little endian with floats in the IEEE 754 format. */
 #ifndef UA_BINARY_OVERLAYABLE_FLOAT
 # warning Float endianness could not be detected to be little endian in the IEEE 754 format. Use slow generic encoding.
 #endif
@@ -5797,13 +5869,15 @@ typedef size_t (*UA_calcSizeBinarySignature)(const void *UA_RESTRICT p, const UA
 extern const UA_calcSizeBinarySignature calcSizeBinaryJumpTable[UA_BUILTIN_TYPES_COUNT + 1];
 
 /* We give pointers to the current position and the last position in the buffer
-   instead of a string with an offset. */
+ * instead of a string with an offset. */
 UA_THREAD_LOCAL UA_Byte * pos;
 UA_THREAD_LOCAL UA_Byte * end;
 
-/* The code UA_STATUSCODE_BADENCODINGLIMITSEXCEEDED is returned only when the
- * end of the buffer is reached. This error is caught. We then try to send the
- * current chunk and continue with the next. */
+/* The code UA_STATUSCODE_BADENCODINGLIMITSEXCEEDED is returned only when the end of the
+ * buffer is reached. When this StatusCode is received, we try to send the current chunk,
+ * replace the buffer and continue encoding. That way, memory-constrained servers need to
+ * allocate only the memory for the current chunk. And we avoid needless copying. Note:
+ * The only place where this is used from is UA_SecureChannel_sendBinaryMessage. */
 
 /* Thread-local buffers used for exchanging the buffer for chunking */
 UA_THREAD_LOCAL UA_ByteString *encodeBuf; /* the original buffer */
@@ -5816,7 +5890,7 @@ exchangeBuffer(void) {
     if(!exchangeBufferCallback)
         return UA_STATUSCODE_BADENCODINGERROR;
 
-    /* store context variables since chunk-sending might call UA_encode itself */
+    /* Store context variables since chunk-sending might call UA_encode itself */
     UA_ByteString *store_encodeBuf = encodeBuf;
     UA_exchangeEncodeBuffer store_exchangeBufferCallback = exchangeBufferCallback;
     void *store_exchangeBufferCallbackHandle = exchangeBufferCallbackHandle;
@@ -5824,12 +5898,14 @@ exchangeBuffer(void) {
     size_t offset = ((uintptr_t)pos - (uintptr_t)encodeBuf->data) / sizeof(UA_Byte);
     UA_StatusCode retval = exchangeBufferCallback(exchangeBufferCallbackHandle, encodeBuf, offset);
 
-    /* restore context variables */
+    /* Restore context variables. This restores the pointer to the buffer, not the buffer
+     * itself. This is required so that a call to UA_encode can be made from within the
+     * exchangeBufferCallback. For example to encode the chunk header */
     encodeBuf = store_encodeBuf;
     exchangeBufferCallback = store_exchangeBufferCallback;
     exchangeBufferCallbackHandle = store_exchangeBufferCallbackHandle;
 
-    /* set pos and end in order to continue encoding */
+    /* Set pos and end in order to continue encoding */
     pos = encodeBuf->data;
     end = &encodeBuf->data[encodeBuf->length];
     return retval;
@@ -5839,8 +5915,9 @@ exchangeBuffer(void) {
 /* Integer Types */
 /*****************/
 
-/* The following en/decoding functions are used only when the architecture isn't
-   little-endian. */
+#if !UA_BINARY_OVERLAYABLE_INTEGER
+
+/* These en/decoding functions are only used when the architecture isn't little-endian. */
 static void
 UA_encode16(const UA_UInt16 v, UA_Byte buf[2]) {
     buf[0] = (UA_Byte)v;
@@ -5863,9 +5940,9 @@ UA_encode32(const UA_UInt32 v, UA_Byte buf[4]) {
 static void
 UA_decode32(const UA_Byte buf[4], UA_UInt32 *v) {
     *v = (UA_UInt32)((UA_UInt32)buf[0] +
-                     (((UA_UInt32)buf[1]) << 8) +
-                     (((UA_UInt32)buf[2]) << 16) +
-                     (((UA_UInt32)buf[3]) << 24));
+                    (((UA_UInt32)buf[1]) << 8) +
+                    (((UA_UInt32)buf[2]) << 16) +
+                    (((UA_UInt32)buf[3]) << 24));
 }
 
 static void
@@ -5883,14 +5960,16 @@ UA_encode64(const UA_UInt64 v, UA_Byte buf[8]) {
 static void
 UA_decode64(const UA_Byte buf[8], UA_UInt64 *v) {
     *v = (UA_UInt64)((UA_UInt64)buf[0] +
-                     (((UA_UInt64)buf[1]) << 8) +
-                     (((UA_UInt64)buf[2]) << 16) +
-                     (((UA_UInt64)buf[3]) << 24) +
-                     (((UA_UInt64)buf[4]) << 32) +
-                     (((UA_UInt64)buf[5]) << 40) +
-                     (((UA_UInt64)buf[6]) << 48) +
-                     (((UA_UInt64)buf[7]) << 56));
+                    (((UA_UInt64)buf[1]) << 8) +
+                    (((UA_UInt64)buf[2]) << 16) +
+                    (((UA_UInt64)buf[3]) << 24) +
+                    (((UA_UInt64)buf[4]) << 32) +
+                    (((UA_UInt64)buf[5]) << 40) +
+                    (((UA_UInt64)buf[6]) << 48) +
+                    (((UA_UInt64)buf[7]) << 56));
 }
+
+#endif /* !UA_BINARY_OVERLAYABLE_INTEGER */
 
 /* Boolean */
 static UA_StatusCode
@@ -6185,7 +6264,59 @@ Double_decodeBinary(UA_Double *dst, const UA_DataType *_) {
 /******************/
 
 static UA_StatusCode
+Array_encodeBinaryOverlayable(uintptr_t ptr, size_t length, size_t elementMemSize) {
+    /* Store the number of already encoded elements */
+    size_t finished = 0;
+
+    /* Loop as long as more elements remain than fit into the chunk */
+    while(end < pos + (elementMemSize * (length-finished))) {
+        size_t possible = ((uintptr_t)end - (uintptr_t)pos) / (sizeof(UA_Byte) * elementMemSize);
+        size_t possibleMem = possible * elementMemSize;
+        memcpy(pos, (void*)ptr, possibleMem);
+        pos += possibleMem;
+        ptr += possibleMem;
+        finished += possible;
+        UA_StatusCode retval = exchangeBuffer();
+        if(retval != UA_STATUSCODE_GOOD)
+            return retval;
+    }
+
+    /* Encode the remaining elements */
+    memcpy(pos, (void*)ptr, elementMemSize * (length-finished));
+    pos += elementMemSize * (length-finished);
+    return UA_STATUSCODE_GOOD;
+}
+
+static UA_StatusCode
+Array_encodeBinaryComplex(uintptr_t ptr, size_t length, const UA_DataType *type) {
+    /* Get the encoding function for the data type. The jumptable at
+     * UA_BUILTIN_TYPES_COUNT points to the generic UA_encodeBinary method */
+    size_t encode_index = type->builtin ? type->typeIndex : UA_BUILTIN_TYPES_COUNT;
+    UA_encodeBinarySignature encodeType = encodeBinaryJumpTable[encode_index];
+
+    /* Encode every element */
+    for(size_t i = 0; i < length; ++i) {
+        UA_Byte *oldpos = pos;
+        UA_StatusCode retval = encodeType((const void*)ptr, type);
+        ptr += type->memSize;
+        /* Encoding failed, switch to the next chunk when possible */
+        if(retval != UA_STATUSCODE_GOOD) {
+            if(retval == UA_STATUSCODE_BADENCODINGLIMITSEXCEEDED) {
+                pos = oldpos; /* Set buffer position to the end of the last encoded element */
+                retval = exchangeBuffer();
+                ptr -= type->memSize; /* Undo to retry encoding the ith element */
+                --i;
+            }
+            if(retval != UA_STATUSCODE_GOOD)
+                return retval; /* Unrecoverable fail */
+        }
+    }
+    return UA_STATUSCODE_GOOD;
+}
+
+static UA_StatusCode
 Array_encodeBinary(const void *src, size_t length, const UA_DataType *type) {
+    /* Check and convert the array length to int32 */
     UA_Int32 signed_length = -1;
     if(length > UA_INT32_MAX)
         return UA_STATUSCODE_BADINTERNALERROR;
@@ -6193,71 +6324,46 @@ Array_encodeBinary(const void *src, size_t length, const UA_DataType *type) {
         signed_length = (UA_Int32)length;
     else if(src == UA_EMPTY_ARRAY_SENTINEL)
         signed_length = 0;
+
+    /* Encode the array length */
     UA_StatusCode retval = Int32_encodeBinary(&signed_length);
     if(retval != UA_STATUSCODE_GOOD || length == 0)
         return retval;
 
-    if(type->overlayable) {
-        size_t i = 0; /* the number of already encoded elements */
-        while(end < pos + (type->memSize * (length-i))) {
-            /* not enough space, need to exchange the buffer */
-            size_t elements = ((uintptr_t)end - (uintptr_t)pos) / (sizeof(UA_Byte) * type->memSize);
-            memcpy(pos, src, type->memSize * elements);
-            pos += type->memSize * elements;
-            i += elements;
-            retval = exchangeBuffer();
-            if(retval != UA_STATUSCODE_GOOD)
-                return retval;
-        }
-        /* encode the remaining elements */
-        memcpy(pos, src, type->memSize * (length-i));
-        pos += type->memSize * (length-i);
-        return UA_STATUSCODE_GOOD;
-    }
-
-    uintptr_t ptr = (uintptr_t)src;
-    size_t encode_index = type->builtin ? type->typeIndex : UA_BUILTIN_TYPES_COUNT;
-    for(size_t i = 0; i < length && retval == UA_STATUSCODE_GOOD; ++i) {
-        UA_Byte *oldpos = pos;
-        retval = encodeBinaryJumpTable[encode_index]((const void*)ptr, type);
-        ptr += type->memSize;
-        if(retval == UA_STATUSCODE_BADENCODINGLIMITSEXCEEDED) {
-            /* exchange the buffer and try to encode the same element once more */
-            pos = oldpos;
-            retval = exchangeBuffer();
-            /* Repeat encoding of the same element */
-            ptr -= type->memSize;
-            --i;
-        }
-    }
-    return retval;
+    /* Encode the content */
+    if(!type->overlayable)
+        return Array_encodeBinaryComplex((uintptr_t)src, length, type);
+    return Array_encodeBinaryOverlayable((uintptr_t)src, length, type->memSize);
 }
 
 static UA_StatusCode
 Array_decodeBinary(void *UA_RESTRICT *UA_RESTRICT dst,
                    size_t *out_length, const UA_DataType *type) {
-    /* decode the length */
+    /* Decode the length */
     UA_Int32 signed_length;
     UA_StatusCode retval = Int32_decodeBinary(&signed_length);
     if(retval != UA_STATUSCODE_GOOD)
         return retval;
 
-    /* check the length */
+    /* Return early for empty arrays */
     if(signed_length <= 0) {
-        *dst = NULL;
-        if(signed_length == 0)
+        *out_length = 0;
+        if(signed_length < 0)
+            *dst = NULL;
+        else
             *dst = UA_EMPTY_ARRAY_SENTINEL;
         return UA_STATUSCODE_GOOD;
     }
-    size_t length = (size_t)signed_length;
 
-    /* filter out arrays that can obviously not be parsed, because the message
-       is too small */
+    /* Filter out arrays that can obviously not be decoded, because the message
+     * is too small for the array length. This prevents the allocation of very
+     * long arrays for bogus messages.*/
+    size_t length = (size_t)signed_length;
     if(pos + ((type->memSize * length) / 32) > end)
         return UA_STATUSCODE_BADDECODINGERROR;
 
-    /* allocate memory */
-    *dst = UA_calloc(1, type->memSize * length);
+    /* Allocate memory */
+    *dst = UA_calloc(length, type->memSize);
     if(!*dst)
         return UA_STATUSCODE_BADOUTOFMEMORY;
 
@@ -6342,50 +6448,46 @@ Guid_decodeBinary(UA_Guid *dst, const UA_DataType *_) {
 #define UA_NODEIDTYPE_NUMERIC_FOURBYTE 1
 #define UA_NODEIDTYPE_NUMERIC_COMPLETE 2
 
+/* For ExpandedNodeId, we prefill the encoding mask */
 static UA_StatusCode
-NodeId_encodeBinary(UA_NodeId const *src, const UA_DataType *_) {
+NodeId_encodeBinaryWithEncodingMask(UA_NodeId const *src, UA_Byte encoding) {
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
-    // temporary variables for endian-save code
-    UA_Byte srcByte;
-    UA_UInt16 srcUInt16;
-    UA_UInt32 srcUInt32;
     switch (src->identifierType) {
     case UA_NODEIDTYPE_NUMERIC:
         if(src->identifier.numeric > UA_UINT16_MAX || src->namespaceIndex > UA_BYTE_MAX) {
-            srcByte = UA_NODEIDTYPE_NUMERIC_COMPLETE;
-            retval |= Byte_encodeBinary(&srcByte, NULL);
+            encoding |= UA_NODEIDTYPE_NUMERIC_COMPLETE;
+            retval |= Byte_encodeBinary(&encoding, NULL);
             retval |= UInt16_encodeBinary(&src->namespaceIndex, NULL);
-            srcUInt32 = src->identifier.numeric;
-            retval |= UInt32_encodeBinary(&srcUInt32, NULL);
+            retval |= UInt32_encodeBinary(&src->identifier.numeric, NULL);
         } else if(src->identifier.numeric > UA_BYTE_MAX || src->namespaceIndex > 0) {
-            srcByte = UA_NODEIDTYPE_NUMERIC_FOURBYTE;
-            retval |= Byte_encodeBinary(&srcByte, NULL);
-            srcByte = (UA_Byte)src->namespaceIndex;
-            srcUInt16 = (UA_UInt16)src->identifier.numeric;
-            retval |= Byte_encodeBinary(&srcByte, NULL);
-            retval |= UInt16_encodeBinary(&srcUInt16, NULL);
+            encoding |= UA_NODEIDTYPE_NUMERIC_FOURBYTE;
+            retval |= Byte_encodeBinary(&encoding, NULL);
+            UA_Byte nsindex = (UA_Byte)src->namespaceIndex;
+            retval |= Byte_encodeBinary(&nsindex, NULL);
+            UA_UInt16 identifier16 = (UA_UInt16)src->identifier.numeric;
+            retval |= UInt16_encodeBinary(&identifier16, NULL);
         } else {
-            srcByte = UA_NODEIDTYPE_NUMERIC_TWOBYTE;
-            retval |= Byte_encodeBinary(&srcByte, NULL);
-            srcByte = (UA_Byte)src->identifier.numeric;
-            retval |= Byte_encodeBinary(&srcByte, NULL);
+            encoding |= UA_NODEIDTYPE_NUMERIC_TWOBYTE;
+            retval |= Byte_encodeBinary(&encoding, NULL);
+            UA_Byte identifier8 = (UA_Byte)src->identifier.numeric;
+            retval |= Byte_encodeBinary(&identifier8, NULL);
         }
         break;
     case UA_NODEIDTYPE_STRING:
-        srcByte = UA_NODEIDTYPE_STRING;
-        retval |= Byte_encodeBinary(&srcByte, NULL);
+        encoding |= UA_NODEIDTYPE_STRING;
+        retval |= Byte_encodeBinary(&encoding, NULL);
         retval |= UInt16_encodeBinary(&src->namespaceIndex, NULL);
         retval |= String_encodeBinary(&src->identifier.string, NULL);
         break;
     case UA_NODEIDTYPE_GUID:
-        srcByte = UA_NODEIDTYPE_GUID;
-        retval |= Byte_encodeBinary(&srcByte, NULL);
+        encoding |= UA_NODEIDTYPE_GUID;
+        retval |= Byte_encodeBinary(&encoding, NULL);
         retval |= UInt16_encodeBinary(&src->namespaceIndex, NULL);
         retval |= Guid_encodeBinary(&src->identifier.guid, NULL);
         break;
     case UA_NODEIDTYPE_BYTESTRING:
-        srcByte = UA_NODEIDTYPE_BYTESTRING;
-        retval |= Byte_encodeBinary(&srcByte, NULL);
+        encoding |= UA_NODEIDTYPE_BYTESTRING;
+        retval |= Byte_encodeBinary(&encoding, NULL);
         retval |= UInt16_encodeBinary(&src->namespaceIndex, NULL);
         retval |= ByteString_encodeBinary(&src->identifier.byteString);
         break;
@@ -6393,6 +6495,11 @@ NodeId_encodeBinary(UA_NodeId const *src, const UA_DataType *_) {
         return UA_STATUSCODE_BADINTERNALERROR;
     }
     return retval;
+}
+
+static UA_StatusCode
+NodeId_encodeBinary(UA_NodeId const *src, const UA_DataType *_) {
+    return NodeId_encodeBinaryWithEncodingMask(src, 0);
 }
 
 static UA_StatusCode
@@ -6449,33 +6556,42 @@ NodeId_decodeBinary(UA_NodeId *dst, const UA_DataType *_) {
 
 static UA_StatusCode
 ExpandedNodeId_encodeBinary(UA_ExpandedNodeId const *src, const UA_DataType *_) {
-    if(pos >= end)
-        return UA_STATUSCODE_BADENCODINGLIMITSEXCEEDED;
-    UA_Byte *start = pos;
-    UA_StatusCode retval = NodeId_encodeBinary(&src->nodeId, NULL);
-    if(src->namespaceUri.length > 0) {
+    /* Set up the encoding mask */
+    UA_Byte encoding = 0;
+    if((void*)src->namespaceUri.data > UA_EMPTY_ARRAY_SENTINEL)
+        encoding |= UA_EXPANDEDNODEID_NAMESPACEURI_FLAG;
+    if(src->serverIndex > 0)
+        encoding |= UA_EXPANDEDNODEID_SERVERINDEX_FLAG;
+
+    /* Encode the content */
+    UA_StatusCode retval = NodeId_encodeBinaryWithEncodingMask(&src->nodeId, encoding);
+    if((void*)src->namespaceUri.data > UA_EMPTY_ARRAY_SENTINEL)
         retval |= String_encodeBinary(&src->namespaceUri, NULL);
-        *start |= UA_EXPANDEDNODEID_NAMESPACEURI_FLAG;
-    }
-    if(src->serverIndex > 0) {
+    if(src->serverIndex > 0)
         retval |= UInt32_encodeBinary(&src->serverIndex, NULL);
-        *start |= UA_EXPANDEDNODEID_SERVERINDEX_FLAG;
-    }
     return retval;
 }
 
 static UA_StatusCode
 ExpandedNodeId_decodeBinary(UA_ExpandedNodeId *dst, const UA_DataType *_) {
+    /* Decode the encoding mask */
     if(pos >= end)
         return UA_STATUSCODE_BADDECODINGERROR;
-    UA_Byte encodingByte = *pos;
-    *pos = encodingByte & (UA_Byte)~(UA_EXPANDEDNODEID_NAMESPACEURI_FLAG | UA_EXPANDEDNODEID_SERVERINDEX_FLAG);
+    UA_Byte encoding = *pos;
+
+    /* Mask out the encoding byte on the stream to decode the NodeId only */
+    *pos = encoding & (UA_Byte)~(UA_EXPANDEDNODEID_NAMESPACEURI_FLAG |
+                                 UA_EXPANDEDNODEID_SERVERINDEX_FLAG);
     UA_StatusCode retval = NodeId_decodeBinary(&dst->nodeId, NULL);
-    if(encodingByte & UA_EXPANDEDNODEID_NAMESPACEURI_FLAG) {
+
+    /* Decode the NamespaceUri */
+    if(encoding & UA_EXPANDEDNODEID_NAMESPACEURI_FLAG) {
         dst->nodeId.namespaceIndex = 0;
         retval |= String_decodeBinary(&dst->namespaceUri, NULL);
     }
-    if(encodingByte & UA_EXPANDEDNODEID_SERVERINDEX_FLAG)
+
+    /* Decode the ServerIndex */
+    if(encoding & UA_EXPANDEDNODEID_SERVERINDEX_FLAG)
         retval |= UInt32_decodeBinary(&dst->serverIndex, NULL);
     return retval;
 }
@@ -6486,26 +6602,32 @@ ExpandedNodeId_decodeBinary(UA_ExpandedNodeId *dst, const UA_DataType *_) {
 
 static UA_StatusCode
 LocalizedText_encodeBinary(UA_LocalizedText const *src, const UA_DataType *_) {
-    UA_Byte encodingMask = 0;
+    /* Set up the encoding mask */
+    UA_Byte encoding = 0;
     if(src->locale.data)
-        encodingMask |= UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_LOCALE;
+        encoding |= UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_LOCALE;
     if(src->text.data)
-        encodingMask |= UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_TEXT;
-    UA_StatusCode retval = Byte_encodeBinary(&encodingMask, NULL);
-    if(encodingMask & UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_LOCALE)
+        encoding |= UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_TEXT;
+
+    /* Encode the content */
+    UA_StatusCode retval = Byte_encodeBinary(&encoding, NULL);
+    if(encoding & UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_LOCALE)
         retval |= String_encodeBinary(&src->locale, NULL);
-    if(encodingMask & UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_TEXT)
+    if(encoding & UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_TEXT)
         retval |= String_encodeBinary(&src->text, NULL);
     return retval;
 }
 
 static UA_StatusCode
 LocalizedText_decodeBinary(UA_LocalizedText *dst, const UA_DataType *_) {
-    UA_Byte encodingMask = 0;
-    UA_StatusCode retval = Byte_decodeBinary(&encodingMask, NULL);
-    if(encodingMask & UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_LOCALE)
+    /* Decode the encoding mask */
+    UA_Byte encoding = 0;
+    UA_StatusCode retval = Byte_decodeBinary(&encoding, NULL);
+
+    /* Decode the content */
+    if(encoding & UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_LOCALE)
         retval |= String_decodeBinary(&dst->locale, NULL);
-    if(encodingMask & UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_TEXT)
+    if(encoding & UA_LOCALIZEDTEXT_ENCODINGMASKTYPE_TEXT)
         retval |= String_decodeBinary(&dst->text, NULL);
     return retval;
 }
@@ -6524,31 +6646,11 @@ findDataTypeByBinary(const UA_NodeId *typeId, const UA_DataType **findtype) {
 /* ExtensionObject */
 static UA_StatusCode
 ExtensionObject_encodeBinary(UA_ExtensionObject const *src, const UA_DataType *_) {
-    UA_StatusCode retval;
     UA_Byte encoding = src->encoding;
-    if(encoding > UA_EXTENSIONOBJECT_ENCODED_XML) {
-        if(!src->content.decoded.type || !src->content.decoded.data)
-            return UA_STATUSCODE_BADENCODINGERROR;
-        UA_NodeId typeId = src->content.decoded.type->typeId;
-        if(typeId.identifierType != UA_NODEIDTYPE_NUMERIC)
-            return UA_STATUSCODE_BADENCODINGERROR;
-        typeId.identifier.numeric= src->content.decoded.type->binaryEncodingId;
-        encoding = UA_EXTENSIONOBJECT_ENCODED_BYTESTRING;
-        retval = NodeId_encodeBinary(&typeId, NULL);
-        retval |= Byte_encodeBinary(&encoding, NULL);
-        UA_Byte *old_pos = pos; /* save the position to encode the length afterwards */
-        pos += 4; /* jump over the length field */
-        const UA_DataType *type = src->content.decoded.type;
-        size_t encode_index = type->builtin ? type->typeIndex : UA_BUILTIN_TYPES_COUNT;
-        retval |= encodeBinaryJumpTable[encode_index](src->content.decoded.data, type);
-        /* jump back, encode the length, jump back forward */
-        UA_Int32 length = (UA_Int32)(((uintptr_t)pos - (uintptr_t)old_pos) / sizeof(UA_Byte)) - 4;
-        UA_Byte *new_pos = pos;
-        pos = old_pos;
-        retval |= Int32_encodeBinary(&length);
-        pos = new_pos;
-    } else {
-        retval = NodeId_encodeBinary(&src->content.encoded.typeId, NULL);
+
+    /* No content or already encoded content */
+    if(encoding <= UA_EXTENSIONOBJECT_ENCODED_XML) {
+        UA_StatusCode retval = NodeId_encodeBinary(&src->content.encoded.typeId, NULL);
         retval |= Byte_encodeBinary(&encoding, NULL);
         switch (src->encoding) {
         case UA_EXTENSIONOBJECT_ENCODED_NOBODY:
@@ -6558,10 +6660,66 @@ ExtensionObject_encodeBinary(UA_ExtensionObject const *src, const UA_DataType *_
             retval |= ByteString_encodeBinary(&src->content.encoded.body);
             break;
         default:
-            return UA_STATUSCODE_BADINTERNALERROR;
+            retval = UA_STATUSCODE_BADINTERNALERROR;
         }
+        return retval;
     }
+
+    /* Cannot encode with no data or no type description */
+    if(!src->content.decoded.type || !src->content.decoded.data)
+        return UA_STATUSCODE_BADENCODINGERROR;
+
+    /* Write the NodeId for the binary encoded type */
+    UA_NodeId typeId = src->content.decoded.type->typeId;
+    if(typeId.identifierType != UA_NODEIDTYPE_NUMERIC)
+        return UA_STATUSCODE_BADENCODINGERROR;
+    typeId.identifier.numeric = src->content.decoded.type->binaryEncodingId;
+    UA_StatusCode retval = NodeId_encodeBinary(&typeId, NULL);
+
+    /* Write the encoding byte */
+    encoding = UA_EXTENSIONOBJECT_ENCODED_BYTESTRING;
+    retval |= Byte_encodeBinary(&encoding, NULL);
+
+    /* Write the length of the following content */
+    const UA_DataType *type = src->content.decoded.type;
+    size_t len = UA_calcSizeBinary(src->content.decoded.data, type);
+    if(len > UA_INT32_MAX)
+        return UA_STATUSCODE_BADENCODINGERROR;
+    UA_Int32 signed_len = (UA_Int32)len;
+    retval |= Int32_encodeBinary(&signed_len);
+
+    /* Encode the content */
+    size_t encode_index = type->builtin ? type->typeIndex : UA_BUILTIN_TYPES_COUNT;
+    retval |= encodeBinaryJumpTable[encode_index](src->content.decoded.data, type);
     return retval;
+}
+
+static UA_StatusCode
+ExtensionObject_decodeBinaryContent(UA_ExtensionObject *dst, const UA_NodeId *typeId) {
+    /* Lookup the datatype */
+    const UA_DataType *type = NULL;
+    findDataTypeByBinary(typeId, &type);
+
+    /* Unknown type, just take the binary content */
+    if(!type) {
+        dst->encoding = UA_EXTENSIONOBJECT_ENCODED_BYTESTRING;
+        dst->content.encoded.typeId = *typeId;
+        return ByteString_decodeBinary(&dst->content.encoded.body);
+    }
+
+    /* Allocate memory */
+    dst->content.decoded.data = UA_new(type);
+    if(!dst->content.decoded.data)
+        return UA_STATUSCODE_BADOUTOFMEMORY;
+
+    /* Jump over the length field (TODO: check if the decoded length matches) */
+    pos += 4;
+        
+    /* Decode */
+    dst->encoding = UA_EXTENSIONOBJECT_DECODED;
+    dst->content.decoded.type = type;
+    size_t decode_index = type->builtin ? type->typeIndex : UA_BUILTIN_TYPES_COUNT;
+    return decodeBinaryJumpTable[decode_index](dst->content.decoded.data, type);
 }
 
 static UA_StatusCode
@@ -6571,14 +6729,16 @@ ExtensionObject_decodeBinary(UA_ExtensionObject *dst, const UA_DataType *_) {
     UA_NodeId_init(&typeId);
     UA_StatusCode retval = NodeId_decodeBinary(&typeId, NULL);
     retval |= Byte_decodeBinary(&encoding, NULL);
-    if(typeId.namespaceIndex != 0 || typeId.identifierType != UA_NODEIDTYPE_NUMERIC)
+    if(typeId.identifierType != UA_NODEIDTYPE_NUMERIC)
         retval = UA_STATUSCODE_BADDECODINGERROR;
     if(retval != UA_STATUSCODE_GOOD) {
         UA_NodeId_deleteMembers(&typeId);
         return retval;
     }
 
-    if(encoding == UA_EXTENSIONOBJECT_ENCODED_NOBODY) {
+    if(encoding == UA_EXTENSIONOBJECT_ENCODED_BYTESTRING) {
+        retval = ExtensionObject_decodeBinaryContent(dst, &typeId);
+    } else if(encoding == UA_EXTENSIONOBJECT_ENCODED_NOBODY) {
         dst->encoding = (UA_ExtensionObjectEncoding)encoding;
         dst->content.encoded.typeId = typeId;
         dst->content.encoded.body = UA_BYTESTRING_NULL;
@@ -6587,33 +6747,53 @@ ExtensionObject_decodeBinary(UA_ExtensionObject *dst, const UA_DataType *_) {
         dst->content.encoded.typeId = typeId;
         retval = ByteString_decodeBinary(&dst->content.encoded.body);
     } else {
-        /* try to decode the content */
-        const UA_DataType *type = NULL;
-        /* helping clang analyzer, typeId is numeric */
-        UA_assert(typeId.identifier.byteString.data == NULL);
-        UA_assert(typeId.identifier.string.data == NULL);
-        findDataTypeByBinary(&typeId, &type);
-        if(type) {
-            pos += 4; /* jump over the length (todo: check if length matches) */
-            dst->content.decoded.data = UA_new(type);
-            size_t decode_index = type->builtin ? type->typeIndex : UA_BUILTIN_TYPES_COUNT;
-            if(dst->content.decoded.data) {
-                dst->content.decoded.type = type;
-                dst->encoding = UA_EXTENSIONOBJECT_DECODED;
-                retval = decodeBinaryJumpTable[decode_index](dst->content.decoded.data, type);
-            } else {
-                retval = UA_STATUSCODE_BADOUTOFMEMORY;
-            }
-        } else {
-            retval = ByteString_decodeBinary(&dst->content.encoded.body);
-            dst->encoding = UA_EXTENSIONOBJECT_ENCODED_BYTESTRING;
-            dst->content.encoded.typeId = typeId;
-        }
+        retval = UA_STATUSCODE_BADDECODINGERROR;
     }
     return retval;
 }
 
 /* Variant */
+static UA_StatusCode
+Variant_encodeBinaryWrapExtensionObject(const UA_Variant *src, const UA_Boolean isArray) {
+    /* Default to 1 for a scalar. */
+    size_t length = 1;
+
+    /* Encode the array length if required */
+    UA_StatusCode retval = UA_STATUSCODE_GOOD;
+    if(isArray) {
+        if(src->arrayLength > UA_INT32_MAX)
+            return UA_STATUSCODE_BADENCODINGERROR;
+        length = src->arrayLength;
+        UA_Int32 encodedLength = (UA_Int32)src->arrayLength;
+        retval = Int32_encodeBinary(&encodedLength);
+    }
+
+    /* Set up the ExtensionObject */
+    UA_ExtensionObject eo;
+    UA_ExtensionObject_init(&eo);
+    eo.encoding = UA_EXTENSIONOBJECT_DECODED;
+    eo.content.decoded.type = src->type;
+    const UA_UInt16 memSize = src->type->memSize;
+    uintptr_t ptr = (uintptr_t)src->data;
+
+    /* Iterate over the array */
+    for(size_t i = 0; i < length && retval == UA_STATUSCODE_GOOD; ++i) {
+        UA_Byte *oldpos = pos;
+        eo.content.decoded.data = (void*)ptr;
+        retval |= ExtensionObject_encodeBinary(&eo, NULL);
+        ptr += memSize;
+        if(retval == UA_STATUSCODE_BADENCODINGLIMITSEXCEEDED) {
+            /* exchange/send with the current buffer with chunking */
+            pos = oldpos;
+            retval = exchangeBuffer();
+            /* encode the same element in the next iteration */
+            --i;
+            ptr -= memSize;
+        }
+    }
+    return retval;
+}
+
 enum UA_VARIANT_ENCODINGMASKTYPE {
     UA_VARIANT_ENCODINGMASKTYPE_TYPEID_MASK = 0x3F,        // bits 0:5
     UA_VARIANT_ENCODINGMASKTYPE_DIMENSIONS  = (0x01 << 6), // bit 6
@@ -6621,74 +6801,90 @@ enum UA_VARIANT_ENCODINGMASKTYPE {
 };
 
 static UA_StatusCode
-Variant_encodeBinary(UA_Variant const *src, const UA_DataType *_) {
-    UA_Byte encodingByte = 0;
+Variant_encodeBinary(const UA_Variant *src, const UA_DataType *_) {
+    /* Quit early for the empty variant */
+    UA_Byte encoding = 0;
     if(!src->type)
-        return Byte_encodeBinary(&encodingByte, NULL); /* empty variant */
+        return Byte_encodeBinary(&encoding, NULL);
 
+    /* Set the content type in the encoding mask */
+    const UA_Boolean isBuiltin = src->type->builtin;
+    if(isBuiltin)
+        encoding |= UA_VARIANT_ENCODINGMASKTYPE_TYPEID_MASK & (UA_Byte)(src->type->typeIndex + 1);
+    else
+        encoding |= UA_VARIANT_ENCODINGMASKTYPE_TYPEID_MASK & (UA_Byte)(UA_TYPES_EXTENSIONOBJECT + 1);
+
+    /* Set the array type in the encoding mask */
     const UA_Boolean isArray = src->arrayLength > 0 || src->data <= UA_EMPTY_ARRAY_SENTINEL;
     const UA_Boolean hasDimensions = isArray && src->arrayDimensionsSize > 0;
-    const UA_Boolean isBuiltin = src->type->builtin;
-
-    /* Encode the encodingbyte */
     if(isArray) {
-        encodingByte |= UA_VARIANT_ENCODINGMASKTYPE_ARRAY;
+        encoding |= UA_VARIANT_ENCODINGMASKTYPE_ARRAY;
         if(hasDimensions)
-            encodingByte |= UA_VARIANT_ENCODINGMASKTYPE_DIMENSIONS;
+            encoding |= UA_VARIANT_ENCODINGMASKTYPE_DIMENSIONS;
     }
-    if(isBuiltin) {
-        UA_Byte t = (UA_Byte)(UA_VARIANT_ENCODINGMASKTYPE_TYPEID_MASK & (src->type->typeIndex + 1));
-        encodingByte |= t;
-    } else {
-        /* Non-builtin types are wrapped in an ExtensionObject */
-        encodingByte |= UA_VARIANT_ENCODINGMASKTYPE_TYPEID_MASK & (UA_Byte) 22;
-    }
-    UA_StatusCode retval = Byte_encodeBinary(&encodingByte, NULL);
 
     /* Encode the content */
-    if(isBuiltin) {
-        if(!isArray) {
-            size_t encode_index = src->type->typeIndex;
-            retval |= encodeBinaryJumpTable[encode_index](src->data, src->type);
-        } else
-            retval |= Array_encodeBinary(src->data, src->arrayLength, src->type);
-    } else {
-        /* Wrap not-builtin elements into an extensionobject */
-        if(src->arrayDimensionsSize > UA_INT32_MAX)
-            return UA_STATUSCODE_BADINTERNALERROR;
-        size_t length = 1;
-        if(isArray) {
-            length = src->arrayLength;
-            UA_Int32 encodedLength = (UA_Int32)src->arrayLength;
-            retval |= Int32_encodeBinary(&encodedLength);
-        }
-        UA_ExtensionObject eo;
-        UA_ExtensionObject_init(&eo);
-        eo.encoding = UA_EXTENSIONOBJECT_DECODED;
-        eo.content.decoded.type = src->type;
-        const UA_UInt16 memSize = src->type->memSize;
-        uintptr_t ptr = (uintptr_t)src->data;
-        for(size_t i = 0; i < length && retval == UA_STATUSCODE_GOOD; ++i) {
-            UA_Byte *oldpos = pos;
-            eo.content.decoded.data = (void*)ptr;
-            retval |= ExtensionObject_encodeBinary(&eo, NULL);
-            ptr += memSize;
-            if(retval == UA_STATUSCODE_BADENCODINGLIMITSEXCEEDED) {
-                /* exchange/send with the current buffer with chunking */
-                pos = oldpos;
-                retval = exchangeBuffer();
-                /* encode the same element in the next iteration */
-                --i;
-                ptr -= memSize;
-            }
-        }
-    }
+    UA_StatusCode retval = Byte_encodeBinary(&encoding, NULL);
+    if(!isBuiltin)
+        retval |= Variant_encodeBinaryWrapExtensionObject(src, isArray);
+    else if(!isArray)
+        retval |= encodeBinaryJumpTable[src->type->typeIndex](src->data, src->type);
+    else
+        retval |= Array_encodeBinary(src->data, src->arrayLength, src->type);
 
-    /* Encode the dimensions */
+    /* Encode the array dimensions */
     if(hasDimensions)
         retval |= Array_encodeBinary(src->arrayDimensions, src->arrayDimensionsSize,
                                      &UA_TYPES[UA_TYPES_INT32]);
+    return retval;
+}
 
+static UA_StatusCode
+Variant_decodeBinaryUnwrapExtensionObject(UA_Variant *dst) {
+    /* Save the position in the ByteString */
+    UA_Byte *old_pos = pos;
+
+    /* Decode the DataType */
+    UA_NodeId typeId;
+    UA_NodeId_init(&typeId);
+    UA_StatusCode retval = NodeId_decodeBinary(&typeId, NULL);
+    if(retval != UA_STATUSCODE_GOOD)
+        return retval;
+
+    /* Decode the EncodingByte */
+    UA_Byte encoding;
+    retval = Byte_decodeBinary(&encoding, NULL);
+    if(retval != UA_STATUSCODE_GOOD) {
+        UA_NodeId_deleteMembers(&typeId);
+        return retval;
+    }
+
+    /* Search for the datatype. Default to ExtensionObject. */
+    if(encoding == UA_EXTENSIONOBJECT_ENCODED_BYTESTRING &&
+       typeId.identifierType == UA_NODEIDTYPE_NUMERIC &&
+       typeId.namespaceIndex == 0 &&
+       findDataTypeByBinary(&typeId, &dst->type) == UA_STATUSCODE_GOOD) {
+        /* Jump over the length field (TODO: check if length matches) */
+        pos += 4; 
+    } else {
+        /* Reset and decode as ExtensionObject */
+        UA_assert(dst->type == &UA_TYPES[UA_TYPES_EXTENSIONOBJECT]);
+        pos = old_pos;
+        UA_NodeId_deleteMembers(&typeId);
+    }
+
+    /* Allocate memory */
+    dst->data = UA_new(dst->type);
+    if(!dst->data)
+        return UA_STATUSCODE_BADOUTOFMEMORY;
+
+    /* Decode the content */
+    size_t decode_index = dst->type->builtin ? dst->type->typeIndex : UA_BUILTIN_TYPES_COUNT;
+    retval = decodeBinaryJumpTable[decode_index](dst->data, dst->type);
+    if(retval != UA_STATUSCODE_GOOD) {
+        UA_free(dst->data);
+        dst->data = NULL;
+    }
     return retval;
 }
 
@@ -6696,87 +6892,55 @@ Variant_encodeBinary(UA_Variant const *src, const UA_DataType *_) {
  we only support ns0 types (todo: attach typedescriptions to datatypenodes) */
 static UA_StatusCode
 Variant_decodeBinary(UA_Variant *dst, const UA_DataType *_) {
+    /* Decode the encoding byte */
     UA_Byte encodingByte;
     UA_StatusCode retval = Byte_decodeBinary(&encodingByte, NULL);
     if(retval != UA_STATUSCODE_GOOD)
         return retval;
+
+    /* Return early for an empty variant (was already _inited) */
     if(encodingByte == 0)
-        return UA_STATUSCODE_GOOD; /* empty Variant (was already _inited) */
-    UA_Boolean isArray = encodingByte & UA_VARIANT_ENCODINGMASKTYPE_ARRAY;
+        return UA_STATUSCODE_GOOD;
+
+    /* Does the variant contain an array? */
+    const UA_Boolean isArray = (encodingByte & UA_VARIANT_ENCODINGMASKTYPE_ARRAY) > 0;
+
+    /* Get the datatype of the content. The type must be a builtin data type.
+     * All not-builtin types are wrapped in an ExtensionObject. */
     size_t typeIndex = (size_t)((encodingByte & UA_VARIANT_ENCODINGMASKTYPE_TYPEID_MASK) - 1);
-    if(typeIndex > 24) /* the type must be builtin (maybe wrapped in an extensionobject) */
+    if(typeIndex > UA_TYPES_DIAGNOSTICINFO)
         return UA_STATUSCODE_BADDECODINGERROR;
+    dst->type = &UA_TYPES[typeIndex];
 
+    /* Decode the content */
     if(isArray) {
-        /* an array */
-        dst->type = &UA_TYPES[typeIndex]; /* Arrays of non-builtin types contain only ExtensionObjects */
         retval = Array_decodeBinary(&dst->data, &dst->arrayLength, dst->type);
-    } else if (typeIndex != UA_TYPES_EXTENSIONOBJECT) {
-        /* a builtin type */
-        dst->type = &UA_TYPES[typeIndex];
-        dst->data = UA_calloc(1, dst->type->memSize);
+    } else if(typeIndex != UA_TYPES_EXTENSIONOBJECT) {
+        dst->data = UA_new(dst->type);
         if(!dst->data)
             return UA_STATUSCODE_BADOUTOFMEMORY;
-        size_t decode_index = dst->type->builtin ? dst->type->typeIndex : UA_BUILTIN_TYPES_COUNT;
-        retval = decodeBinaryJumpTable[decode_index](dst->data, dst->type);
-        // dst->arrayLength = 0; /* is null already in an initialized type */
+        retval = decodeBinaryJumpTable[typeIndex](dst->data, dst->type);
     } else {
-        /* a single extensionobject */
-        UA_Byte *old_pos = pos; /* save the beginning of the extensionobject */
-        UA_NodeId typeId;
-        UA_NodeId_init(&typeId);
-        retval = NodeId_decodeBinary(&typeId, NULL);
-        if(retval != UA_STATUSCODE_GOOD)
-            return retval;
-
-        UA_Byte eo_encoding;
-        retval = Byte_decodeBinary(&eo_encoding, NULL);
-        if(retval != UA_STATUSCODE_GOOD) {
-            UA_NodeId_deleteMembers(&typeId);
-            return retval;
-        }
-
-        /* search for the datatype. use extensionobject if nothing is found */
-        dst->type = &UA_TYPES[UA_TYPES_EXTENSIONOBJECT];
-        if(typeId.namespaceIndex == 0 && typeId.identifierType == UA_NODEIDTYPE_NUMERIC &&
-           eo_encoding == UA_EXTENSIONOBJECT_ENCODED_BYTESTRING) {
-            UA_assert(typeId.identifier.byteString.data == NULL); /* for clang analyzer <= 3.7 */
-            if(findDataTypeByBinary(&typeId, &dst->type) == UA_STATUSCODE_GOOD)
-                pos += 4; /* jump over the length (todo: check if length matches) */
-            else
-                pos = old_pos; /* jump back and decode as extensionobject */
-        } else {
-            pos = old_pos; /* jump back and decode as extensionobject */
-            UA_NodeId_deleteMembers(&typeId); /* found nodeids are always numerical */
-        }
-
-        /* decode the type */
-        dst->data = UA_calloc(1, dst->type->memSize);
-        if(!dst->data)
-            return UA_STATUSCODE_BADOUTOFMEMORY;
-        size_t decode_index = dst->type->builtin ? dst->type->typeIndex : UA_BUILTIN_TYPES_COUNT;
-        retval = decodeBinaryJumpTable[decode_index](dst->data, dst->type);
-        if(retval != UA_STATUSCODE_GOOD) {
-            UA_free(dst->data);
-            dst->data = NULL;
-        }
+        retval = Variant_decodeBinaryUnwrapExtensionObject(dst);
     }
 
-    /* array dimensions */
-    if(isArray && (encodingByte & UA_VARIANT_ENCODINGMASKTYPE_DIMENSIONS))
+    /* Decode array dimensions */
+    if(isArray && (encodingByte & UA_VARIANT_ENCODINGMASKTYPE_DIMENSIONS) > 0)
         retval |= Array_decodeBinary((void**)&dst->arrayDimensions,
                                      &dst->arrayDimensionsSize, &UA_TYPES[UA_TYPES_INT32]);
-
     return retval;
 }
 
 /* DataValue */
 static UA_StatusCode
 DataValue_encodeBinary(UA_DataValue const *src, const UA_DataType *_) {
+    /* Set up the encoding mask */
     UA_Byte encodingMask = (UA_Byte)
         (src->hasValue | (src->hasStatus << 1) | (src->hasSourceTimestamp << 2) |
          (src->hasServerTimestamp << 3) | (src->hasSourcePicoseconds << 4) |
          (src->hasServerPicoseconds << 5));
+
+    /* Encode the content */
     UA_StatusCode retval = Byte_encodeBinary(&encodingMask, NULL);
     if(src->hasValue)
         retval |= Variant_encodeBinary(&src->value, NULL);
@@ -6794,12 +6958,16 @@ DataValue_encodeBinary(UA_DataValue const *src, const UA_DataType *_) {
 }
 
 #define MAX_PICO_SECONDS 9999
+
 static UA_StatusCode
 DataValue_decodeBinary(UA_DataValue *dst, const UA_DataType *_) {
+    /* Decode the encoding mask */
     UA_Byte encodingMask;
     UA_StatusCode retval = Byte_decodeBinary(&encodingMask, NULL);
     if(retval != UA_STATUSCODE_GOOD)
         return retval;
+
+    /* Decode the content */
     if(encodingMask & 0x01) {
         dst->hasValue = true;
         retval |= Variant_decodeBinary(&dst->value, NULL);
@@ -6834,10 +7002,13 @@ DataValue_decodeBinary(UA_DataValue *dst, const UA_DataType *_) {
 /* DiagnosticInfo */
 static UA_StatusCode
 DiagnosticInfo_encodeBinary(const UA_DiagnosticInfo *src, const UA_DataType *_) {
+    /* Set up the encoding mask */
     UA_Byte encodingMask = (UA_Byte)
         (src->hasSymbolicId | (src->hasNamespaceUri << 1) |
          (src->hasLocalizedText << 2) | (src->hasLocale << 3) |
          (src->hasAdditionalInfo << 4) | (src->hasInnerDiagnosticInfo << 5));
+
+    /* Encode the content */
     UA_StatusCode retval = Byte_encodeBinary(&encodingMask, NULL);
     if(src->hasSymbolicId)
         retval |= Int32_encodeBinary(&src->symbolicId);
@@ -6858,10 +7029,13 @@ DiagnosticInfo_encodeBinary(const UA_DiagnosticInfo *src, const UA_DataType *_) 
 
 static UA_StatusCode
 DiagnosticInfo_decodeBinary(UA_DiagnosticInfo *dst, const UA_DataType *_) {
+    /* Decode the encoding mask */
     UA_Byte encodingMask;
     UA_StatusCode retval = Byte_decodeBinary(&encodingMask, NULL);
     if(retval != UA_STATUSCODE_GOOD)
         return retval;
+
+    /* Decode the content */
     if(encodingMask & 0x01) {
         dst->hasSymbolicId = true;
         retval |= Int32_decodeBinary(&dst->symbolicId);
@@ -6973,18 +7147,18 @@ UA_encodeBinaryInternal(const void *src, const UA_DataType *type) {
 
 UA_StatusCode
 UA_encodeBinary(const void *src, const UA_DataType *type,
-                UA_exchangeEncodeBuffer callback, void *handle,
+                UA_exchangeEncodeBuffer exchangeCallback, void *exchangeHandle,
                 UA_ByteString *dst, size_t *offset) {
     /* Set the (thread-local) position and end pointers to save function
        arguments */
     pos = &dst->data[*offset];
     end = &dst->data[dst->length];
 
-    /* Set the (thread-local) callbacks where the buffer is exchanged and the
+    /* Set the (thread-local) exchangeBufferCallbacks where the buffer is exchanged and the
        current chunk sent out */
     encodeBuf = dst;
-    exchangeBufferCallback = callback;
-    exchangeBufferCallbackHandle = handle;
+    exchangeBufferCallback = exchangeCallback;
+    exchangeBufferCallbackHandle = exchangeHandle;
 
     /* Encode and clean up */
     UA_StatusCode retval = UA_encodeBinaryInternal(src, type);
@@ -7319,7 +7493,7 @@ UA_calcSizeBinary(void *p, const UA_DataType *type) {
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541-build/src_generated/ua_types_generated.c" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd with script /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/generate_datatypes.py
- * on host WorkStation by user januil at 2017-01-18 04:03:46 */
+ * on host WorkStation by user januil at 2017-03-21 10:45:30 */
 
 
 /* Boolean */
@@ -14147,7 +14321,7 @@ const UA_DataType UA_TYPES[UA_TYPES_COUNT] = {
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541-build/src_generated/ua_transport_generated.c" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd, Custom.Opc.Ua.Transport.bsd with script /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/generate_datatypes.py
- * on host WorkStation by user januil at 2017-01-18 04:03:46 */
+ * on host WorkStation by user januil at 2017-03-21 10:45:30 */
 
 
 /* SecureConversationMessageAbortBody */
@@ -14236,6 +14410,25 @@ static UA_DataTypeMember TcpHelloMessage_members[6] = {
 #endif
     .namespaceZero = true,
     .padding = offsetof(UA_TcpHelloMessage, endpointUrl) - offsetof(UA_TcpHelloMessage, maxChunkCount) - sizeof(UA_UInt32),
+    .isArray = false
+  },};
+
+/* TcpErrorMessage */
+static UA_DataTypeMember TcpErrorMessage_members[2] = {
+  { .memberTypeIndex = UA_TYPES_UINT32,
+#ifdef UA_ENABLE_TYPENAMES
+    .memberName = "error",
+#endif
+    .namespaceZero = true,
+    .padding = 0,
+    .isArray = false
+  },
+  { .memberTypeIndex = UA_TYPES_STRING,
+#ifdef UA_ENABLE_TYPENAMES
+    .memberName = "reason",
+#endif
+    .namespaceZero = true,
+    .padding = offsetof(UA_TcpErrorMessage, reason) - offsetof(UA_TcpErrorMessage, error) - sizeof(UA_UInt32),
     .isArray = false
   },};
 
@@ -14442,6 +14635,20 @@ const UA_DataType UA_TRANSPORT[UA_TRANSPORT_COUNT] = {
   .membersSize = 6,
   .members = TcpHelloMessage_members },
 
+/* TcpErrorMessage */
+{ .typeId = {.namespaceIndex = 0, .identifierType = UA_NODEIDTYPE_NUMERIC, .identifier.numeric = 0},
+  .typeIndex = UA_TRANSPORT_TCPERRORMESSAGE,
+#ifdef UA_ENABLE_TYPENAMES
+  .typeName = "TcpErrorMessage",
+#endif
+  .memSize = sizeof(UA_TcpErrorMessage),
+  .builtin = false,
+  .fixedSize = false,
+  .overlayable = false,
+  .binaryEncodingId = 0,
+  .membersSize = 2,
+  .members = TcpErrorMessage_members },
+
 /* MessageType */
 { .typeId = {.namespaceIndex = 0, .identifierType = UA_NODEIDTYPE_NUMERIC, .identifier.numeric = 0},
   .typeIndex = UA_TYPES_INT32,
@@ -14558,14 +14765,18 @@ const UA_DataType UA_TRANSPORT[UA_TRANSPORT_COUNT] = {
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/ua_connection.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 void UA_Connection_deleteMembers(UA_Connection *connection) {
     UA_ByteString_deleteMembers(&connection->incompleteMessage);
 }
 
 UA_StatusCode
-UA_Connection_completeMessages(UA_Connection *connection, UA_ByteString * UA_RESTRICT message,
-                              UA_Boolean * UA_RESTRICT realloced) {
+UA_Connection_completeMessages(UA_Connection *connection, UA_ByteString *message,
+                               UA_Boolean *realloced) {
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
 
     /* We have a stored an incomplete chunk. Concat the received message to the end.
@@ -14594,6 +14805,7 @@ UA_Connection_completeMessages(UA_Connection *connection, UA_ByteString * UA_RES
             ((UA_UInt32)message->data[complete_until+1] << 8) +
             ((UA_UInt32)message->data[complete_until+2] << 16);
         if(msgtype != ('M' + ('S' << 8) + ('G' << 16)) &&
+           msgtype != ('E' + ('R' << 8) + ('R' << 16)) &&
            msgtype != ('O' + ('P' << 8) + ('N' << 16)) &&
            msgtype != ('H' + ('E' << 8) + ('L' << 16)) &&
            msgtype != ('A' + ('C' << 8) + ('K' << 16)) &&
@@ -14666,6 +14878,34 @@ UA_Connection_completeMessages(UA_Connection *connection, UA_ByteString * UA_RES
     UA_ByteString_deleteMembers(&connection->incompleteMessage);
     return retval;
 }
+
+UA_StatusCode
+UA_Connection_receiveChunksBlocking(UA_Connection *connection, UA_ByteString *chunks,
+                                    UA_Boolean *realloced, UA_UInt32 timeout) {
+    UA_DateTime now = UA_DateTime_nowMonotonic();
+    UA_DateTime maxDate = now + (timeout * UA_MSEC_TO_DATETIME);
+    *realloced = false;
+
+    UA_StatusCode retval = UA_STATUSCODE_GOOD;
+    while(true) {
+        /* Listen for messages to arrive */
+        retval = connection->recv(connection, chunks, timeout);
+
+        /* Get complete chunks and return */
+        retval |= UA_Connection_completeMessages(connection, chunks, realloced);
+        if(retval != UA_STATUSCODE_GOOD || chunks->length > 0)
+            break;
+
+        /* We received a message. But the chunk is incomplete. Compute the
+         * remaining timeout. */
+        now = UA_DateTime_nowMonotonic();
+        if(now > maxDate)
+            return UA_STATUSCODE_GOODNONCRITICALTIMEOUT;
+        timeout = (UA_UInt32)((maxDate - now) / UA_MSEC_TO_DATETIME);
+    }
+    return retval;
+}
+
 
 void UA_Connection_detachSecureChannel(UA_Connection *connection) {
     UA_SecureChannel *channel = connection->channel;
@@ -14819,13 +15059,18 @@ size_t UA_readNumber(UA_Byte *buf, size_t buflen, UA_UInt32 *number) {
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/ua_securechannel.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 #define UA_SECURE_MESSAGE_HEADER_LENGTH 24
 
 void UA_SecureChannel_init(UA_SecureChannel *channel) {
     memset(channel, 0, sizeof(UA_SecureChannel));
-    LIST_INIT(&channel->sessions);
-    LIST_INIT(&channel->chunks);
+    /* Linked lists are also initialized by zeroing out */
+    /* LIST_INIT(&channel->sessions); */
+    /* LIST_INIT(&channel->chunks); */
 }
 
 void UA_SecureChannel_deleteMembersCleanup(UA_SecureChannel *channel) {
@@ -14992,7 +15237,9 @@ UA_SecureChannel_sendChunk(UA_ChunkInfo *ci, UA_ByteString *dst, size_t offset) 
             connection->getSendBuffer(connection, connection->localConf.sendBufferSize, dst);
         if(retval != UA_STATUSCODE_GOOD)
             return retval;
-        /* Hide the header of the buffer, so that the ensuing encoding does not overwrite anything */
+        /* Forward the data pointer so that the payload is encoded after the message header.
+         * TODO: This works but is a bit too clever. Instead, we could return an offset to the
+         * binary encoding exchangeBuffer function. */
         dst->data = &dst->data[UA_SECURE_MESSAGE_HEADER_LENGTH];
         dst->length = connection->localConf.sendBufferSize - UA_SECURE_MESSAGE_HEADER_LENGTH;
     }
@@ -15167,6 +15414,23 @@ UA_SecureChannel_processChunks(UA_SecureChannel *channel, const UA_ByteString *c
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
     size_t offset= 0;
     do {
+
+        if (chunks->length > 3 && chunks->data[offset] == 'E' &&
+                chunks->data[offset+1] == 'R' && chunks->data[offset+2] == 'R') {
+            UA_TcpMessageHeader header;
+            retval = UA_TcpMessageHeader_decodeBinary(chunks, &offset, &header);
+            if(retval != UA_STATUSCODE_GOOD)
+                break;
+
+            UA_TcpErrorMessage errorMessage;
+            retval = UA_TcpErrorMessage_decodeBinary(chunks, &offset, &errorMessage);
+            if(retval != UA_STATUSCODE_GOOD)
+                break;
+
+            callback(application, channel, UA_MESSAGETYPE_ERR, 0, (void*)&errorMessage);
+            continue;
+        }
+
         /* Store the initial offset to compute the header length */
         size_t initial_offset = offset;
 
@@ -15243,6 +15507,10 @@ UA_SecureChannel_processChunks(UA_SecureChannel *channel, const UA_ByteString *c
 }
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/ua_session.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 #ifdef UA_ENABLE_SUBSCRIPTIONS
 #endif
@@ -15352,6 +15620,10 @@ UA_UInt32 UA_Session_getUniqueSubscriptionID(UA_Session *session) {
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_server.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 #ifdef UA_ENABLE_GENERATE_NAMESPACE0
 #endif
@@ -15390,23 +15662,31 @@ static const UA_NodeId nodeIdNonHierarchicalReferences = {
 /* Namespace Handling */
 /**********************/
 
-UA_UInt16 UA_Server_addNamespace(UA_Server *server, const char* name) {
-    /* Override const attribute to get string (dirty hack) */
-    const UA_String nameString = (UA_String){.length = strlen(name),
-                                             .data = (UA_Byte*)(uintptr_t)name};
-
+UA_UInt16 addNamespace(UA_Server *server, const UA_String name) {
     /* Check if the namespace already exists in the server's namespace array */
     for(UA_UInt16 i=0;i<server->namespacesSize;++i) {
-        if(UA_String_equal(&nameString, &server->namespaces[i]))
+        if(UA_String_equal(&name, &server->namespaces[i]))
             return i;
     }
 
     /* Add a new namespace to the namsepace array */
-    server->namespaces = UA_realloc(server->namespaces,
-                                    sizeof(UA_String) * (server->namespacesSize + 1));
-    UA_String_copy(&nameString, &server->namespaces[server->namespacesSize]);
+    UA_String *newNS = UA_realloc(server->namespaces,
+                                  sizeof(UA_String) * (server->namespacesSize + 1));
+    if(!newNS)
+        return 0;
+    server->namespaces = newNS;
+    UA_StatusCode retval = UA_String_copy(&name, &server->namespaces[server->namespacesSize]);
+    if(retval != UA_STATUSCODE_GOOD)
+        return 0;
     ++server->namespacesSize;
     return (UA_UInt16)(server->namespacesSize - 1);
+}
+
+UA_UInt16 UA_Server_addNamespace(UA_Server *server, const char* name) {
+    /* Override const attribute to get string (dirty hack) */
+    const UA_String nameString = {.length = strlen(name),
+                                  .data = (UA_Byte*)(uintptr_t)name};
+    return addNamespace(server, nameString);
 }
 
 #ifdef UA_ENABLE_EXTERNAL_NAMESPACES
@@ -15437,12 +15717,6 @@ UA_Server_addExternalNamespace(UA_Server *server, const UA_String *url,
     if(!nodeStore)
         return UA_STATUSCODE_BADARGUMENTSMISSING;
 
-    char urlString[256];
-    if(url.length >= 256)
-        return UA_STATUSCODE_BADINTERNALERROR;
-    memcpy(urlString, url.data, url.length);
-    urlString[url.length] = 0;
-
     size_t size = server->externalNamespacesSize;
     server->externalNamespaces =
         UA_realloc(server->externalNamespaces, sizeof(UA_ExternalNamespace) * (size + 1));
@@ -15451,7 +15725,6 @@ UA_Server_addExternalNamespace(UA_Server *server, const UA_String *url,
     *assignedNamespaceIndex = (UA_UInt16)server->namespacesSize;
     UA_String_copy(url, &server->externalNamespaces[size].url);
     ++server->externalNamespacesSize;
-    addNamespaceInternal(server, urlString);
 
     return UA_STATUSCODE_GOOD;
 }
@@ -15460,19 +15733,34 @@ UA_Server_addExternalNamespace(UA_Server *server, const UA_String *url,
 UA_StatusCode
 UA_Server_forEachChildNodeCall(UA_Server *server, UA_NodeId parentNodeId,
                                UA_NodeIteratorCallback callback, void *handle) {
-    UA_StatusCode retval = UA_STATUSCODE_GOOD;
     UA_RCU_LOCK();
     const UA_Node *parent = UA_NodeStore_get(server->nodestore, &parentNodeId);
     if(!parent) {
         UA_RCU_UNLOCK();
         return UA_STATUSCODE_BADNODEIDINVALID;
     }
-    for(size_t i = 0; i < parent->referencesSize; ++i) {
-        UA_ReferenceNode *ref = &parent->references[i];
+
+    /* TODO: We need to do an ugly copy of the references array since users may
+     * delete references from within the callback. In single-threaded mode this
+     * changes the same node we point at here. In multi-threaded mode, this
+     * creates a new copy as nodes are truly immutable. */
+    UA_ReferenceNode *refs = NULL;
+    size_t refssize = parent->referencesSize;
+    UA_StatusCode retval = UA_Array_copy(parent->references, parent->referencesSize,
+                                         (void**)&refs, &UA_TYPES[UA_TYPES_REFERENCENODE]);
+    if(retval != UA_STATUSCODE_GOOD) {
+        UA_RCU_UNLOCK();
+        return retval;
+    }
+
+    for(size_t i = parent->referencesSize; i > 0; --i) {
+        UA_ReferenceNode *ref = &refs[i-1];
         retval |= callback(ref->targetId.nodeId, ref->isInverse,
                            ref->referenceTypeId, handle);
     }
     UA_RCU_UNLOCK();
+
+    UA_Array_delete(refs, refssize, &UA_TYPES[UA_TYPES_REFERENCENODE]);
     return retval;
 }
 
@@ -15576,6 +15864,7 @@ void UA_Server_delete(UA_Server *server) {
 
 #ifdef UA_ENABLE_MULTITHREADING
     pthread_cond_destroy(&server->dispatchQueue_condition);
+    pthread_mutex_destroy(&server->dispatchQueue_mutex);
 #endif
     UA_free(server);
 }
@@ -15690,6 +15979,42 @@ readNamespaces(void *handle, const UA_NodeId nodeid, UA_Boolean sourceTimestamp,
 }
 
 static UA_StatusCode
+writeNamespaces(void *handle, const UA_NodeId nodeid, const UA_Variant *data,
+                const UA_NumericRange *range) {
+    UA_Server *server = (UA_Server*)handle;
+
+    /* Check the data type */
+    if(data->type != &UA_TYPES[UA_TYPES_STRING])
+        return UA_STATUSCODE_BADTYPEMISMATCH;
+
+    /* Check that the variant is not empty */
+    if(!data->data)
+        return UA_STATUSCODE_BADTYPEMISMATCH;
+
+    /* TODO: Writing with a range is not implemented */
+    if(range)
+        return UA_STATUSCODE_BADINTERNALERROR;
+
+    UA_String *newNamespaces = data->data;
+    size_t newNamespacesSize = data->arrayLength;
+
+    /* Test if we append to the existing namespaces */
+    if(newNamespacesSize <= server->namespacesSize)
+        return UA_STATUSCODE_BADTYPEMISMATCH;
+
+    /* Test if the existing namespaces are unchanged */
+    for(size_t i = 0; i < server->namespacesSize; ++i) {
+        if(!UA_String_equal(&server->namespaces[i], &newNamespaces[i]))
+            return UA_STATUSCODE_BADINTERNALERROR;
+    }
+
+    /* Add namespaces */
+    for(size_t i = server->namespacesSize; i < newNamespacesSize; ++i)
+        addNamespace(server, newNamespaces[i]);
+    return UA_STATUSCODE_GOOD;
+}
+
+static UA_StatusCode
 readCurrentTime(void *handle, const UA_NodeId nodeid, UA_Boolean sourceTimeStamp,
                 const UA_NumericRange *range, UA_DataValue *value) {
     if(range) {
@@ -15796,8 +16121,9 @@ UA_Server * UA_Server_new(const UA_ServerConfig config) {
     SLIST_INIT(&server->delayedCallbacks);
 #endif
 
-    /* uncomment for non-reproducible server runs */
-    //UA_random_seed(UA_DateTime_now());
+#ifndef UA_ENABLE_DETERMINISTIC_RNG
+    UA_random_seed((UA_UInt64)UA_DateTime_now());
+#endif
 
     /* ns0 and ns1 */
     server->namespaces = UA_Array_new(2, &UA_TYPES[UA_TYPES_STRING]);
@@ -16268,7 +16594,8 @@ UA_Server * UA_Server_new(const UA_ServerConfig config) {
     namespaceArray->nodeId.identifier.numeric = UA_NS0ID_SERVER_NAMESPACEARRAY;
     namespaceArray->valueSource = UA_VALUESOURCE_DATASOURCE;
     namespaceArray->value.dataSource = (UA_DataSource) {.handle = server, .read = readNamespaces,
-                                                        .write = NULL};
+                                                        .write = writeNamespaces};
+    namespaceArray->dataType = UA_TYPES[UA_TYPES_STRING].typeId;
     namespaceArray->valueRank = 1;
     namespaceArray->minimumSamplingInterval = 1.0;
     addNodeInternalWithType(server, (UA_Node*)namespaceArray, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER),
@@ -16599,6 +16926,8 @@ UA_Server * UA_Server_new(const UA_ServerConfig config) {
     UA_VariableNode *redundancySupport = UA_NodeStore_newVariableNode();
     copyNames((UA_Node*)redundancySupport, "RedundancySupport");
     redundancySupport->nodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER_SERVERREDUNDANCY_REDUNDANCYSUPPORT);
+    redundancySupport->valueRank = -1;
+    redundancySupport->dataType = UA_TYPES[UA_TYPES_INT32].typeId;
     //FIXME: enum is needed for type letting it uninitialized for now
     UA_Variant_setScalar(&redundancySupport->value.data.value.value, UA_Int32_new(),
                          &UA_TYPES[UA_TYPES_INT32]);
@@ -16644,6 +16973,10 @@ UA_Server * UA_Server_new(const UA_ServerConfig config) {
 }
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_server_binary.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 /********************/
@@ -17006,7 +17339,8 @@ processMSG(UA_Server *server, UA_SecureChannel *channel,
                                 "Client requested a subscription, " \
                                 "but those are not enabled in the build");
         } else {
-            UA_LOG_INFO_CHANNEL(server->config.logger, channel, "Unknown request %i",
+            UA_LOG_INFO_CHANNEL(server->config.logger, channel,
+                                "Unknown request with type identifier %i",
                                 requestTypeId.identifier.numeric);
         }
         sendError(channel, msg, requestPos, &UA_TYPES[UA_TYPES_SERVICEFAULT],
@@ -17025,7 +17359,8 @@ processMSG(UA_Server *server, UA_SecureChannel *channel,
     UA_RequestHeader *requestHeader = (UA_RequestHeader*)request;
     retval = UA_decodeBinary(msg, offset, request, requestType);
     if(retval != UA_STATUSCODE_GOOD) {
-        UA_LOG_DEBUG_CHANNEL(server->config.logger, channel, "Could not decode the request");
+        UA_LOG_DEBUG_CHANNEL(server->config.logger, channel,
+                             "Could not decode the request");
         sendError(channel, msg, requestPos, responseType, requestId, retval);
         return;
     }
@@ -17125,12 +17460,26 @@ processMSG(UA_Server *server, UA_SecureChannel *channel,
     retval = UA_SecureChannel_sendBinaryMessage(channel, requestId, response, responseType);
 
     if(retval != UA_STATUSCODE_GOOD)
-        UA_LOG_INFO_CHANNEL(server->config.logger, channel, "Could not send the message over "
-                             "the SecureChannel with error code 0x%08x", retval);
+        UA_LOG_INFO_CHANNEL(server->config.logger, channel,
+                            "Could not send the message over the SecureChannel "
+                            "with StatusCode %s", UA_StatusCode_name(retval));
 
     /* Clean up */
     UA_deleteMembers(request, requestType);
     UA_deleteMembers(response, responseType);
+}
+
+/* ERR -> Error from the remote connection */
+static void processERR(UA_Server *server, UA_Connection *connection, const UA_ByteString *msg, size_t *offset) {
+    UA_TcpErrorMessage errorMessage;
+    if (UA_TcpErrorMessage_decodeBinary(msg, offset, &errorMessage) != UA_STATUSCODE_GOOD) {
+        connection->close(connection);
+        return;
+    }
+
+    UA_LOG_ERROR(server->config.logger, UA_LOGCATEGORY_NETWORK,
+                 "Client replied with an error message: %s %.*s",
+                 UA_StatusCode_name(errorMessage.error), errorMessage.reason.length, errorMessage.reason.data);
 }
 
 /* Takes decoded messages starting at the nodeid of the content type. Only OPN
@@ -17140,7 +17489,16 @@ static void
 UA_Server_processSecureChannelMessage(UA_Server *server, UA_SecureChannel *channel,
                                       UA_MessageType messagetype, UA_UInt32 requestId,
                                       const UA_ByteString *message) {
+    UA_assert(channel);
+    UA_assert(channel->connection);
     switch(messagetype) {
+    case UA_MESSAGETYPE_ERR: {
+        const UA_TcpErrorMessage *msg = (const UA_TcpErrorMessage *) message;
+        UA_LOG_ERROR_CHANNEL(server->config.logger, channel,
+                             "Client replied with an error message: %s %.*s",
+                             UA_StatusCode_name(msg->error), msg->reason.length, msg->reason.data);
+        break;
+    }
     case UA_MESSAGETYPE_HEL:
         UA_LOG_TRACE_CHANNEL(server->config.logger, channel,
                              "Cannot process a HEL on an open channel");
@@ -17177,8 +17535,8 @@ UA_Server_processBinaryMessage(UA_Server *server, UA_Connection *connection,
             UA_SecureChannel_processChunks(channel, message,
                  (UA_ProcessMessageCallback*)UA_Server_processSecureChannelMessage, server);
         if(retval != UA_STATUSCODE_GOOD)
-            UA_LOG_TRACE_CHANNEL(server->config.logger, channel,
-                                 "Procesing chunkgs resulted in error code 0x%08x", retval);
+            UA_LOG_TRACE_CHANNEL(server->config.logger, channel, "Procesing chunks "
+                                 "resulted in error code %s", UA_StatusCode_name(retval));
     } else {
         /* Process messages without a channel and no chunking */
         size_t offset = 0;
@@ -17191,6 +17549,11 @@ UA_Server_processBinaryMessage(UA_Server *server, UA_Connection *connection,
 
         /* Dispatch according to the message type */
         switch(tcpMessageHeader.messageTypeAndChunkType & 0x00ffffff) {
+        case UA_MESSAGETYPE_ERR:
+            UA_LOG_TRACE(server->config.logger, UA_LOGCATEGORY_NETWORK,
+                         "Connection %i | Process ERR message", connection->sockfd);
+            processERR(server, connection, message, &offset);
+            break;
         case UA_MESSAGETYPE_HEL:
             UA_LOG_TRACE(server->config.logger, UA_LOGCATEGORY_NETWORK,
                          "Connection %i | Process HEL message", connection->sockfd);
@@ -17228,6 +17591,10 @@ UA_Server_processBinaryMessage(UA_Server *server, UA_Connection *connection,
 }
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_server_utils.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 /**********************/
@@ -17385,7 +17752,6 @@ getTypeHierarchy(UA_NodeStore *ns, const UA_Node *rootRef, UA_Boolean inverse,
     return UA_STATUSCODE_GOOD;
 }
 
-/* Recursively searches "upwards" in the tree following specific reference types */
 UA_Boolean
 isNodeInTree(UA_NodeStore *ns, const UA_NodeId *leafNode, const UA_NodeId *nodeToFind,
              const UA_NodeId *referenceTypeIds, size_t referenceTypeIdsSize) {
@@ -17509,6 +17875,10 @@ UA_Server_editNode(UA_Server *server, UA_Session *session,
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_server_worker.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 /**
  * There are four types of job execution:
@@ -17541,7 +17911,7 @@ UA_Server_editNode(UA_Server *server, UA_Session *session,
  *     for lockless synchronization. Journal of Parallel and Distributed Computing, 67(12), 1270-1285.
  *
  * Future Plans: Use work-stealing to load-balance between cores.
- * [3] Lê, Nhat Minh, et al. "Correct and efficient work-stealing for weak
+ * [3] Le, Nhat Minh, et al. "Correct and efficient work-stealing for weak
  *     memory models." ACM SIGPLAN Notices. Vol. 48. No. 8. ACM, 2013.
  */
 
@@ -17606,10 +17976,6 @@ workerLoop(UA_Worker *worker) {
     UA_random_seed((uintptr_t)worker);
     rcu_register_thread();
 
-    pthread_mutex_t mutex; // required for the condition variable
-    pthread_mutex_init(&mutex, 0);
-    pthread_mutex_lock(&mutex);
-
     while(*running) {
         struct DispatchJob *dj = (struct DispatchJob*)
             cds_wfcq_dequeue_blocking(&server->dispatchQueue_head, &server->dispatchQueue_tail);
@@ -17618,16 +17984,17 @@ workerLoop(UA_Worker *worker) {
             UA_free(dj);
         } else {
             /* nothing to do. sleep until a job is dispatched (and wakes up all worker threads) */
-            pthread_cond_wait(&server->dispatchQueue_condition, &mutex);
+            pthread_mutex_lock(&server->dispatchQueue_mutex);
+            pthread_cond_wait(&server->dispatchQueue_condition, &server->dispatchQueue_mutex);
+            pthread_mutex_unlock(&server->dispatchQueue_mutex);
         }
         UA_atomic_add(counter, 1);
     }
 
-    pthread_mutex_unlock(&mutex);
-    pthread_mutex_destroy(&mutex);
     UA_ASSERT_RCU_UNLOCKED();
     rcu_barrier(); // wait for all scheduled call_rcu work to complete
     rcu_unregister_thread();
+    UA_LOG_DEBUG(server->config.logger, UA_LOGCATEGORY_SERVER, "Worker shut down");
     return NULL;
 }
 
@@ -17697,19 +18064,20 @@ addRepeatedJob(UA_Server *server, struct RepeatedJob * UA_RESTRICT rj) {
 
 UA_StatusCode
 UA_Server_addRepeatedJob(UA_Server *server, UA_Job job,
-                         UA_UInt32 intervalMs, UA_Guid *jobId) {
+                         UA_UInt32 interval, UA_Guid *jobId) {
     /* the interval needs to be at least 5ms */
-    if(intervalMs < 5)
+    if(interval < 5)
         return UA_STATUSCODE_BADINTERNALERROR;
-    UA_UInt64 interval = (UA_UInt64)intervalMs * (UA_UInt64)UA_MSEC_TO_DATETIME; // from ms to 100ns resolution
+    UA_UInt64 interval_dt =
+        (UA_UInt64)interval * (UA_UInt64)UA_MSEC_TO_DATETIME; // from ms to 100ns resolution
 
     /* Create and fill the repeated job structure */
     struct RepeatedJob *rj = UA_malloc(sizeof(struct RepeatedJob));
     if(!rj)
         return UA_STATUSCODE_BADOUTOFMEMORY;
     /* done inside addRepeatedJob:
-     * rj->nextTime = UA_DateTime_nowMonotonic() + interval; */
-    rj->interval = interval;
+     * rj->nextTime = UA_DateTime_nowMonotonic() + interval_dt; */
+    rj->interval = interval_dt;
     rj->id = UA_Guid_random();
     rj->job = job;
 
@@ -18043,6 +18411,7 @@ UA_StatusCode UA_Server_run_startup(UA_Server *server) {
     UA_LOG_INFO(server->config.logger, UA_LOGCATEGORY_SERVER,
                 "Spinning up %u worker thread(s)", server->config.nThreads);
     pthread_cond_init(&server->dispatchQueue_condition, 0);
+    pthread_mutex_init(&server->dispatchQueue_mutex, 0);
     server->workers = UA_malloc(server->config.nThreads * sizeof(UA_Worker));
     if(!server->workers)
         return UA_STATUSCODE_BADOUTOFMEMORY;
@@ -18114,7 +18483,7 @@ UA_UInt16 UA_Server_run_iterate(UA_Server *server, UA_Boolean waitInternal) {
     /* Get work from the networklayer */
     for(size_t i = 0; i < server->config.networkLayersSize; ++i) {
         UA_ServerNetworkLayer *nl = &server->config.networkLayers[i];
-        UA_Job *jobs;
+        UA_Job *jobs = NULL;
         size_t jobsSize;
         /* only the last networklayer waits on the tieout */
         if(i == server->config.networkLayersSize-1)
@@ -18146,18 +18515,16 @@ UA_UInt16 UA_Server_run_iterate(UA_Server *server, UA_Boolean waitInternal) {
 #endif
         }
 
-#ifdef UA_ENABLE_MULTITHREADING
-        /* Wake up worker threads */
-        if(dispatched)
-            pthread_cond_broadcast(&server->dispatchQueue_condition);
-#endif
-
         /* Clean up jobs list */
         if(jobsSize > 0)
             UA_free(jobs);
     }
 
-#ifndef UA_ENABLE_MULTITHREADING
+#ifdef UA_ENABLE_MULTITHREADING
+    /* Wake up worker threads */
+    if(dispatched)
+        pthread_cond_broadcast(&server->dispatchQueue_condition);
+#else
     processDelayedCallbacks(server);
 #endif
 
@@ -18171,7 +18538,7 @@ UA_UInt16 UA_Server_run_iterate(UA_Server *server, UA_Boolean waitInternal) {
 UA_StatusCode UA_Server_run_shutdown(UA_Server *server) {
     for(size_t i = 0; i < server->config.networkLayersSize; ++i) {
         UA_ServerNetworkLayer *nl = &server->config.networkLayers[i];
-        UA_Job *stopJobs;
+        UA_Job *stopJobs = NULL;
         size_t stopJobsSize = nl->stop(nl, &stopJobs);
         for(size_t j = 0; j < stopJobsSize; ++j)
             processJob(server, &stopJobs[j]);
@@ -18179,18 +18546,22 @@ UA_StatusCode UA_Server_run_shutdown(UA_Server *server) {
     }
 
 #ifdef UA_ENABLE_MULTITHREADING
-    UA_LOG_INFO(server->config.logger, UA_LOGCATEGORY_SERVER,
-                "Shutting down %u worker thread(s)", server->config.nThreads);
-    /* Wait for all worker threads to finish */
-    for(size_t i = 0; i < server->config.nThreads; ++i)
-        server->workers[i].running = false;
-    pthread_cond_broadcast(&server->dispatchQueue_condition);
-    for(size_t i = 0; i < server->config.nThreads; ++i)
-        pthread_join(server->workers[i].thr, NULL);
-    UA_free(server->workers);
+    /* Ensure that run_shutdown can be called multiple times */
+    if(server->workers) {
+        UA_LOG_INFO(server->config.logger, UA_LOGCATEGORY_SERVER,
+                    "Shutting down %u worker thread(s)", server->config.nThreads);
+        /* Wait for all worker threads to finish */
+        for(size_t i = 0; i < server->config.nThreads; ++i)
+            server->workers[i].running = false;
+        pthread_cond_broadcast(&server->dispatchQueue_condition);
+        for(size_t i = 0; i < server->config.nThreads; ++i)
+            pthread_join(server->workers[i].thr, NULL);
+        /* Free the worker structures */
+        UA_free(server->workers);
+        server->workers = NULL;
+    }
 
-    /* Manually finish the work still enqueued.
-       This especially contains delayed frees */
+    /* Manually finish the work still enqueued */
     emptyDispatchQueue(server);
     UA_ASSERT_RCU_UNLOCKED();
     rcu_barrier(); // wait for all scheduled call_rcu work to complete
@@ -18210,6 +18581,10 @@ UA_StatusCode UA_Server_run(UA_Server *server, volatile UA_Boolean *running) {
 }
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_securechannel_manager.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 #define STARTCHANNELID 1
@@ -18381,6 +18756,10 @@ UA_SecureChannelManager_close(UA_SecureChannelManager *cm, UA_UInt32 channelId) 
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_session_manager.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 UA_StatusCode
 UA_SessionManager_init(UA_SessionManager *sm, UA_Server *server) {
@@ -18485,6 +18864,10 @@ UA_SessionManager_removeSession(UA_SessionManager *sm, const UA_NodeId *token) {
 }
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_nodes.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 void UA_Node_deleteMembersAnyNodeClass(UA_Node *node) {
@@ -18688,6 +19071,10 @@ UA_StatusCode UA_Node_copyAnyNodeClass(const UA_Node *src, UA_Node *dst) {
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_nodestore.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 #ifndef UA_ENABLE_MULTITHREADING /* conditional compilation */
 
@@ -18707,10 +19094,9 @@ struct UA_NodeStore {
     UA_UInt32 sizePrimeIndex;
 };
 
-
 /* The size of the hash-map is always a prime number. They are chosen to be
  * close to the next power of 2. So the size ca. doubles with each prime. */
-static hash_t const primes[] = {
+static UA_UInt32 const primes[] = {
     7,         13,         31,         61,         127,         251,
     509,       1021,       2039,       4093,       8191,        16381,
     32749,     65521,      131071,     262139,     524287,      1048573,
@@ -18718,10 +19104,13 @@ static hash_t const primes[] = {
     134217689, 268435399,  536870909,  1073741789, 2147483647,  4294967291
 };
 
+static UA_UInt32 mod(UA_UInt32 h, UA_UInt32 size) { return h % size; }
+static UA_UInt32 mod2(UA_UInt32 h, UA_UInt32 size) { return 1 + (h % (size - 2)); }
+
 static UA_UInt16
-higher_prime_index(hash_t n) {
+higher_prime_index(UA_UInt32 n) {
     UA_UInt16 low  = 0;
-    UA_UInt16 high = (UA_UInt16)(sizeof(primes) / sizeof(hash_t));
+    UA_UInt16 high = (UA_UInt16)(sizeof(primes) / sizeof(UA_UInt32));
     while(low != high) {
         UA_UInt16 mid = (UA_UInt16)(low + ((high - low) / 2));
         if(n > primes[mid])
@@ -18779,10 +19168,10 @@ deleteEntry(UA_NodeStoreEntry *entry) {
 /* returns slot of a valid node or null */
 static UA_NodeStoreEntry **
 findNode(const UA_NodeStore *ns, const UA_NodeId *nodeid) {
-    hash_t h = hash(nodeid);
+    UA_UInt32 h = UA_NodeId_hash(nodeid);
     UA_UInt32 size = ns->size;
-    hash_t idx = mod(h, size);
-    hash_t hash2 = mod2(h, size);
+    UA_UInt32 idx = mod(h, size);
+    UA_UInt32 hash2 = mod2(h, size);
 
     while(true) {
         UA_NodeStoreEntry *e = ns->entries[idx];
@@ -18803,10 +19192,10 @@ findNode(const UA_NodeStore *ns, const UA_NodeId *nodeid) {
 /* returns an empty slot or null if the nodeid exists */
 static UA_NodeStoreEntry **
 findSlot(const UA_NodeStore *ns, const UA_NodeId *nodeid) {
-    hash_t h = hash(nodeid);
+    UA_UInt32 h = UA_NodeId_hash(nodeid);
     UA_UInt32 size = ns->size;
-    hash_t idx = mod(h, size);
-    hash_t hash2 = mod2(h, size);
+    UA_UInt32 idx = mod(h, size);
+    UA_UInt32 hash2 = mod2(h, size);
 
     while(true) {
         UA_NodeStoreEntry *e = ns->entries[idx];
@@ -18891,8 +19280,8 @@ UA_NodeStore_delete(UA_NodeStore *ns) {
 }
 
 UA_Node *
-UA_NodeStore_newNode(UA_NodeClass class) {
-    UA_NodeStoreEntry *entry = instantiateEntry(class);
+UA_NodeStore_newNode(UA_NodeClass nodeClass) {
+    UA_NodeStoreEntry *entry = instantiateEntry(nodeClass);
     if(!entry)
         return NULL;
     return &entry->node;
@@ -18922,7 +19311,7 @@ UA_NodeStore_insert(UA_NodeStore *ns, UA_Node *node) {
             node->nodeId.namespaceIndex = 1;
         UA_UInt32 identifier = ns->count+1; // start value
         UA_UInt32 size = ns->size;
-        hash_t increase = mod2(identifier, size);
+        UA_UInt32 increase = mod2(identifier, size);
         while(true) {
             node->nodeId.identifier.numeric = identifier;
             entry = findSlot(ns, &node->nodeId);
@@ -18935,13 +19324,14 @@ UA_NodeStore_insert(UA_NodeStore *ns, UA_Node *node) {
     } else {
         entry = findSlot(ns, &node->nodeId);
         if(!entry) {
-            deleteEntry(container_of(node, UA_NodeStoreEntry, node));
+            UA_NodeStore_deleteNode(node);
             return UA_STATUSCODE_BADNODEIDEXISTS;
         }
     }
 
     *entry = container_of(node, UA_NodeStoreEntry, node);
     ++ns->count;
+    UA_assert(&(*entry)->node == node);
     return UA_STATUSCODE_GOOD;
 }
 
@@ -19012,6 +19402,10 @@ UA_NodeStore_iterate(UA_NodeStore *ns, UA_NodeStore_nodeVisitor visitor) {
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_nodestore_concurrent.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 #ifdef UA_ENABLE_MULTITHREADING /* conditional compilation */
 #include <urcu/rculfhash.h>
@@ -19022,7 +19416,6 @@ struct nodeEntry {
     struct nodeEntry *orig; //< the version this is a copy from (or NULL)
     UA_Node node; ///< Might be cast from any _bigger_ UA_Node* type. Allocate enough memory!
 };
-
 
 static struct nodeEntry * instantiateEntry(UA_NodeClass class) {
     size_t size = sizeof(struct nodeEntry) - sizeof(UA_Node);
@@ -19094,8 +19487,9 @@ void UA_NodeStore_delete(UA_NodeStore *ns) {
         }
         cds_lfht_next(ht, &iter);
     }
+    UA_RCU_UNLOCK();
     cds_lfht_destroy(ht, NULL);
-    UA_free(ns);
+    UA_RCU_LOCK();
 }
 
 UA_Node * UA_NodeStore_newNode(UA_NodeClass class) {
@@ -19121,7 +19515,7 @@ UA_StatusCode UA_NodeStore_insert(UA_NodeStore *ns, UA_Node *node) {
     tempNodeid = node->nodeId;
     tempNodeid.namespaceIndex = 0;
     if(!UA_NodeId_isNull(&tempNodeid)) {
-        hash_t h = hash(&node->nodeId);
+        UA_UInt32 h = UA_NodeId_hash(&node->nodeId);
         result = cds_lfht_add_unique(ht, h, compare, &node->nodeId, &entry->htn);
         /* If the nodeid exists already */
         if(result != &entry->htn) {
@@ -19141,7 +19535,7 @@ UA_StatusCode UA_NodeStore_insert(UA_NodeStore *ns, UA_Node *node) {
 
         node->nodeId.identifier.numeric = (UA_UInt32)identifier;
         while(true) {
-            hash_t h = hash(&node->nodeId);
+            UA_UInt32 h = UA_NodeId_hash(&node->nodeId);
             result = cds_lfht_add_unique(ht, h, compare, &node->nodeId, &entry->htn);
             if(result == &entry->htn)
                 break;
@@ -19157,7 +19551,7 @@ UA_StatusCode UA_NodeStore_replace(UA_NodeStore *ns, UA_Node *node) {
     struct cds_lfht *ht = (struct cds_lfht*)ns;
 
     /* Get the current version */
-    hash_t h = hash(&node->nodeId);
+    UA_UInt32 h = UA_NodeId_hash(&node->nodeId);
     struct cds_lfht_iter iter;
     cds_lfht_lookup(ht, h, compare, &node->nodeId, &iter);
     if(!iter.node)
@@ -19165,8 +19559,10 @@ UA_StatusCode UA_NodeStore_replace(UA_NodeStore *ns, UA_Node *node) {
 
     /* We try to replace an obsolete version of the node */
     struct nodeEntry *oldEntry = (struct nodeEntry*)iter.node;
-    if(oldEntry != entry->orig)
+    if(oldEntry != entry->orig) {
+        deleteEntry(&entry->rcu_head);
         return UA_STATUSCODE_BADINTERNALERROR;
+    }
     
     cds_lfht_node_init(&entry->htn);
     if(cds_lfht_replace(ht, &iter, h, compare, &node->nodeId, &entry->htn) != 0) {
@@ -19183,7 +19579,7 @@ UA_StatusCode UA_NodeStore_replace(UA_NodeStore *ns, UA_Node *node) {
 UA_StatusCode UA_NodeStore_remove(UA_NodeStore *ns, const UA_NodeId *nodeid) {
     UA_ASSERT_RCU_LOCKED();
     struct cds_lfht *ht = (struct cds_lfht*)ns;
-    hash_t h = hash(nodeid);
+    UA_UInt32 h = UA_NodeId_hash(nodeid);
     struct cds_lfht_iter iter;
     cds_lfht_lookup(ht, h, compare, nodeid, &iter);
     if(!iter.node || cds_lfht_del(ht, iter.node) != 0)
@@ -19196,7 +19592,7 @@ UA_StatusCode UA_NodeStore_remove(UA_NodeStore *ns, const UA_NodeId *nodeid) {
 const UA_Node * UA_NodeStore_get(UA_NodeStore *ns, const UA_NodeId *nodeid) {
     UA_ASSERT_RCU_LOCKED();
     struct cds_lfht *ht = (struct cds_lfht*)ns;
-    hash_t h = hash(nodeid);
+    UA_UInt32 h = UA_NodeId_hash(nodeid);
     struct cds_lfht_iter iter;
     cds_lfht_lookup(ht, h, compare, nodeid, &iter);
     struct nodeEntry *found_entry = (struct nodeEntry*)iter.node;
@@ -19208,7 +19604,7 @@ const UA_Node * UA_NodeStore_get(UA_NodeStore *ns, const UA_NodeId *nodeid) {
 UA_Node * UA_NodeStore_getCopy(UA_NodeStore *ns, const UA_NodeId *nodeid) {
     UA_ASSERT_RCU_LOCKED();
     struct cds_lfht *ht = (struct cds_lfht*)ns;
-    hash_t h = hash(nodeid);
+    UA_UInt32 h = UA_NodeId_hash(nodeid);
     struct cds_lfht_iter iter;
     cds_lfht_lookup(ht, h, compare, nodeid, &iter);
     struct nodeEntry *entry = (struct nodeEntry*)iter.node;
@@ -19240,6 +19636,10 @@ void UA_NodeStore_iterate(UA_NodeStore *ns, UA_NodeStore_nodeVisitor visitor) {
 #endif /* UA_ENABLE_MULTITHREADING */
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_services_discovery.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 void Service_FindServers(UA_Server *server, UA_Session *session,
@@ -19361,6 +19761,10 @@ void Service_GetEndpoints(UA_Server *server, UA_Session *session, const UA_GetEn
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_services_securechannel.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 void Service_OpenSecureChannel(UA_Server *server, UA_Connection *connection,
                                const UA_OpenSecureChannelRequest *request,
@@ -19370,26 +19774,28 @@ void Service_OpenSecureChannel(UA_Server *server, UA_Connection *connection,
         response->responseHeader.serviceResult =
             UA_SecureChannelManager_open(&server->secureChannelManager, connection, request, response);
 
-        if(response->responseHeader.serviceResult == UA_STATUSCODE_GOOD)
+        if(response->responseHeader.serviceResult == UA_STATUSCODE_GOOD) {
             UA_LOG_INFO(server->config.logger, UA_LOGCATEGORY_SECURECHANNEL,
                          "Connection %i | SecureChannel %i | OpenSecureChannel: Opened SecureChannel",
                          connection->sockfd, response->securityToken.channelId);
-        else
+        } else {
             UA_LOG_DEBUG(server->config.logger, UA_LOGCATEGORY_SECURECHANNEL,
                          "Connection %i | OpenSecureChannel: Opening a SecureChannel failed",
                          connection->sockfd);
+        }
     } else {
         response->responseHeader.serviceResult =
             UA_SecureChannelManager_renew(&server->secureChannelManager, connection, request, response);
 
-        if(response->responseHeader.serviceResult == UA_STATUSCODE_GOOD)
+        if(response->responseHeader.serviceResult == UA_STATUSCODE_GOOD) {
             UA_LOG_DEBUG(server->config.logger, UA_LOGCATEGORY_SECURECHANNEL,
                          "Connection %i | SecureChannel %i | OpenSecureChannel: SecureChannel renewed",
                          connection->sockfd, response->securityToken.channelId);
-        else
+        } else {
             UA_LOG_DEBUG(server->config.logger, UA_LOGCATEGORY_SECURECHANNEL,
                          "Connection %i | OpenSecureChannel: Renewing SecureChannel failed",
                          connection->sockfd);
+        }
     }
 }
 
@@ -19400,6 +19806,10 @@ void Service_CloseSecureChannel(UA_Server *server, UA_SecureChannel *channel) {
 }
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_services_session.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 void Service_CreateSession(UA_Server *server, UA_SecureChannel *channel,
@@ -19551,6 +19961,10 @@ Service_CloseSession(UA_Server *server, UA_Session *session, const UA_CloseSessi
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_services_attribute.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 #ifdef UA_ENABLE_NONSTANDARD_STATELESS
 #endif
 
@@ -19633,9 +20047,16 @@ compatibleArrayDimensions(size_t constraintArrayDimensionsSize,
                           const UA_UInt32 *constraintArrayDimensions,
                           size_t testArrayDimensionsSize,
                           const UA_UInt32 *testArrayDimensions) {
+    /* No array dimensions defined -> everything is permitted if the value rank fits */
+    if(constraintArrayDimensionsSize == 0) {
+        return UA_STATUSCODE_GOOD;
+    }
+
+    /* Dimension count must match */
     if(testArrayDimensionsSize != constraintArrayDimensionsSize)
         return UA_STATUSCODE_BADTYPEMISMATCH;
-    /* dimension size zero in the constraint is a wildcard */
+
+    /* Dimension lengths must match; zero in the constraint is a wildcard */
     for(size_t i = 0; i < constraintArrayDimensionsSize; ++i) {
         if(constraintArrayDimensions[i] != testArrayDimensions[i] &&
            constraintArrayDimensions[i] != 0)
@@ -19694,13 +20115,8 @@ typeCheckValue(UA_Server *server, const UA_NodeId *targetDataTypeId,
                const UA_UInt32 *targetArrayDimensions, const UA_Variant *value,
                const UA_NumericRange *range, UA_Variant *editableValue) {
     /* Empty variant is only allowed for BaseDataType */
-    UA_NodeId basedatatype = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
-    if(!value->type) {
-        if(UA_NodeId_equal(targetDataTypeId, &basedatatype))
-            goto check_array;
-        else
-            return UA_STATUSCODE_BADTYPEMISMATCH;
-    }
+    if(!value->type)
+        goto check_array;
 
     /* See if the types match. The nodeid on the wire may be != the nodeid in
      * the node for opaque types, enums and bytestrings. value contains the
@@ -19724,13 +20140,20 @@ typeCheckValue(UA_Server *server, const UA_NodeId *targetDataTypeId,
     if(range) /* array dimensions are checked later when writing the range */
         return UA_STATUSCODE_GOOD;
 
+    size_t valueArrayDimensionsSize = value->arrayDimensionsSize;
+    UA_UInt32 *valueArrayDimensions = value->arrayDimensions;
+    UA_UInt32 tempArrayDimensions;
+    if(valueArrayDimensions == 0 && !UA_Variant_isScalar(value)) {
+        valueArrayDimensionsSize = 1;
+        tempArrayDimensions = (UA_UInt32)value->arrayLength;
+        valueArrayDimensions = &tempArrayDimensions;
+    }
+
     /* See if the array dimensions match. When arrayDimensions are defined, they
      * already hold the valuerank. */
     if(targetArrayDimensionsSize > 0)
-        return compatibleArrayDimensions(targetArrayDimensionsSize,
-                                         targetArrayDimensions,
-                                         value->arrayDimensionsSize,
-                                         value->arrayDimensions);
+        return compatibleArrayDimensions(targetArrayDimensionsSize, targetArrayDimensions,
+                                         valueArrayDimensionsSize, valueArrayDimensions);
 
     /* Check if the valuerank allows for the value dimension */
     return compatibleValueRankValue(targetValueRank, value);
@@ -19786,7 +20209,7 @@ writeArrayDimensionsAttribute(UA_Server *server, UA_VariableNode *node,
     /* Check if the current value is compatible with the array dimensions */
     UA_DataValue value;
     UA_DataValue_init(&value);
-    retval = readValueAttribute(node, &value);
+    retval = readValueAttribute(server, node, &value);
     if(retval != UA_STATUSCODE_GOOD)
         return retval;
     if(value.hasValue) {
@@ -19822,11 +20245,11 @@ writeValueRankAttributeWithVT(UA_Server *server, UA_VariableNode *node,
     const UA_VariableTypeNode *vt = getVariableNodeType(server, node);
     if(!vt)
         return UA_STATUSCODE_BADINTERNALERROR;
-    return writeValueRankAttribute(node, valueRank, vt->valueRank);
+    return writeValueRankAttribute(server, node, valueRank, vt->valueRank);
 }
 
 UA_StatusCode
-writeValueRankAttribute(UA_VariableNode *node, UA_Int32 valueRank,
+writeValueRankAttribute(UA_Server *server, UA_VariableNode *node, UA_Int32 valueRank,
                         UA_Int32 constraintValueRank) {
     /* If this is a variabletype, there must be no instances or subtypes of it
        when we do the change */
@@ -19865,7 +20288,7 @@ writeValueRankAttribute(UA_VariableNode *node, UA_Int32 valueRank,
            dimensions zero indicate a scalar for compatibleValueRankArrayDimensions. */
         UA_DataValue value;
         UA_DataValue_init(&value);
-        retval = readValueAttribute(node, &value);
+        retval = readValueAttribute(server, node, &value);
         if(retval != UA_STATUSCODE_GOOD)
             return retval;
         if(!value.hasValue || value.value.data == NULL)
@@ -19916,7 +20339,7 @@ writeDataTypeAttribute(UA_Server *server, UA_VariableNode *node,
     /* Check if the current value would match the new type */
     UA_DataValue value;
     UA_DataValue_init(&value);
-    UA_StatusCode retval = readValueAttribute(node, &value);
+    UA_StatusCode retval = readValueAttribute(server, node, &value);
     if(retval != UA_STATUSCODE_GOOD)
         return retval;
     if(value.hasValue) {
@@ -19947,11 +20370,18 @@ writeDataTypeAttribute(UA_Server *server, UA_VariableNode *node,
 /*******************/
 
 static UA_StatusCode
-readValueAttributeFromNode(const UA_VariableNode *vn, UA_DataValue *v,
+readValueAttributeFromNode(UA_Server *server, const UA_VariableNode *vn, UA_DataValue *v,
                            UA_NumericRange *rangeptr) {
-    if(vn->value.data.callback.onRead)
+    if(vn->value.data.callback.onRead) {
+        UA_RCU_UNLOCK();
         vn->value.data.callback.onRead(vn->value.data.callback.handle,
-                                       vn->nodeId, &v->value, rangeptr);
+                                       vn->nodeId, &vn->value.data.value.value, rangeptr);
+        UA_RCU_LOCK();
+#ifdef UA_ENABLE_MULTITHREADING
+        /* Reopen the node to see the changes (multithreading only) */
+        vn = (const UA_VariableNode*)UA_NodeStore_get(server->nodestore, &vn->nodeId);
+#endif
+    }
     if(rangeptr)
         return UA_Variant_copyRange(&vn->value.data.value.value, &v->value, *rangeptr);
     *v = vn->value.data.value;
@@ -19967,13 +20397,19 @@ readValueAttributeFromDataSource(const UA_VariableNode *vn, UA_DataValue *v,
         return UA_STATUSCODE_BADINTERNALERROR;
     UA_Boolean sourceTimeStamp = (timestamps == UA_TIMESTAMPSTORETURN_SOURCE ||
                                   timestamps == UA_TIMESTAMPSTORETURN_BOTH);
-    return vn->value.dataSource.read(vn->value.dataSource.handle, vn->nodeId,
-                                     sourceTimeStamp, rangeptr, v);
+
+    UA_RCU_UNLOCK();
+    UA_StatusCode retval =
+        vn->value.dataSource.read(vn->value.dataSource.handle, vn->nodeId,
+                                  sourceTimeStamp, rangeptr, v);
+    UA_RCU_LOCK();
+    return retval;
 }
 
 static UA_StatusCode
-readValueAttributeComplete(const UA_VariableNode *vn, UA_TimestampsToReturn timestamps,
-                           const UA_String *indexRange, UA_DataValue *v) {
+readValueAttributeComplete(UA_Server *server, const UA_VariableNode *vn,
+                           UA_TimestampsToReturn timestamps, const UA_String *indexRange,
+                           UA_DataValue *v) {
     /* Compute the index range */
     UA_NumericRange range;
     UA_NumericRange *rangeptr = NULL;
@@ -19987,7 +20423,7 @@ readValueAttributeComplete(const UA_VariableNode *vn, UA_TimestampsToReturn time
 
     /* Read the value */
     if(vn->valueSource == UA_VALUESOURCE_DATA)
-        retval = readValueAttributeFromNode(vn, v, rangeptr);
+        retval = readValueAttributeFromNode(server, vn, v, rangeptr);
     else
         retval = readValueAttributeFromDataSource(vn, v, timestamps, rangeptr);
 
@@ -19998,8 +20434,8 @@ readValueAttributeComplete(const UA_VariableNode *vn, UA_TimestampsToReturn time
 }
 
 UA_StatusCode
-readValueAttribute(const UA_VariableNode *vn, UA_DataValue *v) {
-    return readValueAttributeComplete(vn, UA_TIMESTAMPSTORETURN_NEITHER, NULL, v);
+readValueAttribute(UA_Server *server, const UA_VariableNode *vn, UA_DataValue *v) {
+    return readValueAttributeComplete(server, vn, UA_TIMESTAMPSTORETURN_NEITHER, NULL, v);
 }
 
 static UA_StatusCode
@@ -20086,16 +20522,32 @@ writeValueAttribute(UA_Server *server, UA_VariableNode *node,
             retval = writeValueAttributeWithoutRange(node, &editableValue);
         else
             retval = writeValueAttributeWithRange(node, &editableValue, rangeptr);
+
         /* Callback after writing */
-        if(retval == UA_STATUSCODE_GOOD && node->value.data.callback.onWrite)
-            node->value.data.callback.onWrite(node->value.data.callback.handle, node->nodeId,
-                                              &node->value.data.value.value, rangeptr);
+        if(retval == UA_STATUSCODE_GOOD && node->value.data.callback.onWrite) {
+            const UA_VariableNode *writtenNode;
+#ifdef UA_ENABLE_MULTITHREADING
+            /* Reopen the node to see the changes (multithreading only) */
+            writtenNode = (const UA_VariableNode*)UA_NodeStore_get(server->nodestore, &node->nodeId);
+#else
+            writtenNode = node; /* The node is written in-situ (TODO: this might
+                                   change with the nodestore plugin approach) */
+#endif
+            UA_RCU_UNLOCK();
+            writtenNode->value.data.callback.onWrite(writtenNode->value.data.callback.handle,
+                                                     writtenNode->nodeId,
+                                                     &writtenNode->value.data.value.value, rangeptr);
+            UA_RCU_LOCK();
+        }
     } else {
-        if(node->value.dataSource.write)
+        if(node->value.dataSource.write) {
+            UA_RCU_UNLOCK();
             retval = node->value.dataSource.write(node->value.dataSource.handle,
                                                   node->nodeId, &editableValue.value, rangeptr);
-        else
+            UA_RCU_LOCK();
+        } else {
             retval = UA_STATUSCODE_BADWRITENOTSUPPORTED;
+        }
     }
 
     /* Clean up */
@@ -20244,7 +20696,7 @@ void Service_Read_single(UA_Server *server, UA_Session *session,
         break;
     case UA_ATTRIBUTEID_VALUE:
         CHECK_NODECLASS(UA_NODECLASS_VARIABLE | UA_NODECLASS_VARIABLETYPE);
-        retval = readValueAttributeComplete((const UA_VariableNode*)node,
+        retval = readValueAttributeComplete(server, (const UA_VariableNode*)node,
                                             timestamps, &id->indexRange, v);
         break;
     case UA_ATTRIBUTEID_DATATYPE:
@@ -20628,7 +21080,8 @@ CopyAttributeIntoNode(UA_Server *server, UA_Session *session,
     }
     if(retval != UA_STATUSCODE_GOOD)
         UA_LOG_INFO_SESSION(server->config.logger, session,
-                            "WriteRequest returned status code 0x%08x", retval);
+                            "WriteRequest returned status code %s",
+                            UA_StatusCode_name(retval));
     return retval;
 }
 
@@ -20699,7 +21152,7 @@ UA_StatusCode
 __UA_Server_write(UA_Server *server, const UA_NodeId *nodeId,
                   const UA_AttributeId attributeId,
                   const UA_DataType *attr_type,
-                  const void *value) {
+                  const void *attr) {
     UA_WriteValue wvalue;
     UA_WriteValue_init(&wvalue);
     wvalue.nodeId = *nodeId;
@@ -20707,14 +21160,18 @@ __UA_Server_write(UA_Server *server, const UA_NodeId *nodeId,
     wvalue.value.hasValue = true;
     if(attr_type != &UA_TYPES[UA_TYPES_VARIANT]) {
         /* hacked cast. the target WriteValue is used as const anyway */
-        UA_Variant_setScalar(&wvalue.value.value, (void*)(uintptr_t)value, attr_type);
+        UA_Variant_setScalar(&wvalue.value.value, (void*)(uintptr_t)attr, attr_type);
     } else {
-        wvalue.value.value = *(const UA_Variant*)value;
+        wvalue.value.value = *(const UA_Variant*)attr;
     }
     return UA_Server_write(server, &wvalue);
 }
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_services_nodemanagement.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 /**********************/
@@ -20730,8 +21187,8 @@ checkParentReference(UA_Server *server, UA_Session *session, UA_NodeClass nodeCl
     /* See if the parent exists */
     const UA_Node *parent = UA_NodeStore_get(server->nodestore, parentNodeId);
     if(!parent) {
-        UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                             "AddNodes: Parent node not found");
+        UA_LOG_INFO_SESSION(server->config.logger, session,
+                            "AddNodes: Parent node not found");
         return UA_STATUSCODE_BADPARENTNODEIDINVALID;
     }
 
@@ -20739,22 +21196,22 @@ checkParentReference(UA_Server *server, UA_Session *session, UA_NodeClass nodeCl
     const UA_ReferenceTypeNode *referenceType =
         (const UA_ReferenceTypeNode*)UA_NodeStore_get(server->nodestore, referenceTypeId);
     if(!referenceType) {
-        UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                             "AddNodes: Reference type to the parent not found");
+        UA_LOG_INFO_SESSION(server->config.logger, session,
+                            "AddNodes: Reference type to the parent not found");
         return UA_STATUSCODE_BADREFERENCETYPEIDINVALID;
     }
 
     /* Check if the referencetype is a reference type node */
     if(referenceType->nodeClass != UA_NODECLASS_REFERENCETYPE) {
-        UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                             "AddNodes: Reference type to the parent invalid");
+        UA_LOG_INFO_SESSION(server->config.logger, session,
+                            "AddNodes: Reference type to the parent invalid");
         return UA_STATUSCODE_BADREFERENCETYPEIDINVALID;
     }
 
     /* Check that the reference type is not abstract */
     if(referenceType->isAbstract == true) {
-        UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                             "AddNodes: Abstract reference type to the parent invalid");
+        UA_LOG_INFO_SESSION(server->config.logger, session,
+                            "AddNodes: Abstract reference type to the parent not allowed");
         return UA_STATUSCODE_BADREFERENCENOTALLOWED;
     }
 
@@ -20766,16 +21223,16 @@ checkParentReference(UA_Server *server, UA_Session *session, UA_NodeClass nodeCl
        nodeClass == UA_NODECLASS_REFERENCETYPE) {
         /* type needs hassubtype reference to the supertype */
         if(!UA_NodeId_equal(referenceTypeId, &subtypeId)) {
-            UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                                 "AddNodes: New type node need to have a "
-                                 "hassubtype reference");
+            UA_LOG_INFO_SESSION(server->config.logger, session,
+                                "AddNodes: New type node need to have a "
+                                "HasSubType reference");
             return UA_STATUSCODE_BADREFERENCENOTALLOWED;
         }
         /* supertype needs to be of the same node type  */
         if(parent->nodeClass != nodeClass) {
-            UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                                 "AddNodes: New type node needs to be of the same "
-                                 "node type as the parent");
+            UA_LOG_INFO_SESSION(server->config.logger, session,
+                                "AddNodes: New type node needs to be of the same "
+                                "node type as the parent");
             return UA_STATUSCODE_BADPARENTNODEIDINVALID;
         }
         return UA_STATUSCODE_GOOD;
@@ -20786,8 +21243,8 @@ checkParentReference(UA_Server *server, UA_Session *session, UA_NodeClass nodeCl
         UA_NODEID_NUMERIC(0, UA_NS0ID_HIERARCHICALREFERENCES);
     if(!isNodeInTree(server->nodestore, referenceTypeId,
                      &hierarchicalReference, &subtypeId, 1)) {
-        UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                             "AddNodes: Reference type is not hierarchical");
+        UA_LOG_INFO_SESSION(server->config.logger, session,
+                            "AddNodes: Reference type is not hierarchical");
         return UA_STATUSCODE_BADREFERENCETYPEIDINVALID;
     }
 
@@ -20824,7 +21281,7 @@ copyExistingVariable(UA_Server *server, UA_Session *session, const UA_NodeId *va
     /* Get the current value */
     UA_DataValue value;
     UA_DataValue_init(&value);
-    UA_StatusCode retval = readValueAttribute(node, &value);
+    UA_StatusCode retval = readValueAttribute(server, node, &value);
     if(retval != UA_STATUSCODE_GOOD)
         return retval;
 
@@ -21128,9 +21585,11 @@ Service_AddNodes_existing(UA_Server *server, UA_Session *session, UA_Node *node,
                           const UA_NodeId *typeDefinition,
                           UA_InstantiationCallback *instantiationCallback,
                           UA_NodeId *addedNodeId) {
+    UA_ASSERT_RCU_LOCKED();
+
     /* Check the namespaceindex */
     if(node->nodeId.namespaceIndex >= server->namespacesSize) {
-        UA_LOG_DEBUG_SESSION(server->config.logger, session, "AddNodes: Namespace invalid");
+        UA_LOG_INFO_SESSION(server->config.logger, session, "AddNodes: Namespace invalid");
         UA_NodeStore_deleteNode(node);
         return UA_STATUSCODE_BADNODEIDINVALID;
     }
@@ -21139,9 +21598,9 @@ Service_AddNodes_existing(UA_Server *server, UA_Session *session, UA_Node *node,
     UA_StatusCode retval = checkParentReference(server, session, node->nodeClass,
                                                 parentNodeId, referenceTypeId);
     if(retval != UA_STATUSCODE_GOOD) {
-        UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                             "AddNodes: Checking the reference to the parent returned"
-                             "error code %s", UA_StatusCode_name(retval));
+        UA_LOG_INFO_SESSION(server->config.logger, session,
+                            "AddNodes: Checking the reference to the parent returned"
+                            "error code %s", UA_StatusCode_name(retval));
         UA_NodeStore_deleteNode(node);
         return retval;
     }
@@ -21149,9 +21608,9 @@ Service_AddNodes_existing(UA_Server *server, UA_Session *session, UA_Node *node,
     /* Add the node to the nodestore */
     retval = UA_NodeStore_insert(server->nodestore, node);
     if(retval != UA_STATUSCODE_GOOD) {
-        UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                             "AddNodes: Node could not be added to the nodestore "
-                             "with error code %s", UA_StatusCode_name(retval));
+        UA_LOG_INFO_SESSION(server->config.logger, session,
+                            "AddNodes: Node could not be added to the nodestore "
+                            "with error code %s", UA_StatusCode_name(retval));
         return retval;
     }
 
@@ -21159,8 +21618,8 @@ Service_AddNodes_existing(UA_Server *server, UA_Session *session, UA_Node *node,
     if(addedNodeId) {
         retval = UA_NodeId_copy(&node->nodeId, addedNodeId);
         if(retval != UA_STATUSCODE_GOOD) {
-            UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                                 "AddNodes: Could not copy the nodeid");
+            UA_LOG_INFO_SESSION(server->config.logger, session,
+                                "AddNodes: Could not copy the nodeid");
             goto remove_node;
         }
     }
@@ -21174,9 +21633,9 @@ Service_AddNodes_existing(UA_Server *server, UA_Session *session, UA_Node *node,
     item.targetNodeId.nodeId = *parentNodeId;
     retval = Service_AddReferences_single(server, session, &item);
     if(retval != UA_STATUSCODE_GOOD) {
-        UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                             "AddNodes: Could not add the reference to the parent"
-                             "with error code %s", UA_StatusCode_name(retval));
+        UA_LOG_INFO_SESSION(server->config.logger, session,
+                            "AddNodes: Could not add the reference to the parent"
+                            "with error code %s", UA_StatusCode_name(retval));
         goto remove_node;
     }
 
@@ -21196,9 +21655,9 @@ Service_AddNodes_existing(UA_Server *server, UA_Session *session, UA_Node *node,
         retval = instantiateNode(server, session, &node->nodeId, node->nodeClass,
                                  typeDefinition, instantiationCallback);
         if(retval != UA_STATUSCODE_GOOD) {
-            UA_LOG_DEBUG_SESSION(server->config.logger, session,
-                                 "AddNodes: Could not instantiate the node with"
-                                 "error code 0x%08x", retval);
+            UA_LOG_INFO_SESSION(server->config.logger, session,
+                                "AddNodes: Could not instantiate the node with"
+                                "error code %s", UA_StatusCode_name(retval));
             goto remove_node;
         }
     }
@@ -21245,9 +21704,9 @@ copyCommonVariableAttributes(UA_Server *server, UA_VariableNode *node,
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
     if(UA_NodeId_equal(&node->nodeId, &basevartype) || 
        UA_NodeId_equal(&node->nodeId, &basedatavartype)) {
-      node->dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
-      node->valueRank = -2;
-      return retval;
+        node->dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
+        node->valueRank = -2;
+        return retval;
     }
     
     const UA_VariableTypeNode *vt =
@@ -21266,30 +21725,51 @@ copyCommonVariableAttributes(UA_Server *server, UA_VariableNode *node,
         return retval;
         
     /* Set the array dimensions. Check only against the vt. */
-    retval = compatibleArrayDimensions(attr->arrayDimensionsSize, attr->arrayDimensions,
-                                       vt->arrayDimensionsSize, vt->arrayDimensions);
-    if(retval != UA_STATUSCODE_GOOD)
+    retval = compatibleArrayDimensions(vt->arrayDimensionsSize, vt->arrayDimensions,
+                                       attr->arrayDimensionsSize, attr->arrayDimensions);
+    if(retval == UA_STATUSCODE_GOOD) {
+        retval = UA_Array_copy(attr->arrayDimensions, attr->arrayDimensionsSize,
+                               (void**)&node->arrayDimensions, &UA_TYPES[UA_TYPES_UINT32]);
+    }
+    if(retval != UA_STATUSCODE_GOOD) {
+        UA_LOG_INFO(server->config.logger, UA_LOGCATEGORY_SERVER,
+                    "Array dimensions incompatible with the VariableType "
+                    "with error code %s", UA_StatusCode_name(retval));
         return retval;
-    retval = UA_Array_copy(attr->arrayDimensions, attr->arrayDimensionsSize,
-                           (void**)&node->arrayDimensions, &UA_TYPES[UA_TYPES_UINT32]);
-    if(retval != UA_STATUSCODE_GOOD)
-        return retval;
+    }
     node->arrayDimensionsSize = attr->arrayDimensionsSize;
 
     /* Set the valuerank */
     if(attr->valueRank != 0 || !UA_Variant_isScalar(&attr->value))
-        retval = writeValueRankAttribute(node, attr->valueRank, vt->valueRank);
+        retval = writeValueRankAttribute(server, node, attr->valueRank, vt->valueRank);
     else /* workaround common error where the valuerank is left as 0 */
         node->valueRank = vt->valueRank;
-    if(retval != UA_STATUSCODE_GOOD)
+    if(retval != UA_STATUSCODE_GOOD) {
+        UA_LOG_INFO(server->config.logger, UA_LOGCATEGORY_SERVER,
+                    "Value Rank incompatible with the VariableType "
+                    "with error code %s", UA_StatusCode_name(retval));
         return retval;
-    
+    }
+
     /* Set the value */
     UA_DataValue value;
     UA_DataValue_init(&value);
-    value.value = attr->value;
     value.hasValue = true;
-    retval |= writeValueAttribute(server, node, &value, NULL);
+    value.value = attr->value;
+    value.value.storageType = UA_VARIANT_DATA_NODELETE;
+
+    /* Use the default value from the vt if none is defined */
+    if(!value.value.type)
+        readValueAttribute(server, (const UA_VariableNode *)vt, &value);
+
+    /* Write the value to the node */
+    retval = writeValueAttribute(server, node, &value, NULL);
+    if(retval != UA_STATUSCODE_GOOD) {
+        UA_LOG_INFO(server->config.logger, UA_LOGCATEGORY_SERVER,
+                    "Could not set the value of the new node "
+                    "with error code %s", UA_StatusCode_name(retval));
+    }
+    UA_DataValue_deleteMembers(&value);
     return retval;
 }
 
@@ -21417,16 +21897,25 @@ Service_AddNodes_single(UA_Server *server, UA_Session *session,
                         const UA_AddNodesItem *item, UA_AddNodesResult *result,
                         UA_InstantiationCallback *instantiationCallback) {
     /* Create the node from the attributes*/
-    UA_Node *node;
+    UA_Node *node = NULL;
     result->statusCode = createNodeFromAttributes(server, item, &node);
-    if(result->statusCode != UA_STATUSCODE_GOOD)
+    if(result->statusCode != UA_STATUSCODE_GOOD) {
+        UA_LOG_INFO_SESSION(server->config.logger, session,
+                            "Could not add node with error code %s",
+                            UA_StatusCode_name(result->statusCode));
         return;
+    }
 
     /* Run consistency checks and add the node */
     UA_assert(node != NULL);
     result->statusCode = Service_AddNodes_existing(server, session, node, &item->parentNodeId.nodeId,
                                                    &item->referenceTypeId, &item->typeDefinition.nodeId,
                                                    instantiationCallback, &result->addedNodeId);
+    if(result->statusCode != UA_STATUSCODE_GOOD) {
+        UA_LOG_INFO_SESSION(server->config.logger, session,
+                            "Could not add node with error code %s",
+                            UA_StatusCode_name(result->statusCode));
+    }
 }
 
 void Service_AddNodes(UA_Server *server, UA_Session *session,
@@ -21559,7 +22048,7 @@ UA_Server_addDataSourceVariableNode(UA_Server *server, const UA_NodeId requested
     item.typeDefinition.nodeId = typeDefinition;
     item.parentNodeId.nodeId = parentNodeId;
     retval |= copyStandardAttributes((UA_Node*)node, &item, (const UA_NodeAttributes*)&editAttr);
-    retval |= copyCommonVariableAttributes(server, node, &item, &editAttr);
+    retval |= copyVariableNodeAttributes(server, node, &item, &editAttr);
     UA_DataValue_deleteMembers(&node->value.data.value);
     node->valueSource = UA_VALUESOURCE_DATASOURCE;
     node->value.dataSource = dataSource;
@@ -21731,7 +22220,7 @@ Service_AddReferences_single(UA_Server *server, UA_Session *session,
             continue;
         } else {
             UA_ExternalNodeStore *ens = &server->externalNamespaces[j].externalNodeStore;
-            retval = ens->addOneWayReference(ens->ensHandle, item);
+            retval = (UA_StatusCode)ens->addOneWayReference(ens->ensHandle, item);
             handledExternally = UA_TRUE;
             break;
         }
@@ -21757,12 +22246,12 @@ Service_AddReferences_single(UA_Server *server, UA_Session *session,
                                 (UA_EditNodeCallback)addOneWayReference, &secondItem);
 #else
     handledExternally = UA_FALSE;
-    for(size_t j = 0; j <server->externalNamespacesSize; ++j) {
+    for(size_t j = 0; j < server->externalNamespacesSize; ++j) {
         if(secondItem.sourceNodeId.namespaceIndex != server->externalNamespaces[j].index) {
             continue;
         } else {
             UA_ExternalNodeStore *ens = &server->externalNamespaces[j].externalNodeStore;
-            retval = ens->addOneWayReference(ens->ensHandle, &secondItem);
+            retval = (UA_StatusCode)ens->addOneWayReference(ens->ensHandle, &secondItem);
             handledExternally = UA_TRUE;
             break;
         }
@@ -21863,6 +22352,19 @@ UA_Server_addReference(UA_Server *server, const UA_NodeId sourceId,
 /* Delete Nodes */
 /****************/
 
+static void
+removeReferences(UA_Server *server, UA_Session *session, const UA_Node *node) {
+    UA_DeleteReferencesItem item;
+    UA_DeleteReferencesItem_init(&item);
+    item.targetNodeId.nodeId = node->nodeId;
+    for(size_t i = 0; i < node->referencesSize; ++i) {
+        item.isForward = node->references[i].isInverse;
+        item.sourceNodeId = node->references[i].targetId.nodeId;
+        item.referenceTypeId = node->references[i].referenceTypeId;
+        Service_DeleteReferences_single(server, session, &item);
+    }
+}
+
 UA_StatusCode
 Service_DeleteNodes_single(UA_Server *server, UA_Session *session,
                            const UA_NodeId *nodeId, UA_Boolean deleteReferences) {
@@ -21870,50 +22372,20 @@ Service_DeleteNodes_single(UA_Server *server, UA_Session *session,
     if(!node)
         return UA_STATUSCODE_BADNODEIDUNKNOWN;
 
-    /* destroy an object before removing it */
+    /* TODO: check if the information model consistency is violated */
+
+    /* Destroy an object before removing it */
     if(node->nodeClass == UA_NODECLASS_OBJECT) {
-        /* find the object type(s) */
-        UA_BrowseDescription bd;
-        UA_BrowseDescription_init(&bd);
-        bd.browseDirection = UA_BROWSEDIRECTION_INVERSE;
-        bd.nodeId = *nodeId;
-        bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASSUBTYPE);
-        bd.includeSubtypes = true;
-        bd.nodeClassMask = UA_NODECLASS_OBJECTTYPE;
-
-        /* browse type definitions with admin rights */
-        UA_BrowseResult result;
-        UA_BrowseResult_init(&result);
-        Service_Browse_single(server, &adminSession, NULL, &bd, 0, &result);
-        for(size_t i = 0; i < result.referencesSize; ++i) {
-            /* call the destructor */
-            UA_ReferenceDescription *rd = &result.references[i];
-            const UA_ObjectTypeNode *typenode =
-                (const UA_ObjectTypeNode*)UA_NodeStore_get(server->nodestore, &rd->nodeId.nodeId);
-            if(!typenode)
-                continue;
-            if(typenode->nodeClass != UA_NODECLASS_OBJECTTYPE || !typenode->lifecycleManagement.destructor)
-                continue;
-
-            /* if there are several types with lifecycle management, call all the destructors */
+        /* Call the destructor from the object type */
+        const UA_ObjectTypeNode *typenode = getObjectNodeType(server, (const UA_ObjectNode*)node);
+        if(typenode && typenode->lifecycleManagement.destructor)
             typenode->lifecycleManagement.destructor(*nodeId, ((const UA_ObjectNode*)node)->instanceHandle);
-        }
-        UA_BrowseResult_deleteMembers(&result);
     }
 
-    /* remove references */
-    /* TODO: check if consistency is violated */
-    if(deleteReferences == true) { 
-        for(size_t i = 0; i < node->referencesSize; ++i) {
-            UA_DeleteReferencesItem item;
-            UA_DeleteReferencesItem_init(&item);
-            item.isForward = node->references[i].isInverse;
-            item.sourceNodeId = node->references[i].targetId.nodeId;
-            item.targetNodeId.nodeId = node->nodeId;
-            UA_Server_editNode(server, session, &node->references[i].targetId.nodeId,
-                               (UA_EditNodeCallback)deleteOneWayReference, &item);
-        }
-    }
+    /* Remove references to the node (not the references in the node that will
+     * be deleted anyway) */
+    if(deleteReferences)
+        removeReferences(server, session, node);
 
     return UA_NodeStore_remove(server->nodestore, nodeId);
 }
@@ -21961,18 +22433,17 @@ static UA_StatusCode
 deleteOneWayReference(UA_Server *server, UA_Session *session, UA_Node *node,
                       const UA_DeleteReferencesItem *item) {
     UA_Boolean edited = false;
-    for(size_t i = node->referencesSize-1; ; --i) {
-        if(i > node->referencesSize)
-            break; /* underflow after i == 0 */
-        if(!UA_NodeId_equal(&item->targetNodeId.nodeId, &node->references[i].targetId.nodeId))
+    for(size_t i = node->referencesSize; i > 0; --i) {
+        UA_ReferenceNode *ref = &node->references[i-1];
+        if(!UA_NodeId_equal(&item->targetNodeId.nodeId, &ref->targetId.nodeId))
             continue;
-        if(!UA_NodeId_equal(&item->referenceTypeId, &node->references[i].referenceTypeId))
+        if(!UA_NodeId_equal(&item->referenceTypeId, &ref->referenceTypeId))
             continue;
-        if(item->isForward == node->references[i].isInverse)
+        if(item->isForward == ref->isInverse)
             continue;
+        UA_ReferenceNode_deleteMembers(ref);
         /* move the last entry to override the current position */
-        UA_ReferenceNode_deleteMembers(&node->references[i]);
-        node->references[i] = node->references[node->referencesSize-1];
+        node->references[i-1] = node->references[node->referencesSize-1];
         --node->referencesSize;
         edited = true;
         break;
@@ -22001,6 +22472,7 @@ Service_DeleteReferences_single(UA_Server *server, UA_Session *session,
     secondItem.isForward = !item->isForward;
     secondItem.sourceNodeId = item->targetNodeId.nodeId;
     secondItem.targetNodeId.nodeId = item->sourceNodeId;
+    secondItem.referenceTypeId = item->referenceTypeId;
     return UA_Server_editNode(server, session, &secondItem.sourceNodeId,
                               (UA_EditNodeCallback)deleteOneWayReference, &secondItem);
 }
@@ -22155,6 +22627,10 @@ UA_Server_setMethodNode_callback(UA_Server *server, const UA_NodeId methodNodeId
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_services_view.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 static UA_StatusCode
 fillReferenceDescription(UA_NodeStore *ns, const UA_Node *curr, UA_ReferenceNode *ref,
@@ -22190,12 +22666,12 @@ static const UA_Node *
 returnRelevantNodeExternal(UA_ExternalNodeStore *ens, const UA_BrowseDescription *descr,
                            const UA_ReferenceNode *reference) {
     /* prepare a read request in the external nodestore */
-    UA_ReadValueId *readValueIds = UA_Array_new(6,&UA_TYPES[UA_TYPES_READVALUEID]);
-    UA_UInt32 *indices = UA_Array_new(6,&UA_TYPES[UA_TYPES_UINT32]);
-    UA_UInt32 indicesSize = 6;
-    UA_DataValue *readNodesResults = UA_Array_new(6,&UA_TYPES[UA_TYPES_DATAVALUE]);
-    UA_DiagnosticInfo *diagnosticInfos = UA_Array_new(6,&UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
-    for(UA_UInt32 i = 0; i < 6; ++i) {
+    UA_ReadValueId *readValueIds = UA_Array_new(5,&UA_TYPES[UA_TYPES_READVALUEID]);
+    UA_UInt32 *indices = UA_Array_new(5,&UA_TYPES[UA_TYPES_UINT32]);
+    UA_UInt32 indicesSize = 5;
+    UA_DataValue *readNodesResults = UA_Array_new(5,&UA_TYPES[UA_TYPES_DATAVALUE]);
+    UA_DiagnosticInfo *diagnosticInfos = UA_Array_new(5,&UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
+    for(UA_UInt32 i = 0; i < 5; ++i) {
         readValueIds[i].nodeId = reference->targetId.nodeId;
         indices[i] = i;
     }
@@ -22204,7 +22680,6 @@ returnRelevantNodeExternal(UA_ExternalNodeStore *ens, const UA_BrowseDescription
     readValueIds[2].attributeId = UA_ATTRIBUTEID_DISPLAYNAME;
     readValueIds[3].attributeId = UA_ATTRIBUTEID_DESCRIPTION;
     readValueIds[4].attributeId = UA_ATTRIBUTEID_WRITEMASK;
-    readValueIds[5].attributeId = UA_ATTRIBUTEID_USERWRITEMASK;
 
     ens->readNodes(ens->ensHandle, NULL, readValueIds, indices,
                    indicesSize, readNodesResults, false, diagnosticInfos);
@@ -22222,12 +22697,16 @@ returnRelevantNodeExternal(UA_ExternalNodeStore *ens, const UA_BrowseDescription
         UA_LocalizedText_copy((UA_LocalizedText*)readNodesResults[3].value.data, &(node->description));
     if(readNodesResults[4].status == UA_STATUSCODE_GOOD)
         UA_UInt32_copy((UA_UInt32*)readNodesResults[4].value.data, &(node->writeMask));
-    if(readNodesResults[5].status == UA_STATUSCODE_GOOD)
-        UA_UInt32_copy((UA_UInt32*)readNodesResults[5].value.data, &(node->userWriteMask));
-    UA_Array_delete(readValueIds,6, &UA_TYPES[UA_TYPES_READVALUEID]);
-    UA_Array_delete(indices,6, &UA_TYPES[UA_TYPES_UINT32]);
-    UA_Array_delete(readNodesResults,6, &UA_TYPES[UA_TYPES_DATAVALUE]);
-    UA_Array_delete(diagnosticInfos,6, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
+
+    UA_ReferenceNode **references = &node->references;
+    UA_UInt32 *referencesSize = (UA_UInt32*)&node->referencesSize;
+    
+    ens->getOneWayReferences (ens->ensHandle, &node->nodeId, referencesSize, references);
+
+    UA_Array_delete(readValueIds,5, &UA_TYPES[UA_TYPES_READVALUEID]);
+    UA_Array_delete(indices,5, &UA_TYPES[UA_TYPES_UINT32]);
+    UA_Array_delete(readNodesResults,5, &UA_TYPES[UA_TYPES_DATAVALUE]);
+    UA_Array_delete(diagnosticInfos,5, &UA_TYPES[UA_TYPES_DIAGNOSTICINFO]);
     if(node && descr->nodeClassMask != 0 && (node->nodeClass & descr->nodeClassMask) == 0) {
         UA_NodeStore_deleteNode(node);
         return NULL;
@@ -22685,6 +23164,17 @@ void Service_TranslateBrowsePathsToNodeIds_single(UA_Server *server, UA_Session 
     }
 }
 
+UA_BrowsePathResult
+UA_Server_translateBrowsePathToNodeIds(UA_Server *server,
+                                       const UA_BrowsePath *browsePath) {
+    UA_BrowsePathResult result;
+    UA_BrowsePathResult_init(&result);
+    UA_RCU_LOCK();
+    Service_TranslateBrowsePathsToNodeIds_single(server, &adminSession, browsePath, &result);
+    UA_RCU_UNLOCK();
+    return result;
+}
+
 void Service_TranslateBrowsePathsToNodeIds(UA_Server *server, UA_Session *session,
                                            const UA_TranslateBrowsePathsToNodeIdsRequest *request,
                                            UA_TranslateBrowsePathsToNodeIdsResponse *response) {
@@ -22765,6 +23255,10 @@ void Service_UnregisterNodes(UA_Server *server, UA_Session *session, const UA_Un
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_services_call.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 #ifdef UA_ENABLE_METHODCALLS /* conditional compilation */
 
@@ -22809,7 +23303,7 @@ argumentsConformsToDefinition(UA_Server *server, const UA_VariableNode *argRequi
     for(size_t i = 0; i < argReqsSize; ++i)
         retval |= typeCheckValue(server, &argReqs[i].dataType, argReqs[i].valueRank,
                                  argReqs[i].arrayDimensionsSize, argReqs[i].arrayDimensions,
-                                 &args[i], NULL, args);
+                                 &args[i], NULL, &args[i]);
     return retval;
 }
 
@@ -22959,6 +23453,10 @@ void Service_Call(UA_Server *server, UA_Session *session,
 #endif /* UA_ENABLE_METHODCALLS */
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_subscription.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 #ifdef UA_ENABLE_SUBSCRIPTIONS /* conditional compilation */
@@ -23384,7 +23882,7 @@ void UA_Subscription_publishCallback(UA_Server *server, UA_Subscription *sub) {
         if(sub->currentKeepAliveCount < sub->maxKeepAliveCount)
             return;
         UA_LOG_DEBUG_SESSION(server->config.logger, sub->session,
-                             "Sending a keepalive on subscription %u",
+                             "Subscription %u | Sending a KeepAlive",
                              sub->subscriptionID)
     }
 
@@ -23399,7 +23897,7 @@ void UA_Subscription_publishCallback(UA_Server *server, UA_Subscription *sub) {
     /* Cannot publish without a response */
     if(!pre) {
         UA_LOG_DEBUG_SESSION(server->config.logger, sub->session,
-                             "Cannot send a publish response on subscription %u, "
+                             "Subscription %u | Cannot send a publish response "
                              "since the publish queue is empty", sub->subscriptionID)
         if(sub->state != UA_SUBSCRIPTIONSTATE_LATE) {
             sub->state = UA_SUBSCRIPTIONSTATE_LATE;
@@ -23502,6 +24000,9 @@ Subscription_registerPublishJob(UA_Server *server, UA_Subscription *sub) {
     if(sub->publishJobIsRegistered)
         return UA_STATUSCODE_GOOD;
 
+    UA_LOG_DEBUG_SESSION(server->config.logger, sub->session,
+                         "Subscription %u | Register subscription publishing callback",
+                         sub->subscriptionID);
     UA_Job job;
     job.type = UA_JOBTYPE_METHODCALL;
     job.job.methodCall.method = (UA_ServerCallback)UA_Subscription_publishCallback;
@@ -23518,6 +24019,9 @@ UA_StatusCode
 Subscription_unregisterPublishJob(UA_Server *server, UA_Subscription *sub) {
     if(!sub->publishJobIsRegistered)
         return UA_STATUSCODE_GOOD;
+    UA_LOG_DEBUG_SESSION(server->config.logger, sub->session,
+                         "Subscription %u | Unregister subscription publishing callback",
+                         sub->subscriptionID);
     sub->publishJobIsRegistered = false;
     return UA_Server_removeRepeatedJob(server, sub->publishJobGuid);
 }
@@ -23551,6 +24055,10 @@ UA_Subscription_answerPublishRequestsNoSubscription(UA_Server *server, UA_NodeId
 #endif /* UA_ENABLE_SUBSCRIPTIONS */
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/server/ua_services_subscription.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 #ifdef UA_ENABLE_SUBSCRIPTIONS /* conditional compilation */
@@ -23653,7 +24161,6 @@ Service_ModifySubscription(UA_Server *server, UA_Session *session,
     response->revisedPublishingInterval = sub->publishingInterval;
     response->revisedLifetimeCount = sub->lifeTimeCount;
     response->revisedMaxKeepAliveCount = sub->maxKeepAliveCount;
-    return;
 }
 
 void
@@ -24126,25 +24633,10 @@ void Service_Republish(UA_Server *server, UA_Session *session, const UA_Republis
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/client/ua_client.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
-/* Listen with a timeout until at least one complete message is received */
-static UA_StatusCode
-Connection_receiveChunk(UA_Connection *connection, UA_ByteString * UA_RESTRICT message,
-                        UA_Boolean * UA_RESTRICT realloced, UA_UInt32 timeout) {
-    UA_StatusCode retval = UA_STATUSCODE_GOOD;
-    *realloced = false;
-    UA_DateTime maxDate = UA_DateTime_nowMonotonic() + (timeout * UA_MSEC_TO_DATETIME);
-    /* Receive packets until one complete message is assembled */
-    do {
-        UA_DateTime now = UA_DateTime_nowMonotonic();
-        if(now > maxDate)
-            return UA_STATUSCODE_GOODNONCRITICALTIMEOUT;
-        UA_UInt32 thisTimeout = (UA_UInt32)((maxDate - now) / UA_MSEC_TO_DATETIME);
-        retval = connection->recv(connection, message, thisTimeout);
-        retval |= UA_Connection_completeMessages(connection, message, realloced);
-    } while(retval == UA_STATUSCODE_GOOD && message->length == 0);
-    return retval;
-}
 
 /*********************/
 /* Create and Delete */
@@ -24152,36 +24644,22 @@ Connection_receiveChunk(UA_Connection *connection, UA_ByteString * UA_RESTRICT m
 
 static void UA_Client_init(UA_Client* client, UA_ClientConfig config) {
     memset(client, 0, sizeof(UA_Client));
-
-    client->state = UA_CLIENTSTATE_READY;
-    client->connection = (UA_Connection*)UA_malloc(sizeof(UA_Connection));
-    memset(client->connection, 0, sizeof(UA_Connection));
-    client->channel = (UA_SecureChannel*)UA_malloc(sizeof(UA_SecureChannel));
-    UA_SecureChannel_init(client->channel);
-    client->channel->connection = client->connection;
-    client->authenticationMethod = UA_CLIENTAUTHENTICATION_NONE;
+    client->channel.connection = &client->connection;
     client->config = config;
-#ifdef UA_ENABLE_SUBSCRIPTIONS
-    LIST_INIT(&client->pendingNotificationsAcks);
-    LIST_INIT(&client->subscriptions);
-#endif
 }
 
 UA_Client * UA_Client_new(UA_ClientConfig config) {
     UA_Client *client = (UA_Client*)UA_calloc(1, sizeof(UA_Client));
     if(!client)
         return NULL;
-
     UA_Client_init(client, config);
     return client;
 }
 
 static void UA_Client_deleteMembers(UA_Client* client) {
     UA_Client_disconnect(client);
-    UA_SecureChannel_deleteMembersCleanup(client->channel);
-    UA_free(client->channel);
-    UA_Connection_deleteMembers(client->connection);
-    UA_free(client->connection);
+    UA_SecureChannel_deleteMembersCleanup(&client->channel);
+    UA_Connection_deleteMembers(&client->connection);
     if(client->endpointUrl.data)
         UA_String_deleteMembers(&client->endpointUrl);
     UA_UserTokenPolicy_deleteMembers(&client->token);
@@ -24189,7 +24667,7 @@ static void UA_Client_deleteMembers(UA_Client* client) {
     if(client->username.data)
         UA_String_deleteMembers(&client->username);
     if(client->password.data)
-           UA_String_deleteMembers(&client->password);
+        UA_String_deleteMembers(&client->password);
 #ifdef UA_ENABLE_SUBSCRIPTIONS
     UA_Client_NotificationsAckNumber *n, *tmp;
     LIST_FOREACH_SAFE(n, &client->pendingNotificationsAcks, listEntry, tmp) {
@@ -24225,13 +24703,10 @@ UA_ClientState UA_EXPORT UA_Client_getState(UA_Client *client) {
 #define UA_MINMESSAGESIZE 8192
 
 static UA_StatusCode HelAckHandshake(UA_Client *client) {
-    UA_Connection *conn = client->connection;
-
     /* Get a buffer */
     UA_ByteString message;
-    UA_StatusCode retval =
-        client->connection->getSendBuffer(client->connection,
-                                          UA_MINMESSAGESIZE, &message);
+    UA_Connection *conn = &client->connection;
+    UA_StatusCode retval = conn->getSendBuffer(conn, UA_MINMESSAGESIZE, &message);
     if(retval != UA_STATUSCODE_GOOD)
         return retval;
 
@@ -24255,13 +24730,13 @@ static UA_StatusCode HelAckHandshake(UA_Client *client) {
     offset = 0;
     retval |= UA_TcpMessageHeader_encodeBinary(&messageHeader, &message, &offset);
     if(retval != UA_STATUSCODE_GOOD) {
-        client->connection->releaseSendBuffer(client->connection, &message);
+        conn->releaseSendBuffer(conn, &message);
         return retval;
     }
 
     /* Send the HEL message */
     message.length = messageHeader.messageSize;
-    retval = client->connection->send(client->connection, &message);
+    retval = conn->send(conn, &message);
     if(retval != UA_STATUSCODE_GOOD) {
         UA_LOG_INFO(client->config.logger, UA_LOGCATEGORY_NETWORK,
                     "Sending HEL failed");
@@ -24273,8 +24748,8 @@ static UA_StatusCode HelAckHandshake(UA_Client *client) {
     /* Loop until we have a complete chunk */
     UA_ByteString reply = UA_BYTESTRING_NULL;
     UA_Boolean realloced = false;
-    retval = Connection_receiveChunk(client->connection, &reply,
-                                     &realloced, client->config.timeout);
+    retval = UA_Connection_receiveChunksBlocking(conn, &reply, &realloced,
+                                                 client->config.timeout);
     if(retval != UA_STATUSCODE_GOOD) {
         UA_LOG_INFO(client->config.logger, UA_LOGCATEGORY_NETWORK,
                     "Receiving ACK message failed");
@@ -24289,15 +24764,14 @@ static UA_StatusCode HelAckHandshake(UA_Client *client) {
 
     /* Free the message buffer */
     if(!realloced)
-        client->connection->releaseRecvBuffer(client->connection, &reply);
+        conn->releaseRecvBuffer(conn, &reply);
     else
         UA_ByteString_deleteMembers(&reply);
 
     /* Store remote connection settings and adjust local configuration to not
        exceed the limits */
     if(retval == UA_STATUSCODE_GOOD) {
-        UA_LOG_DEBUG(client->config.logger, UA_LOGCATEGORY_NETWORK,
-                     "Received ACK message");
+        UA_LOG_DEBUG(client->config.logger, UA_LOGCATEGORY_NETWORK, "Received ACK message");
         conn->remoteConf.maxChunkCount = ackMessage.maxChunkCount; /* may be zero -> unlimited */
         conn->remoteConf.maxMessageSize = ackMessage.maxMessageSize; /* may be zero -> unlimited */
         conn->remoteConf.protocolVersion = ackMessage.protocolVersion;
@@ -24309,8 +24783,7 @@ static UA_StatusCode HelAckHandshake(UA_Client *client) {
             conn->localConf.recvBufferSize = conn->remoteConf.sendBufferSize;
         conn->state = UA_CONNECTION_ESTABLISHED;
     } else {
-        UA_LOG_INFO(client->config.logger, UA_LOGCATEGORY_NETWORK,
-                    "Decoding ACK message failed");
+        UA_LOG_INFO(client->config.logger, UA_LOGCATEGORY_NETWORK, "Decoding ACK message failed");
     }
     UA_TcpAcknowledgeMessage_deleteMembers(&ackMessage);
 
@@ -24320,23 +24793,23 @@ static UA_StatusCode HelAckHandshake(UA_Client *client) {
 static UA_StatusCode
 SecureChannelHandshake(UA_Client *client, UA_Boolean renew) {
     /* Check if sc is still valid */
-    if(renew && client->scRenewAt - UA_DateTime_now() > 0)
+    if(renew && client->nextChannelRenewal - UA_DateTime_nowMonotonic() > 0)
         return UA_STATUSCODE_GOOD;
 
-    UA_Connection *c = client->connection;
-    if(c->state != UA_CONNECTION_ESTABLISHED)
+    UA_Connection *conn = &client->connection;
+    if(conn->state != UA_CONNECTION_ESTABLISHED)
         return UA_STATUSCODE_BADSERVERNOTCONNECTED;
 
     UA_SecureConversationMessageHeader messageHeader;
     messageHeader.messageHeader.messageTypeAndChunkType =
         UA_MESSAGETYPE_OPN + UA_CHUNKTYPE_FINAL;
     if(renew)
-        messageHeader.secureChannelId = client->channel->securityToken.channelId;
+        messageHeader.secureChannelId = client->channel.securityToken.channelId;
     else
         messageHeader.secureChannelId = 0;
 
     UA_SequenceHeader seqHeader;
-    seqHeader.sequenceNumber = ++client->channel->sendSequenceNumber;
+    seqHeader.sequenceNumber = ++client->channel.sendSequenceNumber;
     seqHeader.requestId = ++client->requestId;
 
     UA_AsymmetricAlgorithmSecurityHeader asymHeader;
@@ -24363,11 +24836,11 @@ SecureChannelHandshake(UA_Client *client, UA_Boolean renew) {
                      "Requesting to open a SecureChannel");
     }
 
-    UA_ByteString_copy(&client->channel->clientNonce, &opnSecRq.clientNonce);
+    UA_ByteString_copy(&client->channel.clientNonce, &opnSecRq.clientNonce);
     opnSecRq.securityMode = UA_MESSAGESECURITYMODE_NONE;
 
     UA_ByteString message;
-    UA_StatusCode retval = c->getSendBuffer(c, c->remoteConf.recvBufferSize, &message);
+    UA_StatusCode retval = conn->getSendBuffer(conn, conn->remoteConf.recvBufferSize, &message);
     if(retval != UA_STATUSCODE_GOOD) {
         UA_AsymmetricAlgorithmSecurityHeader_deleteMembers(&asymHeader);
         UA_OpenSecureChannelRequest_deleteMembers(&opnSecRq);
@@ -24386,18 +24859,19 @@ SecureChannelHandshake(UA_Client *client, UA_Boolean renew) {
     UA_AsymmetricAlgorithmSecurityHeader_deleteMembers(&asymHeader);
     UA_OpenSecureChannelRequest_deleteMembers(&opnSecRq);
     if(retval != UA_STATUSCODE_GOOD) {
-        client->connection->releaseSendBuffer(client->connection, &message);
+        client->connection.releaseSendBuffer(&client->connection, &message);
         return retval;
     }
 
     message.length = messageHeader.messageHeader.messageSize;
-    retval = client->connection->send(client->connection, &message);
+    retval = conn->send(conn, &message);
     if(retval != UA_STATUSCODE_GOOD)
         return retval;
 
     UA_ByteString reply = UA_BYTESTRING_NULL;
     UA_Boolean realloced = false;
-    retval = Connection_receiveChunk(c, &reply, &realloced, client->config.timeout);
+    retval = UA_Connection_receiveChunksBlocking(conn, &reply, &realloced,
+                                                 client->config.timeout);
     if(retval != UA_STATUSCODE_GOOD) {
         UA_LOG_DEBUG(client->config.logger, UA_LOGCATEGORY_SECURECHANNEL,
                      "Receiving OpenSecureChannelResponse failed");
@@ -24422,7 +24896,7 @@ SecureChannelHandshake(UA_Client *client, UA_Boolean renew) {
     }
 
     /* Save the sequence number from server */
-    client->channel->receiveSequenceNumber = seqHeader.sequenceNumber;
+    client->channel.receiveSequenceNumber = seqHeader.sequenceNumber;
 
     /* Decode the response */
     UA_OpenSecureChannelResponse response;
@@ -24430,32 +24904,25 @@ SecureChannelHandshake(UA_Client *client, UA_Boolean renew) {
 
     /* Free the message */
     if(!realloced)
-        c->releaseRecvBuffer(c, &reply);
+        conn->releaseRecvBuffer(conn, &reply);
     else
         UA_ByteString_deleteMembers(&reply);
 
-    if(retval != UA_STATUSCODE_GOOD) {
-        UA_LOG_DEBUG(client->config.logger, UA_LOGCATEGORY_SECURECHANNEL,
-                     "Decoding OpenSecureChannelResponse failed");
-        UA_AsymmetricAlgorithmSecurityHeader_deleteMembers(&asymHeader);
-        UA_OpenSecureChannelResponse_init(&response);
-        response.responseHeader.serviceResult = retval;
-        return retval;
-    }
+    /* Results in either the StatusCode of decoding or the service */
+    retval |= response.responseHeader.serviceResult;
 
-    retval = response.responseHeader.serviceResult;
     if(retval == UA_STATUSCODE_GOOD) {
         /* Response.securityToken.revisedLifetime is UInt32 we need to cast it
-           to DateTime=Int64 we take 75% of lifetime to start renewing as
-           described in standard */
-        client->scRenewAt = UA_DateTime_now() +
+         * to DateTime=Int64 we take 75% of lifetime to start renewing as
+         *  described in standard */
+        client->nextChannelRenewal = UA_DateTime_nowMonotonic() +
             (UA_DateTime)(response.securityToken.revisedLifetime * (UA_Double)UA_MSEC_TO_DATETIME * 0.75);
 
         /* Replace the old nonce */
-        UA_ChannelSecurityToken_deleteMembers(&client->channel->securityToken);
-        UA_ChannelSecurityToken_copy(&response.securityToken, &client->channel->securityToken);
-        UA_ByteString_deleteMembers(&client->channel->serverNonce);
-        UA_ByteString_copy(&response.serverNonce, &client->channel->serverNonce);
+        UA_ChannelSecurityToken_deleteMembers(&client->channel.securityToken);
+        UA_ChannelSecurityToken_copy(&response.securityToken, &client->channel.securityToken);
+        UA_ByteString_deleteMembers(&client->channel.serverNonce);
+        UA_ByteString_copy(&response.serverNonce, &client->channel.serverNonce);
 
         if(renew)
             UA_LOG_DEBUG(client->config.logger, UA_LOGCATEGORY_SECURECHANNEL,
@@ -24464,10 +24931,17 @@ SecureChannelHandshake(UA_Client *client, UA_Boolean renew) {
             UA_LOG_DEBUG(client->config.logger, UA_LOGCATEGORY_SECURECHANNEL,
                          "SecureChannel opened");
     } else {
-        UA_LOG_DEBUG(client->config.logger, UA_LOGCATEGORY_SECURECHANNEL,
-                     "SecureChannel could not be opened / "
-                     "renewed with statuscode %i", retval);
+        if(renew)
+            UA_LOG_INFO(client->config.logger, UA_LOGCATEGORY_SECURECHANNEL,
+                        "SecureChannel could not be renewed "
+                        "with error code %s", UA_StatusCode_name(retval));
+        else
+            UA_LOG_INFO(client->config.logger, UA_LOGCATEGORY_SECURECHANNEL,
+                        "SecureChannel could not be opened "
+                        "with error code %s", UA_StatusCode_name(retval));
     }
+
+    /* Clean up */
     UA_OpenSecureChannelResponse_deleteMembers(&response);
     UA_AsymmetricAlgorithmSecurityHeader_deleteMembers(&asymHeader);
     return retval;
@@ -24564,27 +25038,33 @@ static UA_StatusCode EndpointsHandshake(UA_Client *client) {
     for(size_t i = 0; i < endpointArraySize; ++i) {
         UA_EndpointDescription* endpoint = &endpointArray[i];
         /* look out for binary transport endpoints */
-        //NODE: Siemens returns empty ProfileUrl, we will accept it as binary
-        if(endpoint->transportProfileUri.length!=0 &&
+        /* Note: Siemens returns empty ProfileUrl, we will accept it as binary */
+        if(endpoint->transportProfileUri.length != 0 &&
            !UA_String_equal(&endpoint->transportProfileUri, &binaryTransport))
             continue;
         /* look out for an endpoint without security */
         if(!UA_String_equal(&endpoint->securityPolicyUri, &securityNone))
             continue;
-        endpointFound = true;
+        
         /* endpoint with no security found */
+        endpointFound = true;
+       
         /* look for a user token policy with an anonymous token */
         for(size_t j = 0; j < endpoint->userIdentityTokensSize; ++j) {
             UA_UserTokenPolicy* userToken = &endpoint->userIdentityTokens[j];
-            //anonymous authentication
-            if(client->authenticationMethod == UA_CLIENTAUTHENTICATION_NONE){
-                if(userToken->tokenType != UA_USERTOKENTYPE_ANONYMOUS)
-                    continue;
-            }else{
-            //username authentication
-                if(userToken->tokenType != UA_USERTOKENTYPE_USERNAME)
-                    continue;
-            }
+
+            /* Usertokens also have a security policy... */
+            if(userToken->securityPolicyUri.length > 0 &&
+               !UA_String_equal(&userToken->securityPolicyUri, &securityNone))
+                continue;
+
+            /* UA_CLIENTAUTHENTICATION_NONE == UA_USERTOKENTYPE_ANONYMOUS
+             * UA_CLIENTAUTHENTICATION_USERNAME == UA_USERTOKENTYPE_USERNAME
+             * TODO: Check equivalence for other types when adding the support */
+            if((int)client->authenticationMethod != (int)userToken->tokenType)
+                continue;
+
+            /* Endpoint with matching usertokenpolicy found */
             tokenFound = true;
             UA_UserTokenPolicy_copy(userToken, &client->token);
             break;
@@ -24597,12 +25077,11 @@ static UA_StatusCode EndpointsHandshake(UA_Client *client) {
     if(!endpointFound) {
         UA_LOG_ERROR(client->config.logger, UA_LOGCATEGORY_CLIENT,
                      "No suitable endpoint found");
-        return UA_STATUSCODE_BADINTERNALERROR;
-    }
-    if(!tokenFound) {
+        retval = UA_STATUSCODE_BADINTERNALERROR;
+    } else if(!tokenFound) {
         UA_LOG_ERROR(client->config.logger, UA_LOGCATEGORY_CLIENT,
-                     "No anonymous token found");
-        return UA_STATUSCODE_BADINTERNALERROR;
+                     "No suitable UserTokenPolicy found for the possible endpoints");
+        retval = UA_STATUSCODE_BADINTERNALERROR;
     }
     return retval;
 }
@@ -24613,7 +25092,7 @@ static UA_StatusCode SessionHandshake(UA_Client *client) {
 
     request.requestHeader.timestamp = UA_DateTime_now();
     request.requestHeader.timeoutHint = 10000;
-    UA_ByteString_copy(&client->channel->clientNonce, &request.clientNonce);
+    UA_ByteString_copy(&client->channel.clientNonce, &request.clientNonce);
     request.requestedSessionTimeout = 1200000;
     request.maxResponseMessageSize = UA_INT32_MAX;
     UA_String_copy(&client->endpointUrl, &request.endpointUrl);
@@ -24649,7 +25128,7 @@ static UA_StatusCode CloseSession(UA_Client *client) {
 }
 
 static UA_StatusCode CloseSecureChannel(UA_Client *client) {
-    UA_SecureChannel *channel = client->channel;
+    UA_SecureChannel *channel = &client->channel;
     UA_CloseSecureChannelRequest request;
     UA_CloseSecureChannelRequest_init(&request);
     request.requestHeader.requestHandle = ++client->requestHandle;
@@ -24660,7 +25139,7 @@ static UA_StatusCode CloseSecureChannel(UA_Client *client) {
 
     UA_SecureConversationMessageHeader msgHeader;
     msgHeader.messageHeader.messageTypeAndChunkType = UA_MESSAGETYPE_CLO + UA_CHUNKTYPE_FINAL;
-    msgHeader.secureChannelId = client->channel->securityToken.channelId;
+    msgHeader.secureChannelId = channel->securityToken.channelId;
 
     UA_SymmetricAlgorithmSecurityHeader symHeader;
     symHeader.tokenId = channel->securityToken.tokenId;
@@ -24673,8 +25152,8 @@ static UA_StatusCode CloseSecureChannel(UA_Client *client) {
         UA_NODEID_NUMERIC(0, UA_TYPES[UA_TYPES_CLOSESECURECHANNELREQUEST].binaryEncodingId);
 
     UA_ByteString message;
-    UA_Connection *c = client->connection;
-    UA_StatusCode retval = c->getSendBuffer(c, c->remoteConf.recvBufferSize, &message);
+    UA_Connection *conn = &client->connection;
+    UA_StatusCode retval = conn->getSendBuffer(conn, conn->remoteConf.recvBufferSize, &message);
     if(retval != UA_STATUSCODE_GOOD){
         UA_CloseSecureChannelRequest_deleteMembers(&request);
         return retval;
@@ -24693,11 +25172,11 @@ static UA_StatusCode CloseSecureChannel(UA_Client *client) {
 
     if(retval == UA_STATUSCODE_GOOD) {
         message.length = msgHeader.messageHeader.messageSize;
-        retval = client->connection->send(client->connection, &message);
+        retval = conn->send(conn, &message);
     } else {
-        client->connection->releaseSendBuffer(client->connection, &message);
+        conn->releaseSendBuffer(conn, &message);
     }
-    client->connection->close(client->connection);
+    conn->close(conn);
     UA_CloseSecureChannelRequest_deleteMembers(&request);
     return retval;
 }
@@ -24713,10 +25192,10 @@ UA_Client_getEndpoints(UA_Client *client, const char *serverUrl,
 
 
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
-    *client->connection =
+    client->connection =
         client->config.connectionFunc(UA_ConnectionConfig_standard, serverUrl,
                                       client->config.logger);
-    if(client->connection->state != UA_CONNECTION_OPENING) {
+    if(client->connection.state != UA_CONNECTION_OPENING) {
         retval = UA_STATUSCODE_BADCONNECTIONCLOSED;
         goto cleanup;
     }
@@ -24727,7 +25206,7 @@ UA_Client_getEndpoints(UA_Client *client, const char *serverUrl,
         goto cleanup;
     }
 
-    client->connection->localConf = client->config.localConnectionConfig;
+    client->connection.localConf = client->config.localConnectionConfig;
     retval = HelAckHandshake(client);
     if(retval == UA_STATUSCODE_GOOD)
         retval = SecureChannelHandshake(client, false);
@@ -24735,7 +25214,7 @@ UA_Client_getEndpoints(UA_Client *client, const char *serverUrl,
         retval = GetEndpoints(client, endpointDescriptionsSize, endpointDescriptions);
 
     /* always cleanup */
-    cleanup:
+ cleanup:
     UA_Client_disconnect(client);
     UA_Client_reset(client);
     return retval;
@@ -24760,10 +25239,10 @@ UA_Client_connect(UA_Client *client, const char *endpointUrl) {
     }
 
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
-    *client->connection =
+    client->connection =
         client->config.connectionFunc(UA_ConnectionConfig_standard,
                                       endpointUrl, client->config.logger);
-    if(client->connection->state != UA_CONNECTION_OPENING) {
+    if(client->connection.state != UA_CONNECTION_OPENING) {
         retval = UA_STATUSCODE_BADCONNECTIONCLOSED;
         goto cleanup;
     }
@@ -24774,7 +25253,7 @@ UA_Client_connect(UA_Client *client, const char *endpointUrl) {
         goto cleanup;
     }
 
-    client->connection->localConf = client->config.localConnectionConfig;
+    client->connection.localConf = client->config.localConnectionConfig;
     retval = HelAckHandshake(client);
     if(retval == UA_STATUSCODE_GOOD)
         retval = SecureChannelHandshake(client, false);
@@ -24785,28 +25264,28 @@ UA_Client_connect(UA_Client *client, const char *endpointUrl) {
     if(retval == UA_STATUSCODE_GOOD)
         retval = ActivateSession(client);
     if(retval == UA_STATUSCODE_GOOD) {
-        client->connection->state = UA_CONNECTION_ESTABLISHED;
+        client->connection.state = UA_CONNECTION_ESTABLISHED;
         client->state = UA_CLIENTSTATE_CONNECTED;
     } else {
         goto cleanup;
     }
     return retval;
 
-    cleanup:
+ cleanup:
     UA_Client_reset(client);
     return retval;
 }
 
 UA_StatusCode UA_Client_disconnect(UA_Client *client) {
-    if(client->state != UA_CLIENTSTATE_CONNECTED)
+    if(client->state == UA_CLIENTSTATE_READY)
         return UA_STATUSCODE_BADNOTCONNECTED;
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
     /* Is a session established? */
-    if(client->connection->state == UA_CONNECTION_ESTABLISHED &&
+    if(client->connection.state == UA_CONNECTION_ESTABLISHED &&
        !UA_NodeId_equal(&client->authenticationToken, &UA_NODEID_NULL))
         retval = CloseSession(client);
     /* Is a secure channel established? */
-    if(client->connection->state == UA_CONNECTION_ESTABLISHED)
+    if(client->connection.state == UA_CONNECTION_ESTABLISHED)
         retval |= CloseSecureChannel(client);
     return retval;
 }
@@ -24814,7 +25293,7 @@ UA_StatusCode UA_Client_disconnect(UA_Client *client) {
 UA_StatusCode UA_Client_manuallyRenewSecureChannel(UA_Client *client) {
     UA_StatusCode retval = SecureChannelHandshake(client, true);
     if(retval == UA_STATUSCODE_GOOD)
-      client->state = UA_CLIENTSTATE_CONNECTED;
+        client->state = UA_CLIENTSTATE_CONNECTED;
     return retval;
 }
 
@@ -24834,16 +25313,22 @@ static void
 processServiceResponse(struct ResponseDescription *rd, UA_SecureChannel *channel,
                        UA_MessageType messageType, UA_UInt32 requestId,
                        UA_ByteString *message) {
-	const UA_NodeId expectedNodeId =
+    UA_StatusCode retval = UA_STATUSCODE_GOOD;
+    const UA_NodeId expectedNodeId =
         UA_NODEID_NUMERIC(0, rd->responseType->binaryEncodingId);
     const UA_NodeId serviceFaultNodeId =
         UA_NODEID_NUMERIC(0, UA_TYPES[UA_TYPES_SERVICEFAULT].binaryEncodingId);
 
-    UA_StatusCode retval = UA_STATUSCODE_GOOD;
     UA_ResponseHeader *respHeader = (UA_ResponseHeader*)rd->response;
     rd->processed = true;
 
-    if(messageType != UA_MESSAGETYPE_MSG) {
+    if(messageType == UA_MESSAGETYPE_ERR) {
+        UA_TcpErrorMessage *msg = (UA_TcpErrorMessage*)message;
+        UA_LOG_ERROR(rd->client->config.logger, UA_LOGCATEGORY_CLIENT,
+                     "Server replied with an error message: %s %.*s", UA_StatusCode_name(msg->error), msg->reason.length, msg->reason.data);
+        retval = msg->error;
+        goto finish;
+    } else if(messageType != UA_MESSAGETYPE_MSG) {
         UA_LOG_ERROR(rd->client->config.logger, UA_LOGCATEGORY_CLIENT,
                      "Server replied with the wrong message type");
         retval = UA_STATUSCODE_BADTCPMESSAGETYPEINVALID;
@@ -24901,7 +25386,7 @@ processServiceResponse(struct ResponseDescription *rd, UA_SecureChannel *channel
 }
 
 void
-__UA_Client_Service(UA_Client *client, const void *r, const UA_DataType *requestType,
+__UA_Client_Service(UA_Client *client, const void *request, const UA_DataType *requestType,
                     void *response, const UA_DataType *responseType) {
     UA_init(response, responseType);
     UA_ResponseHeader *respHeader = (UA_ResponseHeader*)response;
@@ -24914,25 +25399,25 @@ __UA_Client_Service(UA_Client *client, const void *r, const UA_DataType *request
         return;
     }
 
-    /* Handling request parameters */
-    //here const *r is 'violated'
-    UA_RequestHeader *request = (UA_RequestHeader*)(uintptr_t)r;
-    UA_NodeId_copy(&client->authenticationToken, &request->authenticationToken);
-    request->timestamp = UA_DateTime_now();
-    request->requestHandle = ++client->requestHandle;
+    /* Adjusting the request header. The const attribute is violated, but we
+     * only touch the following members: */
+    UA_RequestHeader *rr = (UA_RequestHeader*)(uintptr_t)request;
+    rr->authenticationToken = client->authenticationToken; /* cleaned up at the end */
+    rr->timestamp = UA_DateTime_now();
+    rr->requestHandle = ++client->requestHandle;
 
     /* Send the request */
     UA_UInt32 requestId = ++client->requestId;
     UA_LOG_DEBUG(client->config.logger, UA_LOGCATEGORY_CLIENT,
                  "Sending a request of type %i", requestType->typeId.identifier.numeric);
-    retval = UA_SecureChannel_sendBinaryMessage(client->channel, requestId, request, requestType);
+    retval = UA_SecureChannel_sendBinaryMessage(&client->channel, requestId, rr, requestType);
     if(retval != UA_STATUSCODE_GOOD) {
         if(retval == UA_STATUSCODE_BADENCODINGLIMITSEXCEEDED)
             respHeader->serviceResult = UA_STATUSCODE_BADREQUESTTOOLARGE;
         else
             respHeader->serviceResult = retval;
-        client->state = UA_CLIENTSTATE_ERRORED;
-        UA_NodeId_deleteMembers(&request->authenticationToken);
+        client->state = UA_CLIENTSTATE_FAULTED;
+        UA_NodeId_init(&rr->authenticationToken);
         return;
     }
 
@@ -24949,7 +25434,7 @@ __UA_Client_Service(UA_Client *client, const void *r, const UA_DataType *request
         UA_DateTime now = UA_DateTime_nowMonotonic();
         if(now < maxDate) {
             UA_UInt32 timeout = (UA_UInt32)((maxDate - now) / UA_MSEC_TO_DATETIME);
-            retval = Connection_receiveChunk(client->connection, &reply, &realloced, timeout);
+            retval = UA_Connection_receiveChunksBlocking(&client->connection, &reply, &realloced, timeout);
         } else {
             retval = UA_STATUSCODE_GOODNONCRITICALTIMEOUT;
         }
@@ -24958,18 +25443,24 @@ __UA_Client_Service(UA_Client *client, const void *r, const UA_DataType *request
             break;
         }
         /* ProcessChunks and call processServiceResponse for complete messages */
-        UA_SecureChannel_processChunks(client->channel, &reply,
-                     (UA_ProcessMessageCallback*)processServiceResponse, &rd);
+        UA_SecureChannel_processChunks(&client->channel, &reply,
+                                       (UA_ProcessMessageCallback*)processServiceResponse, &rd);
         /* Free the received buffer */
         if(!realloced)
-            client->connection->releaseRecvBuffer(client->connection, &reply);
+            client->connection.releaseRecvBuffer(&client->connection, &reply);
         else
             UA_ByteString_deleteMembers(&reply);
     } while(!rd.processed);
-    UA_NodeId_deleteMembers(&request->authenticationToken);
+
+    /* Clean up the authentication token */
+    UA_NodeId_init(&rr->authenticationToken);
 }
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/client/ua_client_highlevel.c" ***********************************/
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
 
 
 UA_StatusCode
@@ -25309,16 +25800,20 @@ __UA_Client_readAttribute(UA_Client *client, const UA_NodeId *nodeId,
         return retval;
     }
 
+    /* Set the StatusCode */
     UA_DataValue *res = response.results;
-    if(res->hasStatus != UA_STATUSCODE_GOOD)
-        retval = res->hasStatus;
-    else if(!res->hasValue)
-        retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
-    if(retval != UA_STATUSCODE_GOOD) {
+    if(res->hasStatus)
+        retval = res->status;
+
+    /* Return early of no value is given */
+    if(!res->hasValue) {
+        if(retval == UA_STATUSCODE_GOOD)
+            retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
         UA_ReadResponse_deleteMembers(&response);
         return retval;
     }
 
+    /* Copy value into out */
     if(attributeId == UA_ATTRIBUTEID_VALUE) {
         memcpy(out, &res->value, sizeof(UA_Variant));
         UA_Variant_init(&res->value);
@@ -25382,6 +25877,10 @@ UA_Client_readArrayDimensionsAttribute(UA_Client *client, const UA_NodeId nodeId
 
 /*********************************** amalgamated original file "/media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/src/client/ua_client_highlevel_subscriptions.c" ***********************************/
 
+/* This Source Code Form is subject to the terms of the Mozilla Public
+*  License, v. 2.0. If a copy of the MPL was not distributed with this 
+*  file, You can obtain one at http://mozilla.org/MPL/2.0/.*/
+
 
 #ifdef UA_ENABLE_SUBSCRIPTIONS /* conditional compilation */
 
@@ -25408,17 +25907,17 @@ UA_Client_Subscriptions_new(UA_Client *client, UA_SubscriptionSettings settings,
         goto cleanup;
     }
 
-    LIST_INIT(&newSub->MonitoredItems);
-    newSub->LifeTime = response.revisedLifetimeCount;
-    newSub->KeepAliveCount = response.revisedMaxKeepAliveCount;
-    newSub->PublishingInterval = response.revisedPublishingInterval;
-    newSub->SubscriptionID = response.subscriptionId;
-    newSub->NotificationsPerPublish = request.maxNotificationsPerPublish;
-    newSub->Priority = request.priority;
+    LIST_INIT(&newSub->monitoredItems);
+    newSub->lifeTime = response.revisedLifetimeCount;
+    newSub->keepAliveCount = response.revisedMaxKeepAliveCount;
+    newSub->publishingInterval = response.revisedPublishingInterval;
+    newSub->subscriptionID = response.subscriptionId;
+    newSub->notificationsPerPublish = request.maxNotificationsPerPublish;
+    newSub->priority = request.priority;
     LIST_INSERT_HEAD(&client->subscriptions, newSub, listEntry);
 
     if(newSubscriptionId)
-        *newSubscriptionId = newSub->SubscriptionID;
+        *newSubscriptionId = newSub->subscriptionID;
 
  cleanup:
     UA_CreateSubscriptionResponse_deleteMembers(&response);
@@ -25430,7 +25929,7 @@ UA_StatusCode
 UA_Client_Subscriptions_remove(UA_Client *client, UA_UInt32 subscriptionId) {
     UA_Client_Subscription *sub;
     LIST_FOREACH(sub, &client->subscriptions, listEntry) {
-        if(sub->SubscriptionID == subscriptionId)
+        if(sub->subscriptionID == subscriptionId)
             break;
     }
     if(!sub)
@@ -25438,10 +25937,10 @@ UA_Client_Subscriptions_remove(UA_Client *client, UA_UInt32 subscriptionId) {
 
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
     UA_Client_MonitoredItem *mon, *tmpmon;
-    LIST_FOREACH_SAFE(mon, &sub->MonitoredItems, listEntry, tmpmon) {
+    LIST_FOREACH_SAFE(mon, &sub->monitoredItems, listEntry, tmpmon) {
         retval =
-            UA_Client_Subscriptions_removeMonitoredItem(client, sub->SubscriptionID,
-                                                        mon->MonitoredItemId);
+            UA_Client_Subscriptions_removeMonitoredItem(client, sub->subscriptionID,
+                                                        mon->monitoredItemId);
         if(retval != UA_STATUSCODE_GOOD)
             return retval;
     }
@@ -25450,7 +25949,7 @@ UA_Client_Subscriptions_remove(UA_Client *client, UA_UInt32 subscriptionId) {
     UA_DeleteSubscriptionsRequest request;
     UA_DeleteSubscriptionsRequest_init(&request);
     request.subscriptionIdsSize = 1;
-    request.subscriptionIds = &sub->SubscriptionID;
+    request.subscriptionIds = &sub->subscriptionID;
     UA_DeleteSubscriptionsResponse response = UA_Client_Service_deleteSubscriptions(client, request);
     retval = response.responseHeader.serviceResult;
     if(retval == UA_STATUSCODE_GOOD && response.resultsSize > 0)
@@ -25460,7 +25959,7 @@ UA_Client_Subscriptions_remove(UA_Client *client, UA_UInt32 subscriptionId) {
     if(retval != UA_STATUSCODE_GOOD && retval != UA_STATUSCODE_BADSUBSCRIPTIONIDINVALID) {
         UA_LOG_INFO(client->config.logger, UA_LOGCATEGORY_CLIENT,
                     "Could not remove subscription %u with statuscode 0x%08x",
-                    sub->SubscriptionID, retval);
+                    sub->subscriptionID, retval);
         return retval;
     }
 
@@ -25472,7 +25971,7 @@ void
 UA_Client_Subscriptions_forceDelete(UA_Client *client,
                                     UA_Client_Subscription *sub) {
     UA_Client_MonitoredItem *mon, *mon_tmp;
-    LIST_FOREACH_SAFE(mon, &sub->MonitoredItems, listEntry, mon_tmp) {
+    LIST_FOREACH_SAFE(mon, &sub->monitoredItems, listEntry, mon_tmp) {
         UA_NodeId_deleteMembers(&mon->monitoredNodeId);
         LIST_REMOVE(mon, listEntry);
         UA_free(mon);
@@ -25484,11 +25983,11 @@ UA_Client_Subscriptions_forceDelete(UA_Client *client,
 UA_StatusCode
 UA_Client_Subscriptions_addMonitoredItem(UA_Client *client, UA_UInt32 subscriptionId,
                                          UA_NodeId nodeId, UA_UInt32 attributeID,
-                                         UA_MonitoredItemHandlingFunction handlingFunction,
-                                         void *handlingContext, UA_UInt32 *newMonitoredItemId) {
+                                         UA_MonitoredItemHandlingFunction hf,
+                                         void *hfContext, UA_UInt32 *newMonitoredItemId) {
     UA_Client_Subscription *sub;
     LIST_FOREACH(sub, &client->subscriptions, listEntry) {
-        if(sub->SubscriptionID == subscriptionId)
+        if(sub->subscriptionID == subscriptionId)
             break;
     }
     if(!sub)
@@ -25504,7 +26003,7 @@ UA_Client_Subscriptions_addMonitoredItem(UA_Client *client, UA_UInt32 subscripti
     item.itemToMonitor.attributeId = attributeID;
     item.monitoringMode = UA_MONITORINGMODE_REPORTING;
     item.requestedParameters.clientHandle = ++(client->monitoredItemHandles);
-    item.requestedParameters.samplingInterval = sub->PublishingInterval;
+    item.requestedParameters.samplingInterval = sub->publishingInterval;
     item.requestedParameters.discardOldest = true;
     item.requestedParameters.queueSize = 1;
     request.itemsToCreate = &item;
@@ -25524,18 +26023,18 @@ UA_Client_Subscriptions_addMonitoredItem(UA_Client *client, UA_UInt32 subscripti
 
     /* Create the handler */
     UA_Client_MonitoredItem *newMon = UA_malloc(sizeof(UA_Client_MonitoredItem));
-    newMon->MonitoringMode = UA_MONITORINGMODE_REPORTING;
+    newMon->monitoringMode = UA_MONITORINGMODE_REPORTING;
     UA_NodeId_copy(&nodeId, &newMon->monitoredNodeId);
-    newMon->AttributeID = attributeID;
-    newMon->ClientHandle = client->monitoredItemHandles;
-    newMon->SamplingInterval = sub->PublishingInterval;
-    newMon->QueueSize = 1;
-    newMon->DiscardOldest = true;
-    newMon->handler = handlingFunction;
-    newMon->handlerContext = handlingContext;
-    newMon->MonitoredItemId = response.results[0].monitoredItemId;
-    LIST_INSERT_HEAD(&sub->MonitoredItems, newMon, listEntry);
-    *newMonitoredItemId = newMon->MonitoredItemId;
+    newMon->attributeID = attributeID;
+    newMon->clientHandle = client->monitoredItemHandles;
+    newMon->samplingInterval = sub->publishingInterval;
+    newMon->queueSize = 1;
+    newMon->discardOldest = true;
+    newMon->handler = hf;
+    newMon->handlerContext = hfContext;
+    newMon->monitoredItemId = response.results[0].monitoredItemId;
+    LIST_INSERT_HEAD(&sub->monitoredItems, newMon, listEntry);
+    *newMonitoredItemId = newMon->monitoredItemId;
 
     UA_LOG_DEBUG(client->config.logger, UA_LOGCATEGORY_CLIENT,
                  "Created a monitored item with client handle %u", client->monitoredItemHandles);
@@ -25549,15 +26048,15 @@ UA_Client_Subscriptions_removeMonitoredItem(UA_Client *client, UA_UInt32 subscri
                                             UA_UInt32 monitoredItemId) {
     UA_Client_Subscription *sub;
     LIST_FOREACH(sub, &client->subscriptions, listEntry) {
-        if(sub->SubscriptionID == subscriptionId)
+        if(sub->subscriptionID == subscriptionId)
             break;
     }
     if(!sub)
         return UA_STATUSCODE_BADSUBSCRIPTIONIDINVALID;
     
     UA_Client_MonitoredItem *mon;
-    LIST_FOREACH(mon, &sub->MonitoredItems, listEntry) {
-        if(mon->MonitoredItemId == monitoredItemId)
+    LIST_FOREACH(mon, &sub->monitoredItems, listEntry) {
+        if(mon->monitoredItemId == monitoredItemId)
             break;
     }
     if(!mon)
@@ -25566,9 +26065,9 @@ UA_Client_Subscriptions_removeMonitoredItem(UA_Client *client, UA_UInt32 subscri
     /* remove the monitoreditem remotely */
     UA_DeleteMonitoredItemsRequest request;
     UA_DeleteMonitoredItemsRequest_init(&request);
-    request.subscriptionId = sub->SubscriptionID;
+    request.subscriptionId = sub->subscriptionID;
     request.monitoredItemIdsSize = 1;
-    request.monitoredItemIds = &mon->MonitoredItemId;
+    request.monitoredItemIds = &mon->monitoredItemId;
     UA_DeleteMonitoredItemsResponse response = UA_Client_Service_deleteMonitoredItems(client, request);
 
     UA_StatusCode retval = response.responseHeader.serviceResult;
@@ -25598,7 +26097,7 @@ UA_Client_processPublishResponse(UA_Client *client, UA_PublishRequest *request,
     /* Find the subscription */
     UA_Client_Subscription *sub;
     LIST_FOREACH(sub, &client->subscriptions, listEntry) {
-        if(sub->SubscriptionID == response->subscriptionId)
+        if(sub->subscriptionID == response->subscriptionId)
             break;
     }
     if(!sub)
@@ -25606,7 +26105,7 @@ UA_Client_processPublishResponse(UA_Client *client, UA_PublishRequest *request,
 
     UA_LOG_DEBUG(client->config.logger, UA_LOGCATEGORY_CLIENT,
                  "Processing a publish response on subscription %u with %u notifications",
-                 sub->SubscriptionID, response->notificationMessage.notificationDataSize);
+                 sub->subscriptionID, response->notificationMessage.notificationDataSize);
 
     /* Check if the server has acknowledged any of the sent ACKs */
     for(size_t i = 0; i < response->resultsSize && i < request->subscriptionAcknowledgementsSize; ++i) {
@@ -25643,23 +26142,23 @@ UA_Client_processPublishResponse(UA_Client *client, UA_PublishRequest *request,
         for(size_t j = 0; j < dataChangeNotification->monitoredItemsSize; ++j) {
             UA_MonitoredItemNotification *mitemNot = &dataChangeNotification->monitoredItems[j];
             UA_Client_MonitoredItem *mon;
-            LIST_FOREACH(mon, &sub->MonitoredItems, listEntry) {
-                if(mon->ClientHandle == mitemNot->clientHandle) {
-                    mon->handler(mon->MonitoredItemId, &mitemNot->value, mon->handlerContext);
+            LIST_FOREACH(mon, &sub->monitoredItems, listEntry) {
+                if(mon->clientHandle == mitemNot->clientHandle) {
+                    mon->handler(mon->monitoredItemId, &mitemNot->value, mon->handlerContext);
                     break;
                 }
             }
             if(!mon)
                 UA_LOG_DEBUG(client->config.logger, UA_LOGCATEGORY_CLIENT,
                              "Could not process a notification with clienthandle %u on subscription %u",
-                             mitemNot->clientHandle, sub->SubscriptionID);
+                             mitemNot->clientHandle, sub->subscriptionID);
         }
     }
 
     /* Add to the list of pending acks */
     UA_Client_NotificationsAckNumber *tmpAck = UA_malloc(sizeof(UA_Client_NotificationsAckNumber));
     tmpAck->subAck.sequenceNumber = msg->sequenceNumber;
-    tmpAck->subAck.subscriptionId = sub->SubscriptionID;
+    tmpAck->subAck.subscriptionId = sub->subscriptionID;
     LIST_INSERT_HEAD(&client->pendingNotificationsAcks, tmpAck, listEntry);
 }
 
@@ -25882,21 +26381,24 @@ socket_recv(UA_Connection *connection, UA_ByteString *response, UA_UInt32 timeou
                        connection->localConf.recvBufferSize, 0);
 #endif
 
+    /* server has closed the connection */
     if(ret == 0) {
-        /* server has closed the connection */
         UA_ByteString_deleteMembers(response);
         socket_close(connection);
         return UA_STATUSCODE_BADCONNECTIONCLOSED;
-    } else if(ret < 0) {
+    }
+
+    /* error case */
+    if(ret < 0) {
         UA_ByteString_deleteMembers(response);
         if(errno__ == INTERRUPTED || (timeout > 0) ?
            false : (errno__ == EAGAIN || errno__ == WOULDBLOCK))
             return UA_STATUSCODE_GOOD; /* statuscode_good but no data -> retry */
-        else {
-            socket_close(connection);
-            return UA_STATUSCODE_BADCONNECTIONCLOSED;
-        }
+        socket_close(connection);
+        return UA_STATUSCODE_BADCONNECTIONCLOSED;
     }
+    
+    /* default case */
     response->length = (size_t)ret;
     return UA_STATUSCODE_GOOD;
 }
@@ -26036,15 +26538,17 @@ ServerNetworkLayerTCP_add(ServerNetworkLayerTCP *layer, UA_Int32 newsockfd) {
     struct sockaddr_in addr;
     socklen_t addrlen = sizeof(struct sockaddr_in);
     int res = getpeername(newsockfd, (struct sockaddr*)&addr, &addrlen);
+    
     if(res == 0) {
         UA_LOG_INFO(layer->logger, UA_LOGCATEGORY_NETWORK,
                     "Connection %i | New connection over TCP from %s:%d",
-            newsockfd, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
+                    newsockfd, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
     } else {
         UA_LOG_WARNING(layer->logger, UA_LOGCATEGORY_NETWORK,
                        "Connection %i | New connection over TCP, "
                        "getpeername failed with errno %i", newsockfd, errno);
     }
+
     memset(c, 0, sizeof(UA_Connection));
     c->sockfd = newsockfd;
     c->handle = layer;
@@ -26314,7 +26818,7 @@ ClientNetworkLayerClose(UA_Connection *connection) {
 
 /* we have no networklayer. instead, attach the reusable buffer to the handle */
 UA_Connection
-UA_ClientConnectionTCP(UA_ConnectionConfig localConf, const char *endpointUrl,
+UA_ClientConnectionTCP(UA_ConnectionConfig conf, const char *endpointUrl,
                        UA_Logger logger) {
 #ifdef _WIN32
     WORD wVersionRequested;
@@ -26326,8 +26830,8 @@ UA_ClientConnectionTCP(UA_ConnectionConfig localConf, const char *endpointUrl,
     UA_Connection connection;
     memset(&connection, 0, sizeof(UA_Connection));
     connection.state = UA_CONNECTION_OPENING;
-    connection.localConf = localConf;
-    connection.remoteConf = localConf;
+    connection.localConf = conf;
+    connection.remoteConf = conf;
     connection.send = socket_write;
     connection.recv = socket_recv;
     connection.close = ClientNetworkLayerClose;
@@ -26490,26 +26994,38 @@ UA_DateTime UA_DateTime_nowMonotonic(void) {
 #include <stdio.h>
 #include <stdarg.h>
 
+#ifdef UA_ENABLE_MULTITHREADING
+#include <pthread.h>
+static pthread_mutex_t printf_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
+
 const char *LogLevelNames[6] = {"trace", "debug", "info", "warning", "error", "fatal"};
 const char *LogCategoryNames[6] = {"network", "channel", "session", "server", "client", "userland"};
 
-#if (defined(__GNUC__) && defined(__GNUC_MINOR__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || defined(__clang__)
+#if (defined(__GNUC__) && defined(__GNUC_MINOR__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || \
+    defined(__clang__)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
 
-void UA_Log_Stdout(UA_LogLevel level, UA_LogCategory category, const char *msg, ...) {
+void
+UA_Log_Stdout(UA_LogLevel level, UA_LogCategory category,
+              const char *msg, va_list args) {
     UA_String t = UA_DateTime_toString(UA_DateTime_now());
+#ifdef UA_ENABLE_MULTITHREADING
+    pthread_mutex_lock(&printf_mutex);
+#endif
     printf("[%.23s] %s/%s\t", t.data, LogLevelNames[level], LogCategoryNames[category]);
-    UA_ByteString_deleteMembers(&t);
-    va_list ap;
-    va_start(ap, msg);
-    vprintf(msg, ap);
-    va_end(ap);
+    vprintf(msg, args);
     printf("\n");
+#ifdef UA_ENABLE_MULTITHREADING
+    pthread_mutex_unlock(&printf_mutex);
+#endif
+    UA_ByteString_deleteMembers(&t);
 }
 
-#if (defined(__GNUC__) && defined(__GNUC_MINOR__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || defined(__clang__)
+#if (defined(__GNUC__) && defined(__GNUC_MINOR__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 6) || \
+    defined(__clang__)
 # pragma GCC diagnostic pop
 #endif
 
@@ -26544,6 +27060,10 @@ const UA_EXPORT UA_ConnectionConfig UA_ConnectionConfig_standard = {
 #define UA_STRING_STATIC(s) {sizeof(s)-1, (UA_Byte*)s}
 #define UA_STRING_STATIC_NULL {0, NULL}
 
+#define STRINGIFY(arg) #arg
+#define VERSION(MAJOR, MINOR, PATCH, LABEL) \
+    STRINGIFY(MAJOR) "." STRINGIFY(MINOR) "." STRINGIFY(PATCH) LABEL
+
 UA_UsernamePasswordLogin usernamePasswords[2] = {
     { UA_STRING_STATIC("user1"), UA_STRING_STATIC("password") },
     { UA_STRING_STATIC("user2"), UA_STRING_STATIC("password1") } };
@@ -26557,7 +27077,10 @@ const UA_EXPORT UA_ServerConfig UA_ServerConfig_standard = {
         .productUri = UA_STRING_STATIC(PRODUCT_URI),
         .manufacturerName = UA_STRING_STATIC(MANUFACTURER_NAME),
         .productName = UA_STRING_STATIC(PRODUCT_NAME),
-        .softwareVersion = UA_STRING_STATIC(UA_GIT_COMMIT_ID),
+        .softwareVersion = UA_STRING_STATIC(VERSION(UA_OPEN62541_VER_MAJOR,
+                                                    UA_OPEN62541_VER_MINOR,
+                                                    UA_OPEN62541_VER_PATCH,
+                                                    UA_OPEN62541_VER_LABEL)),
         .buildNumber = UA_STRING_STATIC(__DATE__ " " __TIME__),
         .buildDate = 0 },
     .applicationDescription = {
@@ -63274,7 +63797,7 @@ return UA_STATUSCODE_GOOD;
  * /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541-build/src_generated/ua_statuscode_descriptions.hgen -- do not modify
  **********************************************************
  * Generated from /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/schema/Opc.Ua.StatusCodes.csv with script /media/januil/Datensammlung/Dokumente/TUDresden/Projekte/HZDR/Programme/ControlSystemAdapter-OPC-UA-Adapter/build/open62541_src/src/external-open62541/tools/generate_statuscode_descriptions.py
- * on host WorkStation by user januil at 2017-01-18 04:03:46
+ * on host WorkStation by user januil at 2017-03-21 10:45:30
  **********************************************************/
 
 

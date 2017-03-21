@@ -182,7 +182,8 @@ endif()
 if(UPDATE_OPEN62541)
 		ExternalProject_Add(external-open62541
 			GIT_REPOSITORY "https://github.com/open62541/open62541.git"
-			GIT_TAG "0.2-rc2"
+			GIT_TAG "93e79321c1b40bbdada49f3bf3d52095b8f64100"
+			#GIT_TAG "0.2-rc2" // Array outlier occure
 			#GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2" // Tag during the first integration Meeting
 			PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
 			CMAKE_ARGS 
@@ -192,6 +193,7 @@ if(UPDATE_OPEN62541)
 			"-DUA_ENABLE_METHODCALLS=ON" 
 			"-DUA_ENABLE_NODEMANAGEMENT=ON" 
 			"-DUA_ENABLE_SUBSCRIPTIONS=ON"
+			#"-DUA_ENABLE_ENABLE_MULTITHREADING=ON"
 			"-DUA_LOGLEVEL=300"
 			"-DCMAKE_BUILD_TYPE=DEBUG"
 		)
