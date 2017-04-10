@@ -148,7 +148,7 @@ void ua_uaadapter::readConfig() {
 		}
 	}
 	else {
-			cout << "Login aktiviert" << endl;
+			this->serverConfig.UsernamePasswordLogin = UA_FALSE;
 	}
 	
 	result = this->fileHandler->getNodeSet(xpath +"//serverConfig");	
@@ -171,7 +171,7 @@ void ua_uaadapter::readConfig() {
 		}
 	}
 	else {
-		cout << "No <serverConfig>-Tag in config file. Use default port and application name configuration." << endl;
+		cout << "No <serverConfig>-Tag in config file. Use default port 16664 and application name configuration." << endl;
 	}
 }
 
@@ -304,7 +304,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 						}
 					}
 				}
-				std::cout << "Variable '" << srcVarName << "' wird unter '" << renameVar << "' im Ordner Namens '" << applicName << "' eingetragen." << std::endl;
+				std::cout << "Variable '" << srcVarName << "' unnamed in '" << renameVar << "' and listed in folder '" << applicName << "'." << std::endl;
 				
 				vector<xmlNodePtr> nodeVectorFolderPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "folder");
 				vector<string> folderPathVector;

@@ -36,12 +36,6 @@ void UAAdapterTest::testExampleSet() {
 	// is Server running?
 	adapter->doStart();
 	BOOST_CHECK(adapter->isRunning() == true);
-	/*
-	adapter->doStop();
-	BOOST_CHECK(adapter->isRunning() != true);
-	
-	adapter->doStart();
-	BOOST_CHECK(adapter->isRunning() == true);*/
 	
 	BOOST_CHECK(adapter->getIpcId() == 0);
 	UA_NodeId ownNodeId = adapter->getOwnNodeId();

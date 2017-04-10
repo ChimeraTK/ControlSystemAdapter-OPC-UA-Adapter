@@ -182,7 +182,7 @@ int main() {
 	csManager->getProcessArray<double>("amplitude")->write();
 
 	csManager->getProcessArray<int8_t>("int8Scalar")->set(vector<int8_t> {12});
-	cout << "Dummy Daten geschrieben..." << std::endl;	
+	cout << "write dummy Data..." << std::endl;	
 	
 	string pathToConfig = "opcuaAdapter_mapping.xml";
 	csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
@@ -194,7 +194,7 @@ int main() {
 	mgr->doStart();	
 	
 	// Server is running
-	std::cout << "Server läuft..." << std::endl;
+	std::cout << "server is running..." << std::endl;
 	while(csaOPCUA->isRunning()) {
 		sleep(2);
 	}

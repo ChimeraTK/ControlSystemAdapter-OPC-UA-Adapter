@@ -71,7 +71,7 @@ struct FolderInfo {
  * 
  */
 struct ServerConfig {
-	string rootFolder = "mtcaModule";
+	string rootFolder = "Module";
 	string descriptionFolder = "No description is set";
 	UA_Boolean	UsernamePasswordLogin = UA_FALSE;
 	string password = "";
