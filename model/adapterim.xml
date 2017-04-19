@@ -11,11 +11,11 @@
     </Aliases>
     <Extensions>
         <Extension>
-            <ModelInfo Tool="UaModeler" Hash="z2XxY13OnY1NaV19+I9EAg==" Version="1.4.4"/>
+            <ModelInfo Tool="UaModeler" Hash="bF2MhbQg4uRn0Q7OODsbQQ==" Version="1.4.4"/>
         </Extension>
     </Extensions>
-    <UAObjectType NodeId="ns=1;i=1005" BrowseName="1:mtcaAdditionalVariable">
-        <DisplayName>mtcaAdditionalVariable</DisplayName>
+    <UAObjectType NodeId="ns=1;i=1005" BrowseName="1:ctkAdditionalVariable">
+        <DisplayName>ctkAdditionalVariable</DisplayName>
         <References>
             <Reference ReferenceType="HasSubtype" IsForward="false">i=58</Reference>
             <Reference ReferenceType="HasComponent">ns=1;i=6002</Reference>
@@ -32,8 +32,8 @@
             <uax:String></uax:String>
         </Value>
     </UAVariable>
-    <UAObjectType NodeId="ns=1;i=1002" BrowseName="1:mtcaModule">
-        <DisplayName>mtcaModule</DisplayName>
+    <UAObjectType NodeId="ns=1;i=1002" BrowseName="1:ctkModule">
+        <DisplayName>ctkModule</DisplayName>
         <References>
             <Reference ReferenceType="HasSubtype" IsForward="false">i=58</Reference>
             <Reference ReferenceType="HasComponent">ns=1;i=5001</Reference>
@@ -47,8 +47,8 @@
             <Reference ReferenceType="HasComponent" IsForward="false">ns=1;i=1002</Reference>
         </References>
     </UAObject>
-    <UAObjectType NodeId="ns=1;i=1001" BrowseName="1:mtcaProcessVariable">
-        <DisplayName>mtcaProcessVariable</DisplayName>
+    <UAObjectType NodeId="ns=1;i=1001" BrowseName="1:ctkProcessVariable">
+        <DisplayName>ctkProcessVariable</DisplayName>
         <References>
             <Reference ReferenceType="HasComponent">ns=1;i=6001</Reference>
             <Reference ReferenceType="HasComponent">ns=1;i=6006</Reference>

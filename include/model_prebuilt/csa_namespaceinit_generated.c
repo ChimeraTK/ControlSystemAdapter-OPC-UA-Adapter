@@ -11,51 +11,51 @@ if (UA_Server_addNamespace(server, "http://adapterIM/") != 2)
 
 do {
 // Referencing node found and declared as parent: i=58/BaseObjectType using i=45/HasSubtype
-// Node: opcua_node_objectType_t(ns=2;i=1005), 1:mtcaAdditionalVariable
+// Node: opcua_node_objectType_t(ns=2;i=1005), 1:ctkAdditionalVariable
 UA_ObjectTypeAttributes attr;
 UA_ObjectTypeAttributes_init(&attr);
-attr.displayName = UA_LOCALIZEDTEXT("", "mtcaAdditionalVariable");
+attr.displayName = UA_LOCALIZEDTEXT("", "ctkAdditionalVariable");
 attr.description = UA_LOCALIZEDTEXT("", "");
 UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 1005);
 UA_NodeId parentNodeId = UA_NODEID_NUMERIC(0, 58);
 UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 45);
-UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "mtcaAdditionalVariable");
+UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "ctkAdditionalVariable");
 UA_Server_addObjectTypeNode(server, nodeId, parentNodeId, parentReferenceNodeId, nodeName
        , attr, NULL, NULL);
 } while(0);
 
 do {
 // Referencing node found and declared as parent: i=58/BaseObjectType using i=45/HasSubtype
-// Node: opcua_node_objectType_t(ns=2;i=1002), 1:mtcaModule
+// Node: opcua_node_objectType_t(ns=2;i=1002), 1:ctkModule
 UA_ObjectTypeAttributes attr;
 UA_ObjectTypeAttributes_init(&attr);
-attr.displayName = UA_LOCALIZEDTEXT("", "mtcaModule");
+attr.displayName = UA_LOCALIZEDTEXT("", "ctkModule");
 attr.description = UA_LOCALIZEDTEXT("", "");
 UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 1002);
 UA_NodeId parentNodeId = UA_NODEID_NUMERIC(0, 58);
 UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 45);
-UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "mtcaModule");
+UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "ctkModule");
 UA_Server_addObjectTypeNode(server, nodeId, parentNodeId, parentReferenceNodeId, nodeName
        , attr, NULL, NULL);
 } while(0);
 
 do {
 // Referencing node found and declared as parent: i=58/BaseObjectType using i=45/HasSubtype
-// Node: opcua_node_objectType_t(ns=2;i=1001), 1:mtcaProcessVariable
+// Node: opcua_node_objectType_t(ns=2;i=1001), 1:ctkProcessVariable
 UA_ObjectTypeAttributes attr;
 UA_ObjectTypeAttributes_init(&attr);
-attr.displayName = UA_LOCALIZEDTEXT("", "mtcaProcessVariable");
+attr.displayName = UA_LOCALIZEDTEXT("", "ctkProcessVariable");
 attr.description = UA_LOCALIZEDTEXT("", "");
 UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 1001);
 UA_NodeId parentNodeId = UA_NODEID_NUMERIC(0, 58);
 UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 45);
-UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "mtcaProcessVariable");
+UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "ctkProcessVariable");
 UA_Server_addObjectTypeNode(server, nodeId, parentNodeId, parentReferenceNodeId, nodeName
        , attr, NULL, NULL);
 } while(0);
 
 do {
-// Referencing node found and declared as parent: ns=2;i=1005/1:mtcaAdditionalVariable using i=47/HasComponent
+// Referencing node found and declared as parent: ns=2;i=1005/1:ctkAdditionalVariable using i=47/HasComponent
 // Node: opcua_node_variable_t(ns=2;i=6002), 1:Value
 UA_VariableAttributes attr;
 UA_VariableAttributes_init(&attr);
@@ -82,7 +82,7 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6002), UA_NODEID_NUMERIC(0, 
 } while(0);
 
 do {
-// Referencing node found and declared as parent: ns=2;i=1002/1:mtcaModule using i=47/HasComponent
+// Referencing node found and declared as parent: ns=2;i=1002/1:ctkModule using i=47/HasComponent
 // Node: opcua_node_object_t(ns=2;i=5001), 1:Variables
 UA_ObjectAttributes attr;
 UA_ObjectAttributes_init(&attr);
@@ -103,7 +103,7 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 5001), UA_NODEID_NUMERIC(0, 
 } while(0);
 
 do {
-// Referencing node found and declared as parent: ns=2;i=1001/1:mtcaProcessVariable using i=47/HasComponent
+// Referencing node found and declared as parent: ns=2;i=1001/1:ctkProcessVariable using i=47/HasComponent
 // Node: opcua_node_variable_t(ns=2;i=6001), 1:Description
 UA_VariableAttributes attr;
 UA_VariableAttributes_init(&attr);
@@ -130,7 +130,7 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6001), UA_NODEID_NUMERIC(0, 
 } while(0);
 
 do {
-// Referencing node found and declared as parent: ns=2;i=1001/1:mtcaProcessVariable using i=47/HasComponent
+// Referencing node found and declared as parent: ns=2;i=1001/1:ctkProcessVariable using i=47/HasComponent
 // Node: opcua_node_variable_t(ns=2;i=6006), 1:EngineeringUnit
 UA_VariableAttributes attr;
 UA_VariableAttributes_init(&attr);
@@ -154,7 +154,7 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6006), UA_NODEID_NUMERIC(0, 
 } while(0);
 
 do {
-// Referencing node found and declared as parent: ns=2;i=1001/1:mtcaProcessVariable using i=47/HasComponent
+// Referencing node found and declared as parent: ns=2;i=1001/1:ctkProcessVariable using i=47/HasComponent
 // Node: opcua_node_variable_t(ns=2;i=6004), 1:Name
 UA_VariableAttributes attr;
 UA_VariableAttributes_init(&attr);
@@ -181,7 +181,7 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6004), UA_NODEID_NUMERIC(0, 
 } while(0);
 
 do {
-// Referencing node found and declared as parent: ns=2;i=1001/1:mtcaProcessVariable using i=47/HasComponent
+// Referencing node found and declared as parent: ns=2;i=1001/1:ctkProcessVariable using i=47/HasComponent
 // Node: opcua_node_variable_t(ns=2;i=6012), 1:Type
 UA_VariableAttributes attr;
 UA_VariableAttributes_init(&attr);
@@ -208,7 +208,7 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6012), UA_NODEID_NUMERIC(0, 
 } while(0);
 
 do {
-// Referencing node found and declared as parent: ns=2;i=1001/1:mtcaProcessVariable using i=47/HasComponent
+// Referencing node found and declared as parent: ns=2;i=1001/1:ctkProcessVariable using i=47/HasComponent
 // Node: opcua_node_variable_t(ns=2;i=6010), 1:Value
 UA_VariableAttributes attr;
 UA_VariableAttributes_init(&attr);

@@ -76,7 +76,7 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
 		UA_INSTATIATIONCALLBACK(icb);  		
 		UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
                              this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                             UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAADDITIONALVARIABLE), oAttr, &icb, &createdNodeId);
+                             UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), oAttr, &icb, &createdNodeId);
     
 	// know your own nodeId
 	this->ownNodeId = createdNodeId;

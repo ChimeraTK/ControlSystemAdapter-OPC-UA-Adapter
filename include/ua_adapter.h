@@ -64,7 +64,8 @@ struct FolderInfo {
 };
 
 /** @struct ServerConfig
- *	@brief This struct represents a server config. If the hole config file is prased, all information will be stored in die struct. Additionally for every necessary variable a default value is set. 
+ *	@brief This struct represents a server config. If the hole config file is prased, all information will be stored in die struct. 
+ * Additionally for every necessary variable a default value is set. 
  *   
  *  @author Chris Iatrou, Julian Rahm
  *  @date 03.12.2016

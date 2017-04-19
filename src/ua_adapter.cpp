@@ -469,7 +469,7 @@ UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
 	UA_INSTATIATIONCALLBACK(icb);
 	UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
                             UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-                            UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_MTCAMODULE), oAttr, &icb, &createdNodeId);
+                            UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &icb, &createdNodeId);
     
 	this->ownNodeId = createdNodeId;
 	// Nodes "Variables" where created on object instantiation, we need these IDs to add new process variables to them...
