@@ -51,6 +51,7 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
 	this->csa_opcua_adapter_InitServer(configFile);
 	this->csa_opcua_adapter_InitVarMapping();
 	
+	this->mgr->doStart(); // Implicit: Startet Worker-Threads aller ipc_managed_objects, die mit addObject registriert wurden  
 }
 
 void csa_opcua_adapter::csa_opcua_adapter_InitServer(string configFile) {
@@ -59,7 +60,6 @@ void csa_opcua_adapter::csa_opcua_adapter_InitServer(string configFile) {
 	// Create new server adapter
 	this->adapter = new ua_uaadapter(configFile);
 	this->mgr->addObject(this->adapter);
-	this->mgr->doStart(); // Implicit: Startet Worker-Threads aller ipc_managed_objects, die mit addObject registriert wurden  
 }
 
 void csa_opcua_adapter::csa_opcua_adapter_InitVarMapping() {

@@ -63,6 +63,9 @@ struct MyApp : public ApplicationBase {
 	}
 	
   void shutdown() {
+		std::lock_guard<std::mutex> lock(instance_mutex);
+    instance = nullptr;
+    hasBeenShutdown = true;
 		cout << "Application shutdown..." << endl;
 	}
 	

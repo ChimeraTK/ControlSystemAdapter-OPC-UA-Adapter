@@ -78,6 +78,7 @@ static void SigHandler_Int(int sign) {
 	terminateMain = true;
 	csaOPCUA->stop();
 	csaOPCUA->~csa_opcua_adapter();
+	ChimeraTK::ApplicationBase::getInstance().shutdown();
 	cout << "OPC UA adapter termianted." << endl;
 }
 
@@ -106,5 +107,6 @@ int main() {
 
 	while(!terminateMain) sleep(3600);  // sleep will be interrupted when signal is received
 	csManager.reset();
+
 	cout << "Application termianted." << endl;
 }
