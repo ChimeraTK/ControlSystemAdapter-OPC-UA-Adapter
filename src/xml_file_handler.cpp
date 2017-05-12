@@ -9,6 +9,7 @@
 #include <libxml2/libxml/xpathInternals.h>
 #include <libxml2/libxml/tree.h>
 
+using namespace std;
 
 xml_file_handler::xml_file_handler(std::string filePath) {
 	// FIXME: Add some check routine if file realy exist
@@ -72,7 +73,8 @@ bool xml_file_handler::createDoc(std::string filePath) {
 	this->doc = xmlParseFile(filePath.c_str());
 	
  	if(this->doc == NULL ) {
-		//std::cout << "Document not parsed successfully." << std::endl;
+		std::cout << "Document not parsed successfully." << std::endl;
+		exit(0);
 		return false;
  	}
 
@@ -82,8 +84,9 @@ bool xml_file_handler::createDoc(std::string filePath) {
 std::vector<std::string> xml_file_handler::praseVariablePath(std::string variablePath, std::string seperator) {
 
 	std::vector<std::string> pathList;
-    boost::char_separator<char> sep(seperator.c_str());
-    boost::tokenizer<boost::char_separator<char>> tokens(variablePath, sep);
+	boost::char_separator<char> sep(seperator.c_str());
+	boost::tokenizer<boost::char_separator<char>> tokens(variablePath, sep);
+	
  	for (const auto& t : tokens) {
 		pathList.push_back(t);
  	}

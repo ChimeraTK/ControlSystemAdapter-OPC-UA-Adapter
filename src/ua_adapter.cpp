@@ -292,6 +292,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 				// assumption last element is name of variable, hence no folder for name is needed
 				if(renameVar.compare("") == 0 && !unrollPathIs) {
 					renameVar = srcVarName;
+					std::cout << "Variable '" << srcVarName << "' renamed in '" << renameVar << "' and listed in folder '" << applicName << "'." << std::endl;
 				}
 				else {
 					if(unrollPathIs && renameVar.compare("") == 0) {
@@ -303,8 +304,10 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 							varPathVector.pop_back();
 						}
 					}
+					std::cout << "Variable '" << srcVarName << "' listed in folder '" << applicName << "'." << std::endl;
 				}
-				std::cout << "Variable '" << srcVarName << "' unnamed in '" << renameVar << "' and listed in folder '" << applicName << "'." << std::endl;
+				
+				
 				
 				vector<xmlNodePtr> nodeVectorFolderPath = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "folder");
 				vector<string> folderPathVector;
@@ -325,9 +328,9 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 							newFolderNodeId = this->createFolderPath(newFolderNodeId, folderPathVector);
 						}
 						
-						if(varPathVector.size() > 0) {
-							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
-						}
+ 						if(varPathVector.size() > 0) {
+ 							newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
+ 						}
 						mappedVariables.push_back(newFolderNodeId);
 						createdVar = true;
 				}
@@ -335,11 +338,14 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 				// in case no <folder> or <unrollpath> is set
 				if(!createdVar) {
 					newFolderNodeId = appliFolderNodeId;
+					
 					if(varPathVector.size() > 0) {
 						mappedVariables.push_back(this->createFolderPath(newFolderNodeId, varPathVector));
 					}
-					// No <folder>
-					mappedVariables.push_back(appliFolderNodeId);
+					else {
+						// No <folder>
+						mappedVariables.push_back(appliFolderNodeId);
+					}
 				}
 				
 				// Create all nessesary mapped ObjectVaraibles with inner variables (reference or attribute, depending attributes are set (engineeringUnit, dexcription) 
