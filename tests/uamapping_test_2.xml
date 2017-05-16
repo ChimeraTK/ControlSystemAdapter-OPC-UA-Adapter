@@ -74,8 +74,6 @@
 	</application>
 	<application name="EPICS">
 		<map sourceVariableName="Mein/Name_ist#int8Array_s15" rename="uint32S">
-			<unrollPath pathSep="/">True</unrollPath>
-		  <folder>EastSide/LINAC</folder>
     </map>
 		<map sourceVariableName="Dein/Name/ist/int32Scalar">
 		  <folder>NorthSideLINAC/partA</folder>

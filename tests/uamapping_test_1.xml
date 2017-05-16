@@ -73,13 +73,11 @@
 	<application name="EPICS">
 		<map sourceVariableName="Mein/Name/ist/uint32Scalar" rename="uint32S">
 			<unrollPath pathSep="/">True</unrollPath>
-		  <folder>EastSide/LINAC</folder>
     </map>
 		<map sourceVariableName="Dein/Name/ist/int32Scalar">
 		  <folder>NorthSideLINAC/partA</folder>
     </map>
 		<map sourceVariableName="Dieser/Name/ist/doubleScalar">
-			<unrollPath pathSep="/">True</unrollPath>
     </map>
 	</application>
 </uamapping>

@@ -64,8 +64,6 @@
 	</application>
 	<application name="EPICS">
 		<map sourceVariableName="Ist/Name/dieser/uint32Scalar" rename="uint32S">
-			<unrollPath pathSep="/">True</unrollPath>
-		  <folder>EastSide/LINAC</folder>
     </map>
 		<map sourceVariableName="Ist/Name/dieser/int32Scalar">
 			<unrollPath pathSep="/">False</unrollPath>
