@@ -63,7 +63,6 @@ ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
 	if(!configFile.empty()) {
 		this->readAdditionalNodes();
 	}
-	
 }
 
 ua_uaadapter::~ua_uaadapter() {
@@ -421,6 +420,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 					
 					UA_BrowseDescription_deleteMembers(&bDesc);
 					UA_BrowseResult_deleteMembers(&bRes);
+					
 				}				
  			}
 		}

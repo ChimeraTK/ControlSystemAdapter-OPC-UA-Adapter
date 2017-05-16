@@ -271,8 +271,6 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 		}
 
     UA_INSTATIATIONCALLBACK(icb);  
-		//UA_NODEID_STRING(1, "the.answer");
-		// UA_NODEID_NUMERIC(1,0)
     UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME_ALLOC(1, this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKPROCESSVARIABLE), oAttr, &icb, &createdNodeId);
@@ -317,6 +315,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 	vAttr.description = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
   vAttr.displayName = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
 	vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
+
 	
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
@@ -366,7 +365,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 	
 	UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char*)this->getName().c_str()), createdNodeId,
 														UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*) "Value"),
-                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &valueNodeId);
+														UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &valueNodeId);
 
 	UA_NodeId nodeIdVariableType = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
 	NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, valueNodeId)
