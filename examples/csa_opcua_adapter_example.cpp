@@ -127,7 +127,6 @@ int main() {
 	ProcessArray<int32_t>::SharedPtr intA32devMap = devManager->createProcessArray<int32_t>(controlSystemToDevice, "Ist/Name/dieser/int32Scalar", 1);
 	ProcessArray<double>::SharedPtr doubledevMap = devManager->createProcessArray<double>(controlSystemToDevice, "Ist/Name/dieser/doubleScalar", 1);
 	
-	
 	/* Some big size arrays for test purpose 
 		* 
 		*/

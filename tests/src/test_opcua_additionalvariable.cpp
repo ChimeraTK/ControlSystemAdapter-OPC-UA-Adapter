@@ -74,6 +74,12 @@ void AdditionalVariableTest::testClientSide(){
 	UA_Client *client = UA_Client_new(UA_ClientConfig_standard);
 	string endpointURL = "opc.tcp://localhost:" + to_string(serverSet->opcuaPort);
 	UA_StatusCode retval = UA_Client_connect(client, endpointURL.c_str());
+	int k = 1;
+	while(retval != UA_STATUSCODE_GOOD & k < 10) {
+		sleep(1);
+		retval = UA_Client_connect(client, endpointURL.c_str());
+		k++;
+	}
 		
 	if (retval != UA_STATUSCODE_GOOD) {
 		std::cout << "Failed to connect to server" << "opc.tcp://localhost:" << serverSet->opcuaPort << std::endl;
