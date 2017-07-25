@@ -140,12 +140,12 @@ int main() {
 			ProcessArray<int32_t>::SharedPtr testIntArray = devManager->createProcessArray<int32_t>(deviceToControlSystem, nameInt, i);
 			for(int32_t k = 0; k < i; k++) {
 				if(k % 2 == 0) {
-					testDoubleArray->get().at(k) = rand() % 6 + 1;
-					testIntArray->get().at(k) = rand() % 6 + 1;
+					testDoubleArray->accessChannel(0).at(k) = rand() % 6 + 1;
+					testIntArray->accessChannel(0).at(k) = rand() % 6 + 1;
 				}
 				else {
-					testDoubleArray->get().at(k) = rand() % 50 + 10;
-					testIntArray->get().at(k) = rand() % 50 + 10;
+					testDoubleArray->accessChannel(0).at(k) = rand() % 50 + 10;
+					testIntArray->accessChannel(0).at(k) = rand() % 50 + 10;
 				}
 			}
 			testDoubleArray->write();
@@ -156,12 +156,12 @@ int main() {
 		ProcessArray<int32_t>::SharedPtr testIntArray = devManager->createProcessArray<int32_t>(deviceToControlSystem, "testIntArray_65535", 65535);
 		for(int32_t i = 0; i < 65535; i++) {
 			if(i % 2 == 0) {
-				testDoubleArray->get().at(i) = rand() % 6 + 1;
-				testIntArray->get().at(i) = rand() % 6 + 1;
+				testDoubleArray->accessChannel(0).at(i) = rand() % 6 + 1;
+				testIntArray->accessChannel(0).at(i) = rand() % 6 + 1;
 			}
 			else {
-				testDoubleArray->get().at(i) = rand() % 50 + 10;
-				testIntArray->get().at(i) = rand() % 50 + 10;
+				testDoubleArray->accessChannel(0).at(i) = rand() % 50 + 10;
+				testIntArray->accessChannel(0).at(i) = rand() % 50 + 10;
 			}
 		}
 		testDoubleArray->write();
@@ -173,14 +173,14 @@ int main() {
 	double amplitude = 10;
 		
 	// Set values
-	csManager->getProcessArray<int32_t>("dt")->set(vector<int32_t> {microseconds});
+	csManager->getProcessArray<int32_t>("dt")->accessChannel(0) = vector<int32_t> {microseconds};
 	csManager->getProcessArray<int32_t>("dt")->write();
-	csManager->getProcessArray<double>("period")->set(vector<double> {period});
+	csManager->getProcessArray<double>("period")->accessChannel(0) = vector<double> {period};
 	csManager->getProcessArray<double>("period")->write();
-	csManager->getProcessArray<double>("amplitude")->set(vector<double> {amplitude});
+	csManager->getProcessArray<double>("amplitude")->accessChannel(0) = vector<double> {amplitude};
 	csManager->getProcessArray<double>("amplitude")->write();
 
-	csManager->getProcessArray<int8_t>("int8Scalar")->set(vector<int8_t> {12});
+	csManager->getProcessArray<int8_t>("int8Scalar")->accessChannel(0) = vector<int8_t> {12};
 	cout << "write dummy Data..." << std::endl;	
 	
 	string pathToConfig = "opcuaAdapter_mapping.xml";

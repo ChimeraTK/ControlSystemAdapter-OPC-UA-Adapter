@@ -51,13 +51,11 @@ void AdditionalVariableTest::testClassSide(){
  	delete serverThread;
  	serverThread = NULL;
 	
-	//addVar1->~ua_additionalvariable();
-
 }
 
 void AdditionalVariableTest::testClientSide(){ 
 	std::cout << "Enter AdditionalVariableTest with ExampleSet and ClientSide testing" << std::endl;
-		
+
 	TestFixtureServerSet *serverSet = new TestFixtureServerSet;	
 			
 	thread *serverThread = new std::thread(UA_Server_run, serverSet->mappedServer, &serverSet->runUAServer);
@@ -74,10 +72,11 @@ void AdditionalVariableTest::testClientSide(){
 	UA_Client *client = UA_Client_new(UA_ClientConfig_standard);
 	string endpointURL = "opc.tcp://localhost:" + to_string(serverSet->opcuaPort);
 	UA_StatusCode retval = UA_Client_connect(client, endpointURL.c_str());
+	sleep(1);
 	int k = 1;
 	while(retval != UA_STATUSCODE_GOOD & k < 10) {
-		sleep(1);
 		retval = UA_Client_connect(client, endpointURL.c_str());
+		sleep(1);
 		k++;
 	}
 		
@@ -192,18 +191,16 @@ void AdditionalVariableTest::testClientSide(){
 	if (serverThread->joinable()) {
 		serverThread->join();
 	}
-	
+	cout << "Delete ServerSet" << endl;
 	UA_Server_delete(serverSet->mappedServer);
 
 	serverSet->server_nl.deleteMembers(&serverSet->server_nl);
-
+	cout << "Delete ServerSet" << endl;
 	delete serverSet;
 	serverSet = NULL;
-	
- 	delete serverThread;
- 	serverThread = NULL;
-	
-	//addVar1->~ua_additionalvariable();
+	cout << "Delete ServerThread" << endl;
+	delete serverThread;
+	serverThread = NULL;
 
 }
 

@@ -115,11 +115,11 @@ string ua_processvariable::getType() {
 _p_type    ua_processvariable::getValue_##_p_type() { \
 		_p_type v = 0; \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return 0; \
-    if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() == 1) { \
+    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() == 1) { \
 			if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
 				while(this->csManager->getProcessArray<_p_type>(this->namePV)->readNonBlocking()) {} \
 			} \
-			v = this->csManager->getProcessArray<_p_type>(this->namePV)->get().at(0); \
+			v = this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).at(0); \
 		} \
     return v; \
 } \
@@ -129,11 +129,11 @@ _p_type    ua_processvariable::getValue_##_p_type() { \
 std::vector<_p_type>    ua_processvariable::getValue_Array_##_p_type() { \
     std::vector<_p_type> v; \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return v; \
-    if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() > 1) { \
+    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() > 1) { \
 			if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
 				while(this->csManager->getProcessArray<_p_type>(this->namePV)->readNonBlocking()) {} \
 			} \
-			v = this->csManager->getProcessArray<_p_type>(this->namePV)->get(); \
+			v = this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0); \
 		} \
     return v; \
 } \
@@ -142,11 +142,11 @@ std::vector<_p_type>    ua_processvariable::getValue_Array_##_p_type() { \
 #define CREATE_WRITE_FUNCTION(_p_type) \
 void ua_processvariable::setValue_##_p_type(_p_type value) { \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
-    if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() == 1) {   \
+    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() == 1) {   \
 			if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
 				vector<_p_type> valueArray; \
 				valueArray.push_back(value); \
-				this->csManager->getProcessArray<_p_type>(this->namePV)->set(valueArray); \
+				this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0) = valueArray; \
 				this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
 			} \
 		} \
@@ -157,11 +157,11 @@ void ua_processvariable::setValue_##_p_type(_p_type value) { \
 #define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
 void ua_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
-    if (this->csManager->getProcessArray<_p_type>(this->namePV)->get().size() <= 1) return; \
+    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() <= 1) return; \
 			if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
-				int32_t valueSize = this->csManager->getProcessArray<_p_type>(this->namePV)->get().size(); \
+				int32_t valueSize = this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size(); \
 				value.resize(valueSize); \
-				this->csManager->getProcessArray<_p_type>(this->namePV)->set(value); \
+				this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0) = value; \
 				this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
 		} \
 	return; \
@@ -323,42 +323,42 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 	std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
 	if (valueType == typeid(int8_t)) {
 //  		vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_SBYTE);
-		if(this->csManager->getProcessArray<int8_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(int8_t)
+		if(this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(int8_t)
 			else PUSH_RDVALUE_ARRAY_TYPE(int8_t)
 		}
 		else if (valueType == typeid(uint8_t)) {
 //  			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BYTE);
-			if(this->csManager->getProcessArray<uint8_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(uint8_t)
+			if(this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(uint8_t)
 			else PUSH_RDVALUE_ARRAY_TYPE(uint8_t)
 		} 
 		else if (valueType == typeid(int16_t)) {
 // 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_INT16);
-			if(this->csManager->getProcessArray<int16_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(int16_t)
+			if(this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(int16_t)
 			else PUSH_RDVALUE_ARRAY_TYPE(int16_t)
 		}
 		else if (valueType == typeid(uint16_t)) {
 // 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_UINT16);
-			if(this->csManager->getProcessArray<uint16_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(uint16_t)
+			if(this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(uint16_t)
 			else PUSH_RDVALUE_ARRAY_TYPE(uint16_t)
 		}
 		else if (valueType == typeid(int32_t)) {
 // 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_INT32);
-			if(this->csManager->getProcessArray<int32_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(int32_t)
+			if(this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(int32_t)
 			else PUSH_RDVALUE_ARRAY_TYPE(int32_t)
 		}
 		else if (valueType == typeid(uint32_t)) {
 // 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_UINT32);
-			if(this->csManager->getProcessArray<uint32_t>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(uint32_t)
+			if(this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(uint32_t)
 			else PUSH_RDVALUE_ARRAY_TYPE(uint32_t)
 		}
 		else if (valueType == typeid(float)) {
 // 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_FLOAT);
-			if(this->csManager->getProcessArray<float>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(float)
+			if(this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(float)
 			else PUSH_RDVALUE_ARRAY_TYPE(float)
 		}
 		else if (valueType == typeid(double)) {
 // 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_DOUBLE);
-			if(this->csManager->getProcessArray<double>(this->namePV)->get().size() == 1) PUSH_RDVALUE_TYPE(double)
+			if(this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(double)
 			else PUSH_RDVALUE_ARRAY_TYPE(double)
 		}
 	else std::cout << "Cannot proxy unknown type " << typeid(valueType).name()  << std::endl;
