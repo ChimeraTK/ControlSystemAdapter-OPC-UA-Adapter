@@ -58,26 +58,26 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
 	clock_t start, end;
 	start = clock();
 	end = clock();
-	devManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {(int32_t)start});
+	devManager->getProcessArray<int32_t>("t")->accessChannel(0) = vector<int32_t> {(int32_t)start};
 	
 	while(true) {
 //  FIXME -Or maybe not: The Const M_PI from math.h generate senceless values, hence I use fix value 3.141
-// 	double double_sine = csManager->getProcessScalar<double>("amplitude")->get() * sin(((2*M_PI)/csManager->getProcessScalar<int32_t>("period")->get()) * csManager->getProcessScalar<int32_t>("t")->get());
-		double double_sine = devManager->getProcessArray<double>("amplitude")->get().at(0) * sin((2*3.141)/devManager->getProcessArray<double>("period")->get().at(0) * devManager->getProcessArray<int32_t>("t")->get().at(0));
+// 	double double_sine = csManager->getProcessScalar<double>("amplitude")->accessChannel(0) * sin(((2*M_PI)/csManager->getProcessScalar<int32_t>("period")->accessChannel(0)) * csManager->getProcessScalar<int32_t>("t")->accessChannel(0));
+		double double_sine = devManager->getProcessArray<double>("amplitude")->accessChannel(0).at(0) * sin((2*3.141)/devManager->getProcessArray<double>("period")->accessChannel(0).at(0) * devManager->getProcessArray<int32_t>("t")->accessChannel(0).at(0));
 		int32_t int_sine = round(double_sine);
 // 	bool bool_sine = (double_sine > 0)? true : false;
 // 	std::cout << "double_sine: " << double_sine << std::endl;
 // 	std::cout << "int_sine: " << int_sine << std::endl;
 // 	std::cout << "bool_sine: " << bool_sine << std::endl;
 			
-		devManager->getProcessArray<double>("double_sine")->set(vector<double> {double_sine});
+		devManager->getProcessArray<double>("double_sine")->accessChannel(0) = vector<double> {double_sine};
 		devManager->getProcessArray<double>("double_sine")->write();
-		devManager->getProcessArray<int32_t>("int_sine")->set(vector<int32_t> {int_sine});
+		devManager->getProcessArray<int32_t>("int_sine")->accessChannel(0) = vector<int32_t> {int_sine};
 		devManager->getProcessArray<int32_t>("int_sine")->write();
-		devManager->getProcessArray<int32_t>("t")->set(vector<int32_t> {(int32_t)((end - start)/(CLOCKS_PER_SEC/1000))});
+		devManager->getProcessArray<int32_t>("t")->accessChannel(0) = vector<int32_t> {(int32_t)((end - start)/(CLOCKS_PER_SEC/1000))};
 		devManager->getProcessArray<int32_t>("t")->write();
 		
-		usleep(devManager->getProcessArray<int32_t>("dt")->get().at(0));
+		usleep(devManager->getProcessArray<int32_t>("dt")->accessChannel(0).at(0));
 		end = clock();
 		
 		
@@ -88,12 +88,12 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
 			ProcessArray<int32_t>::SharedPtr testIntArray = devManager->getProcessArray<int32_t>(nameInt);
 			for(int32_t k = 0; k < i; k++) {
 				if(k % 2 == 0) {
-					testDoubleArray->get().at(k) = rand() % 6 + 1;
-					testIntArray->get().at(k) = rand() % 6 + 1;
+					testDoubleArray->accessChannel(0).at(k) = rand() % 6 + 1;
+					testIntArray->accessChannel(0).at(k) = rand() % 6 + 1;
 				}
 				else {
-					testDoubleArray->get().at(k) = rand() % 50 + 10;
-					testIntArray->get().at(k) = rand() % 50 + 10;
+					testDoubleArray->accessChannel(0).at(k) = rand() % 50 + 10;
+					testIntArray->accessChannel(0).at(k) = rand() % 50 + 10;
 				}
 			}
 			testDoubleArray->write();
@@ -104,12 +104,12 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
 		ProcessArray<int32_t>::SharedPtr testIntArray = devManager->getProcessArray<int32_t>("testIntArray_65535");
 		for(int32_t i = 0; i < 65535; i++) {
 			if(i % 2 == 0) {
-				testDoubleArray->get().at(i) = rand() % 6 + 1;
-				testIntArray->get().at(i) = rand() % 6 + 1;
+				testDoubleArray->accessChannel(0).at(i) = rand() % 6 + 1;
+				testIntArray->accessChannel(0).at(i) = rand() % 6 + 1;
 			}
 			else {
-				testDoubleArray->get().at(i) = rand() % 50 + 10;
-				testIntArray->get().at(i) = rand() % 50 + 10;
+				testDoubleArray->accessChannel(0).at(i) = rand() % 50 + 10;
+				testIntArray->accessChannel(0).at(i) = rand() % 50 + 10;
 			}
 		}
 		testDoubleArray->write();
