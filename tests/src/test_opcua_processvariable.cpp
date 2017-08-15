@@ -521,7 +521,7 @@ void ProcessVariableTest::testClientSide(){
 										// Check EngineeringUnit -> for all the same
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), engineeringUnit);
 										//cout << "EngineeringUnit: " << valName << endl;
-										if((valName.compare("int8Scalar") == 0) || (valName.compare("Mein/Name_ist#int8Array_s15") == 0) || (valName.compare("Unser/Name/ist_uint8Array_s10") == 0)) {
+										if((valName.compare("/int8Scalar") == 0) || (valName.compare("/Mein/Name_ist#int8Array_s15") == 0) || (valName.compare("/Unser/Name/ist_uint8Array_s10") == 0)) {
 											BOOST_CHECK(engineeringUnit == "Einheit");
 										}
 										else {
@@ -546,7 +546,7 @@ void ProcessVariableTest::testClientSide(){
 										// Check Description -> for all the same
 										UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) descToCheck->data)), description);
 										//cout << "Description: " << valName << endl;
-										if((valName.compare("int8Scalar") == 0) || (valName.compare("Mein/Name_ist#int8Array_s15") == 0) || (valName.compare("Unser/Name/ist_uint8Array_s10") == 0)) {
+										if((valName.compare("/int8Scalar") == 0) || (valName.compare("/Mein/Name_ist#int8Array_s15") == 0) || (valName.compare("/Unser/Name/ist_uint8Array_s10") == 0)) {
 											BOOST_CHECK(description == "Beschreibung der Variable");
 										}
 										else {
@@ -576,7 +576,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "int8_t");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "int8Scalar");
+													BOOST_CHECK(valName == "/int8Scalar");
 													// Check Value
 													uint8_t value = (uint8_t) *((uint8_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
@@ -604,7 +604,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "uint8_t");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "uint8Scalar");
+													BOOST_CHECK(valName == "/uint8Scalar");
 													// Check Value
 													int8_t value = (int8_t) *((int8_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
@@ -632,7 +632,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "int16_t");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "int16Scalar");
+													BOOST_CHECK(valName == "/int16Scalar");
 													// Check Value
 													int16_t value = (int16_t) *((int16_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
@@ -660,7 +660,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "uint16_t");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "uint16Scalar");
+													BOOST_CHECK(valName == "/uint16Scalar");
 													// Check Value
 													uint16_t value = (uint16_t) *((uint16_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
@@ -688,7 +688,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "int32_t");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "Dein/Name/ist/int32Scalar");
+													BOOST_CHECK(valName == "/Dein/Name/ist/int32Scalar");
 													// Check Value
 													int32_t value = (int32_t) *((int32_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
@@ -716,7 +716,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "uint32_t");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "Mein/Name/ist/uint32Scalar");
+													BOOST_CHECK(valName == "/Mein/Name/ist/uint32Scalar");
 													// Check Value
 													uint32_t value = (uint32_t) *((uint32_t*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
@@ -744,7 +744,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "double");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "Dieser/Name/ist/doubleScalar");
+													BOOST_CHECK(valName == "/Dieser/Name/ist/doubleScalar");
 													// Check Value
 													double value = (double) *((double*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
@@ -772,7 +772,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "float");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "floatScalar");
+													BOOST_CHECK(valName == "/floatScalar");
 													// Check Value
 													float value = (float) *((float*) valueToCheck->data);
 													BOOST_CHECK(value == 0);
@@ -812,7 +812,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
 													// cout << valName << endl;
-													BOOST_CHECK(valName == "Mein/Name_ist#int8Array_s15");
+													BOOST_CHECK(valName == "/Mein/Name_ist#int8Array_s15");
 													// Check Value							
 													size_t arrayLength = valueToCheck->arrayLength;
 													int8_t* value = (int8_t*) valueToCheck->data; 
@@ -850,7 +850,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
 													// cout << valName << endl;
-													BOOST_CHECK(valName == "Dein/Name/ist/uint8Array_s10");
+													BOOST_CHECK(valName == "/Dein/Name/ist/uint8Array_s10");
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													uint8_t* value = (uint8_t*) valueToCheck->data; 
@@ -887,7 +887,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "int16_t");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "Unser/Name/ist_int16Array_s10");
+													BOOST_CHECK(valName == "/Unser/Name/ist_int16Array_s10");
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													int16_t* value = (int16_t*) valueToCheck->data; 
@@ -929,7 +929,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "uint16_t");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "Unser/Name/ist_uint8Array_s10");
+													BOOST_CHECK(valName == "/Unser/Name/ist_uint8Array_s10");
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													uint16_t* value = (uint16_t*) valueToCheck->data; 
@@ -972,7 +972,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "int32_t");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "int32Array_s15");
+													BOOST_CHECK(valName == "/int32Array_s15");
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													int32_t* value = (int32_t*) valueToCheck->data; 
@@ -1016,7 +1016,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
 													// cout << valName << endl;
-													BOOST_CHECK(valName == "uint32Array_s10");
+													BOOST_CHECK(valName == "/uint32Array_s10");
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													uint32_t* value = (uint32_t*) valueToCheck->data; 
@@ -1054,7 +1054,7 @@ void ProcessVariableTest::testClientSide(){
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
 													// cout << valName << endl;
-													BOOST_CHECK(valName == "doubleArray_s15");
+													BOOST_CHECK(valName == "/doubleArray_s15");
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													double* value = (double*) valueToCheck->data; 
@@ -1092,7 +1092,7 @@ void ProcessVariableTest::testClientSide(){
 													BOOST_CHECK(datatype == "float");
 													// Check Name 
 													UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-													BOOST_CHECK(valName == "floatArray_s101234");
+													BOOST_CHECK(valName == "/floatArray_s101234");
 													// Check Value
 													size_t arrayLength = valueToCheck->arrayLength;
 													float* value = (float*) valueToCheck->data; 
