@@ -12,7 +12,7 @@ endif()
 ##########################################################################################################
 ## Project specification
 ##########################################################################################################
-project(ControlSystemAdapterOPCUAAdapter)
+project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 
 include(ExternalProject)
 
