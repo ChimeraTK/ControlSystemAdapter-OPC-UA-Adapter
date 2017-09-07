@@ -309,7 +309,8 @@ endif()
 ## Early declaration due to the requirement to run the dependencies update prior to building
 ## Create shared lib
 add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects>)
-set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION} SOVERSION ${${PROJECT_NAME}_SOVERSION})
+set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_FULL_LIBRARY_VERSION}
+                                                 SOVERSION ${${PROJECT_NAME}_SOVERSION})
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-DeviceAccess_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
@@ -323,12 +324,14 @@ target_link_libraries(${PROJECT_NAME}
 )
 target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
 
+# do not remove runtime path of the library when installing
+set_property(TARGET ${PROJECT_NAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ##########################################################################################################
 ## Install all Libraries
 ##########################################################################################################
 
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
+install( TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin LIBRARY DESTINATION lib )
 
 ##########################################################################################################
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
