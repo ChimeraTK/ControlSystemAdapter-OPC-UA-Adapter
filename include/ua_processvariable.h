@@ -24,11 +24,12 @@
  *
  */
 
-#ifndef MTCA_PROCESSVARIABLE_H
-#define MTCA_PROCESSVARIABLE_H
+#ifndef UA_PROCESSVARIABLE_H
+#define UA_PROCESSVARIABLE_H
 
 #include "ua_mapped_class.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
+#include <string>
 
 using namespace std;
 using namespace ChimeraTK;
@@ -140,6 +141,7 @@ public:
     CREATE_WRITE_FUNCTION_DEF(uint32_t)
     CREATE_WRITE_FUNCTION_DEF(float)
     CREATE_WRITE_FUNCTION_DEF(double)
+		CREATE_WRITE_FUNCTION_DEF(string)
     
     CREATE_READ_FUNCTION_DEF(int8_t)
     CREATE_READ_FUNCTION_DEF(uint8_t)
@@ -149,6 +151,7 @@ public:
     CREATE_READ_FUNCTION_DEF(uint32_t)
     CREATE_READ_FUNCTION_DEF(float)
     CREATE_READ_FUNCTION_DEF(double)
+		CREATE_READ_FUNCTION_DEF(string)
     
     CREATE_WRITE_FUNCTION_ARRAY_DEF(int8_t)
     CREATE_WRITE_FUNCTION_ARRAY_DEF(uint8_t)
@@ -158,6 +161,7 @@ public:
     CREATE_WRITE_FUNCTION_ARRAY_DEF(uint32_t)
     CREATE_WRITE_FUNCTION_ARRAY_DEF(float)
     CREATE_WRITE_FUNCTION_ARRAY_DEF(double)
+		CREATE_WRITE_FUNCTION_ARRAY_DEF(string)
     
     CREATE_READ_FUNCTION_ARRAY_DEF(int8_t)
     CREATE_READ_FUNCTION_ARRAY_DEF(uint8_t)
@@ -167,6 +171,7 @@ public:
     CREATE_READ_FUNCTION_ARRAY_DEF(uint32_t)
     CREATE_READ_FUNCTION_ARRAY_DEF(float)
     CREATE_READ_FUNCTION_ARRAY_DEF(double)
+		CREATE_READ_FUNCTION_ARRAY_DEF(string)
 };
 
-#endif // MTCA_PROCESSVARIABLE_H
+#endif // UA_PROCESSVARIABLE_H

@@ -103,6 +103,16 @@ std::vector<_p_ctype> vectorizedValue(data->arrayLength); \
 for(uint32_t i=0; i < vectorizedValue.size(); i++) vectorizedValue.at(i) = v[i]; \
 theClass->_p_method(vectorizedValue); \
 
+#define UA_WRPROXY_SIMPLEBODY_ARRAY_STRING(_p_method, _p_ctype) \
+//UA_String* v = (UA_String*) data->data; \
+//std::vector<std::string> vectorizedValue(data->arrayLength); \
+//for(uint32_t i=0; i < vectorizedValue.size(); i++) { \
+//	std::string c_string; \
+//	UASTRING_TO_CPPSTRING(*v[i] , c_string); \
+//	vectorizedValue.at(i) = (std::string)c_string; \
+//} \
+//theClass->_p_method(vectorizedValue); \
+
 #define UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, _p_ctype, _p_uatype) \
 UA_Variant_setArrayCopy(&value->value, (_p_ctype *) thisObj->_p_method().data(), thisObj->_p_method().size(), &UA_TYPES[_p_uatype]); \
 UA_NumericRange arrayRange; \
@@ -110,6 +120,22 @@ arrayRange.dimensionsSize = 1; \
 UA_NumericRangeDimension scalarThisDimension = (UA_NumericRangeDimension){.min = 0, .max = (unsigned)thisObj->_p_method().size()}; \
 arrayRange.dimensions = &scalarThisDimension; \
 UA_Variant_setRangeCopy(&value->value, (_p_ctype *) thisObj->_p_method().data(), thisObj->_p_method().size(), arrayRange); \
+
+#define UA_RDPROXY_SIMPLEBODY_ARRAY_STRING(_p_method, _p_ctype, _p_uatype) \
+//std::basic_string<char>* vectorizedValue; \
+//vectorizedValue = thisObj->_p_method().data(); \
+//UA_String ua_string_vector[thisObj->_p_method().size()]; \
+//for(uint32_t i=0; i < thisObj->_p_method().size(); i++) { \
+//	UA_String ua_val; \
+//	CPPSTRING_TO_UASTRING_NEW(ua_val, vectorizedValue); \
+//	ua_string_vector[i] = ua_val; \
+//} \
+//UA_Variant_setArrayCopy(&value->value, ua_string_vector, thisObj->_p_method().size(), &UA_TYPES[UA_TYPES_STRING]); \
+//UA_NumericRange arrayRange; \
+//arrayRange.dimensionsSize = 1; \
+//UA_NumericRangeDimension scalarThisDimension = (UA_NumericRangeDimension){.min = 0, .max = (unsigned)thisObj->_p_method().size()}; \
+//arrayRange.dimensions = &scalarThisDimension; \
+//UA_Variant_setRangeCopy(&value->value, (_p_ctype *) thisObj->_p_method().data(), thisObj->_p_method().size(), arrayRange); \
 
 // Typed Function Protoypes with datatype specific stuff
 // Readproxies:
@@ -228,6 +254,11 @@ UA_RDPROXY_HEAD(_p_class, _p_method) \
 UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, double, UA_TYPES_DOUBLE) \
 UA_RDPROXY_TAIL()
 
+#define UA_RDPROXY_ARRAY_STRING(_p_class, _p_method) \
+UA_RDPROXY_HEAD(_p_class, _p_method) \
+UA_RDPROXY_SIMPLEBODY_ARRAY_STRING(_p_method, string, UA_TYPES_STRING) \
+UA_RDPROXY_TAIL()
+
 // Writeproxies:
 #define UA_WRPROXY_STRING(_p_class, _p_method) \
 UA_WRPROXY_HEAD(_p_class, _p_method) \
@@ -338,6 +369,11 @@ UA_WRPROXY_TAIL()
 #define UA_WRPROXY_ARRAY_DOUBLE(_p_class, _p_method) \
 UA_WRPROXY_HEAD(_p_class, _p_method) \
 UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, double)\
+UA_WRPROXY_TAIL()
+
+#define UA_WRPROXY_ARRAY_STRING(_p_class, _p_method) \
+UA_WRPROXY_HEAD(_p_class, _p_method) \
+UA_WRPROXY_SIMPLEBODY_ARRAY_STRING(_p_method, _p_ctype) \
 UA_WRPROXY_TAIL()
 
 #endif //HAVE_UA_PROXIES_CALLBACK_H

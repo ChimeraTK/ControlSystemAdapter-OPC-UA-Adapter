@@ -827,7 +827,7 @@ void ProcessVariableTest::testClientSide(){
 													}
 													
 													UA_Variant_init(valueToCheck);													
-													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_SBYTE]);													
+													UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_SBYTE]);
 													UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
 													if(retvalNewVar == UA_STATUSCODE_GOOD) {
 														// get value from server -> should be the new one

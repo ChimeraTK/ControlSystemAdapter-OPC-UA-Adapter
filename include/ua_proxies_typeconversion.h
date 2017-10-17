@@ -73,6 +73,15 @@ memcpy(_p_uastring.data, s, _p_uastring.length); \
 free(s); \
 }
 
+#define CPPSTRING_TO_UASTRING_NEW(_p_uastring, _p_cppstring) {\
+char *s  = (char *) malloc(_p_cppstring->length()+1); \
+strncpy(s, (char*) _p_cppstring->c_str(), _p_cppstring->length()); \
+_p_uastring.length = _p_cppstring->length(); \
+_p_uastring.data = (UA_Byte *) malloc(_p_uastring.length); \
+memcpy(_p_uastring.data, s, _p_uastring.length); \
+free(s); \
+}
+
 #define NODE_BROWSENAME_AS_STRING(_p_server, _p_nodeid, _p_strbuffer) { \
 UA_QualifiedName _p_tmpName; \
 UA_Server_readBrowseName(_p_server, _p_nodeid, &_p_tmpName); \
@@ -90,7 +99,6 @@ UA_LocalizedText _p_tmpName; \
 UA_Server_readDisplayName(_p_server, _p_nodeid, &_p_tmpName); \
 UASTRING_AS_STRING(_p_tmpName.text,  _p_strbuffer); \
 }
-
 
 
 #endif //#ifndef HAVE_UA_PROXIES_TYPECONVERSION_H

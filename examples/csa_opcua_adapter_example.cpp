@@ -93,14 +93,15 @@ int main() {
 	/*
 	 * Generate dummy data
 	 */
- 	ProcessArray<int8_t>::SharedPtr intA8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Scalar", 1, "Iatrou^2/Rahm");
- 	ProcessArray<uint8_t>::SharedPtr intAu8dev = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Scalar", 1, "mIatrou*Rahm");
- 	ProcessArray<int16_t>::SharedPtr intA16dev = devManager->createProcessArray<int16_t>(controlSystemToDevice, "int16Scalar", 1);
- 	ProcessArray<uint16_t>::SharedPtr intAu16dev = devManager->createProcessArray<uint16_t>(controlSystemToDevice, "uint16Scalar", 1);
- 	ProcessArray<int32_t>::SharedPtr intA32dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "int32Scalar", 1);
- 	ProcessArray<uint32_t>::SharedPtr intAu32dev = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "uint32Scalar", 1);
- 	ProcessArray<float>::SharedPtr intAfdev = devManager->createProcessArray<float>(controlSystemToDevice, "floatScalar", 1);
- 	ProcessArray<double>::SharedPtr intAddev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleScalar", 1);
+	ProcessArray<int8_t>::SharedPtr intA8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Scalar", 1, "Iatrou^2/Rahm");
+	ProcessArray<uint8_t>::SharedPtr intAu8dev = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Scalar", 1, "mIatrou*Rahm");
+	ProcessArray<int16_t>::SharedPtr intA16dev = devManager->createProcessArray<int16_t>(controlSystemToDevice, "int16Scalar", 1);
+	ProcessArray<uint16_t>::SharedPtr intAu16dev = devManager->createProcessArray<uint16_t>(controlSystemToDevice, "uint16Scalar", 1);
+	ProcessArray<int32_t>::SharedPtr intA32dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "int32Scalar", 1);
+	ProcessArray<uint32_t>::SharedPtr intAu32dev = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "uint32Scalar", 1);
+	ProcessArray<float>::SharedPtr intAfdev = devManager->createProcessArray<float>(controlSystemToDevice, "floatScalar", 1);
+	ProcessArray<double>::SharedPtr intAddev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleScalar", 1);
+	ProcessArray<string>::SharedPtr stringAddev = devManager->createProcessArray<string>(controlSystemToDevice, "stringScalar", 1);
 	
 	ProcessArray<int8_t>::SharedPtr intB15A8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Array_s15", 15, "mIatrou*Rahm", "Die Einheit ist essentiel und sollte SI Einheit sein...");
 	ProcessArray<uint8_t>::SharedPtr intB10Au8dev = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Array_s10", 10, "1/Rahm");
@@ -109,7 +110,8 @@ int main() {
 	ProcessArray<int32_t>::SharedPtr intB15A32dev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "int32Array_s15", 15);
 	ProcessArray<uint32_t>::SharedPtr intB10Au32dev = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "uint32Array_s10", 10);
 	ProcessArray<double>::SharedPtr intB15Afdev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleArray_s15", 15);
-	ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s10", 10);	
+	ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(controlSystemToDevice, "floatArray_s10", 10);
+	
 	// data generation cycle time in ms
 	ProcessArray<int32_t>::SharedPtr dtDev = devManager->createProcessArray<int32_t>(controlSystemToDevice, "dt", 1);
 	// time since server start in ms
@@ -172,6 +174,9 @@ int main() {
 	double period = 3.141;
 	double amplitude = 10;
 		
+	csManager->getProcessArray<string>("stringScalar")->accessChannel(0) = vector<string> {"Merk"};
+	//std::vector<string> v = {csManager->getProcessArray<string>("stringScalar")->accessChannel(0)};
+	//cout << v.at(0)  << endl;
 	// Set values
 	csManager->getProcessArray<int32_t>("dt")->accessChannel(0) = vector<int32_t> {microseconds};
 	csManager->getProcessArray<int32_t>("dt")->write();

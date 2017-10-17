@@ -43,7 +43,7 @@ ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, 
   	this->namePV = namePV;
   	this->nameNew = namePV;
   	this->csManager = csManager;
-  	
+	
   	this->mapSelfToNamespace();
 }
 
@@ -107,13 +107,17 @@ string ua_processvariable::getType() {
     else if (valueType == typeid(uint32_t)) return "uint32_t";
     else if (valueType == typeid(float))    return "float";
     else if (valueType == typeid(double))   return "double";
+		else if (valueType == typeid(string))   return "string";
     else                                    return "Unsupported type";
+		
+		string merk;
+		merk.length();
 }
 
 /* Multivariant Read Functions for Value (without template-Foo) */
 #define CREATE_READ_FUNCTION(_p_type) \
 _p_type    ua_processvariable::getValue_##_p_type() { \
-		_p_type v = 0; \
+		_p_type v; \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return 0; \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() == 1) { \
 			if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
@@ -183,6 +187,8 @@ void ua_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { 
  CREATE_READ_FUNCTION(float)
  UA_RDPROXY_DOUBLE(ua_processvariable, getValue_double);
  CREATE_READ_FUNCTION(double)
+ UA_RDPROXY_STRING(ua_processvariable, getValue_string);
+ CREATE_READ_FUNCTION(string)
  
  UA_WRPROXY_INT8(ua_processvariable, setValue_int8_t);
  CREATE_WRITE_FUNCTION(int8_t)
@@ -200,6 +206,8 @@ void ua_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { 
  CREATE_WRITE_FUNCTION(float)
  UA_WRPROXY_DOUBLE(ua_processvariable, setValue_double);
  CREATE_WRITE_FUNCTION(double)
+ UA_WRPROXY_STRING(ua_processvariable, setValue_string);
+ CREATE_WRITE_FUNCTION(string)
 
 // Array
 UA_RDPROXY_ARRAY_INT8(ua_processvariable, getValue_Array_int8_t);
@@ -218,6 +226,8 @@ UA_RDPROXY_ARRAY_FLOAT(ua_processvariable, getValue_Array_float);
 CREATE_READ_FUNCTION_ARRAY(float)
 UA_RDPROXY_ARRAY_DOUBLE(ua_processvariable, getValue_Array_double);
 CREATE_READ_FUNCTION_ARRAY(double)
+UA_RDPROXY_ARRAY_STRING(ua_processvariable, getValue_Array_string);
+CREATE_READ_FUNCTION_ARRAY(string)
 
 UA_WRPROXY_ARRAY_INT8(ua_processvariable, setValue_Array_int8_t);
 CREATE_WRITE_FUNCTION_ARRAY(int8_t)
@@ -235,6 +245,8 @@ UA_WRPROXY_ARRAY_FLOAT(ua_processvariable, setValue_Array_float);
 CREATE_WRITE_FUNCTION_ARRAY(float)
 UA_WRPROXY_ARRAY_DOUBLE(ua_processvariable, setValue_Array_double);
 CREATE_WRITE_FUNCTION_ARRAY(double)
+UA_WRPROXY_ARRAY_STRING(ua_processvariable, setValue_Array_string);
+CREATE_WRITE_FUNCTION_ARRAY(string)
 
 // Just a macro to easy pushing different types of dataSources
 // ... and make sure we lock down writing to receivers in this stage already
@@ -315,7 +327,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 	vAttr.description = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
   vAttr.displayName = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
 	vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
-
+	
+	cout << this->getName() << endl;
 	
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
@@ -361,6 +374,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 			if(this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(double)
 			else PUSH_RDVALUE_ARRAY_TYPE(double)
 		}
+		else if (valueType == typeid(string)) {
+// 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_DOUBLE);
+			if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(string)
+			else PUSH_RDVALUE_ARRAY_TYPE(string)
+		}
 	else std::cout << "Cannot proxy unknown type " << typeid(valueType).name()  << std::endl;
 	
 	UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char*)this->getName().c_str()), createdNodeId,
@@ -374,8 +392,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getDescription), .write=UA_WRPROXY_NAME(ua_processvariable, setDescription)});
 	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(ua_processvariable, setEngineeringUnit)});
 	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getType), .write=NULL});
-
- 	this->ua_mapDataSources((void *) this, &mapDs);
+	
+	this->ua_mapDataSources((void *) this, &mapDs);
 	
 	return UA_STATUSCODE_GOOD;
 }
