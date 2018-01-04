@@ -43,7 +43,7 @@ ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, 
   	this->namePV = namePV;
   	this->nameNew = namePV;
   	this->csManager = csManager;
-	
+  	
   	this->mapSelfToNamespace();
 }
 
@@ -107,11 +107,8 @@ string ua_processvariable::getType() {
     else if (valueType == typeid(uint32_t)) return "uint32_t";
     else if (valueType == typeid(float))    return "float";
     else if (valueType == typeid(double))   return "double";
-		else if (valueType == typeid(string))   return "string";
+    else if (valueType == typeid(string))   return "string";
     else                                    return "Unsupported type";
-		
-		string merk;
-		merk.length();
 }
 
 /* Multivariant Read Functions for Value (without template-Foo) */
@@ -327,8 +324,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 	vAttr.description = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
   vAttr.displayName = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
 	vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
-	
-	cout << this->getName() << endl;
+
 	
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
