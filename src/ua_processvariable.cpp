@@ -117,7 +117,7 @@ string ua_processvariable::getType() {
 /* Multivariant Read Functions for Value (without template-Foo) */
 #define CREATE_READ_FUNCTION(_p_type) \
 _p_type    ua_processvariable::getValue_##_p_type() { \
-		_p_type v; \
+    _p_type v = _p_type(); \
     if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return 0; \
     if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() == 1) { \
 			if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
