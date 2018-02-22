@@ -226,20 +226,20 @@ if(ENABLE_COVERAGE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
   
-	file(COPY ${PROJECT_SOURCE_DIR}/cmake/make_coverage.sh.in DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	add_custom_target(coverage ALL
-		${CMAKE_CURRENT_BINARY_DIR}/make_coverage.sh.in ${CMAKE_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}
+  file(COPY ${PROJECT_SOURCE_DIR}/cmake/make_coverage.sh.in DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+  add_custom_target(coverage
+    ${CMAKE_CURRENT_BINARY_DIR}/make_coverage.sh.in ${CMAKE_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-			# Bad soulution to provide all depencys
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_adapter
-			#DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_application
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_uaadapter
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler	
+      # Bad soulution to provide all depencys
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_adapter
+      #DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_application
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_uaadapter
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler	
       COMMENT "Generating test coverage documentation" VERBATIM
-     )
+  )
       
 endif()
 
