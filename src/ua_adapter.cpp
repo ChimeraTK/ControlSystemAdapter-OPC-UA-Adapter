@@ -284,7 +284,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                 // assumption last element is name of variable, hence no folder for name is needed
                                 if(renameVar.compare("") == 0 && !unrollPathIs) {
                                         renameVar = srcVarName;
-                                        std::cout << "Variable '" << srcVarName << "' renamed in '" << renameVar << "' and listed in folder '" << applicName << "'." << std::endl;
+                                        // std::cout << "Variable '" << srcVarName << "' renamed in '" << renameVar << "' and listed in folder '" << applicName << "'." << std::endl;
                                 }
                                 else {
                                         if(unrollPathIs && renameVar.compare("") == 0) {
@@ -296,7 +296,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                                         varPathVector.pop_back();
                                                 }
                                         }
-                                        std::cout << "Variable '" << srcVarName << "' listed in folder '" << applicName << "'." << std::endl;
+                                        // std::cout << "Variable '" << srcVarName << "' listed in folder '" << applicName << "'." << std::endl;
                                 }
 
 

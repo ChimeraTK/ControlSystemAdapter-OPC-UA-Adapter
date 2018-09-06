@@ -91,15 +91,19 @@ ipc_manager* csa_opcua_adapter::getIPCManager() {
 }
 
 void csa_opcua_adapter::start() {
-    this->mgr->startAll();
+    if(this->mgr)
+        this->mgr->startAll();
     return;
 }
 
 void csa_opcua_adapter::stop() {
-    this->mgr->stopAll();
+    if(this->mgr)
+        this->mgr->stopAll();
     return;
 }
 
 bool csa_opcua_adapter::isRunning() {
-    return this->mgr->isRunning();
+    if(this->mgr)
+        return this->mgr->isRunning();
+    return false;
 }
