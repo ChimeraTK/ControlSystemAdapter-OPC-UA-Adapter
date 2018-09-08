@@ -28,6 +28,7 @@ extern "C" {
 #include <thread>
 #include <future>
 #include <functional>     // std::ref
+#include <open62541.h>
 
 #include "csa_config.h"
 
@@ -79,26 +80,26 @@ void ua_uaadapter::constructServer() {
     this->server_config.networkLayers = &this->server_nl;
     this->server_config.networkLayersSize = 1;
 
-                this->server_config.enableUsernamePasswordLogin = this->serverConfig.UsernamePasswordLogin;
-                this->server_config.enableAnonymousLogin = !this->serverConfig.UsernamePasswordLogin;
+    this->server_config.enableUsernamePasswordLogin = this->serverConfig.UsernamePasswordLogin;
+    this->server_config.enableAnonymousLogin = !this->serverConfig.UsernamePasswordLogin;
 
     UA_UsernamePasswordLogin* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
-                usernamePasswordLogins->password = UA_STRING((char*)this->serverConfig.password.c_str());
-                usernamePasswordLogins->username = UA_STRING((char*)this->serverConfig.username.c_str());
-                this->server_config.usernamePasswordLogins = usernamePasswordLogins;
-                this->server_config.usernamePasswordLoginsSize = (size_t)(usernamePasswordLogins->password.length + usernamePasswordLogins->username.length);
-                this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
-                this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
-                this->server_config.applicationDescription.applicationUri = UA_STRING((char*)"opc.tcp://localhost");
-                this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
-                this->server_config.buildInfo.productName = UA_STRING((char*)"csa_opcua_adapter");
-                this->server_config.buildInfo.productUri = UA_STRING((char*)"HZDR OPCUA Server");
-                this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"TU Dresden - Professur für Prozessleittechnik");
+    usernamePasswordLogins->password = UA_STRING((char*)this->serverConfig.password.c_str());
+    usernamePasswordLogins->username = UA_STRING((char*)this->serverConfig.username.c_str());
+    this->server_config.usernamePasswordLogins = usernamePasswordLogins;
+    this->server_config.usernamePasswordLoginsSize = (size_t)(usernamePasswordLogins->password.length + usernamePasswordLogins->username.length);
+    this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
+    this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
+    this->server_config.applicationDescription.applicationUri = UA_STRING((char*)"opc.tcp://localhost");
+    this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
+    this->server_config.buildInfo.productName = UA_STRING((char*)"csa_opcua_adapter");
+    this->server_config.buildInfo.productUri = UA_STRING((char*)"HZDR OPCUA Server");
+    this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"TU Dresden - Professur für Prozessleittechnik");
 
     this->mappedServer = UA_Server_new(this->server_config);
-                this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+    this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
 
-                csa_namespaceinit_generated(this->mappedServer);
+    csa_namespaceinit_generated(this->mappedServer);
 }
 
 void ua_uaadapter::readConfig() {
@@ -289,11 +290,11 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                 else {
                                         if(unrollPathIs && renameVar.compare("") == 0) {
                                                 renameVar = varPathVector.at(varPathVector.size()-1);
-                                                varPathVector.pop_back();
+                                                varPathVector.pop_back(); //TODOREMOVE rename attribute wurde gesetzt und entpsorcjt letztem token im pfad
                                         }
                                         else {
                                                 if(varPathVector.size() > 0) {
-                                                        varPathVector.pop_back();
+                                                        varPathVector.pop_back(); //TODOREMOVE pfadende ist entspricht var namen
                                                 }
                                         }
                                         // std::cout << "Variable '" << srcVarName << "' listed in folder '" << applicName << "'." << std::endl;
@@ -350,8 +351,13 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                         oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str());
                                         oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", description.c_str());
 
+                                        string parentNodeIdString;
+                                        if(objectNodeId.identifierType == UA_NODEIDTYPE_STRING){
+                                            UASTRING_TO_CPPSTRING(objectNodeId.identifier.string, parentNodeIdString);
+                                            parentNodeIdString += '/' + renameVar;
+                                        }
                                         UA_INSTATIATIONCALLBACK(icb);
-                                        UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),
+                                        UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char *) parentNodeIdString.c_str()),//UA_NODEID_NUMERIC(1, 0),
                                                                                                         objectNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                                                                                                         UA_QUALIFIEDNAME_ALLOC(1, renameVar.c_str()), UA_NODEID_NULL, oAttr, &icb, &createdNodeId);
 
@@ -378,30 +384,77 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 
 
                                         bRes = UA_Server_browse(this->mappedServer, 10, &bDesc);
+                                        UA_Variant actualValue;
+                                        UA_Variant_init(&actualValue);
 
                                         for(uint32_t i=0; i < bRes.referencesSize; i++) {
                                                 UA_NodeId newNodeId = UA_NODEID_NULL;
 
-                                                UA_String varName = UA_String_fromChars("EngineeringUnit");
-                                                if(UA_String_equal(&bRes.references[i].browseName.name, &varName) && !engineeringUnit.empty()) {
+
+
+                                                UA_String varName = UA_String_fromChars("Name");
+                                                //new block
+                                                varName = UA_String_fromChars("Name");
+                                                if(UA_String_equal(&bRes.references[i].browseName.name, &varName)){
+                                                    vAttr.description = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "Name");
+                                                    vAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "Name");
+                                                    UA_Server_readValue(this->mappedServer, bRes.references[i].nodeId.nodeId, &actualValue);
+                                                    UA_Variant_copy(&actualValue, &vAttr.value);
+                                                    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (parentNodeIdString+"/Name").c_str()), createdNodeId,
+                                                                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*) "Name"),
+                                                                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &newNodeId);
+                                                    UA_Variant_deleteMembers(&vAttr.value);
+                                                    UA_Variant_deleteMembers(&actualValue);
+
+                                                }
+                                                varName = UA_String_fromChars("Type");
+                                                if(UA_String_equal(&bRes.references[i].browseName.name, &varName)){
+                                                    vAttr.description = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "Type");
+                                                    vAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "Type");
+                                                    UA_Variant_init(&actualValue);
+                                                    UA_Server_readValue(this->mappedServer, bRes.references[i].nodeId.nodeId, &actualValue);
+                                                    UA_Variant_copy(&actualValue, &vAttr.value);
+                                                    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (parentNodeIdString+"/Type").c_str()), createdNodeId,
+                                                                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*) "Type"),
+                                                                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &newNodeId);
+                                                    UA_Variant_deleteMembers(&vAttr.value);
+                                                    UA_Variant_deleteMembers(&actualValue);
+                                                }
+                                                varName = UA_String_fromChars("Value");
+                                                if(UA_String_equal(&bRes.references[i].browseName.name, &varName)){
+                                                    vAttr.description = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "");
+                                                    vAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "Value");
+                                                    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (parentNodeIdString+"/Value").c_str()), createdNodeId,
+                                                                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*) "Value"),
+                                                                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &newNodeId);
+                                                }
+
+                                            varName = UA_String_fromChars("EngineeringUnit");
+                                                //new block end
+                                                if(UA_String_equal(&bRes.references[i].browseName.name, &varName)) {
                                                         vAttr.description = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "EngineeringUnit");
                                                         vAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "EngineeringUnit");
-
-                                                        UA_String engineringUnit = UA_String_fromChars(engineeringUnit.c_str());
-                                                        UA_Variant_setScalar(&vAttr.value, &engineringUnit, &UA_TYPES[UA_TYPES_STRING]);
-                                                        UA_Server_addVariableNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0), createdNodeId,
+                                                        if(!engineeringUnit.empty()) {
+                                                            UA_String engineringUnit = UA_String_fromChars(
+                                                                    engineeringUnit.c_str());
+                                                            UA_Variant_setScalar(&vAttr.value, &engineringUnit,
+                                                                                 &UA_TYPES[UA_TYPES_STRING]);
+                                                        } //TODO get alternative value
+                                                        UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (parentNodeIdString+"/EngineeringUnit").c_str()), createdNodeId,
                                                                                                                                         UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*) "EngineeringUnit"),
                                                                                                                                         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &newNodeId);
                                                 }
 
                                                 varName = UA_String_fromChars("Description");
-                                                if(UA_String_equal(&bRes.references[i].browseName.name, &varName) && !description.empty()) {
+                                                if(UA_String_equal(&bRes.references[i].browseName.name, &varName)) {
                                                         vAttr.description = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "Description");
                                                         vAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "Description");
 
-                                                        UA_String engineringUnit = UA_String_fromChars(description.c_str());
-                                                        UA_Variant_setScalar(&vAttr.value, &engineringUnit, &UA_TYPES[UA_TYPES_STRING]);
-                                                        UA_Server_addVariableNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0), createdNodeId,
+                                                        if(!description.empty()){
+                                                            UA_String engineringUnit = UA_String_fromChars(description.c_str());
+                                                            UA_Variant_setScalar(&vAttr.value, &engineringUnit, &UA_TYPES[UA_TYPES_STRING]);
+                                                        }//TODO get alternative value
+                                                        UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (parentNodeIdString+"/Description").c_str()), createdNodeId,
                                                                                                                                         UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*) "Description"),
                                                                                                                                         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &newNodeId);
                                                 }
@@ -442,8 +495,16 @@ UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderN
         oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)folderName.c_str());
         oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str());
 
+        string parentNodeIdString;
+        if(basenodeid.identifierType == UA_NODEIDTYPE_STRING){
+            UASTRING_TO_CPPSTRING(basenodeid.identifier.string, parentNodeIdString);
+            parentNodeIdString += '/' + folderName;
+        } else if(basenodeid.identifierType == UA_NODEIDTYPE_NUMERIC){
+            parentNodeIdString += '/' + to_string(basenodeid.identifier.numeric);
+        }
+
         UA_INSTATIATIONCALLBACK(icb);
-        UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
+        UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char *) parentNodeIdString.c_str()), //UA_NODEID_NUMERIC(1,0)
                           basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
                           UA_QUALIFIEDNAME(1, (char*)folderName.c_str()), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr, &icb, &createdNodeId);
 
@@ -466,7 +527,7 @@ UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
         oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.descriptionFolder.c_str());
 
         UA_INSTATIATIONCALLBACK(icb);
-        UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
+        UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char*) this->serverConfig.rootFolder.c_str()),
                             UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
                             UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &icb, &createdNodeId);
 

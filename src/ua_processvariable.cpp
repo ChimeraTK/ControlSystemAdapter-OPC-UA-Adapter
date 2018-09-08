@@ -274,7 +274,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
                 }
 
     UA_INSTATIATIONCALLBACK(icb);
-    UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),
+    UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),//UA_NODEID_STRING(1, (char *) ("Variables/"+this->nameNew).c_str()), //
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME_ALLOC(1, this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKPROCESSVARIABLE), oAttr, &icb, &createdNodeId);
 
@@ -316,7 +316,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
         UA_VariableAttributes vAttr;
         UA_VariableAttributes_init(&vAttr);
         vAttr.description = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
-  vAttr.displayName = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
+        vAttr.displayName = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
         vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
 
 
