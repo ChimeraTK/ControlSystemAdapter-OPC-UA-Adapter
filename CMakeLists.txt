@@ -36,7 +36,7 @@ find_package(ChimeraTK-ControlSystemAdapter 01.00)
 find_package(ChimeraTK-DeviceAccess 01.00)
 
 #Install the DeviceAccess if it is not pre-installed
-if(NOT ChimeraTK-DeviceAccess)
+if(NOT ChimeraTK-DeviceAccess_FOUND)
                 ExternalProject_Add(external-ChimeraTK-DeviceAccess
                         GIT_REPOSITORY "https://github.com/ChimeraTK/DeviceAccess.git"
 
