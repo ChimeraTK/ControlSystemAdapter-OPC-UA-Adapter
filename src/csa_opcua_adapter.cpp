@@ -48,11 +48,14 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
     // Initialize the process variables
     // This internally starts the managed threads in the mgr...
     vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
-  
+    for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
+        cout << "New added PV: " << oneProcessVariable->getName() << ' ' << endl;
+    }
+
     for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
         adapter->addVariable(oneProcessVariable->getName(), this->csManager);
     }
-    
+
     vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
     if(allNotMappedVariables.size() > 0) {
         cout << "The following VariableNodes cant be mapped, "
