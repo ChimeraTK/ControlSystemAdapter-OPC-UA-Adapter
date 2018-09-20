@@ -1,29 +1,21 @@
-/*
- * Copyright (c) 2016 Julian Rahm <Julian.Rahm@tu-dresden.de>, Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
- * Chair for Process Systems Engineering
- * Technical University of Dresden
+/* 
+ * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
+ *
+ * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can 
+ * redistribute it and/or modify it under the terms of the Lesser GNU 
+ * General Public License as published by the Free Software Foundation, 
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope 
+ * that it will be useful, but WITHOUT ANY WARRANTY; without even the 
+ * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+ * See the Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
  * 
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- *
+ * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
+ * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
  */
 
 extern "C" {
@@ -99,15 +91,19 @@ ipc_manager* csa_opcua_adapter::getIPCManager() {
 }
 
 void csa_opcua_adapter::start() {
-    this->mgr->startAll();
+    if(this->mgr)
+        this->mgr->startAll();
     return;
 }
 
 void csa_opcua_adapter::stop() {
-    this->mgr->stopAll();
+    if(this->mgr)
+        this->mgr->stopAll();
     return;
 }
 
 bool csa_opcua_adapter::isRunning() {
-    return this->mgr->isRunning();
+    if(this->mgr)
+        return this->mgr->isRunning();
+    return false;
 }

@@ -4,9 +4,9 @@ cmake_minimum_required(VERSION 2.8.0)
 ## Definition for compiler for static analysis
 ##########################################################################################################
 if(BUILD_STATIC_ANALYSIS)
-	set(CMAKE_C_COMPILER   ccc-analyzer)
-	set(CMAKE_CXX_COMPILER c++-analyzer)
-	add_definitions(-o ${PROJECT_BINARY_DIR}/static-analysis})
+        set(CMAKE_C_COMPILER   ccc-analyzer)
+        set(CMAKE_CXX_COMPILER c++-analyzer)
+        add_definitions(-o ${PROJECT_BINARY_DIR}/static-analysis})
 endif()
 
 ##########################################################################################################
@@ -17,8 +17,8 @@ project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 include(ExternalProject)
 
 SET(${PROJECT_NAME}_MAJOR_VERSION 01)
-SET(${PROJECT_NAME}_MINOR_VERSION 05)
-SET(${PROJECT_NAME}_PATCH_VERSION 01)
+SET(${PROJECT_NAME}_MINOR_VERSION 06)
+SET(${PROJECT_NAME}_PATCH_VERSION 00)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
@@ -32,46 +32,46 @@ find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 
 #Do not put any of the following packages as required. We will install it if it is not found.
-find_package(ChimeraTK-ControlSystemAdapter)
-find_package(mtca4u-deviceaccess)
+find_package(ChimeraTK-ControlSystemAdapter 01.00)
+find_package(ChimeraTK-DeviceAccess 01.00)
 
 #Install the DeviceAccess if it is not pre-installed
-if(NOT mtca4u-deviceaccess_FOUND)		
-		ExternalProject_Add(external-ChimeraTK-DeviceAccess
-			GIT_REPOSITORY "https://github.com/ChimeraTK/DeviceAccess.git" #"https://github.com/jmrahm/DeviceAccess"
+if(NOT ChimeraTK-DeviceAccess_FOUND)
+                ExternalProject_Add(external-ChimeraTK-DeviceAccess
+                        GIT_REPOSITORY "https://github.com/ChimeraTK/DeviceAccess.git"
 
-			GIT_TAG "master"
-			PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-DeviceAccess_src"
-			CMAKE_ARGS 
-			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess"
-			"-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-			"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-			)
-			
-		set(ChimeraTK-DeviceAccess_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/include)
-		set(ChimeraTK-DeviceAccess_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/lib)
-		set(ChimeraTK-DeviceAccess_LIBRARIES mtca4u-deviceaccess)
-	endif()
-	
+                        GIT_TAG "master"
+                        PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-DeviceAccess_src"
+                        CMAKE_ARGS
+                        "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess"
+                        "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                        "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                        )
+
+                set(ChimeraTK-DeviceAccess_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/include)
+                set(ChimeraTK-DeviceAccess_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/lib)
+                set(ChimeraTK-DeviceAccess_LIBRARIES ChimeraTK-DeviceAccess)
+        endif()
+
 #Install the ControlSystemAdapter if it is not pre-installed
 if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
-	message("Installing ChimeraTK-ControlSystemAdapter as external dependency inside the build directory.")
-	message("You will not be able to make a proper installation of the OPCUA_Adapter. Only use this for testing and development.\n")
-	ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
-		GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
-		GIT_TAG "master"
-		PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-ControlSystemAdapter_src"
-		DEPENDS external-ChimeraTK-DeviceAccess
-		CMAKE_ARGS 
-			"-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/"
-			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter" 
-			"-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-			"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-	)
-	set(USE_ControlSystemAdapter TRUE)
-	set(ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/include)
-	set(ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/lib)
-	set(ChimeraTK-ControlSystemAdapter_LIBRARIES ChimeraTK-ControlSystemAdapter)
+        message("Installing ChimeraTK-ControlSystemAdapter as external dependency inside the build directory.")
+        message("You will not be able to make a proper installation of the OPCUA_Adapter. Only use this for testing and development.\n")
+        ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
+                GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
+                GIT_TAG "master"
+                PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-ControlSystemAdapter_src"
+                DEPENDS external-ChimeraTK-DeviceAccess
+                CMAKE_ARGS
+                        "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/"
+                        "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter"
+                        "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                        "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+        )
+        set(USE_ControlSystemAdapter TRUE)
+        set(ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/include)
+        set(ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/lib)
+        set(ChimeraTK-ControlSystemAdapter_LIBRARIES ChimeraTK-ControlSystemAdapter)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
@@ -82,25 +82,25 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLA
 ##########################################################################################################
 
 if(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "None")
-	set(CMAKE_BUILD_TYPE "Release" CACHE STRING 
-		"Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
-		FORCE
-	)
+        set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+                "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
+                FORCE
+        )
 endif(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "None")
 
 ##########################################################################################################
 ## Copy mapping.xml into build folder
 ##########################################################################################################
 if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
-	message("Copy mapping files into build folder.")
-	file(GLOB mappingFiles "${CMAKE_SOURCE_DIR}/*_mapping.xml")
-	foreach(mappingFile ${mappingFiles})
-		file(COPY ${mappingFile} DESTINATION ${CMAKE_BINARY_DIR}/)
-		message("Copy ${mappingFile}")
-	endforeach(mappingFile)
-	
-	file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
-endif()         
+        message("Copy mapping files into build folder.")
+        file(GLOB mappingFiles "${CMAKE_SOURCE_DIR}/*_mapping.xml")
+        foreach(mappingFile ${mappingFiles})
+                file(COPY ${mappingFile} DESTINATION ${CMAKE_BINARY_DIR}/)
+                message("Copy ${mappingFile}")
+        endforeach(mappingFile)
+
+        file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
+endif()
 
 ##########################################################################################################
 ## Compiler specific stuff
@@ -109,7 +109,7 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCC OR "x${CMAKE_C_COMPILER_ID}" STREQUAL "xClang")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
   add_definitions(-DNDEBUG)
   add_definitions(-fPIC)
@@ -132,7 +132,7 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 link_directories(${LIBXML2_LIBRARIES})
 link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
 link_directories(${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
-                    
+
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
                    ${CMAKE_SOURCE_DIR}/src/ipc_managed_object.cpp
@@ -143,7 +143,7 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_additionalvariable.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_adapter.cpp
                    ${CMAKE_SOURCE_DIR}/src/csa_opcua_application.cpp
-                   
+
                    ${CMAKE_SOURCE_DIR}/src/open62541.c
                    # Example HelperClass
                    #${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp
@@ -170,7 +170,7 @@ option(UPDATE_OPEN62541	"Build new open62541 from git repository" OFF)
 
 if(ENABLE_CREATEMODEL)
   set(MODEL_XML_FILE "adapterim.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
-  
+
   list(APPEND objectSources ${PROJECT_BINARY_DIR}/src_generated/csa_namespaceinit_generated.c)
 else()
   include_directories(${CMAKE_SOURCE_DIR}/include/model_prebuilt/)
@@ -179,43 +179,43 @@ endif()
 
 #Install the open62541 if it is not pre-installed
 if(UPDATE_OPEN62541)
-		ExternalProject_Add(external-open62541
-			GIT_REPOSITORY "https://github.com/open62541/open62541.git"
-			GIT_TAG "93e79321c1b40bbdada49f3bf3d52095b8f64100"
-			#GIT_TAG "0.2-rc2" // Array outlier occure
-			#GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2" // Tag during the first integration Meeting
-			PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
-			CMAKE_ARGS 
-			"-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/open62541" 
-			"-DUA_ENABLE_AMALGAMATION=On"
-			#"-DUA_ENABLE_GENERATE_NAMESPACE0=On" 
-			"-DUA_ENABLE_METHODCALLS=ON" 
-			"-DUA_ENABLE_NODEMANAGEMENT=ON" 
-			"-DUA_ENABLE_SUBSCRIPTIONS=ON"
-			#"-DUA_ENABLE_ENABLE_MULTITHREADING=ON"
-			"-DUA_LOGLEVEL=300"
-			"-DCMAKE_BUILD_TYPE=DEBUG"
-		)
-				
-		set(UPDATE_Open62541 TRUE)
-		
-		add_custom_target(copyOpen62541Header ALL
-				DEPENDS external-open62541
-				COMMAND ${CMAKE_COMMAND} -E copy
+                ExternalProject_Add(external-open62541
+                        GIT_REPOSITORY "https://github.com/open62541/open62541.git"
+                        GIT_TAG "93e79321c1b40bbdada49f3bf3d52095b8f64100"
+                        #GIT_TAG "0.2-rc2" // Array outlier occure
+                        #GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2" // Tag during the first integration Meeting
+                        PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
+                        CMAKE_ARGS
+                        "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/open62541"
+                        "-DUA_ENABLE_AMALGAMATION=On"
+                        #"-DUA_ENABLE_GENERATE_NAMESPACE0=On"
+                        "-DUA_ENABLE_METHODCALLS=ON"
+                        "-DUA_ENABLE_NODEMANAGEMENT=ON"
+                        "-DUA_ENABLE_SUBSCRIPTIONS=ON"
+                        #"-DUA_ENABLE_ENABLE_MULTITHREADING=ON"
+                        "-DUA_LOGLEVEL=300"
+                        "-DCMAKE_BUILD_TYPE=DEBUG"
+                )
+
+                set(UPDATE_Open62541 TRUE)
+
+                add_custom_target(copyOpen62541Header ALL
+                                DEPENDS external-open62541
+                                COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.h
                 ${CMAKE_SOURCE_DIR}/include/open62541.h
-		)
-		add_custom_target(copyOpen62541Source ALL
-				DEPENDS external-open62541
+                )
+                add_custom_target(copyOpen62541Source ALL
+                                DEPENDS external-open62541
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.c
                 ${CMAKE_SOURCE_DIR}/src/open62541.c
-		)
+                )
 
-		# file(RENAME <oldname> <newname>)
-		file(COPY ${CMAKE_SOURCE_DIR}/src/open62541.c DESTINATION ${CMAKE_SOURCE_DIR}/src/open62541.bak)
-		file(COPY ${CMAKE_SOURCE_DIR}/include/open62541.h DESTINATION ${CMAKE_SOURCE_DIR}/include/open62541.bak)
-		
+                # file(RENAME <oldname> <newname>)
+                file(COPY ${CMAKE_SOURCE_DIR}/src/open62541.c DESTINATION ${CMAKE_SOURCE_DIR}/src/open62541.bak)
+                file(COPY ${CMAKE_SOURCE_DIR}/include/open62541.h DESTINATION ${CMAKE_SOURCE_DIR}/include/open62541.bak)
+
 endif(UPDATE_OPEN62541)
 
 if(ENABLE_COVERAGE)
@@ -224,7 +224,7 @@ if(ENABLE_COVERAGE)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
-  
+
   file(COPY ${PROJECT_SOURCE_DIR}/cmake/make_coverage.sh.in DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   add_custom_target(coverage
     ${CMAKE_CURRENT_BINARY_DIR}/make_coverage.sh.in ${CMAKE_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}
@@ -236,36 +236,36 @@ if(ENABLE_COVERAGE)
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_uaadapter
-      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler	
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler
       COMMENT "Generating test coverage documentation" VERBATIM
   )
-      
+
 endif()
 
 if(ENABLE_UNIT_TESTS)
-	file(GLOB testFiles "${CMAKE_SOURCE_DIR}/tests/uamapping_test*.xml")
-	foreach(testFile ${testFiles})
-		file(COPY ${testFile} DESTINATION ${PROJECT_BINARY_DIR}/tests)
-		message("Copy ${testFile}")
-	endforeach(testFile)
-	
-	enable_testing()
-	add_subdirectory(tests)
+        file(GLOB testFiles "${CMAKE_SOURCE_DIR}/tests/uamapping_test*.xml")
+        foreach(testFile ${testFiles})
+                file(COPY ${testFile} DESTINATION ${PROJECT_BINARY_DIR}/tests)
+                message("Copy ${testFile}")
+        endforeach(testFile)
+
+        enable_testing()
+        add_subdirectory(tests)
 endif()
 
 if(ENABLE_RUNTIME_ANALYSIS)
-	file(COPY ${PROJECT_SOURCE_DIR}/cmake/make_valgrind.sh.in DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-	add_custom_target(valgrind ALL
-		${CMAKE_CURRENT_BINARY_DIR}/make_valgrind.sh.in ${CMAKE_SOURCE_DIR} ${PROJECT_BINARY_DIR}
+        file(COPY ${PROJECT_SOURCE_DIR}/cmake/make_valgrind.sh.in DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+        add_custom_target(valgrind ALL
+                ${CMAKE_CURRENT_BINARY_DIR}/make_valgrind.sh.in ${CMAKE_SOURCE_DIR} ${PROJECT_BINARY_DIR}
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-			# Bad soulution to provide all depencys
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_adapter
-			#DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_application
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_uaadapter
-			DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler	
+                        # Bad soulution to provide all depencys
+                        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_adapter
+                        #DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_application
+                        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
+                        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
+                        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
+                        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_uaadapter
+                        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler
       COMMENT "Generating valgrind runtime test" VERBATIM
      )
 endif()
@@ -297,12 +297,12 @@ configure_file (
 ## Object Files
 add_library(mtca_objects OBJECT ${objectSources})
 if(USE_ControlSystemAdapter)
-	add_dependencies(mtca_objects external-ChimeraTK-ControlSystemAdapter) 
-	add_dependencies(mtca_objects external-ChimeraTK-DeviceAccess) 
+        add_dependencies(mtca_objects external-ChimeraTK-ControlSystemAdapter)
+        add_dependencies(mtca_objects external-ChimeraTK-DeviceAccess)
 endif()
 
 if(UPDATE_Open62541)
-	add_dependencies(mtca_objects external-open62541)
+        add_dependencies(mtca_objects external-open62541)
 endif()
 
 ## Early declaration due to the requirement to run the dependencies update prior to building
@@ -356,7 +356,7 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/csa_namespaceinit_
                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_namespace.py
                            ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_node_types.py)
 
-                           
+
 ##########################################################################################################
 ##  Tests and executables
 ##########################################################################################################
