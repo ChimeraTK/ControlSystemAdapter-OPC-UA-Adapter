@@ -59,10 +59,10 @@ using namespace ChimeraTK;
 /* FUNCTIONS */
 static void SigHandler_Int(int sign) {
     cout << "Received SIGINT... terminating" << endl;
-		valGen->doStop();
-		valGen->~runtime_value_generator();
-		csaOPCUA->stop();
-		csaOPCUA->~csa_opcua_adapter();
+    valGen->doStop();
+    valGen->~runtime_value_generator();
+    csaOPCUA->stop();
+    csaOPCUA->~csa_opcua_adapter();
     cout << "terminated threads" << endl;
 }
 	

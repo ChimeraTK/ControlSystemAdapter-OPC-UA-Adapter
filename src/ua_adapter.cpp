@@ -28,7 +28,6 @@ extern "C" {
 #include <thread>
 #include <future>
 #include <functional>     // std::ref
-#include <open62541.h>
 
 #include "csa_config.h"
 
@@ -289,12 +288,12 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                 }
                                 else {
                                         if(unrollPathIs && renameVar.compare("") == 0) {
-                                                renameVar = varPathVector.at(varPathVector.size()-1);
-                                                varPathVector.pop_back(); //TODOREMOVE rename attribute wurde gesetzt und entpsorcjt letztem token im pfad
+                                                renameVar = varPathVector.at(varPathVector.size() - 1);
+                                                varPathVector.pop_back();
                                         }
                                         else {
                                                 if(varPathVector.size() > 0) {
-                                                        varPathVector.pop_back(); //TODOREMOVE pfadende ist entspricht var namen
+                                                        varPathVector.pop_back();
                                                 }
                                         }
                                         // std::cout << "Variable '" << srcVarName << "' listed in folder '" << applicName << "'." << std::endl;
@@ -345,8 +344,30 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                 for(auto objectNodeId:mappedVariables) {
                                         UA_NodeId createdNodeId = UA_NODEID_NULL;
 
-                                        // Create our new "Value" Variable
-                                        UA_ObjectAttributes oAttr;
+                                        UA_VariableAttributes nodeAttr;
+                                        UA_VariableAttributes_init(&nodeAttr);
+                                        nodeAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str());
+                                        nodeAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", description.c_str());
+
+                                        //nodeAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
+                                        //nodeAttr.accessLevel = UA_ACCESSLEVELMASK_WRITE^UA_ACCESSLEVELMASK_READ;
+                                        //nodeAttr.userAccessLevel = UA_ACCESSLEVELMASK_WRITE^UA_ACCESSLEVELMASK_READ;
+                                        //nodeAttr.valueRank = -1;
+
+                                        string parentNodeIdString;
+                                        if(objectNodeId.identifierType == UA_NODEIDTYPE_STRING){
+                                            UASTRING_TO_CPPSTRING(objectNodeId.identifier.string, parentNodeIdString);
+                                            parentNodeIdString += '/' + renameVar;
+                                        }
+                                        UA_INSTATIATIONCALLBACK(icb);
+                                        UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) parentNodeIdString.c_str()),//UA_NODEID_NUMERIC(1, 0),
+                                                                objectNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                                                                UA_QUALIFIEDNAME_ALLOC(1, renameVar.c_str()), UA_NODEID_NULL, nodeAttr, &icb, &createdNodeId);
+
+
+
+                                    // Create our new "Value" Variable
+/*                                        UA_ObjectAttributes oAttr;
                                         UA_ObjectAttributes_init(&oAttr);
                                         oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str());
                                         oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", description.c_str());
@@ -360,7 +381,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                         UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char *) parentNodeIdString.c_str()),//UA_NODEID_NUMERIC(1, 0),
                                                                                                         objectNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                                                                                                         UA_QUALIFIEDNAME_ALLOC(1, renameVar.c_str()), UA_NODEID_NULL, oAttr, &icb, &createdNodeId);
-
+*/
                                         UA_ExpandedNodeId *targetNodeId = UA_ExpandedNodeId_new();
                                         targetNodeId->nodeId = createdNodeId;
 
@@ -422,11 +443,18 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                                 }
                                                 varName = UA_String_fromChars("Value");
                                                 if(UA_String_equal(&bRes.references[i].browseName.name, &varName)){
-                                                    vAttr.description = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "");
-                                                    vAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "Value");
-                                                    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (parentNodeIdString+"/Value").c_str()), createdNodeId,
-                                                                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*) "Value"),
-                                                                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &newNodeId);
+                                                    UA_Variant_init(&actualValue);
+                                                    UA_Server_readValue(this->mappedServer, bRes.references[i].nodeId.nodeId, &actualValue);
+                                                    UA_Variant_copy(&actualValue, &nodeAttr.value);
+                                                    UA_Server_writeValue(this->mappedServer, UA_NODEID_STRING(1, (char*) parentNodeIdString.c_str()), actualValue);
+                                                    UA_Variant_deleteMembers(&actualValue);
+
+                                                    //vAttr.description = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "");
+                                                    //vAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US",(char*) "Value");
+                                                    //UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (parentNodeIdString+"/Value").c_str()), createdNodeId,
+                                                    //                          UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*) "Value"),
+                                                    //                          UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &newNodeId);
+                                                    UA_Server_deleteNode(this->mappedServer, bRes.references[i].nodeId.nodeId, UA_FALSE);
                                                 }
 
                                             varName = UA_String_fromChars("EngineeringUnit");
