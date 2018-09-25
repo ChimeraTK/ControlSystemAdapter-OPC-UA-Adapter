@@ -28,7 +28,6 @@ extern "C" {
 #include <thread>
 #include <future>
 #include <functional>     // std::ref
-#include <open62541.h>
 
 #include "csa_config.h"
 
