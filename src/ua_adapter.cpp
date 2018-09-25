@@ -526,12 +526,12 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                 }
                                 else {
                                         if(unrollPathIs && renameVar.compare("") == 0) {
-                                                renameVar = varPathVector.at(varPathVector.size()-1);
-                                                varPathVector.pop_back(); //TODOREMOVE rename attribute wurde gesetzt und entpsorcjt letztem token im pfad
+                                                renameVar = varPathVector.at(varPathVector.size() - 1);
+                                                varPathVector.pop_back();
                                         }
                                         else {
                                                 if(varPathVector.size() > 0) {
-                                                        varPathVector.pop_back(); //TODOREMOVE pfadende ist entspricht var namen
+                                                        varPathVector.pop_back();
                                                 }
                                         }
                                         // std::cout << "Variable '" << srcVarName << "' listed in folder '" << applicName << "'." << std::endl;
