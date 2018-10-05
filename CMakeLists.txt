@@ -22,6 +22,8 @@ SET(${PROJECT_NAME}_PATCH_VERSION 00)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ~/hzdr/installed/share/cmake-3.5/Modules)
+
 
 ##########################################################################################################
 ## Hard package dependencies

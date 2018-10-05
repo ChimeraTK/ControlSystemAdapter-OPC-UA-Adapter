@@ -94,7 +94,9 @@ int main() {
 	ProcessArray<float>::SharedPtr intAfdev = devManager->createProcessArray<float>(controlSystemToDevice, "floatScalar", 1);
 	ProcessArray<double>::SharedPtr intAddev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleScalar", 1);
 	ProcessArray<string>::SharedPtr stringAddev = devManager->createProcessArray<string>(controlSystemToDevice, "stringScalar", 1);
-	
+	ProcessArray<string>::SharedPtr stringAddev2 = devManager->createProcessArray<string>(controlSystemToDevice, "1/FOLDER/defaultSep/stringScalar", 1);
+
+
 	ProcessArray<int8_t>::SharedPtr intB15A8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Array_s15", 15, "mIatrou*Rahm", "Die Einheit ist essentiel und sollte SI Einheit sein...");
 	ProcessArray<uint8_t>::SharedPtr intB10Au8dev = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Array_s10", 10, "1/Rahm");
 	ProcessArray<int16_t>::SharedPtr intB15A16dev = devManager->createProcessArray<int16_t>(controlSystemToDevice, "int16Array_s15", 15, "Iatrou", "Beschreibung eines Iatrous");

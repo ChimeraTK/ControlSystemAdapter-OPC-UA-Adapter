@@ -181,6 +181,10 @@ public:
         */
         UA_NodeId existFolder(UA_NodeId basenodeid, string folderName);
 
+        int32_t findMappingIndex(std::string varName);
+
+        void enrollFolderPathFromString(string path, string seperator);
+
         /** @brief Check if a folder ath exist in opcua server
         *
         * @param basenodeId Node id of the parent node
