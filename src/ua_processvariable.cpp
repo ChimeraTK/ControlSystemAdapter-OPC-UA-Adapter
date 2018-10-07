@@ -242,13 +242,13 @@ CREATE_WRITE_FUNCTION_ARRAY(string)
 // Just a macro to easy pushing different types of dataSources
 // ... and make sure we lock down writing to receivers in this stage already
  #define PUSH_RDVALUE_TYPE(_p_typeName) { \
- if(this->csManager->getProcessVariable(this->namePV)->isWriteable())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_##_p_typeName) }); } \
-     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName), .write=NULL}); }\
+ if(this->csManager->getProcessVariable(this->namePV)->isWriteable())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_##_p_typeName) }); } \
+     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName), .write=NULL}); }\
  }
 
 #define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) { \
-if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_Array_##_p_typeName) }); } \
-    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName), .write=NULL}); } \
+if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_Array_##_p_typeName) }); } \
+    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName), .write=NULL}); } \
 }
 
 UA_StatusCode ua_processvariable::mapSelfToNamespace() {
@@ -256,136 +256,99 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     UA_NodeId createdNodeId = UA_NODEID_NULL;
 
     if (UA_NodeId_equal(&this->baseNodeId, &createdNodeId) == UA_TRUE)
-        return 0; // Something went UA_WRING (initializer should have set this!)
+        return 0; // Something went UA_WRONG (initializer should have set this!)
 
-                UA_LocalizedText description;
-                description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->csManager->getProcessVariable(this->namePV)->getDescription().c_str());
+    UA_LocalizedText description;
+    description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->csManager->getProcessVariable(this->namePV)->getDescription().c_str());
 
     // Create our toplevel instance
-    UA_ObjectAttributes oAttr;
-                UA_ObjectAttributes_init(&oAttr);
+    UA_VariableAttributes attr;
+    UA_VariableAttributes_init(&attr);
 
-    oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", this->nameNew.c_str());
-    oAttr.description = description;
+    attr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", this->nameNew.c_str());
+    attr.description = description;
+    attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
 
-                if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-                        oAttr.userWriteMask = UA_ACCESSLEVELMASK_WRITE;
-                        oAttr.writeMask = UA_ACCESSLEVELMASK_WRITE;
-                }
+    if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
+            attr.userWriteMask = UA_ACCESSLEVELMASK_WRITE;
+            attr.writeMask = UA_ACCESSLEVELMASK_WRITE;
+    }
 
     UA_INSTATIATIONCALLBACK(icb);
-    UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),//UA_NODEID_STRING(1, (char *) ("Variables/"+this->nameNew).c_str()), //
+    UA_StatusCode  result = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) this->nameNew.c_str()),//UA_NODEID_NUMERIC(1, 0)
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                            UA_QUALIFIEDNAME_ALLOC(1, this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKPROCESSVARIABLE), oAttr, &icb, &createdNodeId);
+                            UA_QUALIFIEDNAME_ALLOC(1, this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, &icb, &createdNodeId);
+    if(result != UA_STATUSCODE_GOOD)
+        return UA_STATUSCODE_BADCERTIFICATEISSUERREVOKED;
+    //TODO add value to parent
 
-        // know your own nodeId
-        this->ownNodeId = createdNodeId;
+    // know your own nodeId
+    this->ownNodeId = createdNodeId;
 
-        // Delete old "Value" with numeric NodeId
-        UA_BrowseDescription bDesc;
-        UA_BrowseDescription_init(&bDesc);
-        bDesc.browseDirection = UA_BROWSEDIRECTION_FORWARD;
-        bDesc.includeSubtypes = false;
-        bDesc.nodeClassMask = UA_NODECLASS_VARIABLE;
-        bDesc.nodeId = createdNodeId;
-        bDesc.resultMask = UA_BROWSERESULTMASK_ALL;
+    /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
+    UA_DataSource_Map mapDs;
+    // FIXME: We should not be using std::cout here... Where's our logger?
+    std::type_info const &valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
+    if (valueType == typeid(int8_t)) {
+        //vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_SBYTE);
+        if (this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size() == 1)
+            PUSH_RDVALUE_TYPE(int8_t)
+        else PUSH_RDVALUE_ARRAY_TYPE(int8_t)
+    } else if (valueType == typeid(uint8_t)) {
+        //vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BYTE);
+        if (this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size() == 1)
+            PUSH_RDVALUE_TYPE(uint8_t)
+        else PUSH_RDVALUE_ARRAY_TYPE(uint8_t)
+    } else if (valueType == typeid(int16_t)) {
+        //vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_INT16);
+        if (this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size() == 1)
+            PUSH_RDVALUE_TYPE(int16_t)
+        else PUSH_RDVALUE_ARRAY_TYPE(int16_t)
+    } else if (valueType == typeid(uint16_t)) {
+        //vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_UINT16);
+        if (this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size() == 1)
+            PUSH_RDVALUE_TYPE(uint16_t)
+        else PUSH_RDVALUE_ARRAY_TYPE(uint16_t)
+    } else if (valueType == typeid(int32_t)) {
+        //vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_INT32);
+        if (this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size() == 1)
+            PUSH_RDVALUE_TYPE(int32_t)
+        else PUSH_RDVALUE_ARRAY_TYPE(int32_t)
+    } else if (valueType == typeid(uint32_t)) {
+        //vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_UINT32);
+        if (this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size() == 1)
+            PUSH_RDVALUE_TYPE(uint32_t)
+        else PUSH_RDVALUE_ARRAY_TYPE(uint32_t)
+    } else if (valueType == typeid(float)) {
+        //vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_FLOAT);
+        if (this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size() == 1)
+            PUSH_RDVALUE_TYPE(float)
+        else PUSH_RDVALUE_ARRAY_TYPE(float)
+    } else if (valueType == typeid(double)) {
+        //vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_DOUBLE);
+        if (this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size() == 1)
+            PUSH_RDVALUE_TYPE(double)
+        else PUSH_RDVALUE_ARRAY_TYPE(double)
+    } else if (valueType == typeid(string)) {
+        //vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_DOUBLE);
+        if (this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1)
+            PUSH_RDVALUE_TYPE(string)
+        else PUSH_RDVALUE_ARRAY_TYPE(string)
+    } else std::cout << "Cannot proxy unknown type " << typeid(valueType).name() << std::endl;
 
-        UA_BrowseResult bRes;
-        UA_BrowseResult_init(&bRes);
-        bRes = UA_Server_browse(this->mappedServer, 10, &bDesc);
-        UA_NodeId toDeleteNodeId = UA_NODEID_NULL;
-        for(uint32_t i=0; i < bRes.referencesSize; i++) {
-                UA_String varName = UA_String_fromChars("Value");
-                if(UA_String_equal(&bRes.references[i].browseName.name, &varName)) {
-                        UA_Server_deleteNode(this->mappedServer, bRes.references[i].nodeId.nodeId, UA_TRUE);
-                        UA_NodeId_copy(&bRes.references[i].nodeId.nodeId, &toDeleteNodeId);
-                }
-        }
+    //UA_NodeId nodeIdVariableType = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+    UA_NodeId nodeIdVariableType_ = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
+    //NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, valueNodeId); //TODO check -> the following line changes the target of the source mapping to the parent node
+    NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType_, createdNodeId);
 
-        for (nodePairList::reverse_iterator i = this->ownedNodes.rbegin(); i != this->ownedNodes.rend(); ++i) {
-                UA_NodeId_pair *p = *(i);
-                if(UA_NodeId_equal(&toDeleteNodeId, &p->targetNodeId)) {
-                        this->ownedNodes.remove(*(i));
-                }
-        }
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getName), .write=NULL});
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getDescription), .write=UA_WRPROXY_NAME(ua_processvariable, setDescription)});
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(ua_processvariable, setEngineeringUnit)});
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getType), .write=NULL});
 
-        UA_BrowseDescription_deleteMembers(&bDesc);
-        UA_BrowseResult_deleteMembers(&bRes);
+    this->ua_mapDataSources((void *) this, &mapDs);
 
-        UA_NodeId valueNodeId = UA_NODEID_NULL;
-        UA_VariableAttributes vAttr;
-        UA_VariableAttributes_init(&vAttr);
-        vAttr.description = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
-        vAttr.displayName = UA_LOCALIZEDTEXT((char*) "en_US",(char*) "Value");
-        vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
-
-
-        /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
-        UA_DataSource_Map mapDs;
-        // FIXME: We should not be using std::cout here... Where's our logger?
-        std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
-        if (valueType == typeid(int8_t)) {
-//  		vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_SBYTE);
-                if(this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(int8_t)
-                        else PUSH_RDVALUE_ARRAY_TYPE(int8_t)
-                }
-                else if (valueType == typeid(uint8_t)) {
-//  			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BYTE);
-                        if(this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(uint8_t)
-                        else PUSH_RDVALUE_ARRAY_TYPE(uint8_t)
-                }
-                else if (valueType == typeid(int16_t)) {
-// 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_INT16);
-                        if(this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(int16_t)
-                        else PUSH_RDVALUE_ARRAY_TYPE(int16_t)
-                }
-                else if (valueType == typeid(uint16_t)) {
-// 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_UINT16);
-                        if(this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(uint16_t)
-                        else PUSH_RDVALUE_ARRAY_TYPE(uint16_t)
-                }
-                else if (valueType == typeid(int32_t)) {
-// 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_INT32);
-                        if(this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(int32_t)
-                        else PUSH_RDVALUE_ARRAY_TYPE(int32_t)
-                }
-                else if (valueType == typeid(uint32_t)) {
-// 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_UINT32);
-                        if(this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(uint32_t)
-                        else PUSH_RDVALUE_ARRAY_TYPE(uint32_t)
-                }
-                else if (valueType == typeid(float)) {
-// 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_FLOAT);
-                        if(this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(float)
-                        else PUSH_RDVALUE_ARRAY_TYPE(float)
-                }
-                else if (valueType == typeid(double)) {
-// 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_DOUBLE);
-                        if(this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(double)
-                        else PUSH_RDVALUE_ARRAY_TYPE(double)
-                }
-                else if (valueType == typeid(string)) {
-// 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_DOUBLE);
-                        if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(string)
-                        else PUSH_RDVALUE_ARRAY_TYPE(string)
-                }
-        else std::cout << "Cannot proxy unknown type " << typeid(valueType).name()  << std::endl;
-
-        UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char*)this->getName().c_str()), createdNodeId,
-                                                                                                                UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*) "Value"),
-                                                                                                                UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, &icb, &valueNodeId);
-
-        UA_NodeId nodeIdVariableType = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
-        NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, valueNodeId)
-
-        mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getName), .write=NULL});
-        mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getDescription), .write=UA_WRPROXY_NAME(ua_processvariable, setDescription)});
-        mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(ua_processvariable, setEngineeringUnit)});
-        mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getType), .write=NULL});
-
-        this->ua_mapDataSources((void *) this, &mapDs);
-
-        return UA_STATUSCODE_GOOD;
+    return UA_STATUSCODE_GOOD;
 }
 
 /** @brief Reimplement the SourceTimeStamp to timestamp of csa_config
