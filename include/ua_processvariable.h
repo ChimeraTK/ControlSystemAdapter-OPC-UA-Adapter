@@ -39,6 +39,7 @@ class ua_processvariable : ua_mapped_class {
 private:
   string namePV;
         string nameNew;
+        string nodeStringIdOverwrite;
         string engineeringUnit;
         string description;
         UA_NodeId ownNodeId;
@@ -60,7 +61,7 @@ public:
         * @param namePV Name of the process variable from control-system-adapter, is needed to fetch the rigth process varibale from PV-Manager
         * @param csManager Provide the hole PVManager from control-system-adapter to map all processvariable to the OPC UA-Model
         */
-        ua_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager);
+        ua_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager, std::string overwriteNodeString = "");
 
         /** @brief Destructor for ua_processvariable
         *
