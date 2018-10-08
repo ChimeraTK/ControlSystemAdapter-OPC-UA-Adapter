@@ -85,7 +85,9 @@ struct MyApp : public ApplicationBase {
 		ProcessArray<uint32_t>::SharedPtr intAu32dev = this->_processVariableManager->createProcessArray<uint32_t>(controlSystemToDevice, "uint32Scalar", 1);
 		ProcessArray<float>::SharedPtr intAfdev = this->_processVariableManager->createProcessArray<float>(controlSystemToDevice, "floatScalar", 1);
 		ProcessArray<double>::SharedPtr intAddev = this->_processVariableManager->createProcessArray<double>(controlSystemToDevice, "doubleScalar", 1);
-		
+		ProcessArray<string>::SharedPtr stringAddev = devManager->createProcessArray<string>(controlSystemToDevice, "stringScalar", 1);
+		ProcessArray<string>::SharedPtr stringAddev2 = devManager->createProcessArray<string>(deviceToControlSystem, "1/FOLDER/defaultSep/stringScalar", 1, "my unit", "desc");
+
 		ProcessArray<int8_t>::SharedPtr intB15A8dev = this->_processVariableManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Array_s15", 15, "mIatrou*Rahm", "Die Einheit ist essentiel und sollte SI Einheit sein...");
 		ProcessArray<uint8_t>::SharedPtr intB10Au8dev = this->_processVariableManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Array_s10", 10, "1/Rahm");
 		ProcessArray<int16_t>::SharedPtr intB15A16dev = this->_processVariableManager->createProcessArray<int16_t>(controlSystemToDevice, "int16Array_s15", 15, "Iatrou", "Beschreibung eines Iatrous");
@@ -97,6 +99,7 @@ struct MyApp : public ApplicationBase {
 		
 		// example mapping variable
 		ProcessArray<int8_t>::SharedPtr intB15A8devMap = devManager->createProcessArray<int8_t>(controlSystemToDevice, "Mein/Name_ist#int8Array_s15", 15, "Iatrou^2/Rahm");
+		ProcessArray<int8_t>::SharedPtr intB15A8devMap2 = devManager->createProcessArray<int8_t>(controlSystemToDevice, "Mein/Name_ist#int8Array", 15, "Iatrou^2/Rahm");
 		ProcessArray<uint8_t>::SharedPtr intB10Au8devMap1 = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "/Dein/Name//ist/uint8Array_s10", 10, "Iatrou^2/Rahm", "Beschreibung");
 		ProcessArray<uint8_t>::SharedPtr intB10Au8devMap2 = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "Unser/Name/ist_uint8Array_s10", 10);
 		ProcessArray<uint32_t>::SharedPtr intAu32devMap = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "Ist/Name/dieser/uint32Scalar", 1);
