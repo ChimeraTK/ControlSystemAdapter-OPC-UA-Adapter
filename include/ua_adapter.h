@@ -181,9 +181,22 @@ public:
         */
         UA_NodeId existFolder(UA_NodeId basenodeid, string folderName);
 
+        /** @brief Search PV by name in PV-List
+         *
+         * @param varName The name of the seached pv
+         *
+         * @return index of the pv or -1 if not contained
+         */
         int32_t findMappingIndex(std::string varName);
 
-        void enrollFolderPathFromString(string path, string seperator);
+        /** @brief Create folder structure based on the given path.
+         *
+         * @param path The complete path
+         * @param seperator Delimiters with are used to split the path
+         *
+         * @return nodeId of the last created folder (last part of path)
+         */
+        UA_NodeId enrollFolderPathFromString(string path, string seperator);
 
         /** @brief Check if a folder ath exist in opcua server
         *
