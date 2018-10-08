@@ -94,8 +94,7 @@ int main() {
 	ProcessArray<float>::SharedPtr intAfdev = devManager->createProcessArray<float>(controlSystemToDevice, "floatScalar", 1);
 	ProcessArray<double>::SharedPtr intAddev = devManager->createProcessArray<double>(controlSystemToDevice, "doubleScalar", 1);
 	ProcessArray<string>::SharedPtr stringAddev = devManager->createProcessArray<string>(controlSystemToDevice, "stringScalar", 1);
-	ProcessArray<string>::SharedPtr stringAddev2 = devManager->createProcessArray<string>(controlSystemToDevice, "1/FOLDER/defaultSep/stringScalar", 1);
-
+	ProcessArray<string>::SharedPtr stringAddev2 = devManager->createProcessArray<string>(deviceToControlSystem, "1/FOLDER/defaultSep/stringScalar", 1, "my description", "desc");
 
 	ProcessArray<int8_t>::SharedPtr intB15A8dev = devManager->createProcessArray<int8_t>(controlSystemToDevice, "int8Array_s15", 15, "mIatrou*Rahm", "Die Einheit ist essentiel und sollte SI Einheit sein...");
 	ProcessArray<uint8_t>::SharedPtr intB10Au8dev = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "uint8Array_s10", 10, "1/Rahm");
@@ -117,6 +116,7 @@ int main() {
 	
 	// example mapping variable
 	ProcessArray<int8_t>::SharedPtr intB15A8devMap = devManager->createProcessArray<int8_t>(controlSystemToDevice, "Mein/Name_ist#int8Array_s15", 15, "Iatrou^2/Rahm");
+	ProcessArray<int8_t>::SharedPtr intB15A8devMap2 = devManager->createProcessArray<int8_t>(controlSystemToDevice, "Mein/Name_ist#int8Array", 15, "Iatrou^2/Rahm");
 	ProcessArray<uint8_t>::SharedPtr intB10Au8devMap1 = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "/Dein/Name//ist/uint8Array_s10", 10, "Iatrou^2/Rahm", "Beschreibung");
 	ProcessArray<uint8_t>::SharedPtr intB10Au8devMap2 = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "Unser/Name/ist_uint8Array_s10", 10);
 	ProcessArray<uint32_t>::SharedPtr intAu32devMap = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "Ist/Name/dieser/uint32Scalar", 1);
@@ -162,7 +162,9 @@ int main() {
 		}
 		testDoubleArray->write();
 		testIntArray->write();
-	
+
+    stringAddev2->accessChannel(0).at(0) = "Test value";
+    stringAddev2->write();
 	// start values
 	int32_t microseconds = 1000000;
 	double period = 3.141;
