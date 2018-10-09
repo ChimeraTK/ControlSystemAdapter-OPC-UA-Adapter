@@ -45,7 +45,7 @@ private:
         UA_NodeId ownNodeId;
 
         boost::shared_ptr<ControlSystemPVManager> csManager;
-
+        UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, string baseNodePath);
 
         /** @brief  This methode mapped all own nodes into the opcua server
         *

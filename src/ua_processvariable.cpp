@@ -286,15 +286,14 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     }
 
     UA_INSTATIATIONCALLBACK(icb);
-    UA_StatusCode  result = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew).c_str()),//UA_NODEID_NUMERIC(1, 0)
+    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew).c_str()),//UA_NODEID_NUMERIC(1, 0)
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME_ALLOC(1, this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, &icb, &createdNodeId);
-    if(result != UA_STATUSCODE_GOOD)
-        return UA_STATUSCODE_BADCERTIFICATEISSUERREVOKED;
     //TODO add value to parent
-
     // know your own nodeId
     this->ownNodeId = createdNodeId;
+
+    this->addPVChildNodes(createdNodeId, baseNodeIdName);
 
     /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
     UA_DataSource_Map mapDs;
@@ -349,6 +348,94 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     this->ua_mapDataSources((void *) this, &mapDs);
 
     return UA_STATUSCODE_GOOD;
+}
+
+UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string baseNodePath){
+
+    UA_NodeId createdNodeId = UA_NODEID_NULL;
+    UA_VariableAttributes attr;
+    UA_StatusCode addResult;
+
+    //Adding the Name node to the PV
+    UA_VariableAttributes_init(&attr);
+    attr.displayName = UA_LOCALIZEDTEXT((char *)"", (char *)"Name");
+    attr.description = UA_LOCALIZEDTEXT((char *)"", (char *)"");
+    attr.accessLevel = 3;
+    attr.userAccessLevel = 3;
+    attr.valueRank = -1;
+    UA_String *opcua_node_variable_t_ns_2_i_6004_variant_DataContents = UA_String_new();
+    *opcua_node_variable_t_ns_2_i_6004_variant_DataContents = UA_STRING_ALLOC("");
+    UA_Variant_setScalar(&attr.value, opcua_node_variable_t_ns_2_i_6004_variant_DataContents,
+                         &UA_TYPES[UA_TYPES_STRING]);
+    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/name").c_str()), pvNodeId,
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, (char *) "Name"),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, NULL,
+                              &createdNodeId);
+    if(addResult == UA_STATUSCODE_GOOD) {
+        UA_NodeId nameVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
+        NODE_PAIR_PUSH(this->ownedNodes, nameVariable, createdNodeId);
+    } else
+        return addResult;
+
+    //Adding the Description node to the PV
+    UA_VariableAttributes_init(&attr);
+    attr.displayName = UA_LOCALIZEDTEXT((char *)"", (char *)"Description");
+    attr.description = UA_LOCALIZEDTEXT((char *)"", (char *)"");
+    attr.accessLevel = 3;
+    attr.userAccessLevel = 3;
+    attr.valueRank = -1;
+    UA_String *opcua_node_variable_t_ns_2_i_6001_variant_DataContents =  UA_String_new();
+    *opcua_node_variable_t_ns_2_i_6001_variant_DataContents = UA_STRING_ALLOC("");
+    UA_Variant_setScalar( &attr.value, opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
+    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/description").c_str()),
+                              pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char *)"Description"), UA_NODEID_NUMERIC(0, 63),
+                              attr, NULL, &createdNodeId);
+    if(addResult == UA_STATUSCODE_GOOD) {
+        UA_NodeId descVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
+        NODE_PAIR_PUSH(this->ownedNodes, descVariable, createdNodeId);
+    } else
+        return addResult;
+
+    //Adding the EngineeringUnit node to the PV
+    UA_VariableAttributes_init(&attr);
+    attr.displayName = UA_LOCALIZEDTEXT((char *)"", (char *)"EngineeringUnit");
+    attr.description = UA_LOCALIZEDTEXT((char *)"", (char *)"");
+    attr.accessLevel = 3;
+    attr.userAccessLevel = 3;
+    attr.valueRank = -1;
+    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/engineeringunit").c_str()),
+                              pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char *)"EngineeringUnit"),
+                              UA_NODEID_NUMERIC(0, 63), attr, NULL, &createdNodeId);
+    if(addResult == UA_STATUSCODE_GOOD) {
+        UA_NodeId engineeringunitVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
+        NODE_PAIR_PUSH(this->ownedNodes, engineeringunitVariable, createdNodeId);
+    } else
+        return addResult;
+
+    //Adding the Type node to the PV
+    UA_VariableAttributes_init(&attr);
+    attr.displayName = UA_LOCALIZEDTEXT((char *)"", (char *)"Type");
+    attr.description = UA_LOCALIZEDTEXT((char *)"", (char *)"");
+    attr.accessLevel = 3;
+    attr.userAccessLevel = 3;
+    attr.valueRank = -1;
+    UA_String *opcua_node_variable_t_ns_2_i_6012_variant_DataContents =  UA_String_new();
+    *opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING_ALLOC("");
+    UA_Variant_setScalar( &attr.value, opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
+    UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6012);
+    UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
+    UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
+    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/type").c_str()),
+                                          pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char *)"Type"), UA_NODEID_NUMERIC(0, 63),
+                                          attr, NULL, &createdNodeId);
+    if(addResult == UA_STATUSCODE_GOOD) {
+        UA_NodeId typeVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
+        NODE_PAIR_PUSH(this->ownedNodes, typeVariable, createdNodeId);
+    } else
+        return addResult;
+
+    return addResult;
 }
 
 /** @brief Reimplement the SourceTimeStamp to timestamp of csa_config
