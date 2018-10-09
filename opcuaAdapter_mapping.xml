@@ -2,7 +2,12 @@
 <uamapping>
 	<config rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
 		<serverConfig applicationName="OPCUAServer" port="16660" />
-		<login username="test" password="test123" /> 
+		<login username="test" password="test123" />
+
+		<pvVariablesHandling automaticPathUnroll="True">
+			<pvPathSeperator pathSep="/" />
+			<pvPathSeperator pathSep="_" />
+		</pvVariablesHandling>
 	</config>
 
 	<additionalNodes folderName="AdditionalNodesFolder" description="DescriptionOfAdditionalNodes">
@@ -25,7 +30,7 @@
 		  <folder>NorthSide/LINAC/partA</folder>
 			<folder>NorthSide/LINAC/partX</folder>
   	</map>
-		<map sourceVariableName="/Mein/Name_ist#int8Array_s15" rename="Array">
+			<map sourceVariableName="/Mein/Name_ist#int8Array_s15" rename="Array">
 			<unrollPath pathSep="_">True</unrollPath>
 			<unrollPath pathSep="/">True</unrollPath>
 			<unrollPath pathSep="#">True</unrollPath>
@@ -69,7 +74,7 @@
 			<unrollPath pathSep="/">False</unrollPath>
 		  <folder>EastSide/LINAC</folder>
     </map>
-		<map sourceVariableName="/Ist/Name/dieser/doubleScalar" engineeringUnit="Test" description="">
+		<map sourceVariableName="/Ist/Name/dieser/doubleScalar" engineeringUnit="Test" description="updated test desc">
 			<unrollPath pathSep="/">True</unrollPath>
 		  <folder></folder>
     </map>
