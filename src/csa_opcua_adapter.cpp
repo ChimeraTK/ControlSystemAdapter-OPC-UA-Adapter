@@ -57,9 +57,6 @@ void csa_opcua_adapter::csa_opcua_adapter_InitServer(string configFile) {
 void csa_opcua_adapter::csa_opcua_adapter_InitVarMapping() {
     // Get all ProcessVariables
     vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
-    for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
-        cout << "New added PV: " << oneProcessVariable->getName() << ' ' << endl;
-    }
 
     for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
         adapter->addVariable(oneProcessVariable->getName(), this->csManager);
