@@ -16,6 +16,7 @@
  *
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
+ * Copyright (c) 2018 Andreas Ebner <Andreas.Ebner@iosb-extern.fraunhofer.de>
  */
 
 extern "C" {
@@ -124,7 +125,19 @@ void ua_uaadapter::readConfig() {
                         this->serverConfig.descriptionFolder = placeHolder;
                 }
         }
-
+        result = this->fileHandler->getNodeSet(xpath +"//pvVariablesHandling");
+        if(result){
+            xmlNodeSetPtr nodeset = result->nodesetval;
+            vector<xmlNodePtr> nodeVectorUnrollPathPV = this->fileHandler->getNodesByName(
+                    nodeset->nodeTab[0]->children, "pvPathSeperator");
+            for (auto nodeUnrollPath: nodeVectorUnrollPathPV) {
+                this->pvSeperator = this->pvSeperator + this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
+            }
+            string pvUnrollEnabled = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "automaticPathUnroll");
+            if(pvUnrollEnabled.compare("True") != 0){
+                pvSeperator = "";
+            }
+        }
         result = this->fileHandler->getNodeSet(xpath + "//login");
         if(result) {
                 xmlNodeSetPtr nodeset = result->nodesetval;
@@ -253,14 +266,14 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
     //there is no mapping entry contained in the xml file
     if (mappedVariableIndex == -1) {//no mapping node exists in xml file
         //TODO and create folders prepare path
-        UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, {"/_"}); //TODO new global xml seperator entry for variable path?
+        UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeperator); //TODO new global xml seperator entry for variable path?
         ua_processvariable *processvariable;
         if(!UA_NodeId_isNull(&folderPathNodeId)){
-            processvariable = new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1) , csManager, this->fileHandler->praseVariablePath(varName, "/_").back());
+            processvariable = new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1) , csManager, this->fileHandler->praseVariablePath(varName, this->pvSeperator).back());
         } else {
             processvariable = new ua_processvariable(this->mappedServer, this->variablesListId, varName.substr(1, varName.size() - 1), csManager);
         }
-        UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(), UA_LOCALIZEDTEXT((char*) "en_US", (char *) this->fileHandler->praseVariablePath(varName, "/_").back().c_str()));
+        UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(), UA_LOCALIZEDTEXT((char*) "en_US", (char *) this->fileHandler->praseVariablePath(varName, this->pvSeperator).back().c_str()));
         this->variables.push_back(processvariable);
     } else { //mapping node exists in xml file
         xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
@@ -371,7 +384,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                 if (renameVar.compare(srcVarName) == 0)
                     processvariable = new ua_processvariable(this->mappedServer, objectNodeId, varName, csManager,
                                                              this->fileHandler->praseVariablePath(varName,
-                                                                                                  "/_").back());
+                                                                                                  this->pvSeperator).back());
                 else
                     processvariable = new ua_processvariable(this->mappedServer, objectNodeId, varName, csManager,
                                                              renameVar);
@@ -383,7 +396,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                     UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
                                                UA_LOCALIZEDTEXT_ALLOC("en_US",
                                                                       (char *) this->fileHandler->praseVariablePath(
-                                                                              varName, "/_").back().c_str()));
+                                                                              varName, this->pvSeperator).back().c_str()));
                 else
                     UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
                                                UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str()));
