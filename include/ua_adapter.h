@@ -100,6 +100,7 @@ private:
 
         vector<FolderInfo>			folderVector;
         UA_NodeId								ownNodeId;
+        string                              pvSeperator;
 
         ServerConfig 						serverConfig;
 
