@@ -289,8 +289,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew).c_str()),//UA_NODEID_NUMERIC(1, 0)
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME_ALLOC(1, this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, &icb, &createdNodeId);
-    //TODO add value to parent
-    // know your own nodeId
+    //know your own nodeId
     this->ownNodeId = createdNodeId;
 
     this->addPVChildNodes(createdNodeId, baseNodeIdName);
@@ -399,7 +398,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
 
     //Adding the EngineeringUnit node to the PV
     UA_VariableAttributes_init(&attr);
-    attr.displayName = UA_LOCALIZEDTEXT((char *)"", (char *)"EngineeringUnit");
+    attr.displayName = UA_LOCALIZEDTEXT((char *)"en_US", (char *)"EngineeringUnit");
     attr.description = UA_LOCALIZEDTEXT((char *)"", (char *)"");
     attr.accessLevel = 3;
     attr.userAccessLevel = 3;
