@@ -340,8 +340,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, createdNodeId);
 
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getName), .write=NULL});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getDescription), .write=UA_WRPROXY_NAME(ua_processvariable, setDescription)});
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getEngineeringUnit), .write=UA_WRPROXY_NAME(ua_processvariable, setEngineeringUnit)});
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getDescription), .write=NULL});
+    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getEngineeringUnit), .write=NULL});
     mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read=UA_RDPROXY_NAME(ua_processvariable, getType), .write=NULL});
 
     this->ua_mapDataSources((void *) this, &mapDs);
