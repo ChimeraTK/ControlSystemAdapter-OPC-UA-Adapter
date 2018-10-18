@@ -269,7 +269,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     UA_VariableAttributes attr;
     UA_VariableAttributes_init(&attr);
 
-    attr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", this->nameNew.c_str());
+    attr.displayName = UA_LOCALIZEDTEXT((char*) "en_US", (char*) this->nameNew.c_str());
     attr.description = description;
     attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
 
