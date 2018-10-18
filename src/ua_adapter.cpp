@@ -408,17 +408,14 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                 //get the nodeId string from the created pv node
                 UA_String parentNodeString = processvariable->getOwnNodeId().identifier.string;
                 UA_STRING_TO_CPPSTRING_COPY(&parentNodeString, &childNodeId);
-                if (!description.empty())
+                if (!description.empty()) {
                     UA_Server_writeDescription(this->mappedServer, processvariable->getOwnNodeId(),
-                                               UA_LOCALIZEDTEXT_ALLOC("en_US", description.c_str()));
-                    UA_String descriptionString = UA_String_fromChars(description.c_str());
-                    UA_Variant_setScalar(&newValue, &descriptionString, &UA_TYPES[UA_TYPES_STRING]);
-                    UA_Server_writeValue(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/description").c_str()), newValue);
-                if (!engineeringUnit.empty()) {
-                    UA_String eUnitAsCstr = UA_String_fromChars(engineeringUnit.c_str());
-                    UA_Variant_setScalar(&newValue, &eUnitAsCstr, &UA_TYPES[UA_TYPES_STRING]);
-                    UA_Server_writeValue(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/engineeringunit").c_str()), newValue);
+                                               UA_LOCALIZEDTEXT((char *)"en_US", (char *) description.c_str()));
+                    processvariable->setDescription(description);
                 }
+                if (!engineeringUnit.empty())
+                    processvariable->setEngineeringUnit(engineeringUnit);
+
                 UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/description").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Description"));
                 UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/engineeringunit").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "EngineeringUnit"));
                 UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/name").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Name"));
