@@ -243,10 +243,11 @@ void ua_uaadapter::workerThread() {
         serverThread = NULL;
 }
 
-int32_t ua_uaadapter::findMappingIndex(std::string varName) {
+vector<int32_t> ua_uaadapter::findMappingIndex(std::string varName) {
         xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
         xmlNodeSetPtr nodeset;
         string srcVarName = "";
+        vector<int32_t> pvIndexes;
 
         if(result) {
                 nodeset = result->nodesetval;
@@ -254,13 +255,12 @@ int32_t ua_uaadapter::findMappingIndex(std::string varName) {
                         srcVarName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i],
                                                                                   "sourceVariableName");
                         if (varName.compare(srcVarName) == 0) {
-                            xmlXPathFreeObject (result);
-                            return i;
+                            pvIndexes.push_back(i);
                         }
                 }
         }
         xmlXPathFreeObject (result);
-        return -1;
+        return pvIndexes;
 }
 
 UA_NodeId ua_uaadapter::enrollFolderPathFromString(string path, string seperator){
@@ -280,9 +280,9 @@ UA_NodeId ua_uaadapter::enrollFolderPathFromString(string path, string seperator
 }
 
 void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
-    int32_t mappedVariableIndex = findMappingIndex(varName);
+    vector<int32_t> mappedVariableIndex = findMappingIndex(varName);
     //there is no mapping entry contained in the xml file
-    if (mappedVariableIndex == -1) {//no mapping node exists in xml file
+    if (mappedVariableIndex.empty()) {//no mapping node exists in xml file
         //TODO and create folders prepare path
         UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeperator); //TODO new global xml seperator entry for variable path?
         ua_processvariable *processvariable;
@@ -298,146 +298,148 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
         xmlNodeSetPtr nodeset;
         if (result) {
             nodeset = result->nodesetval;
-            string srcVarName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex],
-                                                                             "sourceVariableName");
-            string applicName = this->fileHandler->getAttributeValueFromNode(
-                    nodeset->nodeTab[mappedVariableIndex]->parent, "name");
-            // Check if "rename" is not empty
-            string renameVar = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex],
-                                                                            "rename");
-            string engineeringUnit = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex],
-                                                                                  "engineeringUnit");
-            string description = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex],
-                                                                              "description");
+            for (int mappingPosition = 0; mappingPosition < mappedVariableIndex.size(); mappingPosition++) {
+                string srcVarName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)],
+                                                                                 "sourceVariableName");
+                string applicName = this->fileHandler->getAttributeValueFromNode(
+                        nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)]->parent, "name");
+                // Check if "rename" is not empty
+                string renameVar = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)],
+                                                                                "rename");
+                string engineeringUnit = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)],
+                                                                                      "engineeringUnit");
+                string description = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)],
+                                                                                  "description");
 
-            // TODO. What happen if application name are not unique?
-            // Application Name have to be unique!!!
-            UA_NodeId appliFolderNodeId = this->existFolder(this->ownNodeId, applicName);
-            FolderInfo newFolder;
-            if (UA_NodeId_isNull(&appliFolderNodeId)) {
-                newFolder.folderName = applicName;
-                newFolder.folderNodeId = this->createFolder(this->ownNodeId, applicName);
-                this->folderVector.push_back(newFolder);
-                appliFolderNodeId = newFolder.folderNodeId;
-            }
-
-            vector<string> varPathVector;
-            vector<xmlNodePtr> nodeVectorUnrollPath = this->fileHandler->getNodesByName(
-                    nodeset->nodeTab[mappedVariableIndex]->children, "unrollPath");
-            string seperator = "";
-            bool unrollPathIs = false;
-            for (auto nodeUnrollPath: nodeVectorUnrollPath) {
-                string shouldUnrollPath = this->fileHandler->getContentFromNode(nodeUnrollPath);
-                if (shouldUnrollPath.compare("True") == 0) {
-                    seperator = seperator + this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
-                    unrollPathIs = true;
+                // TODO. What happen if application name are not unique?
+                // Application Name have to be unique!!!
+                UA_NodeId appliFolderNodeId = this->existFolder(this->ownNodeId, applicName);
+                FolderInfo newFolder;
+                if (UA_NodeId_isNull(&appliFolderNodeId)) {
+                    newFolder.folderName = applicName;
+                    newFolder.folderNodeId = this->createFolder(this->ownNodeId, applicName);
+                    this->folderVector.push_back(newFolder);
+                    appliFolderNodeId = newFolder.folderNodeId;
                 }
-            }
 
-            if (!seperator.empty()) {
-                vector<string> newPathVector = this->fileHandler->praseVariablePath(srcVarName, seperator);
-                varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
-            }
-
-            // assumption last element is name of variable, hence no folder for name is needed
-            if (renameVar.compare("") == 0 && !unrollPathIs) {
-                renameVar = srcVarName;
-                // std::cout << "Variable '" << srcVarName << "' renamed in '" << renameVar << "' and listed in folder '" << applicName << "'." << std::endl;
-            } else {
-                if (unrollPathIs && renameVar.compare("") == 0) {
-                    renameVar = varPathVector.at(varPathVector.size() - 1);
-                    varPathVector.pop_back();
-                } else {
-                    if (varPathVector.size() > 0) {
-                        varPathVector.pop_back();
+                vector<string> varPathVector;
+                vector<xmlNodePtr> nodeVectorUnrollPath = this->fileHandler->getNodesByName(
+                        nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)]->children, "unrollPath");
+                string seperator = "";
+                bool unrollPathIs = false;
+                for (auto nodeUnrollPath: nodeVectorUnrollPath) {
+                    string shouldUnrollPath = this->fileHandler->getContentFromNode(nodeUnrollPath);
+                    if (shouldUnrollPath.compare("True") == 0) {
+                        seperator = seperator + this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
+                        unrollPathIs = true;
                     }
                 }
-                // std::cout << "Variable '" << srcVarName << "' listed in folder '" << applicName << "'." << std::endl;
-            }
 
-            vector<xmlNodePtr> nodeVectorFolderPath = this->fileHandler->getNodesByName(
-                    nodeset->nodeTab[mappedVariableIndex]->children, "folder");
-            vector<string> folderPathVector;
-            bool createdVar = false;
-            UA_NodeId newFolderNodeId = UA_NODEID_NULL;
-            vector<UA_NodeId> mappedVariables;
-            for (auto nodeFolderPath: nodeVectorFolderPath) {
-
-                string folderPath = this->fileHandler->getContentFromNode(nodeFolderPath);
-                if (folderPath.empty() && unrollPathIs) {
-                    break;
+                if (!seperator.empty()) {
+                    vector<string> newPathVector = this->fileHandler->praseVariablePath(srcVarName, seperator);
+                    varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
                 }
 
-                folderPathVector = this->fileHandler->praseVariablePath(folderPath);
-                // Create folders
-                newFolderNodeId = appliFolderNodeId;
-                if (folderPathVector.size() > 0) {
-                    newFolderNodeId = this->createFolderPath(newFolderNodeId, folderPathVector);
-                }
-
-                if (varPathVector.size() > 0) {
-                    newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
-                }
-                mappedVariables.push_back(newFolderNodeId);
-                createdVar = true;
-            }
-
-            // in case no <folder> or <unrollpath> is set
-            if (!createdVar) {
-                newFolderNodeId = appliFolderNodeId;
-
-                if (varPathVector.size() > 0) {
-                    mappedVariables.push_back(this->createFolderPath(newFolderNodeId, varPathVector));
+                // assumption last element is name of variable, hence no folder for name is needed
+                if (renameVar.compare("") == 0 && !unrollPathIs) {
+                    renameVar = srcVarName;
+                    // std::cout << "Variable '" << srcVarName << "' renamed in '" << renameVar << "' and listed in folder '" << applicName << "'." << std::endl;
                 } else {
-                    // No <folder>
-                    mappedVariables.push_back(appliFolderNodeId);
+                    if (unrollPathIs && renameVar.compare("") == 0) {
+                        renameVar = varPathVector.at(varPathVector.size() - 1);
+                        varPathVector.pop_back();
+                    } else {
+                        if (varPathVector.size() > 0) {
+                            varPathVector.pop_back();
+                        }
+                    }
+                    // std::cout << "Variable '" << srcVarName << "' listed in folder '" << applicName << "'." << std::endl;
                 }
-            }
 
-            for (auto objectNodeId:mappedVariables) {
-                UA_NodeId createdNodeId = UA_NODEID_NULL;
+                vector<xmlNodePtr> nodeVectorFolderPath = this->fileHandler->getNodesByName(
+                        nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)]->children, "folder");
+                vector<string> folderPathVector;
+                bool createdVar = false;
+                UA_NodeId newFolderNodeId = UA_NODEID_NULL;
+                vector<UA_NodeId> mappedVariables;
+                for (auto nodeFolderPath: nodeVectorFolderPath) {
 
-                ua_processvariable *processvariable;
-                //TODO problem with the following block
-                if (renameVar.compare(srcVarName) == 0)
-                    processvariable = new ua_processvariable(this->mappedServer, objectNodeId, varName, csManager,
-                                                             this->fileHandler->praseVariablePath(varName,
-                                                                                                  this->pvSeperator).back());
-                else
-                    processvariable = new ua_processvariable(this->mappedServer, objectNodeId, varName, csManager,
-                                                             renameVar);
-                this->variables.push_back(processvariable);
+                    string folderPath = this->fileHandler->getContentFromNode(nodeFolderPath);
+                    if (folderPath.empty() && unrollPathIs) {
+                        break;
+                    }
 
-                //checks if a mapped variable has no rename option or unrollPathIds option
-                //in this case the name will be shorten using the default path delimiters, (string node id is still the full name)
-                if (renameVar.compare(srcVarName) == 0 && !unrollPathIs)
-                    UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
-                                               UA_LOCALIZEDTEXT_ALLOC("en_US",
-                                                                      (char *) this->fileHandler->praseVariablePath(
-                                                                              varName, this->pvSeperator).back().c_str()));
-                else
-                    UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
-                                               UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str()));
+                    folderPathVector = this->fileHandler->praseVariablePath(folderPath);
+                    // Create folders
+                    newFolderNodeId = appliFolderNodeId;
+                    if (folderPathVector.size() > 0) {
+                        newFolderNodeId = this->createFolderPath(newFolderNodeId, folderPathVector);
+                    }
 
-                createdNodeId = objectNodeId;
-
-                UA_Variant newValue;
-                string childNodeId;
-                //get the nodeId string from the created pv node
-                UA_String parentNodeString = processvariable->getOwnNodeId().identifier.string;
-                UA_STRING_TO_CPPSTRING_COPY(&parentNodeString, &childNodeId);
-                if (!description.empty()) {
-                    UA_Server_writeDescription(this->mappedServer, processvariable->getOwnNodeId(),
-                                               UA_LOCALIZEDTEXT((char *)"en_US", (char *) description.c_str()));
-                    processvariable->setDescription(description);
+                    if (varPathVector.size() > 0) {
+                        newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
+                    }
+                    mappedVariables.push_back(newFolderNodeId);
+                    createdVar = true;
                 }
-                if (!engineeringUnit.empty())
-                    processvariable->setEngineeringUnit(engineeringUnit);
 
-                UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/description").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Description"));
-                UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/engineeringunit").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "EngineeringUnit"));
-                UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/name").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Name"));
-                UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/type").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Type"));
+                // in case no <folder> or <unrollpath> is set
+                if (!createdVar) {
+                    newFolderNodeId = appliFolderNodeId;
+
+                    if (varPathVector.size() > 0) {
+                        mappedVariables.push_back(this->createFolderPath(newFolderNodeId, varPathVector));
+                    } else {
+                        // No <folder>
+                        mappedVariables.push_back(appliFolderNodeId);
+                    }
+                }
+
+                for (auto objectNodeId:mappedVariables) {
+                    UA_NodeId createdNodeId = UA_NODEID_NULL;
+
+                    ua_processvariable *processvariable;
+                    //TODO problem with the following block
+                    if (renameVar.compare(srcVarName) == 0)
+                        processvariable = new ua_processvariable(this->mappedServer, objectNodeId, varName, csManager,
+                                                                 this->fileHandler->praseVariablePath(varName,
+                                                                                                      this->pvSeperator).back());
+                    else
+                        processvariable = new ua_processvariable(this->mappedServer, objectNodeId, varName, csManager,
+                                                                 renameVar);
+                    this->variables.push_back(processvariable);
+
+                    //checks if a mapped variable has no rename option or unrollPathIds option
+                    //in this case the name will be shorten using the default path delimiters, (string node id is still the full name)
+                    if (renameVar.compare(srcVarName) == 0 && !unrollPathIs)
+                        UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
+                                                   UA_LOCALIZEDTEXT_ALLOC("en_US",
+                                                                          (char *) this->fileHandler->praseVariablePath(
+                                                                                  varName, this->pvSeperator).back().c_str()));
+                    else
+                        UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
+                                                   UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str()));
+
+                    createdNodeId = objectNodeId;
+
+                    UA_Variant newValue;
+                    string childNodeId;
+                    //get the nodeId string from the created pv node
+                    UA_String parentNodeString = processvariable->getOwnNodeId().identifier.string;
+                    UA_STRING_TO_CPPSTRING_COPY(&parentNodeString, &childNodeId);
+                    if (!description.empty()) {
+                        UA_Server_writeDescription(this->mappedServer, processvariable->getOwnNodeId(),
+                                                   UA_LOCALIZEDTEXT((char *)"en_US", (char *) description.c_str()));
+                        processvariable->setDescription(description);
+                    }
+                    if (!engineeringUnit.empty())
+                        processvariable->setEngineeringUnit(engineeringUnit);
+
+                    UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/description").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Description"));
+                    UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/engineeringunit").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "EngineeringUnit"));
+                    UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/name").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Name"));
+                    UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/type").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Type"));
+                }
             }
             xmlXPathFreeObject(result);
         }
@@ -556,7 +558,9 @@ UA_NodeId ua_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<strin
                 for(uint32_t m=0; m < folderPath.size(); m++) {
                         for(uint32_t i=0; i < this->folderVector.size(); i++) {
                                 // get correct folder NodeId from first folderPath element
-                                if(!setted && (folderPath.at(m).compare(this->folderVector.at(i).folderName) == 0) && (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &nextNodeId)) && ((m+1) < folderPath.size())) {
+                                if(!setted && (folderPath.at(m).compare(this->folderVector.at(i).folderName) == 0) &&
+                                    (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &nextNodeId)) &&
+                                    ((m+1) < folderPath.size())) {
                                         // remember on witch position the folder still exist
                                         setted = true;
                                         starter4Folder = m+1;
