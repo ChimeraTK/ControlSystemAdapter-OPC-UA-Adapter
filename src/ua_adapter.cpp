@@ -548,6 +548,8 @@ UA_NodeId ua_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<strin
                                         break;
                                 }
                         }
+                        if(!setted)
+                            break;
                         setted = false;
                 }
         }
