@@ -186,9 +186,9 @@ public:
          *
          * @param varName The name of the seached pv
          *
-         * @return index of the pv or -1 if not contained
+         * @return index of the matching pv's or empty if the pv not exists
          */
-        int32_t findMappingIndex(std::string varName);
+        std::vector<int32_t> findMappingIndex(std::string varName);
 
         /** @brief Create folder structure based on the given path.
          *
