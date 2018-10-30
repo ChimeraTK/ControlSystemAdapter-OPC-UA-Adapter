@@ -246,7 +246,7 @@ vector<int32_t> ua_uaadapter::findMappingIndex(std::string varName) {
 }
 
 UA_NodeId ua_uaadapter::enrollFolderPathFromString(string path, string seperator){
-    //TODO als reuse this on the default path
+    //TODO use this function in add_variable inside the folder attribute code block
     vector<string> varPathVector;
     if (!seperator.empty()) {
         vector<string> newPathVector = this->fileHandler->praseVariablePath(path, seperator);
@@ -265,8 +265,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
     vector<int32_t> mappedVariableIndex = findMappingIndex(varName);
     //there is no mapping entry contained in the xml file
     if (mappedVariableIndex.empty()) {//no mapping node exists in xml file
-        //TODO and create folders prepare path
-        UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeperator); //TODO new global xml seperator entry for variable path?
+        UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeperator);
         ua_processvariable *processvariable;
         if(!UA_NodeId_isNull(&folderPathNodeId)){
             processvariable = new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1) , csManager, this->fileHandler->praseVariablePath(varName, this->pvSeperator).back());
@@ -280,7 +279,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
         xmlNodeSetPtr nodeset;
         if (result) {
             nodeset = result->nodesetval;
-            for (int mappingPosition = 0; mappingPosition < mappedVariableIndex.size(); mappingPosition++) {
+            for (size_t mappingPosition = 0; mappingPosition < mappedVariableIndex.size(); mappingPosition++) {
                 string srcVarName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)],
                                                                                  "sourceVariableName");
                 string applicName = this->fileHandler->getAttributeValueFromNode(
@@ -290,9 +289,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                                                                 "rename");
                 string engineeringUnit = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)],
                                                                                       "engineeringUnit");
-                string description = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)],
-                                                                                  "description");
-
+                string description = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)], "description");
                 // TODO. What happen if application name are not unique?
                 // Application Name have to be unique!!!
                 UA_NodeId appliFolderNodeId = this->existFolder(this->ownNodeId, applicName);
@@ -381,7 +378,6 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                     UA_NodeId createdNodeId = UA_NODEID_NULL;
 
                     ua_processvariable *processvariable;
-                    //TODO problem with the following block
                     if (renameVar.compare(srcVarName) == 0)
                         processvariable = new ua_processvariable(this->mappedServer, objectNodeId, varName, csManager,
                                                                  this->fileHandler->praseVariablePath(varName,
@@ -395,12 +391,12 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                     //in this case the name will be shorten using the default path delimiters, (string node id is still the full name)
                     if (renameVar.compare(srcVarName) == 0 && !unrollPathIs)
                         UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
-                                                   UA_LOCALIZEDTEXT_ALLOC("en_US",
+                                                   UA_LOCALIZEDTEXT((char *) "en_US",
                                                                           (char *) this->fileHandler->praseVariablePath(
                                                                                   varName, this->pvSeperator).back().c_str()));
                     else
                         UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
-                                                   UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str()));
+                                                   UA_LOCALIZEDTEXT((char *) "en_US", (char *) renameVar.c_str()));
 
                     createdNodeId = objectNodeId;
 
@@ -507,7 +503,7 @@ UA_NodeId ua_uaadapter::existFolderPath(UA_NodeId basenodeid, std::vector<string
         for(std::string t : folderPath) {
                 lastNodeId = this->existFolder(lastNodeId, t);
                 if(UA_NodeId_isNull(&lastNodeId)) {
-                        return UA_NODEID_NULL;
+                    return UA_NODEID_NULL;
                 }
         }
         return lastNodeId;
@@ -516,7 +512,8 @@ UA_NodeId ua_uaadapter::existFolderPath(UA_NodeId basenodeid, std::vector<string
 UA_NodeId ua_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
         UA_NodeId lastNodeId = UA_NODEID_NULL;
         for(uint32_t i=0; i < this->folderVector.size(); i++) {
-                if((this->folderVector.at(i).folderName.compare(folder) == 0) && (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &basenodeid))) {
+                if((this->folderVector.at(i).folderName.compare(folder) == 0) &&
+                   (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &basenodeid))) {
                         return this->folderVector.at(i).folderNodeId;
                 }
         }
