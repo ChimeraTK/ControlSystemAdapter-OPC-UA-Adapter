@@ -266,6 +266,42 @@ void ProcessVariableTest::testClassSide(){
                                 }
                         }
                 }
+		/**
+                 * \ToDo: Add uint64_t test once uint64_t is supported.
+                 *
+                else if (valueType == "uint64_t") {
+                        BOOST_CHECK(valueType == "uint64_t");
+                        vector<uint64_t> valueArray = pvSet.csManager->getProcessArray<float>(oneProcessVariable->getName())->accessChannel(0);
+
+                        if(valueArray.size() == 1) {
+                                uint64_t newValue;
+                                BOOST_CHECK(test->getValue_uint64_t() == 0);
+                                newValue = 100;
+
+                                test->setValue_uint_64_t(newValue);
+                                // Check value on controlsystemmanager side
+                                vector<uint64_t> csValueArray = pvSet.csManager->getProcessArray<uint64_t>(oneProcessVariable->getName())->accessChannel(0);
+                                BOOST_CHECK(csValueArray.size() == 1);
+                                BOOST_CHECK(csValueArray.at(0) == 100);
+                        }
+                        else {
+                                // if Array
+                                uint32_t i = 0;
+                                std::vector<uint64_t> newVector(test->getValue_Array_uint64_t().size());
+                                for(uint64_t value: test->getValue_Array_uint64_t()) {
+                                        BOOST_CHECK(value == 0);
+                                        newVector.at(i) = 100-i;
+                                        i++;
+                                }
+                                test->setValue_Array_uint64_t(newVector);
+                                vector<uint64_t> valueArray = pvSet.csManager->getProcessArray<float>(oneProcessVariable->getName())->accessChannel(0);
+                                i = 0;
+                                for(auto value : valueArray) {
+                                        BOOST_CHECK(value == (100-i));
+                                        i++;
+                                }
+                        }
+                }*/
                 else if (valueType == "float") {
                         BOOST_CHECK(valueType == "float");
                         vector<float> valueArray = pvSet.csManager->getProcessArray<float>(oneProcessVariable->getName())->accessChannel(0);
