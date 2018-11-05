@@ -24,7 +24,6 @@ CMakeLists.txt.user
 include/ChimeraTK
 tools/dependencies/
 .kdev*
-.*
 ControlSystemAdapter-OPC-UA-Adapter.kdev4
 cov_htmp/
 app.info
