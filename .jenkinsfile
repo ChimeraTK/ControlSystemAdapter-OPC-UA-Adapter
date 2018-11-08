@@ -1,2 +1,2 @@
 @Library('ChimeraTK') _
-buildTestDeploy(['ChimeraTK-DeviceAccess', 'ChimeraTK-cppext', 'ChimeraTK-ControlSystemAdapter'])
+buildTestDeploy(['ChimeraTK-ControlSystemAdapter'])
