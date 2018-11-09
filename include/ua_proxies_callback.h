@@ -151,6 +151,16 @@ UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_LOCALIZEDTEX
 UA_LocalizedText_deleteMembers(&ua_val); \
 UA_RDPROXY_TAIL()
 
+#define UA_RDPROXY_UINT64(_p_class, _p_method) \
+UA_RDPROXY_HEAD(_p_class, _p_method) \
+UA_RDPROXY_SIMPLEBODY(_p_method, uint64_t, UA_TYPES_UINT64); \
+UA_RDPROXY_TAIL()
+
+#define UA_RDPROXY_INT64(_p_class, _p_method) \
+UA_RDPROXY_HEAD(_p_class, _p_method) \
+UA_RDPROXY_SIMPLEBODY(_p_method, int64_t, UA_TYPES_INT64); \
+UA_RDPROXY_TAIL()
+
 #define UA_RDPROXY_INT32(_p_class, _p_method) \
 UA_RDPROXY_HEAD(_p_class, _p_method) \
 UA_RDPROXY_SIMPLEBODY(_p_method, int32_t, UA_TYPES_INT32); \
@@ -236,6 +246,16 @@ UA_RDPROXY_HEAD(_p_class, _p_method) \
 UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, uint32_t, UA_TYPES_UINT32) \
 UA_RDPROXY_TAIL()
 
+#define UA_RDPROXY_ARRAY_INT64(_p_class, _p_method) \
+UA_RDPROXY_HEAD(_p_class, _p_method) \
+UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, int64_t, UA_TYPES_INT64) \
+UA_RDPROXY_TAIL()
+
+#define UA_RDPROXY_ARRAY_UINT64(_p_class, _p_method) \
+UA_RDPROXY_HEAD(_p_class, _p_method) \
+UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, uint64_t, UA_TYPES_UINT64) \
+UA_RDPROXY_TAIL()
+
 #define UA_RDPROXY_ARRAY_FLOAT(_p_class, _p_method) \
 UA_RDPROXY_HEAD(_p_class, _p_method) \
 UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, float, UA_TYPES_FLOAT) \
@@ -298,6 +318,16 @@ UA_WRPROXY_HEAD(_p_class, _p_method) \
 UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
 UA_WRPROXY_TAIL()
     
+#define UA_WRPROXY_INT64(_p_class, _p_method) \
+UA_WRPROXY_HEAD(_p_class, _p_method) \
+UA_WRPROXY_SIMPLEBODY(_p_method, int64_t); \
+UA_WRPROXY_TAIL()
+
+#define UA_WRPROXY_UINT64(_p_class, _p_method) \
+UA_WRPROXY_HEAD(_p_class, _p_method) \
+UA_WRPROXY_SIMPLEBODY(_p_method, uint64_t); \
+UA_WRPROXY_TAIL()
+
 #define UA_WRPROXY_BOOL(_p_class, _p_method) \
 UA_WRPROXY_HEAD(_p_class, _p_method) \
 UA_WRPROXY_SIMPLEBODY(_p_method, bool); \
@@ -351,6 +381,16 @@ UA_WRPROXY_TAIL()
 #define UA_WRPROXY_ARRAY_UINT32(_p_class, _p_method) \
 UA_WRPROXY_HEAD(_p_class, _p_method) \
 UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, uint32_t)\
+UA_WRPROXY_TAIL()
+
+#define UA_WRPROXY_ARRAY_INT64(_p_class, _p_method) \
+UA_WRPROXY_HEAD(_p_class, _p_method) \
+UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, int64_t)\
+UA_WRPROXY_TAIL()
+
+#define UA_WRPROXY_ARRAY_UINT64(_p_class, _p_method) \
+UA_WRPROXY_HEAD(_p_class, _p_method) \
+UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, uint64_t)\
 UA_WRPROXY_TAIL()
 
 #define UA_WRPROXY_ARRAY_FLOAT(_p_class, _p_method) \

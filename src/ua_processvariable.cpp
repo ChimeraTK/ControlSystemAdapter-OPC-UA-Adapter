@@ -99,6 +99,8 @@ string ua_processvariable::getType() {
     else if (valueType == typeid(uint16_t)) return "uint16_t";
     else if (valueType == typeid(int32_t))  return "int32_t";
     else if (valueType == typeid(uint32_t)) return "uint32_t";
+    else if (valueType == typeid(int64_t))  return "int64_t";
+    else if (valueType == typeid(uint64_t)) return "uint64_t";
     else if (valueType == typeid(float))    return "float";
     else if (valueType == typeid(double))   return "double";
     else if (valueType == typeid(string))   return "string";
@@ -174,6 +176,10 @@ void ua_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { 
  CREATE_READ_FUNCTION(int32_t)
  UA_RDPROXY_UINT32(ua_processvariable, getValue_uint32_t);
  CREATE_READ_FUNCTION(uint32_t)
+ UA_RDPROXY_INT64(ua_processvariable, getValue_int64_t);
+ CREATE_READ_FUNCTION(int64_t)
+ UA_RDPROXY_UINT64(ua_processvariable, getValue_uint64_t);
+ CREATE_READ_FUNCTION(uint64_t)
  UA_RDPROXY_FLOAT(ua_processvariable, getValue_float);
  CREATE_READ_FUNCTION(float)
  UA_RDPROXY_DOUBLE(ua_processvariable, getValue_double);
@@ -193,6 +199,10 @@ void ua_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { 
  CREATE_WRITE_FUNCTION(int32_t)
  UA_WRPROXY_UINT32(ua_processvariable, setValue_uint32_t);
  CREATE_WRITE_FUNCTION(uint32_t)
+ UA_WRPROXY_INT64(ua_processvariable, setValue_int64_t);
+ CREATE_WRITE_FUNCTION(int64_t)
+ UA_WRPROXY_UINT64(ua_processvariable, setValue_uint64_t);
+ CREATE_WRITE_FUNCTION(uint64_t)
  UA_WRPROXY_FLOAT(ua_processvariable, setValue_float);
  CREATE_WRITE_FUNCTION(float)
  UA_WRPROXY_DOUBLE(ua_processvariable, setValue_double);
@@ -213,6 +223,10 @@ UA_RDPROXY_ARRAY_INT32(ua_processvariable, getValue_Array_int32_t);
 CREATE_READ_FUNCTION_ARRAY(int32_t)
 UA_RDPROXY_ARRAY_UINT32(ua_processvariable, getValue_Array_uint32_t);
 CREATE_READ_FUNCTION_ARRAY(uint32_t)
+UA_RDPROXY_ARRAY_INT64(ua_processvariable, getValue_Array_int64_t);
+CREATE_READ_FUNCTION_ARRAY(int64_t)
+UA_RDPROXY_ARRAY_UINT64(ua_processvariable, getValue_Array_uint64_t);
+CREATE_READ_FUNCTION_ARRAY(uint64_t)
 UA_RDPROXY_ARRAY_FLOAT(ua_processvariable, getValue_Array_float);
 CREATE_READ_FUNCTION_ARRAY(float)
 UA_RDPROXY_ARRAY_DOUBLE(ua_processvariable, getValue_Array_double);
@@ -232,6 +246,10 @@ UA_WRPROXY_ARRAY_INT32(ua_processvariable, setValue_Array_int32_t);
 CREATE_WRITE_FUNCTION_ARRAY(int32_t)
 UA_WRPROXY_ARRAY_UINT32(ua_processvariable, setValue_Array_uint32_t);
 CREATE_WRITE_FUNCTION_ARRAY(uint32_t)
+UA_WRPROXY_ARRAY_INT64(ua_processvariable, setValue_Array_int64_t);
+CREATE_WRITE_FUNCTION_ARRAY(int64_t)
+UA_WRPROXY_ARRAY_UINT64(ua_processvariable, setValue_Array_uint64_t);
+CREATE_WRITE_FUNCTION_ARRAY(uint64_t)
 UA_WRPROXY_ARRAY_FLOAT(ua_processvariable, setValue_Array_float);
 CREATE_WRITE_FUNCTION_ARRAY(float)
 UA_WRPROXY_ARRAY_DOUBLE(ua_processvariable, setValue_Array_double);
@@ -353,6 +371,16 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 // 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_UINT32);
                         if(this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(uint32_t)
                         else PUSH_RDVALUE_ARRAY_TYPE(uint32_t)
+                }
+                else if (valueType == typeid(int64_t)) {
+// 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_INT64);
+                        if(this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(int64_t)
+                        else PUSH_RDVALUE_ARRAY_TYPE(int64_t)
+                }
+                else if (valueType == typeid(uint64_t)) {
+// 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_UINT64);
+                        if(this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size() == 1) PUSH_RDVALUE_TYPE(uint64_t)
+                        else PUSH_RDVALUE_ARRAY_TYPE(uint64_t)
                 }
                 else if (valueType == typeid(float)) {
 // 			vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_FLOAT);
