@@ -75,6 +75,7 @@ if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${ChimeraTK-ControlSystemAdapter_LINKER_FLAGS}")
 
 ##########################################################################################################
 ## Set the build type to Release if none is specified
@@ -109,7 +110,7 @@ endif()
 if(CMAKE_COMPILER_IS_GNUCC OR "x${CMAKE_C_COMPILER_ID}" STREQUAL "xClang")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
   add_definitions(-DNDEBUG)
   add_definitions(-fPIC)
@@ -408,5 +409,5 @@ set(${PROJECT_NAME}_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
 set(${PROJECT_NAME}_LIBRARIES "${ChimeraTK-ControlSystemAdapter_LIBRARIES}")
 set(${PROJECT_NAME}_LIBRARY_DIRS "${CMAKE_INSTALL_PREFIX}/lib ${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS}")
 set(${PROJECT_NAME}_CXX_FLAGS "${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
-set(${PROJECT_NAME}_LINKER_FLAGS "-Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib,--enable-new-dtags")
+set(${PROJECT_NAME}_LINKER_FLAGS "${ChimeraTK-ControlSystemAdapter_LINKER_FLAGS} -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib,--enable-new-dtags")
 include(${CMAKE_SOURCE_DIR}/cmake/create_cmake_config_files.cmake)
