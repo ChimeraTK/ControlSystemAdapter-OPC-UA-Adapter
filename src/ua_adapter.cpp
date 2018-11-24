@@ -134,7 +134,9 @@ void ua_uaadapter::readConfig() {
                 this->pvSeperator = this->pvSeperator + this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
             }
             string pvUnrollEnabled = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "automaticPathUnroll");
-            if(pvUnrollEnabled.compare("True") != 0){
+            string pvUnrollEnabledUpper;
+            transform(pvUnrollEnabledUpper.begin(), pvUnrollEnabledUpper.end(), pvUnrollEnabledUpper.begin(), ::toupper);
+            if(pvUnrollEnabled.compare("TRUE") != 0){
                 pvSeperator = "";
             }
         }
@@ -326,7 +328,9 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                 bool unrollPathIs = false;
                 for (auto nodeUnrollPath: nodeVectorUnrollPath) {
                     string shouldUnrollPath = this->fileHandler->getContentFromNode(nodeUnrollPath);
-                    if (shouldUnrollPath.compare("True") == 0) {
+                    string shouldUnrollPathUpper;
+                    transform(shouldUnrollPathUpper.begin(), shouldUnrollPathUpper.end(), shouldUnrollPathUpper.begin(), ::toupper);
+                    if (shouldUnrollPathUpper.compare("TRUE") == 0) {
                         seperator = seperator + this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
                         unrollPathIs = true;
                     }
