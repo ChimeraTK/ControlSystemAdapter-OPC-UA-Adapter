@@ -136,8 +136,10 @@ void ua_uaadapter::readConfig() {
             string pvUnrollEnabled = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "automaticPathUnroll");
             transform(pvUnrollEnabled.begin(), pvUnrollEnabled.end(), pvUnrollEnabled.begin(), ::toupper);
             if(pvUnrollEnabled.compare("TRUE") != 0){
-                pvSeperator = "";
+                this->pvSeperator = "";
             }
+        } else {
+            this->pvSeperator = "/";
         }
         result = this->fileHandler->getNodeSet(xpath + "//login");
         if(result) {
@@ -399,6 +401,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
 
                     ua_processvariable *processvariable;
                     if (renameVar.compare(srcVarName) == 0)
+                        //default short name based on implicit var mapping param, alternativ a hard coded delimiter '/' can be used(this->pvSeperator -> instead "/")
                         processvariable = new ua_processvariable(this->mappedServer, objectNodeId, varName, csManager,
                                                                  this->fileHandler->praseVariablePath(varName,
                                                                                                       this->pvSeperator).back());
