@@ -287,7 +287,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 
     //check if the nodeId is used by another mapping and find next free NodeId
     UA_NodeId result;
-    while(UA_Server_readDataType(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew).c_str()), &result) == UA_STATUSCODE_GOOD){
+    if(UA_Server_readDataType(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew).c_str()), &result) == UA_STATUSCODE_GOOD){
         std::cout << "Mapping error. Same mapping name used for different mappings! " << std::endl;
         return UA_STATUSCODE_BADNODEIDEXISTS;
     }
