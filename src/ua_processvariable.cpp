@@ -287,14 +287,12 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 
     //check if the nodeId is used by another mapping and find next free NodeId
     UA_NodeId result;
-    string nodeIdExtension = "";
-    int counter = 1;
-    while(UA_Server_readDataType(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew+nodeIdExtension).c_str()), &result) == UA_STATUSCODE_GOOD){
-        nodeIdExtension = to_string(counter++);
+    while(UA_Server_readDataType(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew).c_str()), &result) == UA_STATUSCODE_GOOD){
+        std::cout << "Mapping error. Same mapping name used for different mappings! " << std::endl;
+        return UA_STATUSCODE_BADNODEIDEXISTS;
     }
-    this->nameNew += nodeIdExtension;
     UA_INSTATIATIONCALLBACK(icb);
-    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew).c_str()),//UA_NODEID_NUMERIC(1, 0)
+    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew+"Value").c_str()),//UA_NODEID_NUMERIC(1, 0)
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME(1, (char *) this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, &icb, &createdNodeId);
     //know your own nodeId

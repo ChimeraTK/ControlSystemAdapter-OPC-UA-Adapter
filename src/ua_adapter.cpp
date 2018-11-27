@@ -285,17 +285,25 @@ UA_NodeId ua_uaadapter::enrollFolderPathFromString(string path, string seperator
 void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
     vector<int32_t> mappedVariableIndex = findMappingIndex(varName);
     //there is no mapping entry contained in the xml file
-    if (mappedVariableIndex.empty()) {//no mapping node exists in xml file
+    if (this->pvSeperator.compare("") != 0) {//implicit var mapping is enabled
         UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeperator);
         ua_processvariable *processvariable;
-        if(!UA_NodeId_isNull(&folderPathNodeId)){
-            processvariable = new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1) , csManager, this->fileHandler->praseVariablePath(varName, this->pvSeperator).back());
+        if (!UA_NodeId_isNull(&folderPathNodeId)) {
+            processvariable = new ua_processvariable(this->mappedServer, folderPathNodeId,
+                                                     varName.substr(1, varName.size() - 1), csManager,
+                                                     this->fileHandler->praseVariablePath(varName,
+                                                                                          this->pvSeperator).back());
         } else {
-            processvariable = new ua_processvariable(this->mappedServer, this->ownNodeId, varName.substr(1, varName.size() - 1), csManager);
+            processvariable = new ua_processvariable(this->mappedServer, this->ownNodeId,
+                                                     varName.substr(1, varName.size() - 1), csManager);
         }
-        UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(), UA_LOCALIZEDTEXT((char*) "en_US", (char *) this->fileHandler->praseVariablePath(varName, this->pvSeperator).back().c_str()));
+        UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
+                                   UA_LOCALIZEDTEXT((char *) "en_US",
+                                                    (char *) this->fileHandler->praseVariablePath(varName,
+                                                                                                  this->pvSeperator).back().c_str()));
         this->variables.push_back(processvariable);
-    } else { //mapping node exists in xml file
+    }
+    if(!mappedVariableIndex.empty()) { //mapping node exists in xml file
         xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
         xmlNodeSetPtr nodeset;
         if (result) {
