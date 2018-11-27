@@ -273,7 +273,7 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
         if(!UA_NodeId_isNull(&folderPathNodeId)){
             processvariable = new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1) , csManager, this->fileHandler->praseVariablePath(varName, this->pvSeperator).back());
         } else {
-            processvariable = new ua_processvariable(this->mappedServer, this->variablesListId, varName.substr(1, varName.size() - 1), csManager);
+            processvariable = new ua_processvariable(this->mappedServer, this->ownNodeId, varName.substr(1, varName.size() - 1), csManager);
         }
         UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(), UA_LOCALIZEDTEXT((char*) "en_US", (char *) this->fileHandler->praseVariablePath(varName, this->pvSeperator).back().c_str()));
         this->variables.push_back(processvariable);
@@ -485,13 +485,13 @@ UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
                             UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
                             UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &icb, &createdNodeId);
 
-        UA_ObjectAttributes attr;
+/*        UA_ObjectAttributes attr;
         UA_ObjectAttributes_init(&attr);
         attr.displayName = UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Variables");
         attr.description = UA_LOCALIZEDTEXT((char *) "", (char *) "");
         UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char*) (this->serverConfig.rootFolder+"/Variables").c_str()),
                                 createdNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char *) "Variables"),
-                                UA_NODEID_NUMERIC(0, 61), attr, &icb, &this->variablesListId);
+                                UA_NODEID_NUMERIC(0, 61), attr, &icb, &this->variablesListId); */
         this->ownNodeId = createdNodeId;
         // Nodes "Variables" where created on object instantiation, we need these IDs to add new process variables to them...
         //UA_NodeId_copy(nodePairList_getTargetIdBySourceId(this->ownedNodes, UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLES)), &this->variablesListId);
