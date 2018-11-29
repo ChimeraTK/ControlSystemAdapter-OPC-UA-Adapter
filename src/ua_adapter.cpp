@@ -177,6 +177,9 @@ void ua_uaadapter::readConfig() {
                 else {
                         cout << "No 'applicationName'-Attribute is set in config file. Use default Applicationname." << endl;
                 }
+                if (this->serverConfig.rootFolder.empty()) { //if no root folder name is set, use application name
+                    this->serverConfig.rootFolder = this->serverConfig.applicationName;
+                }
         }
         else {
                 cout << "No <serverConfig>-Tag in config file. Use default port 16664 and application name configuration." << endl;
