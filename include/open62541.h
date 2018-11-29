@@ -1,6 +1,6 @@
 /* THIS IS A SINGLE-FILE DISTRIBUTION CONCATENATED FROM THE OPEN62541 SOURCES
  * visit http://open62541.org/ for information about this software
- * Git-Revision: v0.2-57-g4da3b50
+ * Git-Revision: v0.2.2
  */
 
 /*
@@ -38,9 +38,9 @@ extern "C" {
  * --------------- */
 #define UA_OPEN62541_VER_MAJOR 0
 #define UA_OPEN62541_VER_MINOR 2
-#define UA_OPEN62541_VER_PATCH 0
-#define UA_OPEN62541_VER_LABEL "dev" /* Release candidate label, etc. */
-#define UA_OPEN62541_VER_COMMIT "v0.2-57-g4da3b50"
+#define UA_OPEN62541_VER_PATCH 2
+#define UA_OPEN62541_VER_LABEL "" /* Release candidate label, etc. */
+#define UA_OPEN62541_VER_COMMIT "v0.2.2"
 
 /**
  * Options
@@ -1789,7 +1789,7 @@ UA_Guid UA_EXPORT UA_Guid_random(void);     /* no cryptographic entropy */
  * /home/iosb/sw/open62541/build/src_generated/ua_nodeids.hgen -- do not modify
  **********************************************************
  * Generated from /home/iosb/sw/open62541/tools/schema/NodeIds.csv with script /home/iosb/sw/open62541/tools/generate_nodeids.py
- * on host iosb-VirtualBox by user iosb at 2018-08-29 05:32:08
+ * on host iosb-VirtualBox by user iosb at 2018-11-29 10:33:08
  **********************************************************/
  
 
@@ -3069,7 +3069,7 @@ UA_Guid UA_EXPORT UA_Guid_random(void);     /* no cryptographic entropy */
 /*********************************** amalgamated original file "/home/iosb/sw/open62541/build/src_generated/ua_types_generated.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd with script /home/iosb/sw/open62541/tools/generate_datatypes.py
- * on host iosb-VirtualBox by user iosb at 2018-08-29 05:32:08 */
+ * on host iosb-VirtualBox by user iosb at 2018-11-29 10:33:07 */
 
 
 #ifdef __cplusplus
@@ -5189,7 +5189,7 @@ typedef struct {
 /*********************************** amalgamated original file "/home/iosb/sw/open62541/build/src_generated/ua_types_generated_handling.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd with script /home/iosb/sw/open62541/tools/generate_datatypes.py
- * on host iosb-VirtualBox by user iosb at 2018-08-29 05:32:08 */
+ * on host iosb-VirtualBox by user iosb at 2018-11-29 10:33:07 */
 
 
 #ifdef __cplusplus
