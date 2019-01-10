@@ -37,25 +37,16 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
 
-csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
-	
-	this->csManager = csManager; 	
-	this->csa_opcua_adapter_InitServer(configFile);
-	this->csa_opcua_adapter_InitVarMapping();
-	
-	this->mgr->doStart(); // Implicit: Startet Worker-Threads aller ipc_managed_objects, die mit addObject registriert wurden  
-}
+csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager,
+                                     string configFile) {
+    this->csManager = csManager; 	
+    this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
 
-void csa_opcua_adapter::csa_opcua_adapter_InitServer(string configFile) {
-	this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
+    // Create new server adapter
+    this->adapter = new ua_uaadapter(configFile);
 
-	// Create new server adapter
-	this->adapter = new ua_uaadapter(configFile);
-	this->mgr->addObject(this->adapter);
-}
-
-void csa_opcua_adapter::csa_opcua_adapter_InitVarMapping() {
-    // Get all ProcessVariables
+    // Initialize the process variables
+    // This internally starts the managed threads in the mgr...
     vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
   
     for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
@@ -63,18 +54,21 @@ void csa_opcua_adapter::csa_opcua_adapter_InitVarMapping() {
     }
     
     vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
-		if(allNotMappedVariables.size() > 0) {
-			cout << "The following VariableNodes cant be mapped, because they are not member in PV-Manager:" << endl;
-			for(string var:allNotMappedVariables) {
-				cout << var << endl;
-			}
-		}
+    if(allNotMappedVariables.size() > 0) {
+        cout << "The following VariableNodes cant be mapped, "
+            "because they are not member in PV-Manager:" << endl;
+        for(string var:allNotMappedVariables) {
+            cout << var << endl;
+        }
+    }
+
+    // add the managed ipc thread only now
+    this->mgr->addObject(this->adapter);
+    this->mgr->startAll();
 }
 
 csa_opcua_adapter::~csa_opcua_adapter() {
-	
 	this->adapter->~ua_uaadapter();
-	
 	this->mgr->~ipc_manager();
 }
 
