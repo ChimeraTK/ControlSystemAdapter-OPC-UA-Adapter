@@ -199,35 +199,17 @@ void ua_uaadapter::workerThread() {
                 return;
         }
 
-        UA_Boolean runUAServer = UA_TRUE;
+        cout << "Starting the server worker thread" << endl;
 
-// 		std::packaged_task<UA_StatusCode(UA_Server*, UA_Boolean*)> task(UA_Server_run);
-//    std::future<UA_StatusCode> result = task.get_future();
-//    std::thread *serverThread = new std::thread (std::move(task), this->mappedServer, &runUAServer);
+        UA_Server_run_startup(this->mappedServer);
 
-                //std::future<UA_StatusCode> serverThread = std::async(std::launch::async, UA_Server_run, this->mappedServer, &runUAServer);
-
-
-        thread *serverThread = new std::thread(UA_Server_run, this->mappedServer, &runUAServer);
-//  		std::future<UA_StatusCode> serverThread = std::async(std::launch::async, UA_Server_run, this->mappedServer, &runUAServer);
-//  		if(serverThread.get() != UA_STATUSCODE_GOOD) {
-//  			cout << "Error during establishing the network interface." << endl;
-//  			exit(0);
-//   		}
-
-        while (runUAServer == true) {
-                 if (! this->isRunning()) {
-                         runUAServer = false;
-                }
-                sleep(1);
+        while(this->isRunning()) {
+            UA_Server_run_iterate(this->mappedServer, true);
         }
 
-        if (serverThread->joinable()) {
-        serverThread->join();
-  }
+        UA_Server_run_shutdown(this->mappedServer);
 
-        delete serverThread;
-        serverThread = NULL;
+        cout << "Stopped the server worker thread" << endl;
 }
 
 void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {

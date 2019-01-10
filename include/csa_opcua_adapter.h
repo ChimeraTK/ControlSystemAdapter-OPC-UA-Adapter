@@ -48,21 +48,6 @@ private:
 	ua_uaadapter *adapter;
 	boost::shared_ptr<ControlSystemPVManager> csManager;
 	
-	/**
-	 * @brief This method starts the OPC UA Server with the defined port from mapping-file. 
-	 * For this, the server starts his own thread.
-	 * 
-	 * @param configFile Define the path to the mapping-file with config and mapping information
-	 */ 
-	void csa_opcua_adapter_InitServer(string configFile);
-	
-	/**
-	 * @brief To map all processvariables from controlsystemadapter to the OPC UA server the Method takes all variable 
-	 * and put these in a flat list. For better a better workflow in connection with the mapping-file the defined 
-	 * processvaribale are mapped in special folder, will be renamed, get description or a other engineering unit.
-	 */
-	void csa_opcua_adapter_InitVarMapping();
-    
 public:
 	/**
 	 * @brief Constructor for ControlSystemAdapter-OPC-UA-Adapter

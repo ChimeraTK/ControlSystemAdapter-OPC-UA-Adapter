@@ -56,6 +56,7 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 #include "csa_opcua_adapter.h"
+#include "ipc_manager.h"
 
 boost::shared_ptr<ControlSystemPVManager> csManager;
 boost::shared_ptr<DevicePVManager> devManager;
