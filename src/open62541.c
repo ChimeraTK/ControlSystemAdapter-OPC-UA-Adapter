@@ -1,6 +1,6 @@
 /* THIS IS A SINGLE-FILE DISTRIBUTION CONCATENATED FROM THE OPEN62541 SOURCES
  * visit http://open62541.org/ for information about this software
- * Git-Revision: v0.2-57-g4da3b50
+ * Git-Revision: v0.2.2
  */
 
 /*
@@ -867,7 +867,7 @@ size_t UA_calcSizeBinary(void *p, const UA_DataType *type);
 /*********************************** amalgamated original file "/home/iosb/sw/open62541/build/src_generated/ua_types_generated_encoding_binary.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd with script /home/iosb/sw/open62541/tools/generate_datatypes.py
- * on host iosb-VirtualBox by user iosb at 2018-08-29 05:32:08 */
+ * on host iosb-VirtualBox by user iosb at 2018-11-29 10:33:07 */
 
 
 /* Boolean */
@@ -2503,7 +2503,7 @@ UA_QueryFirstRequest_decodeBinary(const UA_ByteString *src, size_t *offset, UA_Q
 /*********************************** amalgamated original file "/home/iosb/sw/open62541/build/src_generated/ua_transport_generated.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd, Custom.Opc.Ua.Transport.bsd with script /home/iosb/sw/open62541/tools/generate_datatypes.py
- * on host iosb-VirtualBox by user iosb at 2018-08-29 05:32:08 */
+ * on host iosb-VirtualBox by user iosb at 2018-11-29 10:33:06 */
 
 
 #ifdef __cplusplus
@@ -2675,7 +2675,7 @@ typedef struct {
 /*********************************** amalgamated original file "/home/iosb/sw/open62541/build/src_generated/ua_transport_generated_handling.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd, Custom.Opc.Ua.Transport.bsd with script /home/iosb/sw/open62541/tools/generate_datatypes.py
- * on host iosb-VirtualBox by user iosb at 2018-08-29 05:32:08 */
+ * on host iosb-VirtualBox by user iosb at 2018-11-29 10:33:06 */
 
 
 #ifdef __cplusplus
@@ -3007,7 +3007,7 @@ UA_SecureConversationMessageHeader_delete(UA_SecureConversationMessageHeader *p)
 /*********************************** amalgamated original file "/home/iosb/sw/open62541/build/src_generated/ua_transport_generated_encoding_binary.h" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd, Custom.Opc.Ua.Transport.bsd with script /home/iosb/sw/open62541/tools/generate_datatypes.py
- * on host iosb-VirtualBox by user iosb at 2018-08-29 05:32:08 */
+ * on host iosb-VirtualBox by user iosb at 2018-11-29 10:33:06 */
 
 
 /* SecureConversationMessageAbortBody */
@@ -3986,8 +3986,6 @@ void UA_NodeStore_delete(UA_NodeStore *ns);
 UA_Node * UA_NodeStore_newNode(UA_NodeClass nodeClass);
 #define UA_NodeStore_newObjectNode() \
     (UA_ObjectNode*)UA_NodeStore_newNode(UA_NODECLASS_OBJECT)
-#define UA_NodeStore_newVariableNode() \
-    (UA_VariableNode*)UA_NodeStore_newNode(UA_NODECLASS_VARIABLE)
 #define UA_NodeStore_newMethodNode() \
     (UA_MethodNode*)UA_NodeStore_newNode(UA_NODECLASS_METHOD)
 #define UA_NodeStore_newObjectTypeNode() \
@@ -4000,6 +3998,17 @@ UA_Node * UA_NodeStore_newNode(UA_NodeClass nodeClass);
     (UA_DataTypeNode*)UA_NodeStore_newNode(UA_NODECLASS_DATATYPE)
 #define UA_NodeStore_newViewNode() \
     (UA_ViewNode*)UA_NodeStore_newNode(UA_NODECLASS_VIEW)
+
+/* Enable read/write AccessLevel flags for variables by default. More complete
+ * access control is added starting in the 0.3 branch. */
+static UA_VariableNode *
+UA_NodeStore_newVariableNode(void) {
+    UA_VariableNode *vn = (UA_VariableNode*)
+        UA_NodeStore_newNode(UA_NODECLASS_VARIABLE);
+    if(vn)
+        vn->accessLevel = 3; /* Enable read/write */
+    return vn;
+}
 
 /* Delete an editable node. */
 void UA_NodeStore_deleteNode(UA_Node *node);
@@ -7578,7 +7587,7 @@ UA_calcSizeBinary(void *p, const UA_DataType *type) {
 /*********************************** amalgamated original file "/home/iosb/sw/open62541/build/src_generated/ua_types_generated.c" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd with script /home/iosb/sw/open62541/tools/generate_datatypes.py
- * on host iosb-VirtualBox by user iosb at 2018-08-29 05:32:08 */
+ * on host iosb-VirtualBox by user iosb at 2018-11-29 10:33:07 */
 
 
 /* Boolean */
@@ -14406,7 +14415,7 @@ const UA_DataType UA_TYPES[UA_TYPES_COUNT] = {
 /*********************************** amalgamated original file "/home/iosb/sw/open62541/build/src_generated/ua_transport_generated.c" ***********************************/
 
 /* Generated from Opc.Ua.Types.bsd, Custom.Opc.Ua.Transport.bsd with script /home/iosb/sw/open62541/tools/generate_datatypes.py
- * on host iosb-VirtualBox by user iosb at 2018-08-29 05:32:08 */
+ * on host iosb-VirtualBox by user iosb at 2018-11-29 10:33:06 */
 
 
 /* SecureConversationMessageAbortBody */
