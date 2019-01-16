@@ -1,95 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <uamapping>
-	<config rootFolder="llrfCtrl_hzdr" description="Test application for the digital LLRF system at ELBE / HZDR">
-		<server applicationName="LLRFServer" port="16660" />
+	<config rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
+		<serverConfig applicationName="OPCUAServer" port="16660" />
 		<login username="test" password="test123" />
-		<process_variable_hierarchy>
-			<unroll pathSep="/">True</unroll>
-		</process_variable_hierarchy>
-		<mapping_exceptions>True</mapping_exceptions>
+
+		<pvVariablesHandling automaticPathUnroll="True">
+			<pvPathSeperator pathSep="/" />
+			<pvPathSeperator pathSep="_" />
+		</pvVariablesHandling>
 	</config>
-
-    <!-- create folder -->
-	<folder>
-		<destination>A/B</destination>
-		<name>C</name>
-		<description>Folder description</description>
-	</folder>
-	<!-- update folder description of created folder 'B' -->
-	<folder>
-		<destination>A</destination>
-		<name>B</name>
-		<description>Description of B</description>
-	</folder>
-	<!-- update folder description of created folder 'A' -->
-	<folder>
-		<name>A</name>
-		<description>Description of A</description>
-	</folder>
-
-	<!-- hierarchical map of complete structure (copy=false)-->
-	<folder sourceName="Mein" copy="false">
-		<destination>A/B</destination>
-	</folder>
-
-	<!-- hierarchical map of complete structure (copy=true)-->
-	<folder sourceName="Dein" copy="true">
-		<destination>A</destination>
-	</folder>
-
-    <!-- Error, copy with false 'option', names not equal -->
-    <process_variable sourceName="Dein/Name/ist/uint8Array_s10" copy="false">
-        <destination>folderB/folderC</destination>
-        <name>varA</name>
-        <unit>K</unit>
-        <description>newA</description>
-    </process_variable>
-
-    <!-- ref in new folder -->
-    <process_variable sourceName="Dein/Name/ist/uint8Array_s10" copy="false">
-        <destination>folderB/folderC</destination>
-        <name>uint8Array_s10</name>
-        <unit>K</unit>
-        <description>newA</description>
-    </process_variable>
-
-    <!-- ref in existing folder -->
-	<process_variable sourceName="Dein/Name/ist/uint8Array_s10" copy="false">
-		<destination>A/B</destination>
-		<name>uint8Array_s10</name>
-		<unit>K</unit>
-		<description>newA</description>
-	</process_variable>
-
-	<!-- update existing pv -->
-	<process_variable sourceName="A/B/uint8Array_s10" copy="false">
-		<destination>A/B</destination>
-		<name>uint8Array_s10</name>
-		<unit>F</unit>
-		<description>update description</description>
-	</process_variable>
-
-	<!-- minimal process var test  TODO adjust, currently is the destination needed
-	<process_variable sourceName="A/B/uint8Array_s10" copy="true">
-		<name>varB</name>
-	</process_variable>
-	-->
-
-	<process_variable sourceName="Dein/Name/ist/uint8Array_s10" copy="true">
-		<destination>folderB</destination>
-		<name>varA</name>
-		<unit>K</unit>
-		<description>newA</description>
-	</process_variable>
-
-	<additional_variable>
-		<destination>A/B</destination>
-		<name>test</name>
-		<description>New information of AV</description>
-		<value>1</value>
-	</additional_variable>
-
-	<!--- START OF OLD CONFIGURATION PART -->
 
 	<additionalNodes folderName="AdditionalNodesFolder" description="DescriptionOfAdditionalNodes">
 		<variable name="BrowseName1" description="myDescription1" value="Wert1" />

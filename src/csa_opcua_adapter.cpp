@@ -49,9 +49,17 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
     // This internally starts the managed threads in the mgr...
     vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
 
+    //start implicit var mapping
     for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
-        adapter->addVariable(oneProcessVariable->getName(), this->csManager);
+        //adapter->addVariable(oneProcessVariable->getName(), this->csManager);
+        adapter->implicitVarMapping(oneProcessVariable->getName(), this->csManager);
     }
+    //build folder structure
+    adapter->buildFolderStructure(this->csManager);
+    //start explicit mapping
+    adapter->explicitVarMapping(this->csManager);
+    //add configured additional variables
+    adapter->addAdditionalVariables();
 
     vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
     if(allNotMappedVariables.size() > 0) {

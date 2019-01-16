@@ -16,6 +16,7 @@
  * 
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
+ * Copyright (c) 2019 Andreas Ebner  <Andreas.Ebner@iosb-extern.fraunhofer.de>
  */
 
 #ifndef MTCA_UAADAPTER_H
@@ -71,7 +72,7 @@ struct ServerConfig {
         UA_Boolean	UsernamePasswordLogin = UA_FALSE;
         string password = "";
         string username = "";
-        string applicationName = "OPCUA Adapter";
+        string applicationName = "OPCUA-Adapter";
         uint16_t opcuaPort = 16664;
 };
 
@@ -101,6 +102,7 @@ private:
         vector<FolderInfo>			folderVector;
         UA_NodeId								ownNodeId;
         string                              pvSeperator;
+        UA_Boolean                               mappingExceptions;
 
         ServerConfig 						serverConfig;
 
@@ -205,6 +207,29 @@ public:
         * @param folderPathVector Every single string is a folder name, the path ist checked in the given order
         */
         void addVariable(string name, boost::shared_ptr<ControlSystemPVManager> csManager);
+
+        /** @brief Start implicit mapping process
+        *
+        * @param basenodeId Node id of the parent node
+        * @param folderPathVector Every single string is a folder name, the path ist checked in the given order
+        */
+        void implicitVarMapping(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager);
+
+        //TODO add description
+        void explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> csManager);
+
+        //TODO add additional variables
+        void addAdditionalVariables();
+
+        //TODO add description
+        void buildFolderStructure(boost::shared_ptr<ControlSystemPVManager> csManager);
+
+        //TODO add description
+        void deepCopyHierarchicalLayer(boost::shared_ptr<ControlSystemPVManager> csManager, UA_NodeId layer, UA_NodeId target);
+
+        //TODO add description or move to a new utilite file
+        UA_NodeId findSingleChildNode(UA_QualifiedName targetName, UA_NodeId referenceTypeId, UA_NodeId startingNode);
+
 
         /** @brief Methode that returns the node id of the instanced class
         *
