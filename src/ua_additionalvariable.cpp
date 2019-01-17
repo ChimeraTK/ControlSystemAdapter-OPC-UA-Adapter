@@ -16,6 +16,7 @@
  * 
  * Copyright (c) 2016 Chris Iatrou   <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm    <Julian.Rahm@tu-dresden.de>
+ * Copyright (c) 2019 Andreas Ebner <Andreas.Ebner@iosb-extern.fraunhofer.de>
  */
 
 #include "ua_additionalvariable.h"
@@ -58,45 +59,40 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
     UA_NodeId createdNodeId = UA_NODEID_NULL;
 		
     if (UA_NodeId_equal(&this->baseNodeId, &createdNodeId) == UA_TRUE) 
-        return 0; // Something went UA_WRING (initializer should have set this!)
+        return UA_STATUSCODE_BADINVALIDARGUMENT; // Something went UA_WRING (initializer should have set this!)
 
 	//Generate additional variable node id
 	UA_String baseNodeIdString = baseNodeId.identifier.string;
 	string baseNodeIdStringCPP;
 	UASTRING_TO_CPPSTRING(baseNodeIdString, baseNodeIdStringCPP);
-		
-    // Create our toplevel instance
-    /*
-    UA_ObjectAttributes oAttr; 
-	UA_ObjectAttributes_init(&oAttr);
-    oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->name.c_str());
-    oAttr.description = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->description.c_str());
-    */
 
-    cout << "addvar value "<< this->value << endl;
-    UA_String *opcua_node_variable_t_ns_2_i_6002_variant_DataContents =  UA_String_new();
-    *opcua_node_variable_t_ns_2_i_6002_variant_DataContents = UA_STRING_ALLOC(this->value.c_str());
+    UA_String *opcua_node_variable_t_ns_2_variant_DataContents =  UA_String_new();
+    *opcua_node_variable_t_ns_2_variant_DataContents = UA_STRING_ALLOC(this->value.c_str());
     UA_VariableAttributes vAttr;
     UA_VariableAttributes_init(&vAttr);
     vAttr.displayName = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->name.c_str());
     vAttr.description = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->description.c_str());
     vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
-    UA_Variant_setScalar(&vAttr.value, opcua_node_variable_t_ns_2_i_6002_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
-
+    UA_Variant_setScalar(&vAttr.value, opcua_node_variable_t_ns_2_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
 
     UA_INSTATIATIONCALLBACK(icb);
 
 	UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/additionalvariable").c_str()), this->baseNodeId,
                               UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()),
                               UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), vAttr ,&icb, &createdNodeId);
-
-	/*
-	UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/additionalvariable").c_str()),
-			this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-			UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), oAttr, &icb, &createdNodeId);
-    */
-
 	this->ownNodeId = createdNodeId;
+
+    UA_VariableAttributes_init(&vAttr);
+    vAttr.displayName = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*) "description");
+    vAttr.description = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->description.c_str());
+    vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
+    UA_String addVarDescription = UA_STRING_ALLOC(description.c_str());
+    UA_Variant_setScalar(&vAttr.value, &addVarDescription, &UA_TYPES[UA_TYPES_STRING]);
+
+    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/additionalvariable/description").c_str()),
+            this->ownNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+            UA_QUALIFIEDNAME_ALLOC(1, this->description.c_str()),
+            UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, NULL, &createdNodeId);
 		
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
