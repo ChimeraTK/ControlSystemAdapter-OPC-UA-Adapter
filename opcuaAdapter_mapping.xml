@@ -142,12 +142,74 @@ Default cases:
 		<value></value>
 	</additional_variable>
 
+	<!-- E1
+	<additional_variable>
+		<name>av_d4</name>
+	</additional_variable>-->
+	<!-- E2
+	<additional_variable>
+		<destination>A</destination>
+		<value>av_value</value>
+	</additional_variable> -->
+	<!-- E2.1
+	<additional_variable>
+		<name></name>
+		<destination>A</destination>
+		<value>av_value</value>
+	</additional_variable>-->
+
+	<!-- general additional variable test -->
 	<additional_variable>
 		<destination>A/B</destination>
 		<name>test</name>
 		<description>New information of AV</description>
 		<value>1</value>
 	</additional_variable>
+
+
+<!-- (3) Folder without source
+  Information:
+   - the path seperator for the destination tag is "/"
+   - the destination can include a folder hierachy that is created on the fligth
+   - allows to add a folder with or without a description
+   - allows to change the description of an existing folder
+
+  Error cases:
+   1. name is missing or is empty
+
+  Default cases:
+   1. Description -> empty description
+   2. Destination -> folder is created in the root folder
+-->
+
+	<!-- D1 -->
+	<folder>
+		<destination>B</destination>
+		<name>C</name>
+	</folder>
+	<folder>
+		<destination>B</destination>
+		<name>D</name>
+		<description></description>
+	</folder>
+	<!-- D2 -->
+	<folder>
+		<name>D</name>
+		<description>Folder Description</description>
+	</folder>
+	<folder>
+		<name>E</name>
+		<description>Folder Description</description>
+	</folder>
+	<!-- D3 -->
+	<folder>
+		<name>F</name>
+	</folder>
+	<folder>
+		<name>G</name>
+		<description></description>
+		<destination></destination>
+	</folder>
 
 	<!--- START OF OLD CONFIGURATION PART -->
 
