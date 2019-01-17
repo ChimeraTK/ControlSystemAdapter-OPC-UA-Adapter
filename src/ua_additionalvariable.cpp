@@ -77,7 +77,7 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
 
     UA_INSTATIATIONCALLBACK(icb);
 
-	UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/additionalvariable").c_str()), this->baseNodeId,
+	retval |= UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/"+name+"/additionalvariable").c_str()), this->baseNodeId,
                               UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()),
                               UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), vAttr ,&icb, &createdNodeId);
 	this->ownNodeId = createdNodeId;
@@ -89,7 +89,7 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
     UA_String addVarDescription = UA_STRING_ALLOC(description.c_str());
     UA_Variant_setScalar(&vAttr.value, &addVarDescription, &UA_TYPES[UA_TYPES_STRING]);
 
-    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/additionalvariable/description").c_str()),
+    retval |= UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/"+name+"/additionalvariable/description").c_str()),
             this->ownNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME_ALLOC(1, this->description.c_str()),
             UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, NULL, &createdNodeId);
@@ -100,7 +100,7 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
 	
 	this->ua_mapDataSources((void *) this, &mapDs);
 	
-	return UA_STATUSCODE_GOOD;
+	return retval;
 }
 	
 

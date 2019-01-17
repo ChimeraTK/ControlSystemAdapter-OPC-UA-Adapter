@@ -750,8 +750,14 @@ void ua_uaadapter::addAdditionalVariables() {
                 value = this->fileHandler->getContentFromNode(nodeValue[0]);
             }
             cout << "current additional " << destination << " " << name << " " << description << " " << value << endl;
-            UA_NodeId additionalVarFolderPath = enrollFolderPathFromString(destination+"/removePart", "/");
+            UA_NodeId additionalVarFolderPath = UA_NODEID_NULL;
+            if(!destination.empty()){
+                additionalVarFolderPath = enrollFolderPathFromString(destination+"/removePart", "/");
+            } else {
+                additionalVarFolderPath = UA_NODEID_STRING(1, (char *) this->serverConfig.rootFolder.c_str());
+            }
             if(UA_NodeId_isNull(&additionalVarFolderPath)){
+                cout << "created folder node id was null " << endl;
                 //TODO error handling
             }
             cout << "add new additional var "<< value << endl;

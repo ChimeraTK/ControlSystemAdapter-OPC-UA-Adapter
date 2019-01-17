@@ -82,6 +82,66 @@
 		<description>newA</description>
 	</process_variable>
 
+<!-- Additional variable section
+Information:
+- the path seperator for the destination tag is "/"
+- the destination can include a folder hierachy that is created on the fligth
+- variable type is ctkAdditionalVariable (UAString)
+- value should be assigned directly to the additional variable (no subnode named value)
+
+Error cases:
+	E1. PV with same name exists
+	E2. name is missing or is empty
+
+Default cases:
+	D1. Description -> description empty
+	D2. Destination -> variable is created in the root folder
+	D3. Value -> empty string
+-->
+
+	<!-- D1 -->
+	<additional_variable>
+		<name>av_d1</name>
+		<destination>A</destination>
+		<value>av_value</value>
+	</additional_variable>
+	<additional_variable>
+		<name>av_d1_1</name>
+		<destination>A</destination>
+		<description></description>
+		<value>av_value</value>
+	</additional_variable>
+	<!-- D2 -->
+	<additional_variable>
+		<name>av_d2</name>
+		<value>av_value</value>
+	</additional_variable>
+	<additional_variable>
+		<name>av_d2_1</name>
+		<destination></destination>
+		<value>av_value</value>
+	</additional_variable>
+	<!-- D3 -->
+	<additional_variable>
+		<name>av_d3</name>
+		<destination>A</destination>
+	</additional_variable>
+	<additional_variable>
+		<name>av_d3_1</name>
+		<destination>A</destination>
+		<value></value>
+	</additional_variable>
+	<!-- D1, D2, D3 -->
+	<additional_variable>
+		<name>av_d4</name>
+	</additional_variable>
+	<additional_variable>
+		<name>av_d4_1</name>
+		<destination></destination>
+		<description></description>
+		<value></value>
+	</additional_variable>
+
 	<additional_variable>
 		<destination>A/B</destination>
 		<name>test</name>
