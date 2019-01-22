@@ -6,7 +6,7 @@
 		<process_variable_hierarchy>
 			<unroll pathSep="/">True</unroll>
 		</process_variable_hierarchy>
-		<mapping_exceptions>True</mapping_exceptions>
+		<mapping_exceptions>False</mapping_exceptions>
 	</config>
 
     <!-- create folder -->
@@ -82,22 +82,113 @@
 		<description>newA</description>
 	</process_variable>
 
-<!-- Additional variable section
-Information:
-- the path seperator for the destination tag is "/"
-- the destination can include a folder hierachy that is created on the fligth
-- variable type is ctkAdditionalVariable (UAString)
-- value should be assigned directly to the additional variable (no subnode named value)
+<!-- (1) Process variable options
+  Information:
+	- the path seperator for the destination tag is "/"
+	- the destination can include a folder hierachy that is created on the flight
+	- the given name is used without any modifications, e.g. myVars/myVar will result in a
+	  variable with the name myVars/myVar and no folder myVars is created
 
-Error cases:
-	E1. PV with same name exists
-	E2. name is missing or is empty
+  Error cases:
+   1. no sourceName attribute
+   2. sourceName attribute with no corresponding PV
+   3. source and new PV are the same and copy="True" (see below)
+   4. sourceName of the PV and new name are different and copy="False"
 
-Default cases:
-	D1. Description -> description empty
-	D2. Destination -> variable is created in the root folder
-	D3. Value -> empty string
+  Default cases:
+   1. Copy attribute -> copy="False"
+   2. Description -> description from source PV
+   3. Unit -> unit from source PV
+   4. Name -> Use pv name from sourceName attribute (here: varA)
+   5. Destination -> pv is created in root directory
 -->
+
+	<!-- D1 -->
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10">
+		<destination>A</destination>
+		<name>ist_uint8Array_s10</name>
+		<description>Test Desc D1</description>
+		<unit>U1</unit>
+	</process_variable>
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10">
+		<destination>B</destination>
+		<name>ist_uint8Array_s10</name>
+		<description>Test Desc D1.1</description>
+		<unit>U1.1</unit>
+	</process_variable>
+    <!-- D2  TODO copy description from original node-->
+    <process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+        <destination>D</destination>
+        <name>ist_uint8Array_s10</name>
+        <unit>U2</unit>
+    </process_variable>
+    <process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+        <destination>E</destination>
+        <name>ist_uint8Array_s10</name>
+        <description></description>
+        <unit>U2.1</unit>
+    </process_variable>
+	<!-- D3 -->
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+		<destination>F</destination>
+		<name>ist_uint8Array_s10</name>
+		<description>update description</description>
+	</process_variable>
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+		<destination>G</destination>
+		<name>ist_uint8Array_s10</name>
+		<description>update description</description>
+		<unit></unit>
+	</process_variable>
+	<!-- D4 -->
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+		<destination>A/B</destination>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+		<destination>A/Dein</destination>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<!-- D5 -->
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+		<name>ist_uint8Array_s10</name>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+		<name>ist_uint8Array_s10</name>
+		<destination></destination>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<!-- D6 -->
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="">
+	</process_variable>
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="">
+		<name></name>
+		<destination></destination>
+		<description></description>
+		<unit></unit>
+	</process_variable>
+
+	<!-- (2) Additional variable options
+    Information:
+    - the path seperator for the destination tag is "/"
+    - the destination can include a folder hierachy that is created on the fligth
+    - variable type is ctkAdditionalVariable (UAString)
+    - value should be assigned directly to the additional variable (no subnode named value)
+
+    Error cases:
+        E1. PV with same name exists
+        E2. name is missing or is empty
+
+    Default cases:
+        D1. Description -> description empty
+        D2. Destination -> variable is created in the root folder
+        D3. Value -> empty string
+    -->
 
 	<!-- D1 -->
 	<additional_variable>

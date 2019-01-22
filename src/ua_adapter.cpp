@@ -128,7 +128,7 @@ void ua_uaadapter::readConfig() {
                 nodeset->nodeTab[0]->children, "mapping_exceptions");
         placeHolder = this->fileHandler->getContentFromNode(mappingExceptionsVector[0]);
         transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
-        if(placeHolder.compare("TRUE") != 0){
+        if(placeHolder.compare("TRUE") == 0){
             this->mappingExceptions = UA_TRUE;
         } else {
             this->mappingExceptions = UA_FALSE;
@@ -345,7 +345,7 @@ void ua_uaadapter::deepCopyHierarchicalLayer(boost::shared_ptr<ControlSystemPVMa
     }
 
 
-        //copy folders of current layer
+    //copy folders of current layer
     bd.includeSubtypes = false;
     bd.nodeId = layer;
     bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
@@ -664,7 +664,6 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                 UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
                                            UA_LOCALIZEDTEXT((char *) "en_US", (char *) name.c_str()));
             } else {
-
                 //get node id of the source node
                 UA_NodeId destinationFolder = enrollFolderPathFromString(destination+"/removedpart", "/");
 
@@ -674,7 +673,10 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
 
                 cout << "srcnmae " << sourceVarName << "rename name " << name << endl;
                 if(sourceVarName.compare(name) != 0){
-                    cout << "Error! Skipping PV. The pv name can't changed if copy is false." << endl;
+                    if(this->mappingExceptions){
+                        throw std::runtime_error ("The PV name can't be changed if copy is false");
+                    }
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV. The pv name can't changed if copy is false.");
                     continue;
                 }
 
@@ -758,7 +760,11 @@ void ua_uaadapter::addAdditionalVariables() {
             }
             if(UA_NodeId_isNull(&additionalVarFolderPath)){
                 cout << "created folder node id was null " << endl;
-                //TODO error handling
+                if(this->mappingExceptions){
+                    throw std::runtime_error ("Error! Creation of additional variable folder failed.");
+                }
+                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping AV. Creation of additional variable folder failed. Skipping.");
+                continue;
             }
             cout << "add new additional var "<< value << endl;
             ua_additionalvariable *additionalvariable = new ua_additionalvariable(this->mappedServer,
