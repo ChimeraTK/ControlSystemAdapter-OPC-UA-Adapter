@@ -104,69 +104,69 @@
 -->
 
 	<!-- D1 -->
-	<process_variable sourceName="Unser/Name/ist_uint8Array_s10">
+	<process_variable sourceName="testDoubleArray_10000">
 		<destination>A</destination>
-		<name>ist_uint8Array_s10</name>
+		<name>testDoubleArray_10000</name>
 		<description>Test Desc D1</description>
 		<unit>U1</unit>
 	</process_variable>
-	<process_variable sourceName="Unser/Name/ist_uint8Array_s10">
+	<process_variable sourceName="testDoubleArray_11000">
 		<destination>B</destination>
-		<name>ist_uint8Array_s10</name>
+		<name>testDoubleArray_11000</name>
 		<description>Test Desc D1.1</description>
 		<unit>U1.1</unit>
 	</process_variable>
     <!-- D2  TODO copy description from original node-->
-    <process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+    <process_variable sourceName="testDoubleArray_12000" copy="false">
         <destination>D</destination>
-        <name>ist_uint8Array_s10</name>
+        <name>testDoubleArray_12000</name>
         <unit>U2</unit>
     </process_variable>
-    <process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+    <process_variable sourceName="testDoubleArray_13000" copy="false">
         <destination>E</destination>
-        <name>ist_uint8Array_s10</name>
+        <name>testDoubleArray_13000</name>
         <description></description>
         <unit>U2.1</unit>
     </process_variable>
 	<!-- D3 -->
-	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+	<process_variable sourceName="testDoubleArray_14000" copy="false">
 		<destination>F</destination>
-		<name>ist_uint8Array_s10</name>
+		<name>testDoubleArray_14000</name>
 		<description>update description</description>
 	</process_variable>
-	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+	<process_variable sourceName="testDoubleArray_15000" copy="false">
 		<destination>G</destination>
-		<name>ist_uint8Array_s10</name>
+		<name>testDoubleArray_15000</name>
 		<description>update description</description>
 		<unit></unit>
 	</process_variable>
 	<!-- D4 -->
-	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+	<process_variable sourceName="testDoubleArray_16000" copy="false">
 		<destination>A/B</destination>
 		<description>update description</description>
 		<unit>new U</unit>
 	</process_variable>
-	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
+	<process_variable sourceName="testDoubleArray_17000" copy="false">
 		<destination>A/Dein</destination>
 		<description>update description</description>
 		<unit>new U</unit>
 	</process_variable>
 	<!-- D5 -->
-	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
-		<name>ist_uint8Array_s10</name>
+	<process_variable sourceName="testDoubleArray_18000" copy="false">
+		<name>testDoubleArray_18000</name>
 		<description>update description</description>
 		<unit>new U</unit>
 	</process_variable>
-	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="false">
-		<name>ist_uint8Array_s10</name>
+	<process_variable sourceName="testDoubleArray_19000" copy="false">
+		<name>testDoubleArray_19000</name>
 		<destination></destination>
 		<description>update description</description>
 		<unit>new U</unit>
 	</process_variable>
 	<!-- D6 -->
-	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="">
+	<process_variable sourceName="testDoubleArray_20000" copy="">
 	</process_variable>
-	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="">
+	<process_variable sourceName="testDoubleArray_21000" copy="">
 		<name></name>
 		<destination></destination>
 		<description></description>

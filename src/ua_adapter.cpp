@@ -620,6 +620,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
             */
 
             //check the pv copy attribute -> copy of pv requested; false -> reference to original pv requested
+            UA_NodeId createdNodeId;
             transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
             if(copy.compare("TRUE") == 0){
                 UA_NodeId destinationFolderNodeId = enrollFolderPathFromString(destination+"/removedPart", "/");
@@ -633,92 +634,82 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                     cout << "Error during PV mapping. Folder creation failed! Skipping." << endl;
                     continue;
                 }
-                if(!unit.empty()){
-                    string unitNodeId;
-                    UASTRING_TO_CPPSTRING(processvariable->getOwnNodeId().identifier.string, unitNodeId);
-                    unitNodeId = unitNodeId.substr(0, unitNodeId.length()-5);
-                    unitNodeId += "/engineeringunit";
-                    cout << "node id from pv to change unit" << unitNodeId << endl;
-                    UA_String ua_unit = UA_STRING((char *) unit.c_str());
-                    UA_Variant value;
-                    UA_Variant_setScalar(&value, &ua_unit, &UA_TYPES[UA_TYPES_STRING]);
-                    //TODO remove develop result output
-                    UA_StatusCode addrstl = UA_Server_writeValue(this->mappedServer, UA_NODEID_STRING(1, (char *) unitNodeId.c_str()), value);
-                    const UA_StatusCodeDescription *st = UA_StatusCode_description(addrstl);
-                    cout << "tried to update unit (copy true)"<< st->name << endl;
-                }
-                if(!description.empty()){
-                    string descriptionNodeId;
-                    UASTRING_TO_CPPSTRING(processvariable->getOwnNodeId().identifier.string, descriptionNodeId);
-                    descriptionNodeId = descriptionNodeId.substr(0, descriptionNodeId.length()-5);
-                    descriptionNodeId += "/description";
-                    UA_String ua_description = UA_STRING((char *) description.c_str());
-                    UA_Variant value;
-                    UA_Variant_setScalar(&value, &ua_description, &UA_TYPES[UA_TYPES_STRING]);
-                    //TODO remove develop result output
-                    UA_StatusCode addrstl = UA_Server_writeValue(this->mappedServer, UA_NODEID_STRING(1, (char *) descriptionNodeId.c_str()), value);
-                    const UA_StatusCodeDescription *st = UA_StatusCode_description(addrstl);
-                    cout << "tried to update description (copy true)"<< st->name << endl;
-                }
-
-                UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
-                                           UA_LOCALIZEDTEXT((char *) "en_US", (char *) name.c_str()));
+                UA_NodeId tmpPVNodeId = processvariable->getOwnNodeId();
+                UA_NodeId_copy(&tmpPVNodeId, &createdNodeId);
             } else {
                 //get node id of the source node
-                UA_NodeId destinationFolder = enrollFolderPathFromString(destination+"/removedpart", "/");
-
-                //TODO remove this, source parent folder link should not be created on the fly, just get the nodeid of the parent
-                UA_NodeId sourceParentFolder = enrollFolderPathFromString(sourceName, "/");
+                string parentSourceString = this->serverConfig.rootFolder + "/" + sourceName + "Value";
+                UA_NodeId parentSourceId = UA_NODEID_STRING(1, (char *) parentSourceString.c_str());
+                UA_NodeId tmpOutput = UA_NODEID_NULL;
+                UA_Server_readNodeId(this->mappedServer, parentSourceId, &tmpOutput);
+                if(UA_NodeId_isNull(&tmpOutput)){
+                    if(this->mappingExceptions){
+                        throw std::runtime_error ("PV source node not found. Mapping must target a non mapped PV.");
+                    }
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV. PV source node not found. Mapping must target a non mapped PV.");
+                    continue;
+                } else {
+                    cout << "Good source node id found. " << endl;
+                }
                 string sourceVarName = this->fileHandler->praseVariablePath(sourceName, "/").back();
-
                 cout << "srcnmae " << sourceVarName << "rename name " << name << endl;
+                if(name.empty()){
+                    name = sourceVarName;
+                }
                 if(sourceVarName.compare(name) != 0){
                     if(this->mappingExceptions){
-                        throw std::runtime_error ("The PV name can't be changed if copy is false");
+                        throw std::runtime_error ("The PV name can't be changed if copy is false.");
                     }
                     UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV. The pv name can't changed if copy is false.");
                     continue;
                 }
-
-                /* Find the NodeId of the status child variable */
-                UA_RelativePathElement rpe;
-                UA_RelativePathElement_init(&rpe);
-                rpe.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
-                rpe.isInverse = false;
-                rpe.includeSubtypes = false;
-                cout << "src var name " << sourceVarName.c_str() << endl;
-                rpe.targetName = UA_QUALIFIEDNAME(1, (char *) sourceVarName.c_str());
-
-                UA_BrowsePath bp;
-                UA_BrowsePath_init(&bp);
-                bp.startingNode = sourceParentFolder;
-                bp.relativePath.elementsSize = 1;
-                bp.relativePath.elements = &rpe;
-
-                UA_BrowsePathResult bpr =
-                        UA_Server_translateBrowsePathToNodeIds(this->mappedServer, &bp);
-                if(bpr.statusCode != UA_STATUSCODE_GOOD || bpr.targetsSize < 1){
-                    //TODO handle error case
-                    continue;
-                }
-                UA_NodeId sourceNodeId;
-                if(UA_NodeId_copy(&bpr.targets[0].targetId.nodeId, &sourceNodeId) != UA_STATUSCODE_GOOD){
-                    UA_BrowsePathResult_deleteMembers(&bpr);
-                    sourceNodeId =  UA_NODEID_NULL;
-                }
-                UA_BrowsePathResult_deleteMembers(&bpr);
-
+                //create destination folder
+                UA_NodeId destinationFolder = enrollFolderPathFromString(destination+"/removedpart", "/");
                 UA_ExpandedNodeId enid;
                 enid.serverIndex = 1;
                 enid.namespaceUri = UA_STRING_NULL;
-                enid.nodeId = sourceNodeId;
+                enid.nodeId = parentSourceId;
                 //add reference to the source node
                 UA_StatusCode  addRef = UA_Server_addReference(this->mappedServer, destinationFolder, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, UA_TRUE);
-                const UA_StatusCodeDescription *st = UA_StatusCode_description(addRef);
-                cout << "tried to link "<< st->name << endl;
-                cout << "nodeid "<< (char *) sourceParentFolder.identifier.string.data << endl;
-                cout << "nodeid "<< (char *) sourceNodeId.identifier.string.data << endl;
+                if(sourceVarName.compare(name) != 0){
+                    if(this->mappingExceptions){
+                        throw std::runtime_error ("PV mapping failed. Can't create reference to original pv.");
+                    }
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV. Can't create reference to original pv.");
+                    continue;
+                }
+                UA_NodeId_copy(&parentSourceId, &createdNodeId);
             }
+            if(!unit.empty()){
+                string unitNodeId;
+                UASTRING_TO_CPPSTRING(createdNodeId.identifier.string, unitNodeId);
+                unitNodeId = unitNodeId.substr(0, unitNodeId.length()-5);
+                unitNodeId += "/engineeringunit";
+                UA_String ua_unit = UA_STRING((char *) unit.c_str());
+                UA_Variant value;
+                UA_Variant_setScalar(&value, &ua_unit, &UA_TYPES[UA_TYPES_STRING]);
+                //TODO remove develop result output
+                UA_StatusCode addrstl = UA_Server_writeValue(this->mappedServer,
+                        UA_NODEID_STRING(1, (char *) unitNodeId.c_str()), value);
+                const UA_StatusCodeDescription *st = UA_StatusCode_description(addrstl);
+                cout << "tried to update unit (copy true)"<< st->name << endl;
+            }
+            if(!description.empty()){
+                string descriptionNodeId;
+                UASTRING_TO_CPPSTRING(createdNodeId.identifier.string, descriptionNodeId);
+                descriptionNodeId = descriptionNodeId.substr(0, descriptionNodeId.length()-5);
+                descriptionNodeId += "/description";
+                UA_String ua_description = UA_STRING((char *) description.c_str());
+                UA_Variant value;
+                UA_Variant_setScalar(&value, &ua_description, &UA_TYPES[UA_TYPES_STRING]);
+                //TODO remove develop result output
+                UA_StatusCode addrstl = UA_Server_writeValue(this->mappedServer,
+                        UA_NODEID_STRING(1, (char *) descriptionNodeId.c_str()), value);
+                const UA_StatusCodeDescription *st = UA_StatusCode_description(addrstl);
+                cout << "tried to update description (copy true)"<< st->name << endl;
+            }
+            UA_Server_writeDisplayName(this->mappedServer, createdNodeId, UA_LOCALIZEDTEXT((char *) "en_US",
+                    (char *) name.c_str()));
         }
     }
 }
