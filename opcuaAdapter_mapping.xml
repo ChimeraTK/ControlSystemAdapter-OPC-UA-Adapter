@@ -102,8 +102,7 @@
    4. Name -> Use pv name from sourceName attribute (here: varA)
    5. Destination -> pv is created in root directory
 -->
-
-	<!-- D1 -->
+	<!-- D1 [x]-->
 	<process_variable sourceName="testDoubleArray_10000">
 		<destination>A</destination>
 		<name>testDoubleArray_10000</name>
@@ -116,7 +115,7 @@
 		<description>Test Desc D1.1</description>
 		<unit>U1.1</unit>
 	</process_variable>
-    <!-- D2  TODO copy description from original node-->
+    <!-- D2 [x]-->
     <process_variable sourceName="testDoubleArray_12000" copy="false">
         <destination>D</destination>
         <name>testDoubleArray_12000</name>
@@ -128,7 +127,7 @@
         <description></description>
         <unit>U2.1</unit>
     </process_variable>
-	<!-- D3 -->
+	<!-- D3 [x]-->
 	<process_variable sourceName="testDoubleArray_14000" copy="false">
 		<destination>F</destination>
 		<name>testDoubleArray_14000</name>
@@ -140,7 +139,7 @@
 		<description>update description</description>
 		<unit></unit>
 	</process_variable>
-	<!-- D4 -->
+	<!-- D4 [x]-->
 	<process_variable sourceName="testDoubleArray_16000" copy="false">
 		<destination>A/B</destination>
 		<description>update description</description>
@@ -151,7 +150,7 @@
 		<description>update description</description>
 		<unit>new U</unit>
 	</process_variable>
-	<!-- D5 -->
+	<!-- D5 [x]-->
 	<process_variable sourceName="testDoubleArray_18000" copy="false">
 		<name>testDoubleArray_18000</name>
 		<description>update description</description>
@@ -163,7 +162,18 @@
 		<description>update description</description>
 		<unit>new U</unit>
 	</process_variable>
-	<!-- D6 -->
+	<process_variable sourceName="testDoubleArray_18000" copy="true">
+		<name>testDoubleArray_18000_</name>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<process_variable sourceName="testDoubleArray_19000" copy="true">
+		<name>testDoubleArray_19000_</name>
+		<destination></destination>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<!-- D6 [x]-->
 	<process_variable sourceName="testDoubleArray_20000" copy="">
 	</process_variable>
 	<process_variable sourceName="testDoubleArray_21000" copy="">
@@ -172,8 +182,14 @@
 		<description></description>
 		<unit></unit>
 	</process_variable>
+	<process_variable sourceName="testDoubleArray_21000" copy="true">
+		<name></name>
+		<destination></destination>
+		<description></description>
+		<unit></unit>
+	</process_variable>
 
-	<!-- (2) Additional variable options
+<!-- (2) Additional variable options
     Information:
     - the path seperator for the destination tag is "/"
     - the destination can include a folder hierachy that is created on the fligth
@@ -190,7 +206,7 @@
         D3. Value -> empty string
     -->
 
-	<!-- D1 -->
+	<!-- D1 [x]-->
 	<additional_variable>
 		<name>av_d1</name>
 		<destination>A</destination>
@@ -202,7 +218,7 @@
 		<description></description>
 		<value>av_value</value>
 	</additional_variable>
-	<!-- D2 -->
+	<!-- D2 [x]-->
 	<additional_variable>
 		<name>av_d2</name>
 		<value>av_value</value>
@@ -212,7 +228,7 @@
 		<destination></destination>
 		<value>av_value</value>
 	</additional_variable>
-	<!-- D3 -->
+	<!-- D3 [x]-->
 	<additional_variable>
 		<name>av_d3</name>
 		<destination>A</destination>
@@ -222,7 +238,7 @@
 		<destination>A</destination>
 		<value></value>
 	</additional_variable>
-	<!-- D1, D2, D3 -->
+	<!-- D1, D2, D3 [x]-->
 	<additional_variable>
 		<name>av_d4</name>
 	</additional_variable>
@@ -233,21 +249,21 @@
 		<value></value>
 	</additional_variable>
 
-	<!-- E1
+	<!-- E1 [x]-->
 	<additional_variable>
 		<name>av_d4</name>
-	</additional_variable>-->
-	<!-- E2
+	</additional_variable>
+	<!-- E2 [x]-->
 	<additional_variable>
 		<destination>A</destination>
 		<value>av_value</value>
-	</additional_variable> -->
-	<!-- E2.1
+	</additional_variable>
+	<!-- E2.1 [x]-->
 	<additional_variable>
 		<name></name>
 		<destination>A</destination>
 		<value>av_value</value>
-	</additional_variable>-->
+	</additional_variable>
 
 	<!-- general additional variable test -->
 	<additional_variable>
@@ -257,9 +273,8 @@
 		<value>1</value>
 	</additional_variable>
 
-
 <!-- (3) Folder without source
-  Information:
+ 	Information:
    - the path seperator for the destination tag is "/"
    - the destination can include a folder hierachy that is created on the fligth
    - allows to add a folder with or without a description
@@ -273,7 +288,7 @@
    2. Destination -> folder is created in the root folder
 -->
 
-	<!-- D1 -->
+	<!-- D1 [x]-->
 	<folder>
 		<destination>B</destination>
 		<name>C</name>
@@ -283,7 +298,7 @@
 		<name>D</name>
 		<description></description>
 	</folder>
-	<!-- D2 -->
+	<!-- D2 [x]-->
 	<folder>
 		<name>D</name>
 		<description>Folder Description</description>
@@ -292,7 +307,7 @@
 		<name>E</name>
 		<description>Folder Description</description>
 	</folder>
-	<!-- D3 -->
+	<!-- D3 [x]-->
 	<folder>
 		<name>F</name>
 	</folder>
@@ -301,6 +316,75 @@
 		<description></description>
 		<destination></destination>
 	</folder>
+
+	<!-- E1 [x]-->
+	<folder>
+		<destination>B</destination>
+	</folder>
+	<folder>
+		<name></name>
+		<destination>B</destination>
+	</folder>
+
+<!-- (4) Folder with source
+     Information:
+      - the path seperator for the destination tag is "/"
+      - the destination can include a folder hierachy that is created on the flight
+      - allows to show folder content at another location
+      - folder content can be copied to the new location (copy="True") or simply linked to the new location
+
+     Error cases:
+      1. name is missing or is empty
+      2. new folder is equal to the source folder
+      3. sourceName with no corresponding folder
+      4. sourceName is empty or missing
+
+     Default cases:
+      1. Description -> empty description
+      2. Destination -> folder is created in the root folder
+      3. Copy attribute -> copy="False"
+-->
+	<!-- D1 []-->
+	<folder sourceName="Ist/Name/dieser" copy="false">
+		<destination>A</destination>
+		<name>Z</name>
+	</folder>
+	<folder sourceName="Ist/Name/dieser" copy="false">
+		<destination>A</destination>
+		<name>Y</name>
+		<description></description>
+	</folder>
+	<!-- D2 []-->
+	<folder sourceName="Ist/Name/dieser" copy="false">
+		<name>Z</name>
+		<description>New mapping folder</description>
+	</folder>
+	<folder sourceName="Ist/Name/dieser" copy="false">
+		<name>Y</name>
+		<description>New mapping folder</description>
+		<destination></destination>
+	</folder>
+	<!-- D3 []-->
+	<folder sourceName="Ist/Name/dieser">
+		<name>Y</name>
+		<description>New mapping folder</description>
+		<destination>Z</destination>
+	</folder>
+	<folder sourceName="Ist/Name/dieser" copy="">
+		<name>Y</name>
+		<description>New mapping folder</description>
+		<destination>X</destination>
+	</folder>
+	<!-- D1, D2, D3 []-->
+	<folder sourceName="Ist/Name/dieser">
+		<name>YY</name>
+	</folder>
+	<folder sourceName="Ist/Name/dieser" copy="">
+		<name>ZZ</name>
+		<description></description>
+		<destination></destination>
+	</folder>
+
 
 	<!--- START OF OLD CONFIGURATION PART -->
 

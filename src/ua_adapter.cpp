@@ -401,7 +401,6 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
             if(!nodeFolderPath.empty()){
                 destination = this->fileHandler->getContentFromNode(nodeFolderPath[0]);
             }
-
             //check if source name is set -> map complete hierarchical structure to the destination
             if(!sourceName.empty()){
                 //check if the src is a folder
@@ -458,11 +457,11 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
             }
             if(!nodeFolder.empty()) {
                 folder = this->fileHandler->getContentFromNode(nodeFolder[0]);
-                if(folder.compare("") == 0){
+                if(folder.empty()){
                     if(this->mappingExceptions){
-                        throw std::runtime_error ("Folder name is missing.");
+                        throw std::runtime_error ("Error! Folder creation failed. Name is missing");
                     }
-                    cerr << "Folder name is missing. Skipping folder!" << endl;
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Folder creation failed. Name is missing");
                     continue;
                 }
             }
@@ -589,7 +588,6 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                     UA_Byte accessLevelMask = UA_ACCESSLEVELMASK_WRITE^UA_ACCESSLEVELMASK_READ;
                     __UA_Server_write(this->mappedServer, &accessLevel, UA_ATTRIBUTEID_USERACCESSLEVEL, &UA_TYPES[UA_TYPES_BYTE], &accessLevelMask);
                     */
-                    //TODO remove develop result output
                     UA_StatusCode addrstl = UA_Server_writeValue(this->mappedServer, UA_NODEID_STRING(1, (char *) unitNodeId.c_str()), value);
                     const UA_StatusCodeDescription *st = UA_StatusCode_description(addrstl);
                     cout << "tried to update unit "<< st->name << endl;
@@ -603,35 +601,41 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                     UA_String ua_description = UA_STRING((char *) description.c_str());
                     UA_Variant value;
                     UA_Variant_setScalar(&value, &ua_description, &UA_TYPES[UA_TYPES_STRING]);
-                    //TODO remove develop result output
                     UA_StatusCode addrstl = UA_Server_writeValue(this->mappedServer, UA_NODEID_STRING(1, (char *) descriptionNodeId.c_str()), value);
                     const UA_StatusCodeDescription *st = UA_StatusCode_description(addrstl);
                     cout << "tried to update description "<< st->name << endl;
                 }
                 continue;
             }
-            /*
-            UA_NodeId requestedPV = this->findSingleChildNode(UA_QUALIFIEDNAME(1, ), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT));
-            UA_NodeId result;
-            if(UA_Server_readDataType(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew+"Value").c_str()), &result) == UA_STATUSCODE_GOOD){
-                std::cout << "WARNING: Same mapping name used for different mappings! Skipping." << std::endl;
-                return UA_STATUSCODE_BADNODEIDEXISTS;
-            }
-            */
-
             //check the pv copy attribute -> copy of pv requested; false -> reference to original pv requested
             UA_NodeId createdNodeId;
             transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
             if(copy.compare("TRUE") == 0){
-                UA_NodeId destinationFolderNodeId = enrollFolderPathFromString(destination+"/removedPart", "/");
+                UA_NodeId destinationFolderNodeId = UA_NODEID_NULL;
+                if(destination.empty()){
+                    destinationFolderNodeId = this->ownNodeId;
+                } else {
+                    destinationFolderNodeId = enrollFolderPathFromString(destination + "/removedPart", "/");
+                }
                 cout << "destination "<< destination <<" string folder " << (char *) destinationFolderNodeId.identifier.string.data << endl;
                 ua_processvariable *processvariable;
                 if (!UA_NodeId_isNull(&destinationFolderNodeId)) {
                     processvariable = new ua_processvariable(this->mappedServer, destinationFolderNodeId,
                                                              sourceName,  csManager, name);
+                    UA_NodeId tmpProcessVariableNodeId = processvariable->getOwnNodeId();
+                    if(UA_NodeId_isNull(&tmpProcessVariableNodeId)){
+                        if(this->mappingExceptions){
+                            throw std::runtime_error ("PV Source and Destination must be different");
+                        }
+                        UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV %s. Source and Destination must be different.", sourceName.c_str());
+                        continue;
+                    }
                     this->variables.push_back(processvariable);
                 } else {
-                    cout << "Error during PV mapping. Folder creation failed! Skipping." << endl;
+                    if(this->mappingExceptions){
+                        throw std::runtime_error ("Folder creation failed.");
+                    }
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV. Folder creation failed.");
                     continue;
                 }
                 UA_NodeId tmpPVNodeId = processvariable->getOwnNodeId();
@@ -688,7 +692,6 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                 UA_String ua_unit = UA_STRING((char *) unit.c_str());
                 UA_Variant value;
                 UA_Variant_setScalar(&value, &ua_unit, &UA_TYPES[UA_TYPES_STRING]);
-                //TODO remove develop result output
                 UA_StatusCode addrstl = UA_Server_writeValue(this->mappedServer,
                         UA_NODEID_STRING(1, (char *) unitNodeId.c_str()), value);
                 const UA_StatusCodeDescription *st = UA_StatusCode_description(addrstl);
@@ -702,7 +705,6 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                 UA_String ua_description = UA_STRING((char *) description.c_str());
                 UA_Variant value;
                 UA_Variant_setScalar(&value, &ua_description, &UA_TYPES[UA_TYPES_STRING]);
-                //TODO remove develop result output
                 UA_StatusCode addrstl = UA_Server_writeValue(this->mappedServer,
                         UA_NODEID_STRING(1, (char *) descriptionNodeId.c_str()), value);
                 const UA_StatusCodeDescription *st = UA_StatusCode_description(addrstl);
@@ -742,7 +744,27 @@ void ua_uaadapter::addAdditionalVariables() {
             if(!nodeValue.empty()) {
                 value = this->fileHandler->getContentFromNode(nodeValue[0]);
             }
-            cout << "current additional " << destination << " " << name << " " << description << " " << value << endl;
+            //check if name is empty
+            if(name.empty()){
+                if(this->mappingExceptions){
+                    throw std::runtime_error ("AV node creation failed. AV name is mandatory");
+                }
+                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping AV. AV name is mandatory.");
+                continue;
+            }
+            //check if the av node still exists
+            UA_NodeId tmpOutput = UA_NODEID_NULL;
+            string avNodeString = this->serverConfig.rootFolder + destination + "/" + name + "/additionalvariable";
+            UA_NodeId avNode = UA_NODEID_STRING(1, (char *) avNodeString.c_str());
+            UA_Server_readNodeId(this->mappedServer, avNode, &tmpOutput);
+            if(!UA_NodeId_isNull(&tmpOutput)){
+                if(this->mappingExceptions){
+                    throw std::runtime_error ("AV node creation failed. AV already exists.");
+                }
+                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping AV %s. AV node already exists.", name.c_str());
+                continue;
+            }
+            //cout << "current additional " << destination << " " << name << " " << description << " " << value << endl;
             UA_NodeId additionalVarFolderPath = UA_NODEID_NULL;
             if(!destination.empty()){
                 additionalVarFolderPath = enrollFolderPathFromString(destination+"/removePart", "/");
@@ -750,22 +772,23 @@ void ua_uaadapter::addAdditionalVariables() {
                 additionalVarFolderPath = UA_NODEID_STRING(1, (char *) this->serverConfig.rootFolder.c_str());
             }
             if(UA_NodeId_isNull(&additionalVarFolderPath)){
-                cout << "created folder node id was null " << endl;
                 if(this->mappingExceptions){
                     throw std::runtime_error ("Error! Creation of additional variable folder failed.");
                 }
                 UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping AV. Creation of additional variable folder failed. Skipping.");
                 continue;
             }
-            cout << "add new additional var "<< value << endl;
+            //cout << "add new additional var "<< value << endl;
             ua_additionalvariable *additionalvariable = new ua_additionalvariable(this->mappedServer,
                     additionalVarFolderPath, name, value, description);
             this->additionalVariables.push_back(additionalvariable);
-
         }
     }
 }
 
+/**
+ * @deprecated
+ */
 void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
     vector<int32_t> mappedVariableIndex = findMappingIndex(varName);
     //there is no mapping entry contained in the xml file
