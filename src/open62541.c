@@ -22716,6 +22716,7 @@ Service_Browse_single(UA_Server *server, UA_Session *session,
     size_t referencesIndex = 0;
     /* set the browsedescription if a cp is given */
     UA_UInt32 continuationIndex = 0;
+	struct ContinuationPointEntry *cpLoop = NULL, *cpLast = NULL, *cpTemp = NULL;
     if(cp) {
         descr = &cp->browseDescription;
         maxrefs = cp->maxReferences;
@@ -22835,6 +22836,19 @@ Service_Browse_single(UA_Server *server, UA_Session *session,
             UA_ByteString_copy(&cp->identifier, &result->continuationPoint);
         }
     } else if(maxrefs != 0 && referencesCount >= maxrefs) {
+    	if(session->availableContinuationPoints <= 0) {
+    		// if no more ContinuationPoints are available,
+    		// we delete the last one
+    	    LIST_FOREACH_SAFE(cpLoop, &session->continuationPoints, pointers, cpTemp) {
+    			cpLast = cpLoop;
+    		}
+
+    	    if (cpLast){
+    	    	removeCp(cpLast, session);
+    	    }
+    	}
+
+
         /* create a cp */
         if(session->availableContinuationPoints <= 0 ||
            !(cp = UA_malloc(sizeof(struct ContinuationPointEntry)))) {
