@@ -22716,7 +22716,7 @@ Service_Browse_single(UA_Server *server, UA_Session *session,
     size_t referencesIndex = 0;
     /* set the browsedescription if a cp is given */
     UA_UInt32 continuationIndex = 0;
-	struct ContinuationPointEntry *cpLoop = NULL, *cpLast = NULL, *cpTemp = NULL;
+    struct ContinuationPointEntry *cpLoop = NULL, *cpLast = NULL;
     if(cp) {
         descr = &cp->browseDescription;
         maxrefs = cp->maxReferences;
@@ -22836,31 +22836,30 @@ Service_Browse_single(UA_Server *server, UA_Session *session,
             UA_ByteString_copy(&cp->identifier, &result->continuationPoint);
         }
     } else if(maxrefs != 0 && referencesCount >= maxrefs) {
-    	if(session->availableContinuationPoints <= 0) {
-    		// if no more ContinuationPoints are available,
-    		// we delete the last one
-    	    LIST_FOREACH_SAFE(cpLoop, &session->continuationPoints, pointers, cpTemp) {
-    			cpLast = cpLoop;
-    		}
+        if (session->availableContinuationPoints <= 0) {
+            // if no more ContinuationPoints are available,
+            // we delete the last one
+            LIST_FOREACH(cpLoop, &session->continuationPoints, pointers) {
+                cpLast = cpLoop;
+            }
 
-    	    if (cpLast){
-    	    	removeCp(cpLast, session);
-    	    }
-    	}
-
+            if (cpLast) {
+                removeCp(cpLast, session);
+            }
+        }
 
         /* create a cp */
-        if(session->availableContinuationPoints <= 0 ||
-           !(cp = UA_malloc(sizeof(struct ContinuationPointEntry)))) {
+        if (session->availableContinuationPoints <= 0 ||
+            !(cp = UA_malloc(sizeof(struct ContinuationPointEntry)))) {
             result->statusCode = UA_STATUSCODE_BADNOCONTINUATIONPOINTS;
             return;
         }
         UA_BrowseDescription_copy(descr, &cp->browseDescription);
         cp->maxReferences = maxrefs;
-        cp->continuationIndex = (UA_UInt32)referencesCount;
+        cp->continuationIndex = (UA_UInt32) referencesCount;
         UA_Guid *ident = UA_Guid_new();
         *ident = UA_Guid_random();
-        cp->identifier.data = (UA_Byte*)ident;
+        cp->identifier.data = (UA_Byte*) ident;
         cp->identifier.length = sizeof(UA_Guid);
         UA_ByteString_copy(&cp->identifier, &result->continuationPoint);
 
