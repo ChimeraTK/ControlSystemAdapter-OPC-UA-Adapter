@@ -39,7 +39,7 @@ extern "C" {
 
 csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager,
                                      string configFile) {
-    this->csManager = csManager; 	
+    this->csManager = csManager;
     this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
 
     // Create new server adapter
@@ -54,22 +54,16 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
         //adapter->addVariable(oneProcessVariable->getName(), this->csManager);
         adapter->implicitVarMapping(oneProcessVariable->getName(), this->csManager);
     }
-    //build folder structure
-    adapter->buildFolderStructure(this->csManager);
-    //start explicit mapping
-    adapter->explicitVarMapping(this->csManager);
-    //add configured additional variables
-    adapter->addAdditionalVariables();
+
+    adapter->applyMapping(this->csManager);
 
     vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
-    if(allNotMappedVariables.size() > 0) {
-        cout << "The following VariableNodes cant be mapped, "
-            "because they are not member in PV-Manager:" << endl;
-        for(string var:allNotMappedVariables) {
-            cout << var << endl;
-        }
-    }
-
+		if(!allNotMappedVariables.empty()) {
+			cout << "The following VariableNodes cant be mapped, because they are not member in PV-Manager:" << endl;
+			for(string var:allNotMappedVariables) {
+				cout << var << endl;
+			}
+		}
     // add the managed ipc thread only now
     this->mgr->addObject(this->adapter);
     this->mgr->startAll();

@@ -92,22 +92,22 @@ struct ServerConfig {
  */
 class ua_uaadapter : ua_mapped_class, public ipc_managed_object {
 private:
-        UA_ServerConfig					server_config;
-        UA_ServerNetworkLayer 	server_nl;
-        UA_Logger 							logger;
+        UA_ServerConfig					        server_config;
+        UA_ServerNetworkLayer 	                server_nl;
+        UA_Logger 							    logger;
 
-        UA_NodeId 							variablesListId;
-        UA_NodeId 							constantsListId;
+        UA_NodeId 							    variablesListId;
+        UA_NodeId 							    constantsListId;
 
-        vector<FolderInfo>			folderVector;
+        vector<FolderInfo>			            folderVector;
         UA_NodeId								ownNodeId;
-        string                              pvSeperator;
+        string                                  pvSeperator;
         UA_Boolean                               mappingExceptions;
 
-        ServerConfig 						serverConfig;
+        ServerConfig 						    serverConfig;
 
         vector<ua_processvariable *> 			variables;
-        vector<ua_additionalvariable *> 	additionalVariables;
+        vector<ua_additionalvariable *> 	    additionalVariables;
         vector<ua_processvariable *>			mappedVariables;
 
         xml_file_handler *fileHandler;
@@ -215,21 +215,41 @@ public:
         */
         void implicitVarMapping(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager);
 
-        //TODO add description
+        /**
+        * @brief Read mapping file and apply the contained folders, additional variables and pv mappings.
+        * Order -> Folder (without source) -> Folder (with source) -> additional variables -> PV mappings
+        *
+        * @param csManager control system manager
+        */
+        void applyMapping(boost::shared_ptr<ControlSystemPVManager> csManager);
+
+        /**
+        * @brief Read mapping file and apply contained PV mappings.
+        *
+        * @param csManager control system manager
+        */
         void explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> csManager);
 
-        //TODO add additional variables
+        /**
+         * @brief Read mapping file and add contained additional variables to the server.
+         */
         void addAdditionalVariables();
 
-        //TODO add description
+        /**
+        * @brief Read mapping file and and add contained folders to the server.
+         *
+         * @param csManager control system manager
+        */
         void buildFolderStructure(boost::shared_ptr<ControlSystemPVManager> csManager);
 
-        //TODO add description
+        /**
+        * @brief Copy (recursively) the content of a folder to a new location
+        *
+        * @param csManager control system manager
+        * @param layer source folder
+        * @param target destination folder
+        */
         void deepCopyHierarchicalLayer(boost::shared_ptr<ControlSystemPVManager> csManager, UA_NodeId layer, UA_NodeId target);
-
-        //TODO add description or move to a new utilite file
-        UA_NodeId findSingleChildNode(UA_QualifiedName targetName, UA_NodeId referenceTypeId, UA_NodeId startingNode);
-
 
         /** @brief Methode that returns the node id of the instanced class
         *

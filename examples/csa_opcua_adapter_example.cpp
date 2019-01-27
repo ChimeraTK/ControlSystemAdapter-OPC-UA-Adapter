@@ -147,7 +147,34 @@ int main() {
 			testDoubleArray->write();
 			testIntArray->write();
 		}
-		
+
+    /* Adding some folder with variables
+    *
+    */
+    time(&t);
+    srand((unsigned int)t);
+	for(int32_t n=1; n < 10; n++) {
+		for (int32_t i = 1000; i < 65535; i = i + 10000) {
+			string nameDouble = "folder/f" + to_string(n) + "/testDoubleArray_" + to_string(i);
+			string nameInt = "folder/f" + to_string(n) + "/testIntArray_" + to_string(i);
+			ProcessArray<double>::SharedPtr testDoubleArray = devManager->createProcessArray<double>(
+					deviceToControlSystem, nameDouble, i);
+			ProcessArray<int32_t>::SharedPtr testIntArray = devManager->createProcessArray<int32_t>(
+					deviceToControlSystem, nameInt, i);
+			for (int32_t k = 0; k < i; k++) {
+				if (k % 2 == 0) {
+					testDoubleArray->accessChannel(0).at(k) = rand() % 6 + 1;
+					testIntArray->accessChannel(0).at(k) = rand() % 6 + 1;
+				} else {
+					testDoubleArray->accessChannel(0).at(k) = rand() % 50 + 10;
+					testIntArray->accessChannel(0).at(k) = rand() % 50 + 10;
+				}
+			}
+			testDoubleArray->write();
+			testIntArray->write();
+		}
+	}
+
 		ProcessArray<double>::SharedPtr testDoubleArray = devManager->createProcessArray<double>(deviceToControlSystem, "testDoubleArray_65535", 65535);
 		ProcessArray<int32_t>::SharedPtr testIntArray = devManager->createProcessArray<int32_t>(deviceToControlSystem, "testIntArray_65535", 65535);
 		for(int32_t i = 0; i < 65535; i++) {
