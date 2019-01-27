@@ -68,7 +68,7 @@ struct FolderInfo {
  */
 struct ServerConfig {
         string rootFolder = "";
-        string descriptionFolder = "No description is set";
+        string descriptionFolder = "";
         UA_Boolean	UsernamePasswordLogin = UA_FALSE;
         string password = "";
         string username = "";

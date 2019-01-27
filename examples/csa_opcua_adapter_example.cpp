@@ -161,7 +161,7 @@ int main() {
 					deviceToControlSystem, nameDouble, i);
 			ProcessArray<int32_t>::SharedPtr testIntArray = devManager->createProcessArray<int32_t>(
 					deviceToControlSystem, nameInt, i);
-			for (int32_t k = 0; k < i; k++) {
+			for (int32_t k = i - 10; k < i; k++) {
 				if (k % 2 == 0) {
 					testDoubleArray->accessChannel(0).at(k) = rand() % 6 + 1;
 					testIntArray->accessChannel(0).at(k) = rand() % 6 + 1;

@@ -295,7 +295,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME(1, (char *) this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, &icb, &createdNodeId);
     //know your own nodeId
-    this->ownNodeId = createdNodeId;
+    UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
+    //this->ownNodeId = createdNodeId;
 
     this->addPVChildNodes(createdNodeId, baseNodeIdName);
 
@@ -452,5 +453,7 @@ UA_DateTime ua_processvariable::getSourceTimeStamp() {
 }
 
 UA_NodeId ua_processvariable::getOwnNodeId() {
-        return this->ownNodeId;
+    UA_NodeId outputNode;
+    UA_NodeId_copy(&this->ownNodeId, &outputNode);
+    return outputNode;
 }

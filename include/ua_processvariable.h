@@ -42,7 +42,7 @@ private:
         string nodeStringIdOverwrite;
         string engineeringUnit;
         string description;
-        UA_NodeId ownNodeId;
+        UA_NodeId ownNodeId = UA_NODEID_NULL;
 
         boost::shared_ptr<ControlSystemPVManager> csManager;
         UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, string baseNodePath);
