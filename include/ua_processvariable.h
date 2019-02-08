@@ -28,6 +28,21 @@
 using namespace std;
 using namespace ChimeraTK;
 
+typedef enum {
+    UA_PV_UNKNOWN = 0,
+    UA_PV_INT8 = 1,
+    UA_PV_UINT8 = 2,
+    UA_PV_INT16 = 3,
+    UA_PV_UINT16 = 4,
+    UA_PV_INT32 = 5,
+    UA_PV_UINT32 = 6,
+    UA_PV_FLOAT = 8,
+    UA_PV_DOUBLE = 9,
+    UA_PV_STRING = 10,
+    UA_PV_INT64 = 11,
+    UA_PV_UINT64 = 12
+} UA_Processvariable_Type;
+
 /** @class ua_processvariable
  *	@brief This class represent a processvariable of the controlsystemadapter in the information model of a OPC UA Server
  *
@@ -42,6 +57,8 @@ private:
         string engineeringUnit;
         string description;
         UA_NodeId ownNodeId;
+        UA_Processvariable_Type type;
+        bool array;
 
         boost::shared_ptr<ControlSystemPVManager> csManager;
 
@@ -127,53 +144,80 @@ public:
         #define CREATE_READ_FUNCTION_DEF(_p_type)  _p_type  getValue_##_p_type();
         #define CREATE_WRITE_FUNCTION_DEF(_p_type) void setValue_##_p_type(_p_type value);
 
-    CREATE_WRITE_FUNCTION_DEF(int8_t)
-    CREATE_WRITE_FUNCTION_DEF(uint8_t)
-    CREATE_WRITE_FUNCTION_DEF(int16_t)
-    CREATE_WRITE_FUNCTION_DEF(uint16_t)
-    CREATE_WRITE_FUNCTION_DEF(int32_t)
-    CREATE_WRITE_FUNCTION_DEF(uint32_t)
-    CREATE_WRITE_FUNCTION_DEF(int64_t)
-    CREATE_WRITE_FUNCTION_DEF(uint64_t)
-    CREATE_WRITE_FUNCTION_DEF(float)
-    CREATE_WRITE_FUNCTION_DEF(double)
-    CREATE_WRITE_FUNCTION_DEF(string)
+    //CREATE_WRITE_FUNCTION_DEF(int8_t)
+    //CREATE_WRITE_FUNCTION_DEF(uint8_t)
+    //CREATE_WRITE_FUNCTION_DEF(int16_t)
+    //CREATE_WRITE_FUNCTION_DEF(uint16_t)
+    //CREATE_WRITE_FUNCTION_DEF(int32_t)
+    //CREATE_WRITE_FUNCTION_DEF(uint32_t)
+    //CREATE_WRITE_FUNCTION_DEF(int64_t)
+    //CREATE_WRITE_FUNCTION_DEF(uint64_t)
+    //CREATE_WRITE_FUNCTION_DEF(float)
+    //CREATE_WRITE_FUNCTION_DEF(double)
+    //CREATE_WRITE_FUNCTION_DEF(string)
 
-    CREATE_READ_FUNCTION_DEF(int8_t)
-    CREATE_READ_FUNCTION_DEF(uint8_t)
-    CREATE_READ_FUNCTION_DEF(int16_t)
-    CREATE_READ_FUNCTION_DEF(uint16_t)
-    CREATE_READ_FUNCTION_DEF(int32_t)
-    CREATE_READ_FUNCTION_DEF(uint32_t)
-    CREATE_READ_FUNCTION_DEF(int64_t)
-    CREATE_READ_FUNCTION_DEF(uint64_t)
-    CREATE_READ_FUNCTION_DEF(float)
-    CREATE_READ_FUNCTION_DEF(double)
-    CREATE_READ_FUNCTION_DEF(string)
+    //CREATE_READ_FUNCTION_DEF(int8_t)
+    //CREATE_READ_FUNCTION_DEF(uint8_t)
+    //CREATE_READ_FUNCTION_DEF(int16_t)
+    //CREATE_READ_FUNCTION_DEF(uint16_t)
+    //CREATE_READ_FUNCTION_DEF(int32_t)
+    //CREATE_READ_FUNCTION_DEF(uint32_t)
+    //CREATE_READ_FUNCTION_DEF(int64_t)
+    //CREATE_READ_FUNCTION_DEF(uint64_t)
+    //CREATE_READ_FUNCTION_DEF(float)
+    //CREATE_READ_FUNCTION_DEF(double)
+    //CREATE_READ_FUNCTION_DEF(string)
 
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(int8_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(uint8_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(int16_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(uint16_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(int32_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(uint32_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(int64_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(uint64_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(float)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(double)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(string)
+    //CREATE_WRITE_FUNCTION_ARRAY_DEF(int8_t)
+    //CREATE_WRITE_FUNCTION_ARRAY_DEF(uint8_t)
+    //CREATE_WRITE_FUNCTION_ARRAY_DEF(int16_t)
+    //CREATE_WRITE_FUNCTION_ARRAY_DEF(uint16_t)
+    //CREATE_WRITE_FUNCTION_ARRAY_DEF(int32_t)
+    //CREATE_WRITE_FUNCTION_ARRAY_DEF(uint32_t)
+    //CREATE_WRITE_FUNCTION_ARRAY_DEF(int64_t)
+    //CREATE_WRITE_FUNCTION_ARRAY_DEF(uint64_t)
+    //CREATE_WRITE_FUNCTION_ARRAY_DEF(float)
+    //CREATE_WRITE_FUNCTION_ARRAY_DEF(double)
+    //CREATE_WRITE_FUNCTION_ARRAY_DEF(string)
 
-    CREATE_READ_FUNCTION_ARRAY_DEF(int8_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(uint8_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(int16_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(uint16_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(int32_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(uint32_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(int64_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(uint64_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(float)
-    CREATE_READ_FUNCTION_ARRAY_DEF(double)
-    CREATE_READ_FUNCTION_ARRAY_DEF(string)
+    //CREATE_READ_FUNCTION_ARRAY_DEF(int8_t)
+    //CREATE_READ_FUNCTION_ARRAY_DEF(uint8_t)
+    //CREATE_READ_FUNCTION_ARRAY_DEF(int16_t)
+    //CREATE_READ_FUNCTION_ARRAY_DEF(uint16_t)
+    //CREATE_READ_FUNCTION_ARRAY_DEF(int32_t)
+    //CREATE_READ_FUNCTION_ARRAY_DEF(uint32_t)
+    //CREATE_READ_FUNCTION_ARRAY_DEF(int64_t)
+    //CREATE_READ_FUNCTION_ARRAY_DEF(uint64_t)
+    //CREATE_READ_FUNCTION_ARRAY_DEF(float)
+    //CREATE_READ_FUNCTION_ARRAY_DEF(double)
+    //CREATE_READ_FUNCTION_ARRAY_DEF(string)
+    static UA_StatusCode ua_readproxy_ua_processvariable_getValue(void *handle,
+            const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp,
+            const UA_NumericRange *range, UA_DataValue *value);
+    UA_StatusCode getValue_int8(UA_Variant* v);
+    UA_StatusCode getValue_uint8(UA_Variant* v);
+    UA_StatusCode getValue_int16(UA_Variant* v);
+    UA_StatusCode getValue_uint16(UA_Variant* v);
+    UA_StatusCode getValue_int32(UA_Variant* v);
+    UA_StatusCode getValue_uint32(UA_Variant* v);
+    UA_StatusCode getValue_int64(UA_Variant* v);
+    UA_StatusCode getValue_uint64(UA_Variant* v);
+    UA_StatusCode getValue_float(UA_Variant* v);
+    UA_StatusCode getValue_double(UA_Variant* v);
+    UA_StatusCode getValue_string(UA_Variant* v);
+
+    static UA_StatusCode ua_writeproxy_ua_processvariable_setValue(void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range);
+    UA_StatusCode setValue_int8(const UA_Variant* data);
+    UA_StatusCode setValue_uint8(const UA_Variant* data);
+    UA_StatusCode setValue_int16(const UA_Variant* data);
+    UA_StatusCode setValue_uint16(const UA_Variant* data);
+    UA_StatusCode setValue_int32(const UA_Variant* data);
+    UA_StatusCode setValue_uint32(const UA_Variant* data);
+    UA_StatusCode setValue_int64(const UA_Variant* data);
+    UA_StatusCode setValue_uint64(const UA_Variant* data);
+    UA_StatusCode setValue_float(const UA_Variant* data);
+    UA_StatusCode setValue_double(const UA_Variant* data);
+    UA_StatusCode setValue_string(const UA_Variant* data);
 };
 
 #endif // UA_PROCESSVARIABLE_H
