@@ -323,6 +323,7 @@ target_link_libraries(${PROJECT_NAME}
   ${Boost_CHRONO_LIBRARY}
 )
 target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/open62541.c PROPERTIES COMPILE_FLAGS -w)
 
 # do not remove runtime path of the library when installing
 set_property(TARGET ${PROJECT_NAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
