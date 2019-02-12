@@ -111,61 +111,61 @@ string ua_processvariable::getType() {
 }
 
 /* Multivariant Read Functions for Value (without template-Foo) */
-#define CREATE_READ_FUNCTION(_p_type) \
-_p_type    ua_processvariable::getValue_##_p_type() { \
-    _p_type v = _p_type(); \
-    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return 0; \
-    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() == 1) { \
-                        if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
-                                while(this->csManager->getProcessArray<_p_type>(this->namePV)->readNonBlocking()) {} \
-                        } \
-                        v = this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).at(0); \
-                } \
-    return v; \
-} \
+//#define CREATE_READ_FUNCTION(_p_type) \
+//_p_type    ua_processvariable::getValue_##_p_type() { \
+//    _p_type v = _p_type(); \
+//    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return 0; \
+//    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() == 1) { \
+//                        if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
+//                                while(this->csManager->getProcessArray<_p_type>(this->namePV)->readNonBlocking()) {} \
+//                        } \
+//                        v = this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).at(0); \
+//                } \
+//    return v; \
+//} \
 
 
-#define CREATE_READ_FUNCTION_ARRAY(_p_type) \
-std::vector<_p_type>    ua_processvariable::getValue_Array_##_p_type() { \
-    std::vector<_p_type> v; \
-    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return v; \
-    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() > 1) { \
-                        if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
-                                while(this->csManager->getProcessArray<_p_type>(this->namePV)->readNonBlocking()) {} \
-                        } \
-                        v = this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0); \
-                } \
-    return v; \
-} \
+//#define CREATE_READ_FUNCTION_ARRAY(_p_type) \
+//std::vector<_p_type>    ua_processvariable::getValue_Array_##_p_type() { \
+//    std::vector<_p_type> v; \
+//    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return v; \
+//    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() > 1) { \
+//                        if(this->csManager->getProcessVariable(this->namePV)->isReadable()) { \
+//                                while(this->csManager->getProcessArray<_p_type>(this->namePV)->readNonBlocking()) {} \
+//                        } \
+//                        v = this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0); \
+//                } \
+//    return v; \
+//} \
 
 
-#define CREATE_WRITE_FUNCTION(_p_type) \
-void ua_processvariable::setValue_##_p_type(_p_type value) { \
-    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
-    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() == 1) {   \
-                        if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
-                                vector<_p_type> valueArray; \
-                                valueArray.push_back(value); \
-                                this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0) = valueArray; \
-                                this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
-                        } \
-                } \
-    return; \
-}
+//#define CREATE_WRITE_FUNCTION(_p_type) \
+//void ua_processvariable::setValue_##_p_type(_p_type value) { \
+//    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
+//    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() == 1) {   \
+//                        if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
+//                                vector<_p_type> valueArray; \
+//                                valueArray.push_back(value); \
+//                                this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0) = valueArray; \
+//                                this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
+//                        } \
+//                } \
+//    return; \
+//}
 
 
-#define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
-void ua_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
-    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
-    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() <= 1) return; \
-                        if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
-                                int32_t valueSize = this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size(); \
-                                value.resize(valueSize); \
-                                this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0) = value; \
-                                this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
-                } \
-        return; \
-}
+//#define CREATE_WRITE_FUNCTION_ARRAY(_p_type) \
+//void ua_processvariable::setValue_Array_##_p_type(std::vector<_p_type> value) { \
+//    if (this->csManager->getProcessVariable(this->namePV)->getValueType() != typeid(_p_type)) return; \
+//    if (this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size() <= 1) return; \
+//                        if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) { \
+//                                int32_t valueSize = this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0).size(); \
+//                                value.resize(valueSize); \
+//                                this->csManager->getProcessArray<_p_type>(this->namePV)->accessChannel(0) = value; \
+//                                this->csManager->getProcessArray<_p_type>(this->namePV)->write(); \
+//                } \
+//        return; \
+//}
 
 UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(void *handle,
     const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp,
@@ -424,8 +424,7 @@ UA_StatusCode ua_processvariable::getValue_int64(UA_Variant* v) {
         else {
             // Array
             std::vector<int64_t> iarr = this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0);
-            UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(),
-                &UA_TYPES[UA_TYPES_INT64]);
+            UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT64]);
             UA_NumericRange arrayRange;
             arrayRange.dimensionsSize = 1;
             UA_NumericRangeDimension

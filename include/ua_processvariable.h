@@ -139,10 +139,10 @@ public:
         */
         UA_NodeId getOwnNodeId();
 
-        #define CREATE_READ_FUNCTION_ARRAY_DEF(_p_type)  std::vector<_p_type>  getValue_Array_##_p_type();
-        #define CREATE_WRITE_FUNCTION_ARRAY_DEF(_p_type) void setValue_Array_##_p_type(std::vector<_p_type> value);
-        #define CREATE_READ_FUNCTION_DEF(_p_type)  _p_type  getValue_##_p_type();
-        #define CREATE_WRITE_FUNCTION_DEF(_p_type) void setValue_##_p_type(_p_type value);
+//        #define CREATE_READ_FUNCTION_ARRAY_DEF(_p_type)  std::vector<_p_type>  getValue_Array_##_p_type();
+//        #define CREATE_WRITE_FUNCTION_ARRAY_DEF(_p_type) void setValue_Array_##_p_type(std::vector<_p_type> value);
+//        #define CREATE_READ_FUNCTION_DEF(_p_type)  _p_type  getValue_##_p_type();
+//        #define CREATE_WRITE_FUNCTION_DEF(_p_type) void setValue_##_p_type(_p_type value);
 
     //CREATE_WRITE_FUNCTION_DEF(int8_t)
     //CREATE_WRITE_FUNCTION_DEF(uint8_t)
@@ -191,6 +191,7 @@ public:
     //CREATE_READ_FUNCTION_ARRAY_DEF(float)
     //CREATE_READ_FUNCTION_ARRAY_DEF(double)
     //CREATE_READ_FUNCTION_ARRAY_DEF(string)
+
     static UA_StatusCode ua_readproxy_ua_processvariable_getValue(void *handle,
             const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp,
             const UA_NumericRange *range, UA_DataValue *value);

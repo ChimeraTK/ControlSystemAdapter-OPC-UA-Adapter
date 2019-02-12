@@ -139,137 +139,137 @@ UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]); \
 UA_String_deleteMembers(&ua_val); \
 UA_RDPROXY_TAIL()
 
-#define UA_RDPROXY_LOCALIZEDTEXT(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_LocalizedText ua_val; \
-std::tuple<std::string, std::string> val = thisObj->_p_method(); \
-std::string locale = std::get<0>(val); \
-std::string text   = std::get<1>(val); \
-CPPSTRING_TO_UASTRING(ua_val.locale, locale); \
-CPPSTRING_TO_UASTRING(ua_val.text, text); \
-UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]); \
-UA_LocalizedText_deleteMembers(&ua_val); \
-UA_RDPROXY_TAIL()
+//#define UA_RDPROXY_LOCALIZEDTEXT(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_LocalizedText ua_val; \
+//std::tuple<std::string, std::string> val = thisObj->_p_method(); \
+//std::string locale = std::get<0>(val); \
+//std::string text   = std::get<1>(val); \
+//CPPSTRING_TO_UASTRING(ua_val.locale, locale); \
+//CPPSTRING_TO_UASTRING(ua_val.text, text); \
+//UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]); \
+//UA_LocalizedText_deleteMembers(&ua_val); \
+//UA_RDPROXY_TAIL()
 
-#define UA_RDPROXY_UINT64(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, uint64_t, UA_TYPES_UINT64); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_INT64(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, int64_t, UA_TYPES_INT64); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_INT32(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, int32_t, UA_TYPES_INT32); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_UINT32(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, uint32_t, UA_TYPES_UINT32); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_INT16(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, int16_t, UA_TYPES_INT16); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_UINT16(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, uint16_t, UA_TYPES_UINT16); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_INT8(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, int8_t, UA_TYPES_SBYTE); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_UINT8(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, uint8_t, UA_TYPES_BYTE); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_BOOL(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, UA_Boolean, UA_TYPES_BOOLEAN); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_FLOAT(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, float, UA_TYPES_FLOAT); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_DOUBLE(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, double, UA_TYPES_DOUBLE); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_DATETIME(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, long long int, UA_TYPES_DATETIME); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_NODEID(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY(_p_method, UA_NodeId, UA_TYPES_NODEID); \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_ARRAY_INT8(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, int8_t, UA_TYPES_SBYTE) \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_ARRAY_UINT8(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, uint8_t, UA_TYPES_BYTE) \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_ARRAY_INT16(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, int16_t, UA_TYPES_INT16) \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_ARRAY_UINT16(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, uint16_t, UA_TYPES_UINT16) \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_ARRAY_INT32(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, int32_t, UA_TYPES_INT32) \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_ARRAY_UINT32(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, uint32_t, UA_TYPES_UINT32) \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_ARRAY_INT64(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, int64_t, UA_TYPES_INT64) \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_ARRAY_UINT64(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, uint64_t, UA_TYPES_UINT64) \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_ARRAY_FLOAT(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, float, UA_TYPES_FLOAT) \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_ARRAY_DOUBLE(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, double, UA_TYPES_DOUBLE) \
-UA_RDPROXY_TAIL()
-
-#define UA_RDPROXY_ARRAY_STRING(_p_class, _p_method) \
-UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_RDPROXY_SIMPLEBODY_ARRAY_STRING(_p_method, string, UA_TYPES_STRING) \
-UA_RDPROXY_TAIL()
+//#define UA_RDPROXY_UINT64(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, uint64_t, UA_TYPES_UINT64); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_INT64(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, int64_t, UA_TYPES_INT64); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_INT32(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, int32_t, UA_TYPES_INT32); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_UINT32(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, uint32_t, UA_TYPES_UINT32); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_INT16(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, int16_t, UA_TYPES_INT16); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_UINT16(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, uint16_t, UA_TYPES_UINT16); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_INT8(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, int8_t, UA_TYPES_SBYTE); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_UINT8(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, uint8_t, UA_TYPES_BYTE); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_BOOL(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, UA_Boolean, UA_TYPES_BOOLEAN); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_FLOAT(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, float, UA_TYPES_FLOAT); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_DOUBLE(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, double, UA_TYPES_DOUBLE); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_DATETIME(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, long long int, UA_TYPES_DATETIME); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_NODEID(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY(_p_method, UA_NodeId, UA_TYPES_NODEID); \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_ARRAY_INT8(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, int8_t, UA_TYPES_SBYTE) \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_ARRAY_UINT8(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, uint8_t, UA_TYPES_BYTE) \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_ARRAY_INT16(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, int16_t, UA_TYPES_INT16) \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_ARRAY_UINT16(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, uint16_t, UA_TYPES_UINT16) \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_ARRAY_INT32(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, int32_t, UA_TYPES_INT32) \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_ARRAY_UINT32(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, uint32_t, UA_TYPES_UINT32) \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_ARRAY_INT64(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, int64_t, UA_TYPES_INT64) \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_ARRAY_UINT64(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, uint64_t, UA_TYPES_UINT64) \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_ARRAY_FLOAT(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, float, UA_TYPES_FLOAT) \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_ARRAY_DOUBLE(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY_ARRAY(_p_method, double, UA_TYPES_DOUBLE) \
+//UA_RDPROXY_TAIL()
+//
+//#define UA_RDPROXY_ARRAY_STRING(_p_class, _p_method) \
+//UA_RDPROXY_HEAD(_p_class, _p_method) \
+//UA_RDPROXY_SIMPLEBODY_ARRAY_STRING(_p_method, string, UA_TYPES_STRING) \
+//UA_RDPROXY_TAIL()
 
 // Writeproxies:
 #define UA_WRPROXY_STRING(_p_class, _p_method) \
@@ -279,133 +279,133 @@ UASTRING_TO_CPPSTRING( ((UA_String) *((UA_String *) data->data)) , cpps); \
 theClass->_p_method(cpps); \
 UA_WRPROXY_TAIL()
 
-#define UA_WRPROXY_LOCALIZEDTEXT(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-std::string locale; \
-UASTRING_TO_CPPSTRING( ((UA_String) *((UA_String *) &((UA_LocalizedText *) data->data)->locale)) , locale); \
-std::string text; \
-UASTRING_TO_CPPSTRING( ((UA_String) *((UA_String *) &((UA_LocalizedText *) data->data)->text)) , text); \
-theClass->_p_method(std::make_tuple(locale, text)); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_INT8(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_UINT8(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_INT16(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_UINT16(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_INT32(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_UINT32(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
-UA_WRPROXY_TAIL()
-    
-#define UA_WRPROXY_INT64(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, int64_t); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_UINT64(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, uint64_t); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_BOOL(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, bool); \
-UA_WRPROXY_TAIL()
-    
-#define UA_WRPROXY_FLOAT(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, float); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_DOUBLE(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, double); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_DATETIME(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, UA_DateTime); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_NODEID(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY(_p_method, UA_NodeId); \
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_ARRAY_INT8(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, int8_t)\
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_ARRAY_UINT8(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, uint8_t)\
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_ARRAY_INT16(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, int16_t)\
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_ARRAY_UINT16(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, uint16_t)\
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_ARRAY_INT32(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, int32_t)\
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_ARRAY_UINT32(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, uint32_t)\
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_ARRAY_INT64(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, int64_t)\
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_ARRAY_UINT64(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, uint64_t)\
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_ARRAY_FLOAT(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, float)\
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_ARRAY_DOUBLE(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, double)\
-UA_WRPROXY_TAIL()
-
-#define UA_WRPROXY_ARRAY_STRING(_p_class, _p_method) \
-UA_WRPROXY_HEAD(_p_class, _p_method) \
-UA_WRPROXY_SIMPLEBODY_ARRAY_STRING(_p_method, _p_ctype) \
-UA_WRPROXY_TAIL()
+//#define UA_WRPROXY_LOCALIZEDTEXT(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//std::string locale; \
+//UASTRING_TO_CPPSTRING( ((UA_String) *((UA_String *) &((UA_LocalizedText *) data->data)->locale)) , locale); \
+//std::string text; \
+//UASTRING_TO_CPPSTRING( ((UA_String) *((UA_String *) &((UA_LocalizedText *) data->data)->text)) , text); \
+//theClass->_p_method(std::make_tuple(locale, text)); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_INT8(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_UINT8(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_INT16(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_UINT16(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_INT32(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_UINT32(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, uint32_t); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_INT64(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, int64_t); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_UINT64(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, uint64_t); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_BOOL(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, bool); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_FLOAT(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, float); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_DOUBLE(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, double); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_DATETIME(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, UA_DateTime); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_NODEID(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY(_p_method, UA_NodeId); \
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_ARRAY_INT8(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, int8_t)\
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_ARRAY_UINT8(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, uint8_t)\
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_ARRAY_INT16(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, int16_t)\
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_ARRAY_UINT16(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, uint16_t)\
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_ARRAY_INT32(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, int32_t)\
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_ARRAY_UINT32(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, uint32_t)\
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_ARRAY_INT64(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, int64_t)\
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_ARRAY_UINT64(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, uint64_t)\
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_ARRAY_FLOAT(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, float)\
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_ARRAY_DOUBLE(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY_ARRAY(_p_method, double)\
+//UA_WRPROXY_TAIL()
+//
+//#define UA_WRPROXY_ARRAY_STRING(_p_class, _p_method) \
+//UA_WRPROXY_HEAD(_p_class, _p_method) \
+//UA_WRPROXY_SIMPLEBODY_ARRAY_STRING(_p_method, _p_ctype) \
+//UA_WRPROXY_TAIL()
 
 #endif //HAVE_UA_PROXIES_CALLBACK_H
