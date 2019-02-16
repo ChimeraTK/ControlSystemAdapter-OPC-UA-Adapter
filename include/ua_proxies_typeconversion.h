@@ -21,6 +21,8 @@
 #ifndef HAVE_UA_PROXIES_TYPECONVERSION_H
 #define HAVE_UA_PROXIES_TYPECONVERSION_H
 
+#include <string>
+
 /* Helpers for type converstion and such */
 #define UA_STRING_TO_CPPSTRING_COPY(_p_uastring, _p_cppstring) do { \
 UA_String *ua_url = (UA_String *) _p_uastring; \
@@ -56,13 +58,13 @@ free(s);\
  * 
  * Copy contents of s_cpp into s_ua
  */
-#define CPPSTRING_TO_UASTRING(_p_uastring, _p_cppstring) {\
-char *s  = (char *) malloc(_p_cppstring.length()+1); \
-strncpy(s, (char*) _p_cppstring.c_str(), _p_cppstring.length()); \
-_p_uastring.length = _p_cppstring.length(); \
-_p_uastring.data = (UA_Byte *) malloc(_p_uastring.length); \
-memcpy(_p_uastring.data, s, _p_uastring.length); \
-free(s); \
+static inline UA_String
+CPPSTRING_TO_UASTRING(std::string &s) {
+    char *buf  = (char *) malloc(s.length());
+    if(!buf)
+        return UA_STRING_NULL;
+    strncpy(buf, (char*) s.c_str(), s.length());
+    return {s.length(), (UA_Byte*)buf};
 }
 
 #define CPPSTRING_TO_UASTRING_NEW(_p_uastring, _p_cppstring) {\

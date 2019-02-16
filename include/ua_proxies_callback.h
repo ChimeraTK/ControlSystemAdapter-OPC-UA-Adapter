@@ -133,8 +133,8 @@ UA_Variant_setRangeCopy(&value->value, (_p_ctype *) thisObj->_p_method().data(),
 // Readproxies:
 #define UA_RDPROXY_STRING(_p_class, _p_method) \
 UA_RDPROXY_HEAD(_p_class, _p_method) \
-UA_String ua_val; \
-CPPSTRING_TO_UASTRING(ua_val, thisObj->_p_method()); \
+string temp = thisObj->_p_method();        \
+UA_String ua_val = CPPSTRING_TO_UASTRING(temp); \
 UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]); \
 UA_String_deleteMembers(&ua_val); \
 UA_RDPROXY_TAIL()
@@ -145,8 +145,8 @@ UA_LocalizedText ua_val; \
 std::tuple<std::string, std::string> val = thisObj->_p_method(); \
 std::string locale = std::get<0>(val); \
 std::string text   = std::get<1>(val); \
-CPPSTRING_TO_UASTRING(ua_val.locale, locale); \
-CPPSTRING_TO_UASTRING(ua_val.text, text); \
+ua_val.locale = CPPSTRING_TO_UASTRING(locale); \
+ua_val.text = CPPSTRING_TO_UASTRING(text); \
 UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]); \
 UA_LocalizedText_deleteMembers(&ua_val); \
 UA_RDPROXY_TAIL()
