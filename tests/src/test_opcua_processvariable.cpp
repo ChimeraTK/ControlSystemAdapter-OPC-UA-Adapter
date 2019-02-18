@@ -531,10 +531,8 @@ void ProcessVariableTest::testClientSide(){
                                                                                 }
 
                                                                                 // Write new engineering unit
-                                                                                UA_String newEU;
-                                                                                UA_String_init(&newEU);
                                                                                 string merker = "mHensel/Iatrou";
-                                                                                CPPSTRING_TO_UASTRING(newEU, merker);
+                                                                                UA_String newEU = CPPSTRING_TO_UASTRING(merker);
                                                                                 UA_Variant_init(euToCheck);
                                                                                 UA_Variant_setScalarCopy(euToCheck, &newEU, &UA_TYPES[UA_TYPES_STRING]);
                                                                                 UA_StatusCode retvalNewEU = UA_Client_writeValueAttribute(client, engineeringUnitNodeId, euToCheck);
@@ -555,10 +553,8 @@ void ProcessVariableTest::testClientSide(){
                                                                                         BOOST_CHECK(description == "");
                                                                                 }
                                                                                 // Write new engineering unit
-                                                                                UA_String newDesc;
-                                                                                UA_String_init(&newDesc);
                                                                                 merker = "Beschreibung";
-                                                                                CPPSTRING_TO_UASTRING(newDesc, merker);
+                                                                                UA_String newDesc = CPPSTRING_TO_UASTRING(merker);
                                                                                 UA_Variant_init(descToCheck);
                                                                                 UA_Variant_setScalarCopy(descToCheck, &newDesc, &UA_TYPES[UA_TYPES_STRING]);
                                                                                 UA_StatusCode retvalNewDesc = UA_Client_writeValueAttribute(client, descriptionNodeId, descToCheck);
