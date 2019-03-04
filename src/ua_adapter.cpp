@@ -350,10 +350,12 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                         oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str());
                                         oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", description.c_str());
 
-                                        UA_INSTATIATIONCALLBACK(icb);
-                                        UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),
-                                                                                                        objectNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                                                                                                        UA_QUALIFIEDNAME_ALLOC(1, renameVar.c_str()), UA_NODEID_NULL, oAttr, &icb, &createdNodeId);
+//                                        UA_INSTATIATIONCALLBACK(icb);
+                                        UA_InstantiationCallback icb;
+                                        icb.handle = (void *) &this->ownedNodes;
+                                        icb.method = ua_mapInstantiatedNodes;
+                                        UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0), objectNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                                                UA_QUALIFIEDNAME_ALLOC(1, renameVar.c_str()), UA_NODEID_NULL, oAttr, &icb, &createdNodeId);
 
                                         UA_ExpandedNodeId *targetNodeId = UA_ExpandedNodeId_new();
                                         targetNodeId->nodeId = createdNodeId;
@@ -442,7 +444,10 @@ UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderN
         oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)folderName.c_str());
         oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str());
 
-        UA_INSTATIATIONCALLBACK(icb);
+//        UA_INSTATIATIONCALLBACK(icb);
+        UA_InstantiationCallback icb;
+        icb.handle = (void *) &this->ownedNodes;
+        icb.method = ua_mapInstantiatedNodes;
         UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
                           basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
                           UA_QUALIFIEDNAME(1, (char*)folderName.c_str()), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr, &icb, &createdNodeId);
@@ -465,7 +470,10 @@ UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
         oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.rootFolder.c_str());
         oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.descriptionFolder.c_str());
 
-        UA_INSTATIATIONCALLBACK(icb);
+//        UA_INSTATIATIONCALLBACK(icb);
+        UA_InstantiationCallback icb;
+        icb.handle = (void *) &this->ownedNodes;
+        icb.method = ua_mapInstantiatedNodes;
         UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
                             UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
                             UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &icb, &createdNodeId);

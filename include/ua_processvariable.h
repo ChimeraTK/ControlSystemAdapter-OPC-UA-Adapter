@@ -89,6 +89,8 @@ public:
         */
         UA_DateTime getSourceTimeStamp();
 
+        static UA_StatusCode ua_readproxy_ua_processvariable_getName (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
+
         /** @brief Set name of processvariable
         *
         * @param name Name of the processvariable
@@ -99,6 +101,8 @@ public:
         * @return <String> of the name of processvariable
         */
         string getName();
+
+        static UA_StatusCode ua_readproxy_ua_processvariable_getType (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
 
         /** @brief  Set type of processvariable
         *
@@ -111,6 +115,9 @@ public:
         */
         string getType();
 
+        static UA_StatusCode ua_readproxy_ua_processvariable_getEngineeringUnit (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
+        static UA_StatusCode ua_writeproxy_ua_processvariable_setEngineeringUnit (void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range);
+
         /** @brief  Set engineering unit of processvariable
         *
         * @param type Define the engineering unit of the processvariable
@@ -121,6 +128,9 @@ public:
         * @return <String> of engineering unit
         */
         string getEngineeringUnit();
+
+        static UA_StatusCode ua_writeproxy_ua_processvariable_setDescription (void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range);
+        static UA_StatusCode ua_readproxy_ua_processvariable_getDescription (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
 
         /** @brief  Get description unit of processvariable
         *
@@ -138,59 +148,6 @@ public:
         * @return <UA_NodeId> of this processvariable
         */
         UA_NodeId getOwnNodeId();
-
-//        #define CREATE_READ_FUNCTION_ARRAY_DEF(_p_type)  std::vector<_p_type>  getValue_Array_##_p_type();
-//        #define CREATE_WRITE_FUNCTION_ARRAY_DEF(_p_type) void setValue_Array_##_p_type(std::vector<_p_type> value);
-//        #define CREATE_READ_FUNCTION_DEF(_p_type)  _p_type  getValue_##_p_type();
-//        #define CREATE_WRITE_FUNCTION_DEF(_p_type) void setValue_##_p_type(_p_type value);
-
-    //CREATE_WRITE_FUNCTION_DEF(int8_t)
-    //CREATE_WRITE_FUNCTION_DEF(uint8_t)
-    //CREATE_WRITE_FUNCTION_DEF(int16_t)
-    //CREATE_WRITE_FUNCTION_DEF(uint16_t)
-    //CREATE_WRITE_FUNCTION_DEF(int32_t)
-    //CREATE_WRITE_FUNCTION_DEF(uint32_t)
-    //CREATE_WRITE_FUNCTION_DEF(int64_t)
-    //CREATE_WRITE_FUNCTION_DEF(uint64_t)
-    //CREATE_WRITE_FUNCTION_DEF(float)
-    //CREATE_WRITE_FUNCTION_DEF(double)
-    //CREATE_WRITE_FUNCTION_DEF(string)
-
-    //CREATE_READ_FUNCTION_DEF(int8_t)
-    //CREATE_READ_FUNCTION_DEF(uint8_t)
-    //CREATE_READ_FUNCTION_DEF(int16_t)
-    //CREATE_READ_FUNCTION_DEF(uint16_t)
-    //CREATE_READ_FUNCTION_DEF(int32_t)
-    //CREATE_READ_FUNCTION_DEF(uint32_t)
-    //CREATE_READ_FUNCTION_DEF(int64_t)
-    //CREATE_READ_FUNCTION_DEF(uint64_t)
-    //CREATE_READ_FUNCTION_DEF(float)
-    //CREATE_READ_FUNCTION_DEF(double)
-    //CREATE_READ_FUNCTION_DEF(string)
-
-    //CREATE_WRITE_FUNCTION_ARRAY_DEF(int8_t)
-    //CREATE_WRITE_FUNCTION_ARRAY_DEF(uint8_t)
-    //CREATE_WRITE_FUNCTION_ARRAY_DEF(int16_t)
-    //CREATE_WRITE_FUNCTION_ARRAY_DEF(uint16_t)
-    //CREATE_WRITE_FUNCTION_ARRAY_DEF(int32_t)
-    //CREATE_WRITE_FUNCTION_ARRAY_DEF(uint32_t)
-    //CREATE_WRITE_FUNCTION_ARRAY_DEF(int64_t)
-    //CREATE_WRITE_FUNCTION_ARRAY_DEF(uint64_t)
-    //CREATE_WRITE_FUNCTION_ARRAY_DEF(float)
-    //CREATE_WRITE_FUNCTION_ARRAY_DEF(double)
-    //CREATE_WRITE_FUNCTION_ARRAY_DEF(string)
-
-    //CREATE_READ_FUNCTION_ARRAY_DEF(int8_t)
-    //CREATE_READ_FUNCTION_ARRAY_DEF(uint8_t)
-    //CREATE_READ_FUNCTION_ARRAY_DEF(int16_t)
-    //CREATE_READ_FUNCTION_ARRAY_DEF(uint16_t)
-    //CREATE_READ_FUNCTION_ARRAY_DEF(int32_t)
-    //CREATE_READ_FUNCTION_ARRAY_DEF(uint32_t)
-    //CREATE_READ_FUNCTION_ARRAY_DEF(int64_t)
-    //CREATE_READ_FUNCTION_ARRAY_DEF(uint64_t)
-    //CREATE_READ_FUNCTION_ARRAY_DEF(float)
-    //CREATE_READ_FUNCTION_ARRAY_DEF(double)
-    //CREATE_READ_FUNCTION_ARRAY_DEF(string)
 
     static UA_StatusCode ua_readproxy_ua_processvariable_getValue(void *handle,
             const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp,

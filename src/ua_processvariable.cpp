@@ -27,7 +27,7 @@ extern "C" {
 }
 
 #include "ua_proxies.h"
-#include "ua_proxies_callback.h"
+//#include "ua_proxies_callback.h"
 
 #include <iostream>
 #include <vector>
@@ -50,18 +50,78 @@ ua_processvariable::~ua_processvariable()
 }
 
 // Name
-UA_RDPROXY_STRING(ua_processvariable, getName)
+//UA_RDPROXY_STRING(ua_processvariable, getName)
+UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getName(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
+    ua_processvariable *thisObj = static_cast<ua_processvariable *>(handle);
+    UA_String ua_val;
+    //{
+    char *s = (char *) malloc(thisObj->getName().length() + 1);
+    strncpy(s, (char*) thisObj->getName().c_str(), thisObj->getName().length());
+    ua_val.length = thisObj->getName().length();
+    ua_val.data = (UA_Byte *) malloc(ua_val.length);
+    memcpy(ua_val.data, s, ua_val.length);
+    free(s);
+    //};
+    UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
+    UA_String_deleteMembers(&ua_val);
+    value->hasValue = true;
+    if (includeSourceTimeStamp) {
+        value->sourceTimestamp = thisObj->getSourceTimeStamp();
+        value->hasSourceTimestamp = true;
+    }
+    return UA_STATUSCODE_GOOD;
+}
+
 string ua_processvariable::getName() {
   return this->namePV;
 }
 
 // EngineeringUnit
-UA_WRPROXY_STRING(ua_processvariable, setEngineeringUnit)
+UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setEngineeringUnit(void *handle, const UA_NodeId nodeid, const UA_Variant *data, const UA_NumericRange *range) {
+    ua_processvariable *theClass = static_cast<ua_processvariable *>(handle);
+    std::string cpps;
+    do {
+        char *s;
+        {
+            s = (char *) malloc(((UA_String) *((UA_String *) data->data)).length + 1);
+            memset(s, 0, ((UA_String) *((UA_String *) data->data)).length + 1);
+            memcpy(s, ((UA_String) *((UA_String *) data->data)).data, ((UA_String) *((UA_String *) data->data)).length);
+        }
+        cpps.assign(s, ((UA_String) *((UA_String *) data->data)).length);
+        free(s);
+    }
+    while (0);
+    theClass->setEngineeringUnit(cpps);
+    return UA_STATUSCODE_GOOD;
+}
+
+//UA_WRPROXY_STRING(ua_processvariable, setEngineeringUnit)
 void ua_processvariable::setEngineeringUnit(string engineeringUnit) {
         this->engineeringUnit = engineeringUnit;
 }
 
-UA_RDPROXY_STRING(ua_processvariable, getEngineeringUnit)
+UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getEngineeringUnit(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
+    ua_processvariable *thisObj = static_cast<ua_processvariable *>(handle);
+    UA_String ua_val;
+    {
+        char *s = (char *) malloc(thisObj->getEngineeringUnit().length() + 1);
+        strncpy(s, (char*) thisObj->getEngineeringUnit().c_str(), thisObj->getEngineeringUnit().length());
+        ua_val.length = thisObj->getEngineeringUnit().length();
+        ua_val.data = (UA_Byte *) malloc(ua_val.length);
+        memcpy(ua_val.data, s, ua_val.length);
+        free(s);
+    };
+    UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
+    UA_String_deleteMembers(&ua_val);
+    value->hasValue = true;
+    if (includeSourceTimeStamp) {
+        value->sourceTimestamp = thisObj->getSourceTimeStamp();
+        value->hasSourceTimestamp = true;
+    }
+    return UA_STATUSCODE_GOOD;
+}
+
+//UA_RDPROXY_STRING(ua_processvariable, getEngineeringUnit)
 string ua_processvariable::getEngineeringUnit() {
         if(!this->engineeringUnit.empty()) {
                 return this->engineeringUnit;
@@ -74,12 +134,52 @@ string ua_processvariable::getEngineeringUnit() {
 }
 
 // Description
-UA_WRPROXY_STRING(ua_processvariable, setDescription)
+UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setDescription(void *handle, const UA_NodeId nodeid, const UA_Variant *data, const UA_NumericRange *range) {
+    ua_processvariable *theClass = static_cast<ua_processvariable *>(handle);
+    std::string cpps;
+    do {
+        char *s;
+        {
+            s = (char *) malloc(((UA_String) *((UA_String *) data->data)).length + 1);
+            memset(s, 0, ((UA_String) *((UA_String *) data->data)).length + 1);
+            memcpy(s, ((UA_String) *((UA_String *) data->data)).data, ((UA_String) *((UA_String *) data->data)).length);
+        }
+        cpps.assign(s, ((UA_String) *((UA_String *) data->data)).length);
+        free(s);
+    }
+    while (0);
+    theClass->setDescription(cpps);
+    return UA_STATUSCODE_GOOD;
+}
+
+//UA_WRPROXY_STRING(ua_processvariable, setDescription)
 void ua_processvariable::setDescription(string description) {
         this->description = description;
 }
 
-UA_RDPROXY_STRING(ua_processvariable, getDescription)
+UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getDescription(void *handle, const UA_NodeId nodeid,
+        UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
+    ua_processvariable *thisObj = static_cast<ua_processvariable *>(handle);
+    UA_String ua_val;
+    {
+        char *s = (char *) malloc(thisObj->getDescription().length() + 1);
+        strncpy(s, (char*) thisObj->getDescription().c_str(), thisObj->getDescription().length());
+        ua_val.length = thisObj->getDescription().length();
+        ua_val.data = (UA_Byte *) malloc(ua_val.length);
+        memcpy(ua_val.data, s, ua_val.length);
+        free(s);
+    };
+    UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
+    UA_String_deleteMembers(&ua_val);
+    value->hasValue = true;
+    if (includeSourceTimeStamp) {
+        value->sourceTimestamp = thisObj->getSourceTimeStamp();
+        value->hasSourceTimestamp = true;
+    }
+    return UA_STATUSCODE_GOOD;
+}
+
+//UA_RDPROXY_STRING(ua_processvariable, getDescription)
 string ua_processvariable::getDescription() {
         if(!this->description.empty()) {
                 return this->description;
@@ -92,7 +192,28 @@ string ua_processvariable::getDescription() {
 }
 
 // Type
-UA_RDPROXY_STRING(ua_processvariable, getType)
+UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getType(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
+    ua_processvariable *thisObj = static_cast<ua_processvariable *>(handle);
+    UA_String ua_val;
+    {
+        char *s = (char *) malloc(thisObj->getType().length() + 1);
+        strncpy(s, (char*) thisObj->getType().c_str(), thisObj->getType().length());
+        ua_val.length = thisObj->getType().length();
+        ua_val.data = (UA_Byte *) malloc(ua_val.length);
+        memcpy(ua_val.data, s, ua_val.length);
+        free(s);
+    };
+    UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[11]);
+    UA_String_deleteMembers(&ua_val);
+    value->hasValue = true;
+    if (includeSourceTimeStamp) {
+        value->sourceTimestamp = thisObj->getSourceTimeStamp();
+        value->hasSourceTimestamp = true;
+    }
+    return UA_STATUSCODE_GOOD;
+}
+
+//UA_RDPROXY_STRING(ua_processvariable, getType)
 string ua_processvariable::getType() {
     // Note: typeid().name() may return the name; may as well return the symbol's name from the binary though...
     std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
@@ -1041,15 +1162,15 @@ UA_StatusCode ua_processvariable::setValue_string(const UA_Variant* data) {
 
 // Just a macro to easy pushing different types of dataSources
 // ... and make sure we lock down writing to receivers in this stage already
- #define PUSH_RDVALUE_TYPE(_p_typeName) { \
- if(this->csManager->getProcessVariable(this->namePV)->isWriteable())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_##_p_typeName) }); } \
-     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName), .write=NULL}); }\
- }
+// #define PUSH_RDVALUE_TYPE(_p_typeName) { \
+// if(this->csManager->getProcessVariable(this->namePV)->isWriteable())  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_##_p_typeName) }); } \
+//     else                                                                    { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_##_p_typeName), .write=NULL}); }\
+// }
 
-#define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) { \
-if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_Array_##_p_typeName) }); } \
-    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName), .write=NULL}); } \
-}
+//#define PUSH_RDVALUE_ARRAY_TYPE(_p_typeName) { \
+//if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName), .write=UA_WRPROXY_NAME(ua_processvariable, setValue_Array_##_p_typeName) }); } \
+//    else                                                                  { mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE), .description = description, .read=UA_RDPROXY_NAME(ua_processvariable, getValue_Array_##_p_typeName), .write=NULL}); } \
+//}
 
 UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
@@ -1073,7 +1194,10 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
         oAttr.writeMask = UA_ACCESSLEVELMASK_WRITE;
     }
 
-    UA_INSTATIATIONCALLBACK(icb);
+//    UA_INSTATIATIONCALLBACK(icb);
+    UA_InstantiationCallback icb;
+    icb.handle = (void *) &this->ownedNodes;
+    icb.method = ua_mapInstantiatedNodes;
     UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0),
         this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
         UA_QUALIFIEDNAME_ALLOC(1, this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKPROCESSVARIABLE), oAttr, &icb, &createdNodeId);
@@ -1548,10 +1672,38 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     UA_NodeId nodeIdVariableType = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
     NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, valueNodeId)
 
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read = UA_RDPROXY_NAME(ua_processvariable, getName), .write = NULL });
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read = UA_RDPROXY_NAME(ua_processvariable, getDescription), .write = UA_WRPROXY_NAME(ua_processvariable, setDescription) });
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read = UA_RDPROXY_NAME(ua_processvariable, getEngineeringUnit), .write = UA_WRPROXY_NAME(ua_processvariable, setEngineeringUnit) });
-    mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read = UA_RDPROXY_NAME(ua_processvariable, getType), .write = NULL });
+    //mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read = UA_RDPROXY_NAME(ua_processvariable, getName), .write = NULL });
+    UA_DataSource_Map_Element mapElemName;
+    mapElemName.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
+    mapElemName.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+    mapElemName.read = ua_readproxy_ua_processvariable_getName;
+    mapElemName.write = NULL;
+    mapDs.push_back(mapElemName);
+
+    //mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read = UA_RDPROXY_NAME(ua_processvariable, getDescription), .write = UA_WRPROXY_NAME(ua_processvariable, setDescription) });
+    UA_DataSource_Map_Element mapElemDesc;
+    mapElemDesc.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
+    mapElemDesc.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+    mapElemDesc.read = ua_readproxy_ua_processvariable_getDescription;
+    mapElemDesc.write = ua_writeproxy_ua_processvariable_setDescription;
+    mapDs.push_back(mapElemDesc);
+    //mapDs.push_back((UA_DataSource_Map_Element) { , , .read = UA_RDPROXY_NAME(ua_processvariable, getDescription), ;
+
+    UA_DataSource_Map_Element mapElemEU;
+    mapElemEU.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
+    mapElemEU.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+    mapElemEU.read = ua_readproxy_ua_processvariable_getEngineeringUnit;
+    mapElemEU.write = ua_writeproxy_ua_processvariable_setEngineeringUnit;
+    mapDs.push_back(mapElemEU);
+    //mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read = UA_RDPROXY_NAME(ua_processvariable, getEngineeringUnit), .write = UA_WRPROXY_NAME(ua_processvariable, setEngineeringUnit) });
+
+    UA_DataSource_Map_Element mapElemType;
+    mapElemType.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
+    mapElemType.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+    mapElemType.read = ua_readproxy_ua_processvariable_getType;
+    mapElemType.write = NULL;
+    mapDs.push_back(mapElemType);
+    //mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE), UA_LOCALIZEDTEXT((char*)"", (char*)""), .read = UA_RDPROXY_NAME(ua_processvariable, getType), .write = NULL });
 
     this->ua_mapDataSources((void *) this, &mapDs);
 

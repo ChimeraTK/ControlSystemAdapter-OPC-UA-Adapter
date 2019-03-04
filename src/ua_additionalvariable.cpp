@@ -47,7 +47,28 @@ ua_additionalvariable::~ua_additionalvariable()
 }
 
 // Value
-UA_RDPROXY_STRING(ua_additionalvariable, getValue)
+UA_StatusCode ua_additionalvariable::ua_readproxy_ua_additionalvariable_getValue(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
+    ua_additionalvariable *thisObj = static_cast<ua_additionalvariable *>(handle);
+    UA_String ua_val;
+    {
+        char *s = (char *) malloc(thisObj->getValue().length() + 1);
+        strncpy(s, (char*) thisObj->getValue().c_str(), thisObj->getValue().length());
+        ua_val.length = thisObj->getValue().length();
+        ua_val.data = (UA_Byte *) malloc(ua_val.length);
+        memcpy(ua_val.data, s, ua_val.length);
+        free(s);
+    };
+    UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[11]);
+    UA_String_deleteMembers(&ua_val);
+    value->hasValue = true;
+    if (includeSourceTimeStamp) {
+        value->sourceTimestamp = thisObj->getSourceTimeStamp();
+        value->hasSourceTimestamp = true;
+    }
+    return UA_STATUSCODE_GOOD;
+}
+
+//UA_RDPROXY_STRING(ua_additionalvariable, getValue)
 string ua_additionalvariable::getValue() {
   return this->value;
 }
@@ -67,17 +88,25 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
     oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->name.c_str());
     oAttr.description = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->description.c_str());
 		    		
-		UA_INSTATIATIONCALLBACK(icb);  		
-		UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1,0),
-                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                             UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), oAttr, &icb, &createdNodeId);
+//    UA_INSTATIATIONCALLBACK(icb);
+    UA_InstantiationCallback icb;
+    icb.handle = (void *) &this->ownedNodes;
+    icb.method = ua_mapInstantiatedNodes;
+    UA_Server_addObjectNode(this->mappedServer, UA_NODEID_NUMERIC(1, 0), this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+            UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), oAttr, &icb, &createdNodeId);
     
 	// know your own nodeId
 	this->ownNodeId = createdNodeId;
 		
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE), oAttr.description, .read=UA_RDPROXY_NAME(ua_additionalvariable, getValue), .write=NULL});
+	UA_DataSource_Map_Element mapElemValue;
+	mapElemValue.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE);
+	mapElemValue.description = oAttr.description;
+	mapElemValue.read = ua_readproxy_ua_additionalvariable_getValue;
+	mapElemValue.write = NULL;
+	mapDs.push_back(mapElemValue);
+	//mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE), oAttr.description, .read=UA_RDPROXY_NAME(ua_additionalvariable, getValue), .write=NULL});
 	
 	this->ua_mapDataSources((void *) this, &mapDs);
 	
