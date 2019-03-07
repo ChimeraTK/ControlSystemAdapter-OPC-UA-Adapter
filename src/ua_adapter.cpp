@@ -350,7 +350,6 @@ void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSys
                                         oAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en_US", renameVar.c_str());
                                         oAttr.description = UA_LOCALIZEDTEXT_ALLOC("en_US", description.c_str());
 
-//                                        UA_INSTATIATIONCALLBACK(icb);
                                         UA_InstantiationCallback icb;
                                         icb.handle = (void *) &this->ownedNodes;
                                         icb.method = ua_mapInstantiatedNodes;
@@ -444,7 +443,6 @@ UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderN
         oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)folderName.c_str());
         oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str());
 
-//        UA_INSTATIATIONCALLBACK(icb);
         UA_InstantiationCallback icb;
         icb.handle = (void *) &this->ownedNodes;
         icb.method = ua_mapInstantiatedNodes;
@@ -470,7 +468,6 @@ UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
         oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.rootFolder.c_str());
         oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.descriptionFolder.c_str());
 
-//        UA_INSTATIATIONCALLBACK(icb);
         UA_InstantiationCallback icb;
         icb.handle = (void *) &this->ownedNodes;
         icb.method = ua_mapInstantiatedNodes;
