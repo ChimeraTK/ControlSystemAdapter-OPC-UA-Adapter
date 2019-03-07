@@ -26,7 +26,6 @@ extern "C" {
 }
 
 #include "ua_proxies.h"
-#include "ua_proxies_callback.h"
 
 #include <iostream>
 
