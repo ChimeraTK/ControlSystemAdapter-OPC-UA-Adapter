@@ -204,6 +204,7 @@ string ua_processvariable::getType() {
     else if (valueType == typeid(float))    return "float";
     else if (valueType == typeid(double))   return "double";
     else if (valueType == typeid(string))   return "string";
+    else if (valueType == typeid(bool))     return "bool";
     else                                    return "Unsupported type";
 }
 
@@ -256,6 +257,14 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(void 
 
     case UA_PV_STRING:
         rv = thisObj->getValue_string(&value->value);
+        break;
+
+    case UA_PV_BOOL:
+        rv = thisObj->getValue_bool(&value->value);
+        break;
+
+    default:
+        std::cout << "ua_readproxy_ua_processvariable_getValue: Unknown type: " << thisObj->type;
         break;
     }
 
@@ -605,6 +614,45 @@ UA_StatusCode ua_processvariable::getValue_string(UA_Variant* v) {
     return rv;
 }
 
+UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
+    UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
+
+    if (this->type == UA_PV_BOOL) {
+        if (this->csManager->getProcessVariable(this->namePV)->isReadable()) {
+            while (this->csManager->getProcessArray<bool>(this->namePV)->readNonBlocking()) {
+            }
+        }
+        if (this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0).size() == 1) {
+            bool bval = this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0).at(0);
+            rv = UA_Variant_setScalarCopy(v, &bval, &UA_TYPES[UA_TYPES_BOOLEAN]);
+        }
+        else {
+            // Array
+            std::vector<bool> bvector = this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0);
+            // Da vector<bool> kein Array liefert, müssen die Daten umkopiert werden
+            bool* barr = new bool[bvector.size()];
+            for (size_t i = 0; i < bvector.size(); i++)
+            {
+                barr[i] = bvector[i];
+            }
+
+            UA_Variant_setArrayCopy(v, barr, bvector.size(), &UA_TYPES[UA_TYPES_BOOLEAN]);
+            UA_NumericRange arrayRange;
+            arrayRange.dimensionsSize = 1;
+            UA_NumericRangeDimension
+                scalarThisDimension = (UA_NumericRangeDimension)
+            {
+                .min = 0, .max = (unsigned)bvector.size()
+            };
+            arrayRange.dimensions = &scalarThisDimension;
+            rv = UA_Variant_setRangeCopy(v, (UA_Boolean*)barr, bvector.size(), arrayRange);
+            delete [] barr;
+        }
+    }
+
+    return rv;
+}
+
 UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setValue(void *handle, const UA_NodeId nodeid, const UA_Variant *data, const UA_NumericRange *range) {
     UA_StatusCode retval = UA_STATUSCODE_BADINTERNALERROR;
     ua_processvariable *theClass = static_cast<ua_processvariable *> (handle);
@@ -651,6 +699,10 @@ UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setValue(void
 
     case UA_PV_STRING:
         retval = theClass->setValue_string(data);
+        break;
+
+    case UA_PV_BOOL:
+        retval = theClass->setValue_bool(data);
         break;
 
     default:
@@ -976,6 +1028,35 @@ UA_StatusCode ua_processvariable::setValue_string(const UA_Variant* data) {
             }
             this->csManager->getProcessArray <string>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <string>(this->namePV)->write();
+            retval = UA_STATUSCODE_GOOD;
+        }
+        else {
+            retval = UA_STATUSCODE_BADNOTWRITABLE;
+        }
+    }
+
+    return retval;
+}
+
+UA_StatusCode ua_processvariable::setValue_bool(const UA_Variant* data) {
+    UA_StatusCode retval = UA_STATUSCODE_BADINTERNALERROR;
+
+    if (type == UA_PV_BOOL) {
+        if (this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
+            vector<bool> valueArray;
+            if (UA_Variant_isScalar(data) && (!array)) {
+                bool value = *((bool *)data->data);
+                valueArray.push_back(value);
+            }
+            else if ((!UA_Variant_isScalar(data)) && array) {
+                bool* v = (bool *)data->data;
+                valueArray.resize(data->arrayLength);
+                for (uint32_t i = 0; i < valueArray.size(); i++) {
+                    valueArray.at(i) = v[i];
+                }
+            }
+            this->csManager->getProcessArray <bool>(this->namePV)->accessChannel(0) = valueArray;
+            this->csManager->getProcessArray <bool>(this->namePV)->write();
             retval = UA_STATUSCODE_GOOD;
         }
         else {
@@ -1389,6 +1470,38 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <string>(this->namePV)->accessChannel(0).size() == 1)
+        {
+            this->array = false;
+            if (this->csManager->getProcessVariable(this->namePV)->isWriteable())
+            {
+                mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
+            }
+            else
+            {
+                mapElem.write = NULL;
+            }
+        }
+        else
+        {
+            this->array = true;
+            if (this->csManager->getProcessVariable(this->namePV)->isWriteable())
+            {
+                mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
+            }
+            else
+            {
+                mapElem.write = NULL;
+            }
+        }
+        mapDs.push_back(mapElem);
+    }
+    else if (valueType == typeid(bool)) {
+        type = UA_PV_BOOL;
+        UA_DataSource_Map_Element mapElem;
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.description = description;
+        mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
+        if (this->csManager->getProcessArray <bool>(this->namePV)->accessChannel(0).size() == 1)
         {
             this->array = false;
             if (this->csManager->getProcessVariable(this->namePV)->isWriteable())

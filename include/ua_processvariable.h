@@ -40,7 +40,8 @@ typedef enum {
     UA_PV_DOUBLE = 9,
     UA_PV_STRING = 10,
     UA_PV_INT64 = 11,
-    UA_PV_UINT64 = 12
+    UA_PV_UINT64 = 12,
+    UA_PV_BOOL = 13
 } UA_Processvariable_Type;
 
 /** @class ua_processvariable
@@ -163,6 +164,7 @@ public:
     UA_StatusCode getValue_float(UA_Variant* v);
     UA_StatusCode getValue_double(UA_Variant* v);
     UA_StatusCode getValue_string(UA_Variant* v);
+    UA_StatusCode getValue_bool(UA_Variant* v);
 
     static UA_StatusCode ua_writeproxy_ua_processvariable_setValue(void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range);
     UA_StatusCode setValue_int8(const UA_Variant* data);
@@ -176,6 +178,7 @@ public:
     UA_StatusCode setValue_float(const UA_Variant* data);
     UA_StatusCode setValue_double(const UA_Variant* data);
     UA_StatusCode setValue_string(const UA_Variant* data);
+    UA_StatusCode setValue_bool(const UA_Variant* data);
 };
 
 #endif // UA_PROCESSVARIABLE_H
