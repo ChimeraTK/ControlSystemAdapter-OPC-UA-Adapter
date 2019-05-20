@@ -27,7 +27,6 @@ extern "C" {
 }
 
 #include "ua_proxies.h"
-#include "ua_proxies_callback.h"
 
 #include <iostream>
 
@@ -47,8 +46,29 @@ ua_additionalvariable::~ua_additionalvariable()
   // Our ua_mapped_class destructor will take care of deleting our opcua footprint as long as all variables are mapped in this->ownedNodes
 }
 
-//
-UA_RDPROXY_STRING(ua_additionalvariable, getValue)
+// Value
+UA_StatusCode ua_additionalvariable::ua_readproxy_ua_additionalvariable_getValue(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
+    ua_additionalvariable *thisObj = static_cast<ua_additionalvariable *>(handle);
+    UA_String ua_val;
+    {
+        char *s = (char *) malloc(thisObj->getValue().length() + 1);
+        strncpy(s, (char*) thisObj->getValue().c_str(), thisObj->getValue().length());
+        ua_val.length = thisObj->getValue().length();
+        ua_val.data = (UA_Byte *) malloc(ua_val.length);
+        memcpy(ua_val.data, s, ua_val.length);
+        free(s);
+    };
+    UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[11]);
+    UA_String_deleteMembers(&ua_val);
+    value->hasValue = true;
+    if (includeSourceTimeStamp) {
+        value->sourceTimestamp = thisObj->getSourceTimeStamp();
+        value->hasSourceTimestamp = true;
+    }
+    return UA_STATUSCODE_GOOD;
+}
+
+//UA_RDPROXY_STRING(ua_additionalvariable, getValue)
 string ua_additionalvariable::getValue() {
 	return this->value;
 }
@@ -75,7 +95,10 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
     vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
     UA_Variant_setScalar(&vAttr.value, opcua_node_variable_t_ns_2_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
 
-    UA_INSTATIATIONCALLBACK(icb);
+    //    UA_INSTATIATIONCALLBACK(icb);
+    UA_InstantiationCallback icb;
+    icb.handle = (void *) &this->ownedNodes;
+    icb.method = ua_mapInstantiatedNodes;
 
 	retval |= UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/"+name+"AdditionalVariable").c_str()), this->baseNodeId,
                               UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()),
@@ -93,10 +116,16 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
             this->ownNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
             UA_QUALIFIEDNAME_ALLOC(1, this->description.c_str()),
             UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, NULL, &createdNodeId);
-		
+
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
-	mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE), vAttr.description, .read=UA_RDPROXY_NAME(ua_additionalvariable, getValue), .write=NULL});
+	UA_DataSource_Map_Element mapElemValue;
+	mapElemValue.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE);
+	mapElemValue.description = vAttr.description;
+	mapElemValue.read = ua_readproxy_ua_additionalvariable_getValue;
+	mapElemValue.write = NULL;
+	mapDs.push_back(mapElemValue);
+	//mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE), oAttr.description, .read=UA_RDPROXY_NAME(ua_additionalvariable, getValue), .write=NULL});
 	
 	this->ua_mapDataSources((void *) this, &mapDs);
 	

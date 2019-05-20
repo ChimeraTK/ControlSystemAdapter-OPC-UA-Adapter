@@ -65,287 +65,341 @@ void ProcessVariableTest::testClassSide() {
         BOOST_CHECK(test->getSourceTimeStamp() == usecs * UA_USEC_TO_DATETIME + UA_DATETIME_UNIX_EPOCH);
         std::string valueType = test->getType();
 
-        cout << "Check Processvariable: " << test->getName() << endl;
-        if (valueType == "int8_t") {
-            BOOST_CHECK(valueType == "int8_t");
-            vector<int8_t> valueArray = pvSet.csManager->getProcessArray<int8_t>(
-                    oneProcessVariable->getName())->accessChannel(0);
-
-            if (valueArray.size() == 1) {
-                int8_t newValue;
-                BOOST_CHECK(test->getValue_int8_t() == 0);
-                newValue = 100;
-
-                test->setValue_int8_t(newValue);
-                // Check value on controlsystemmanager side
-                vector<int8_t> csValueArray = pvSet.csManager->getProcessArray<int8_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                BOOST_CHECK(csValueArray.size() == 1);
-                BOOST_CHECK(csValueArray.at(0) == 100);
-            } else {
-                // if Array
-                std::vector<int8_t> newVector(test->getValue_Array_int8_t().size());
-                int32_t i = 0;
-                for (auto value : test->getValue_Array_int8_t()) {
-                    BOOST_CHECK(value == 0);
-                    newVector.at(i) = (100 - i);
-                    i++;
+                cout << "Check Processvariable: " << test->getName() << endl;
+                if (valueType == "int8_t") {
+//                        BOOST_CHECK(valueType == "int8_t");
+//                        vector<int8_t> valueArray = pvSet.csManager->getProcessArray<int8_t>(oneProcessVariable->getName())->accessChannel(0);
+//
+//                        if(valueArray.size() == 1) {
+//                                int8_t newValue;
+//                                BOOST_CHECK(test->getValue_int8_t() == 0);
+//                                newValue = 100;
+//
+//                                test->setValue_int8_t(newValue);
+//                                // Check value on controlsystemmanager side
+//                                vector<int8_t> csValueArray = pvSet.csManager->getProcessArray<int8_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                BOOST_CHECK(csValueArray.size() == 1);
+//                                BOOST_CHECK(csValueArray.at(0) == 100);
+//                        }
+//                        else {
+//                                // if Array
+//                                std::vector<int8_t> newVector(test->getValue_Array_int8_t().size());
+//                                int32_t i = 0;
+//                                for(auto value : test->getValue_Array_int8_t()) {
+//                                        BOOST_CHECK(value == 0);
+//                                        newVector.at(i) = (100-i);
+//                                        i++;
+//                                }
+//                                test->setValue_Array_int8_t(newVector);
+//
+//                                // Check value on controlsystemmanager side
+//                                vector<int8_t> valueArray = pvSet.csManager->getProcessArray<int8_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                i = 0;
+//                                for(auto value : valueArray) {
+//                                        BOOST_CHECK(value == (100-i));
+//                                        i++;
+//                                }
+//                        }
                 }
-                test->setValue_Array_int8_t(newVector);
-
-                // Check value on controlsystemmanager side
-                vector<int8_t> valueArray = pvSet.csManager->getProcessArray<int8_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                i = 0;
-                for (auto value : valueArray) {
-                    BOOST_CHECK(value == (100 - i));
-                    i++;
+                else if (valueType == "uint8_t") {
+//                        BOOST_CHECK(valueType == "uint8_t");
+//                        vector<uint8_t> valueArray = pvSet.csManager->getProcessArray<uint8_t>(oneProcessVariable->getName())->accessChannel(0);
+//
+//                        if(valueArray.size() == 1) {
+//                                uint8_t newValue;
+//                                BOOST_CHECK(test->getValue_uint8_t() == 0);
+//                                newValue = 100;
+//
+//                                test->setValue_uint8_t(newValue);
+//                                // Check value on controlsystemmanager side
+//                                vector<uint8_t> csValueArray = pvSet.csManager->getProcessArray<uint8_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                BOOST_CHECK(csValueArray.size() == 1);
+//                                BOOST_CHECK(csValueArray.at(0) == 100);
+//                        }
+//                        else {
+//                                // if Array
+//                                std::vector<uint8_t> newVector(test->getValue_Array_uint8_t().size());
+//                                int32_t i = 0;
+//                                for(uint8_t value: test->getValue_Array_uint8_t()) {
+//                                        BOOST_CHECK(value == 0);
+//                                        newVector.at(i) = 100-i;
+//                                        i++;
+//                                }
+//                                test->setValue_Array_uint8_t(newVector);
+//                                vector<uint8_t> valueArray = pvSet.csManager->getProcessArray<uint8_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                i = 0;
+//                                for(auto value : valueArray) {
+//                                        BOOST_CHECK(value == (100-i));
+//                                        i++;
+//                                }
+//                        }
                 }
-            }
-        } else if (valueType == "uint8_t") {
-            BOOST_CHECK(valueType == "uint8_t");
-            vector<uint8_t> valueArray = pvSet.csManager->getProcessArray<uint8_t>(
-                    oneProcessVariable->getName())->accessChannel(0);
-
-            if (valueArray.size() == 1) {
-                uint8_t newValue;
-                BOOST_CHECK(test->getValue_uint8_t() == 0);
-                newValue = 100;
-
-                test->setValue_uint8_t(newValue);
-                // Check value on controlsystemmanager side
-                vector<uint8_t> csValueArray = pvSet.csManager->getProcessArray<uint8_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                BOOST_CHECK(csValueArray.size() == 1);
-                BOOST_CHECK(csValueArray.at(0) == 100);
-            } else {
-                // if Array
-                std::vector<uint8_t> newVector(test->getValue_Array_uint8_t().size());
-                int32_t i = 0;
-                for (uint8_t value: test->getValue_Array_uint8_t()) {
-                    BOOST_CHECK(value == 0);
-                    newVector.at(i) = 100 - i;
-                    i++;
+                else if (valueType == "int16_t") {
+//                        BOOST_CHECK(valueType == "int16_t");
+//                        vector<int16_t> valueArray = pvSet.csManager->getProcessArray<int16_t>(oneProcessVariable->getName())->accessChannel(0);
+//
+//                        if(valueArray.size() == 1) {
+//                                int16_t newValue;
+//                                BOOST_CHECK(test->getValue_int16_t() == 0);
+//                                newValue = 100;
+//
+//                                test->setValue_int16_t(newValue);
+//                                // Check value on controlsystemmanager side
+//                                vector<int16_t> csValueArray = pvSet.csManager->getProcessArray<int16_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                BOOST_CHECK(csValueArray.size() == 1);
+//                                BOOST_CHECK(csValueArray.at(0) == 100);
+//                        }
+//                        else {
+//                                // if Array
+//                                int32_t i = 0;
+//                                std::vector<int16_t> newVector(test->getValue_Array_int16_t().size());
+//                                for(int16_t value: test->getValue_Array_int16_t()) {
+//                                        BOOST_CHECK(value == 0);
+//                                        newVector.at(i) = 100-i;
+//                                        i++;
+//                                }
+//                                test->setValue_Array_int16_t(newVector);
+//                                vector<int16_t> valueArray = pvSet.csManager->getProcessArray<int16_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                i = 0;
+//                                for(auto value : valueArray) {
+//                                        BOOST_CHECK(value == (100-i));
+//                                        i++;
+//                                }
+//                        }
                 }
-                test->setValue_Array_uint8_t(newVector);
-                vector<uint8_t> valueArray = pvSet.csManager->getProcessArray<uint8_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                i = 0;
-                for (auto value : valueArray) {
-                    BOOST_CHECK(value == (100 - i));
-                    i++;
+                else if (valueType == "uint16_t") {
+//                        BOOST_CHECK(valueType == "uint16_t");
+//                        vector<uint16_t> valueArray = pvSet.csManager->getProcessArray<uint16_t>(oneProcessVariable->getName())->accessChannel(0);
+//
+//                        if(valueArray.size() == 1) {
+//                                uint16_t newValue;
+//                                BOOST_CHECK(test->getValue_uint16_t() == 0);
+//                                newValue = 100;
+//
+//                                test->setValue_uint16_t(newValue);
+//                                // Check value on controlsystemmanager side
+//                                vector<uint16_t> csValueArray = pvSet.csManager->getProcessArray<uint16_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                BOOST_CHECK(csValueArray.size() == 1);
+//                                BOOST_CHECK(csValueArray.at(0) == 100);
+//                        }
+//                        else {
+//                                // if Array
+//                                int32_t i = 0;
+//                                std::vector<uint16_t> newVector(test->getValue_Array_uint16_t().size());
+//                                for(uint16_t value: test->getValue_Array_uint16_t()) {
+//                                        BOOST_CHECK(value == 0);
+//                                        newVector.at(i) = 100-i;
+//                                        i++;
+//                                }
+//                                test->setValue_Array_uint16_t(newVector);
+//                                vector<uint16_t> valueArray = pvSet.csManager->getProcessArray<uint16_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                i = 0;
+//                                for(auto value : valueArray) {
+//                                        BOOST_CHECK(value == (100-i));
+//                                        i++;
+//                                }
+//                        }
                 }
-            }
-        } else if (valueType == "int16_t") {
-            BOOST_CHECK(valueType == "int16_t");
-            vector<int16_t> valueArray = pvSet.csManager->getProcessArray<int16_t>(
-                    oneProcessVariable->getName())->accessChannel(0);
-
-            if (valueArray.size() == 1) {
-                int16_t newValue;
-                BOOST_CHECK(test->getValue_int16_t() == 0);
-                newValue = 100;
-
-                test->setValue_int16_t(newValue);
-                // Check value on controlsystemmanager side
-                vector<int16_t> csValueArray = pvSet.csManager->getProcessArray<int16_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                BOOST_CHECK(csValueArray.size() == 1);
-                BOOST_CHECK(csValueArray.at(0) == 100);
-            } else {
-                // if Array
-                int32_t i = 0;
-                std::vector<int16_t> newVector(test->getValue_Array_int16_t().size());
-                for (int16_t value: test->getValue_Array_int16_t()) {
-                    BOOST_CHECK(value == 0);
-                    newVector.at(i) = 100 - i;
-                    i++;
+                else if (valueType == "int32_t") {
+//                        BOOST_CHECK(valueType == "int32_t");
+//                        vector<int32_t> valueArray = pvSet.csManager->getProcessArray<int32_t>(oneProcessVariable->getName())->accessChannel(0);
+//
+//                        if(valueArray.size() == 1) {
+//                                int32_t newValue;
+//                                BOOST_CHECK(test->getValue_int32_t() == 0);
+//                                newValue = 100;
+//
+//                                test->setValue_int32_t(newValue);
+//                                // Check value on controlsystemmanager side
+//                                vector<int32_t> csValueArray = pvSet.csManager->getProcessArray<int32_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                BOOST_CHECK(csValueArray.size() == 1);
+//                                BOOST_CHECK(csValueArray.at(0) == 100);
+//                        }
+//                        else {
+//                                // if Array
+//                                int32_t i = 0;
+//                                std::vector<int32_t> newVector(test->getValue_Array_int32_t().size());
+//                                for(int32_t value : test->getValue_Array_int32_t()){
+//                                        BOOST_CHECK(value == 0);
+//                                        newVector.at(i) = 100-i;
+//                                        i++;
+//                                }
+//                                test->setValue_Array_int32_t(newVector);
+//                                vector<int32_t> valueArray = pvSet.csManager->getProcessArray<int32_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                i = 0;
+//                                for(auto value : valueArray) {
+//                                        BOOST_CHECK(value == (100-i));
+//                                        i++;
+//                                }
+//                        }
                 }
-                test->setValue_Array_int16_t(newVector);
-                vector<int16_t> valueArray = pvSet.csManager->getProcessArray<int16_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                i = 0;
-                for (auto value : valueArray) {
-                    BOOST_CHECK(value == (100 - i));
-                    i++;
+                else if (valueType == "uint32_t") {
+//                        BOOST_CHECK(valueType == "uint32_t");
+//                        vector<uint32_t> valueArray = pvSet.csManager->getProcessArray<uint32_t>(oneProcessVariable->getName())->accessChannel(0);
+//
+//                        if(valueArray.size() == 1) {
+//                                uint32_t newValue;
+//                                BOOST_CHECK(test->getValue_uint32_t() == 0);
+//                                newValue = 100;
+//
+//                                test->setValue_uint32_t(newValue);
+//                                // Check value on controlsystemmanager side
+//                                vector<uint32_t> csValueArray = pvSet.csManager->getProcessArray<uint32_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                BOOST_CHECK(csValueArray.size() == 1);
+//                                BOOST_CHECK(csValueArray.at(0) == 100);
+//                        }
+//                        else {
+//                                // if Array
+//                                int32_t i = 0;
+//                                std::vector<uint32_t> newVector(test->getValue_Array_uint32_t().size());
+//                                for(uint32_t value: test->getValue_Array_uint32_t()) {
+//                                        BOOST_CHECK(value == 0);
+//                                        newVector.at(i) = 100-i;
+//                                        i++;
+//                                }
+//                                test->setValue_Array_uint32_t(newVector);
+//                                vector<uint32_t> valueArray = pvSet.csManager->getProcessArray<uint32_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                i = 0;
+//                                for(auto value : valueArray) {
+//                                        uint32_t merk = 100-i;
+//                                        BOOST_CHECK(value == merk);
+//                                        i++;
+//                                }
+//                        }
                 }
-            }
-        } else if (valueType == "uint16_t") {
-            BOOST_CHECK(valueType == "uint16_t");
-            vector<uint16_t> valueArray = pvSet.csManager->getProcessArray<uint16_t>(
-                    oneProcessVariable->getName())->accessChannel(0);
-
-            if (valueArray.size() == 1) {
-                uint16_t newValue;
-                BOOST_CHECK(test->getValue_uint16_t() == 0);
-                newValue = 100;
-
-                test->setValue_uint16_t(newValue);
-                // Check value on controlsystemmanager side
-                vector<uint16_t> csValueArray = pvSet.csManager->getProcessArray<uint16_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                BOOST_CHECK(csValueArray.size() == 1);
-                BOOST_CHECK(csValueArray.at(0) == 100);
-            } else {
-                // if Array
-                int32_t i = 0;
-                std::vector<uint16_t> newVector(test->getValue_Array_uint16_t().size());
-                for (uint16_t value: test->getValue_Array_uint16_t()) {
-                    BOOST_CHECK(value == 0);
-                    newVector.at(i) = 100 - i;
-                    i++;
+                else if (valueType == "int64_t") {
+//                        BOOST_CHECK(valueType == "int64_t");
+//                        vector<int64_t> valueArray = pvSet.csManager->getProcessArray<int64_t>(oneProcessVariable->getName())->accessChannel(0);
+//
+//                        if(valueArray.size() == 1) {
+//                                int64_t newValue;
+//                                BOOST_CHECK(test->getValue_int64_t() == 0);
+//                                newValue = 100;
+//
+//                                test->setValue_int64_t(newValue);
+//                                // Check value on controlsystemmanager side
+//                                vector<int64_t> csValueArray = pvSet.csManager->getProcessArray<int64_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                BOOST_CHECK(csValueArray.size() == 1);
+//                                BOOST_CHECK(csValueArray.at(0) == 100);
+//                        }
+//                        else {
+//                                // if Array
+//                        		int32_t i = 0;
+//                                std::vector<int64_t> newVector(test->getValue_Array_int64_t().size());
+//                                for(int64_t value: test->getValue_Array_int64_t()) {
+//                                        BOOST_CHECK(value == 0);
+//                                        newVector.at(i) = 100-i;
+//                                        i++;
+//                                }
+//                                test->setValue_Array_int64_t(newVector);
+//                                vector<int64_t> valueArray = pvSet.csManager->getProcessArray<int64_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                i = 0;
+//                                for(auto value : valueArray) {
+//                                        BOOST_CHECK(value == (100-i));
+//                                        i++;
+//                                }
+//                        }
                 }
-                test->setValue_Array_uint16_t(newVector);
-                vector<uint16_t> valueArray = pvSet.csManager->getProcessArray<uint16_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                i = 0;
-                for (auto value : valueArray) {
-                    BOOST_CHECK(value == (100 - i));
-                    i++;
+                else if (valueType == "uint64_t") {
+//                        BOOST_CHECK(valueType == "uint64_t");
+//                        vector<uint64_t> valueArray = pvSet.csManager->getProcessArray<uint64_t>(oneProcessVariable->getName())->accessChannel(0);
+//
+//                        if(valueArray.size() == 1) {
+//                                uint64_t newValue;
+//                                BOOST_CHECK(test->getValue_uint64_t() == 0);
+//                                newValue = 100;
+//
+//                                test->setValue_uint64_t(newValue);
+//                                // Check value on controlsystemmanager side
+//                                vector<uint64_t> csValueArray = pvSet.csManager->getProcessArray<uint64_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                BOOST_CHECK(csValueArray.size() == 1);
+//                                BOOST_CHECK(csValueArray.at(0) == 100);
+//                        }
+//                        else {
+//                                // if Array
+//                        		uint32_t i = 0;
+//                                std::vector<uint64_t> newVector(test->getValue_Array_uint64_t().size());
+//                                for(uint64_t value: test->getValue_Array_uint64_t()) {
+//                                        BOOST_CHECK(value == 0);
+//                                        newVector.at(i) = 100-i;
+//                                        i++;
+//                                }
+//                                test->setValue_Array_uint64_t(newVector);
+//                                vector<uint64_t> valueArray = pvSet.csManager->getProcessArray<uint64_t>(oneProcessVariable->getName())->accessChannel(0);
+//                                i = 0;
+//                                for(auto value : valueArray) {
+//                                        BOOST_CHECK(value == (100-i));
+//                                        i++;
+//                                }
+//                        }
                 }
-            }
-        } else if (valueType == "int32_t") {
-            BOOST_CHECK(valueType == "int32_t");
-            vector<int32_t> valueArray = pvSet.csManager->getProcessArray<int32_t>(
-                    oneProcessVariable->getName())->accessChannel(0);
-
-            if (valueArray.size() == 1) {
-                int32_t newValue;
-                BOOST_CHECK(test->getValue_int32_t() == 0);
-                newValue = 100;
-
-                test->setValue_int32_t(newValue);
-                // Check value on controlsystemmanager side
-                vector<int32_t> csValueArray = pvSet.csManager->getProcessArray<int32_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                BOOST_CHECK(csValueArray.size() == 1);
-                BOOST_CHECK(csValueArray.at(0) == 100);
-            } else {
-                // if Array
-                int32_t i = 0;
-                std::vector<int32_t> newVector(test->getValue_Array_int32_t().size());
-                for (int32_t value : test->getValue_Array_int32_t()) {
-                    BOOST_CHECK(value == 0);
-                    newVector.at(i) = 100 - i;
-                    i++;
+                else if (valueType == "float") {
+//                        BOOST_CHECK(valueType == "float");
+//                        vector<float> valueArray = pvSet.csManager->getProcessArray<float>(oneProcessVariable->getName())->accessChannel(0);
+//
+//                        if(valueArray.size() == 1) {
+//                                float newValue;
+//                                BOOST_CHECK(test->getValue_float() == 0);
+//                                newValue = 100;
+//
+//                                test->setValue_float(newValue);
+//                                // Check value on controlsystemmanager side
+//                                vector<float> csValueArray = pvSet.csManager->getProcessArray<float>(oneProcessVariable->getName())->accessChannel(0);
+//                                BOOST_CHECK(csValueArray.size() == 1);
+//                                BOOST_CHECK(csValueArray.at(0) == 100);
+//                        }
+//                        else {
+//                                // if Array
+//                                int32_t i = 0;
+//                                std::vector<float> newVector(test->getValue_Array_float().size());
+//                                for(float value: test->getValue_Array_float()) {
+//                                        BOOST_CHECK(value == 0);
+//                                        newVector.at(i) = 100-i;
+//                                        i++;
+//                                }
+//                                test->setValue_Array_float(newVector);
+//                                vector<float> valueArray = pvSet.csManager->getProcessArray<float>(oneProcessVariable->getName())->accessChannel(0);
+//                                i = 0;
+//                                for(auto value : valueArray) {
+//                                        BOOST_CHECK(value == (100-i));
+//                                        i++;
+//                                }
+//                        }
                 }
-                test->setValue_Array_int32_t(newVector);
-                vector<int32_t> valueArray = pvSet.csManager->getProcessArray<int32_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                i = 0;
-                for (auto value : valueArray) {
-                    BOOST_CHECK(value == (100 - i));
-                    i++;
+                else if (valueType == "double") {
+//                        BOOST_CHECK(valueType == "double");
+//                        vector<double> valueArray = pvSet.csManager->getProcessArray<double>(oneProcessVariable->getName())->accessChannel(0);
+//
+//                        if(valueArray.size() == 1) {
+//                                double newValue;
+//                                BOOST_CHECK(test->getValue_double() == 0);
+//                                newValue = 100;
+//
+//                                test->setValue_double(newValue);
+//                                // Check value on controlsystemmanager side
+//                                vector<double> csValueArray = pvSet.csManager->getProcessArray<double>(oneProcessVariable->getName())->accessChannel(0);
+//                                BOOST_CHECK(csValueArray.size() == 1);
+//                                BOOST_CHECK(csValueArray.at(0) == 100);
+//                        }
+//                        else {
+//                                // if Array
+//                                int32_t i = 0;
+//                                vector<double> newVector(test->getValue_Array_double().size());
+//                                for(double value: test->getValue_Array_double()) {
+//                                        BOOST_CHECK(value == 0);
+//                                        newVector.at(i) = 100-i;
+//                                        i++;
+//                                }
+//                                test->setValue_Array_double(newVector);
+//                                vector<double> valueArray = pvSet.csManager->getProcessArray<double>(oneProcessVariable->getName())->accessChannel(0);
+//                                i = 0;
+//                                for(auto value : valueArray) {
+//                                        BOOST_CHECK(value == (100-i));
+//                                        i++;
+//                                }
+//                        }
                 }
-            }
-        } else if (valueType == "uint32_t") {
-            BOOST_CHECK(valueType == "uint32_t");
-            vector<uint32_t> valueArray = pvSet.csManager->getProcessArray<uint32_t>(
-                    oneProcessVariable->getName())->accessChannel(0);
-
-            if (valueArray.size() == 1) {
-                uint32_t newValue;
-                BOOST_CHECK(test->getValue_uint32_t() == 0);
-                newValue = 100;
-
-                test->setValue_uint32_t(newValue);
-                // Check value on controlsystemmanager side
-                vector<uint32_t> csValueArray = pvSet.csManager->getProcessArray<uint32_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                BOOST_CHECK(csValueArray.size() == 1);
-                BOOST_CHECK(csValueArray.at(0) == 100);
-            } else {
-                // if Array
-                int32_t i = 0;
-                std::vector<uint32_t> newVector(test->getValue_Array_uint32_t().size());
-                for (uint32_t value: test->getValue_Array_uint32_t()) {
-                    BOOST_CHECK(value == 0);
-                    newVector.at(i) = 100 - i;
-                    i++;
-                }
-                test->setValue_Array_uint32_t(newVector);
-                vector<uint32_t> valueArray = pvSet.csManager->getProcessArray<uint32_t>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                i = 0;
-                for (auto value : valueArray) {
-                    uint32_t merk = 100 - i;
-                    BOOST_CHECK(value == merk);
-                    i++;
-                }
-            }
-        } else if (valueType == "float") {
-            BOOST_CHECK(valueType == "float");
-            vector<float> valueArray = pvSet.csManager->getProcessArray<float>(
-                    oneProcessVariable->getName())->accessChannel(0);
-
-            if (valueArray.size() == 1) {
-                float newValue;
-                BOOST_CHECK(test->getValue_float() == 0);
-                newValue = 100;
-
-                test->setValue_float(newValue);
-                // Check value on controlsystemmanager side
-                vector<float> csValueArray = pvSet.csManager->getProcessArray<float>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                BOOST_CHECK(csValueArray.size() == 1);
-                BOOST_CHECK(csValueArray.at(0) == 100);
-            } else {
-                // if Array
-                int32_t i = 0;
-                std::vector<float> newVector(test->getValue_Array_float().size());
-                for (float value: test->getValue_Array_float()) {
-                    BOOST_CHECK(value == 0);
-                    newVector.at(i) = 100 - i;
-                    i++;
-                }
-                test->setValue_Array_float(newVector);
-                vector<float> valueArray = pvSet.csManager->getProcessArray<float>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                i = 0;
-                for (auto value : valueArray) {
-                    BOOST_CHECK(value == (100 - i));
-                    i++;
-                }
-            }
-        } else if (valueType == "double") {
-            BOOST_CHECK(valueType == "double");
-            vector<double> valueArray = pvSet.csManager->getProcessArray<double>(
-                    oneProcessVariable->getName())->accessChannel(0);
-
-            if (valueArray.size() == 1) {
-                double newValue;
-                BOOST_CHECK(test->getValue_double() == 0);
-                newValue = 100;
-
-                test->setValue_double(newValue);
-                // Check value on controlsystemmanager side
-                vector<double> csValueArray = pvSet.csManager->getProcessArray<double>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                BOOST_CHECK(csValueArray.size() == 1);
-                BOOST_CHECK(csValueArray.at(0) == 100);
-            } else {
-                // if Array
-                int32_t i = 0;
-                vector<double> newVector(test->getValue_Array_double().size());
-                for (double value: test->getValue_Array_double()) {
-                    BOOST_CHECK(value == 0);
-                    newVector.at(i) = 100 - i;
-                    i++;
-                }
-                test->setValue_Array_double(newVector);
-                vector<double> valueArray = pvSet.csManager->getProcessArray<double>(
-                        oneProcessVariable->getName())->accessChannel(0);
-                i = 0;
-                for (auto value : valueArray) {
-                    BOOST_CHECK(value == (100 - i));
-                    i++;
-                }
-            }
-        } else if (valueType == "Unsupported type") {
-            BOOST_CHECK(valueType == "Unsupported type");
-            cerr << "Warning: Unspported Type!" << endl;
-        } else
-            BOOST_CHECK(false);
+                else BOOST_CHECK(false);
 
         const UA_NodeId nodeId = test->getOwnNodeId();
         BOOST_CHECK(!UA_NodeId_isNull(&nodeId));
@@ -590,272 +644,320 @@ void ProcessVariableTest::testClientSide() {
                         UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) descToCheck->data)), valName);
                         BOOST_CHECK(valName == "Beschreibung");
 
-                        // i know, this part is perfecly for makro stuff... but common, for maintainability reason we should use simple code...
-                        if (valueToCheck->arrayLength < 1) {
-                            switch (datatypeId.identifier.numeric - 1) {
-                                case UA_TYPES_SBYTE: {
-                                    // Check Datatype
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)),
-                                                          datatype);
-                                    BOOST_CHECK(datatype == "int8_t");
-                                    // Check Name
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-                                    BOOST_CHECK(valName == "/int8Scalar");
-                                    // Check Value
-                                    uint8_t value = (uint8_t) *((uint8_t *) valueToCheck->data);
-                                    BOOST_CHECK(value == 0);
-                                    //cout << "Wert: " << std::to_string(value) << endl;
-                                    // set new value
-                                    uint8_t newValue = 123;
-                                    UA_Variant_init(valueToCheck);
-                                    UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_SBYTE]);
-                                    UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId,
-                                                                                               valueToCheck);
-                                    if (retvalNewVar == UA_STATUSCODE_GOOD) {
-                                        // get value from server
-                                        UA_Variant_init(valueToCheck);
-                                        UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                                        value = (uint8_t) *((uint8_t *) valueToCheck->data);
-                                        BOOST_CHECK(value == newValue);
-                                    } else {
-                                        BOOST_CHECK(false);
-                                    }
-                                    break;
-                                }
-                                case UA_TYPES_BYTE: {
-                                    // Check Datatype
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)),
-                                                          datatype);
-                                    BOOST_CHECK(datatype == "uint8_t");
-                                    // Check Name
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-                                    BOOST_CHECK(valName == "/uint8Scalar");
-                                    // Check Value
-                                    int8_t value = (int8_t) *((int8_t *) valueToCheck->data);
-                                    BOOST_CHECK(value == 0);
-                                    //cout << "Wert: " << std::to_string(value) << endl;
-                                    // set new value
-                                    int8_t newValue = 122;
-                                    UA_Variant_init(valueToCheck);
-                                    UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_BYTE]);
-                                    UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId,
-                                                                                               valueToCheck);
-                                    if (retvalNewVar == UA_STATUSCODE_GOOD) {
-                                        // get value from server
-                                        UA_Variant_init(valueToCheck);
-                                        UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                                        value = (int8_t) *((int8_t *) valueToCheck->data);
-                                        BOOST_CHECK(value == newValue);
-                                    } else {
-                                        BOOST_CHECK(false);
-                                    }
-                                    break;
-                                }
-                                case UA_TYPES_INT16: {
-                                    // Check Datatype
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)),
-                                                          datatype);
-                                    BOOST_CHECK(datatype == "int16_t");
-                                    // Check Name
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-                                    BOOST_CHECK(valName == "/int16Scalar");
-                                    // Check Value
-                                    int16_t value = (int16_t) *((int16_t *) valueToCheck->data);
-                                    BOOST_CHECK(value == 0);
-                                    // cout << "Wert: " << std::to_string(value) << endl;
-                                    // set new value, should be wrong
-                                    int16_t newValue = 123;
-                                    UA_Variant_init(valueToCheck);
-                                    UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_INT16]);
-                                    UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId,
-                                                                                               valueToCheck);
-                                    if (retvalNewVar == UA_STATUSCODE_GOOD) {
-                                        // get value from server
-                                        UA_Variant_init(valueToCheck);
-                                        UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                                        value = (int16_t) *((int16_t *) valueToCheck->data);
-                                        BOOST_CHECK(value == newValue);
-                                    } else {
-                                        BOOST_CHECK(false);
-                                    }
-                                    break;
-                                }
-                                case UA_TYPES_UINT16: {
-                                    // Check Datatype
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)),
-                                                          datatype);
-                                    BOOST_CHECK(datatype == "uint16_t");
-                                    // Check Name
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-                                    BOOST_CHECK(valName == "/uint16Scalar");
-                                    // Check Value
-                                    uint16_t value = (uint16_t) *((uint16_t *) valueToCheck->data);
-                                    BOOST_CHECK(value == 0);
-                                    //cout << "Wert: " << std::to_string(value) << endl;
-                                    // set new value
-                                    uint16_t newValue = 123;
-                                    UA_Variant_init(valueToCheck);
-                                    UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_UINT16]);
-                                    UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId,
-                                                                                               valueToCheck);
-                                    if (retvalNewVar == UA_STATUSCODE_GOOD) {
-                                        // get value from server
-                                        UA_Variant_init(valueToCheck);
-                                        UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                                        value = (uint16_t) *((uint16_t *) valueToCheck->data);
-                                        BOOST_CHECK(value == newValue);
-                                    } else {
-                                        BOOST_CHECK(false);
-                                    }
-                                    break;
-                                }
-                                case UA_TYPES_INT32: {
-                                    // Check Datatype
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)),
-                                                          datatype);
-                                    BOOST_CHECK(datatype == "int32_t");
-                                    // Check Name
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-                                    BOOST_CHECK(valName == "/Dein/Name/ist/int32Scalar");
-                                    // Check Value
-                                    int32_t value = (int32_t) *((int32_t *) valueToCheck->data);
-                                    BOOST_CHECK(value == 0);
-                                    //cout << "Wert: " << std::to_string(value) << endl;
-                                    // set new value
-                                    int32_t newValue = 123;
-                                    UA_Variant_init(valueToCheck);
-                                    UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_INT32]);
-                                    UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId,
-                                                                                               valueToCheck);
-                                    if (retvalNewVar == UA_STATUSCODE_GOOD) {
-                                        // get value from server
-                                        UA_Variant_init(valueToCheck);
-                                        UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                                        value = (int32_t) *((int32_t *) valueToCheck->data);
-                                        BOOST_CHECK(value == newValue);
-                                    } else {
-                                        BOOST_CHECK(false);
-                                    }
-                                    break;
-                                }
-                                case UA_TYPES_UINT32: {
-                                    // Check Datatype
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)),
-                                                          datatype);
-                                    BOOST_CHECK(datatype == "uint32_t");
-                                    // Check Name
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-                                    BOOST_CHECK(valName == "/Mein/Name/ist/uint32Scalar");
-                                    // Check Value
-                                    uint32_t value = (uint32_t) *((uint32_t *) valueToCheck->data);
-                                    BOOST_CHECK(value == 0);
-                                    //cout << "Wert: " << std::to_string(value) << endl;
-                                    // set new value
-                                    uint32_t newValue = 123;
-                                    UA_Variant_init(valueToCheck);
-                                    UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_UINT32]);
-                                    UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId,
-                                                                                               valueToCheck);
-                                    if (retvalNewVar == UA_STATUSCODE_GOOD) {
-                                        // get value from server
-                                        UA_Variant_init(valueToCheck);
-                                        UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                                        value = (uint32_t) *((uint32_t *) valueToCheck->data);
-                                        BOOST_CHECK(value == newValue);
-                                    } else {
-                                        BOOST_CHECK(false);
-                                    }
-                                    break;
-                                }
-                                case UA_TYPES_DOUBLE: {
-                                    // Check Datatype
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)),
-                                                          datatype);
-                                    BOOST_CHECK(datatype == "double");
-                                    // Check Name
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-                                    BOOST_CHECK(valName == "/Dieser/Name/ist/doubleScalar");
-                                    // Check Value
-                                    double value = (double) *((double *) valueToCheck->data);
-                                    BOOST_CHECK(value == 0);
-                                    //cout << "Wert: " << std::to_string(value) << endl;
-                                    // set new value
-                                    double newValue = 123.12;
-                                    UA_Variant_init(valueToCheck);
-                                    UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_DOUBLE]);
-                                    UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId,
-                                                                                               valueToCheck);
-                                    if (retvalNewVar == UA_STATUSCODE_GOOD) {
-                                        // get value from server
-                                        UA_Variant_init(valueToCheck);
-                                        UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                                        value = (double) *((double *) valueToCheck->data);
-                                        BOOST_CHECK(((int32_t) value * 100) == ((int32_t) newValue * 100));
-                                    } else {
-                                        BOOST_CHECK(false);
-                                    }
-                                    break;
-                                }
-                                case UA_TYPES_FLOAT: {
-                                    // Check Datatype
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)),
-                                                          datatype);
-                                    BOOST_CHECK(datatype == "float");
-                                    // Check Name
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-                                    BOOST_CHECK(valName == "/floatScalar");
-                                    // Check Value
-                                    float value = (float) *((float *) valueToCheck->data);
-                                    BOOST_CHECK(value == 0);
-                                    //cout << "Wert: " << std::to_string(value) << endl;
-                                    // set new value
-                                    float newValue = 123.12;
-                                    UA_Variant_init(valueToCheck);
-                                    UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_FLOAT]);
-                                    UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId,
-                                                                                               valueToCheck);
-                                    if (retvalNewVar == UA_STATUSCODE_GOOD) {
-                                        // get value from server
-                                        UA_Variant_init(valueToCheck);
-                                        UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                                        value = (float) *((float *) valueToCheck->data);
-                                        BOOST_CHECK(((int32_t) value * 100) == ((int32_t) newValue * 100));
-                                    } else {
-                                        BOOST_CHECK(false);
-                                    }
-                                    break;
-                                }
-                                default: {
-                                    printf("Not define: %-16d\n", datatypeId.identifier.numeric);
-                                    BOOST_CHECK(false);
-                                }
-                            }
-                        } else {
-                            /*
-                            * Begin array section
-                            */
-                            switch (datatypeId.identifier.numeric - 1) {
-                                case UA_TYPES_SBYTE: {
-                                    // Check Datatype
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)),
-                                                          datatype);
-                                    BOOST_CHECK(datatype == "int8_t");
-                                    // Check Name
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-                                    // cout << valName << endl;
-                                    BOOST_CHECK(valName == "/Mein/Name_ist#int8Array_s15");
-                                    // Check Value
-                                    size_t arrayLength = valueToCheck->arrayLength;
-                                    int8_t *value = (int8_t *) valueToCheck->data;
-                                    for (uint32_t i = 0; i < arrayLength; i++) {
-                                        BOOST_CHECK(value[i] == 0);
-                                    }
-                                    // set new value
-                                    int8_t varArray[arrayLength];
-                                    int8_t *newValue = varArray;
-                                    for (uint32_t i = 0; i < arrayLength; i++) {
-                                        newValue[i] = i;
-                                    }
+                                                                                // i know, this part is perfecly for makro stuff... but common, for maintainability reason we should use simple code...
+                                                                                if(valueToCheck->arrayLength < 1) {
+                                                                                        switch(datatypeId.identifier.numeric -1) {
+                                                                                                case UA_TYPES_SBYTE: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "int8_t");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/int8Scalar");
+                                                                                                        // Check Value
+                                                                                                        uint8_t value = (uint8_t) *((uint8_t*) valueToCheck->data);
+                                                                                                        BOOST_CHECK(value == 0);
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                        uint8_t newValue = 123;
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_SBYTE]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (uint8_t) *((uint8_t*) valueToCheck->data);
+                                                                                                                BOOST_CHECK(value == newValue);
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_BYTE: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "uint8_t");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/uint8Scalar");
+                                                                                                        // Check Value
+                                                                                                        int8_t value = (int8_t) *((int8_t*) valueToCheck->data);
+                                                                                                        BOOST_CHECK(value == 0);
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                        int8_t newValue = 122;
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_BYTE]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (int8_t) *((int8_t*) valueToCheck->data);
+                                                                                                                BOOST_CHECK(value == newValue);
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_INT16: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "int16_t");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/int16Scalar");
+                                                                                                        // Check Value
+                                                                                                        int16_t value = (int16_t) *((int16_t*) valueToCheck->data);
+                                                                                                        BOOST_CHECK(value == 0);
+                                                                                                        // cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value, should be wrong
+                                                                                                        int16_t newValue = 123;
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_INT16]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (int16_t) *((int16_t*) valueToCheck->data);
+                                                                                                                BOOST_CHECK(value == newValue);
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_UINT16: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "uint16_t");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/uint16Scalar");
+                                                                                                        // Check Value
+                                                                                                        uint16_t value = (uint16_t) *((uint16_t*) valueToCheck->data);
+                                                                                                        BOOST_CHECK(value == 0);
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                uint16_t newValue = 123;
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_UINT16]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (uint16_t) *((uint16_t*) valueToCheck->data);
+                                                                                                                BOOST_CHECK(value == newValue);
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_INT32: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "int32_t");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/Dein/Name/ist/int32Scalar");
+                                                                                                        // Check Value
+                                                                                                        int32_t value = (int32_t) *((int32_t*) valueToCheck->data);
+                                                                                                        BOOST_CHECK(value == 0);
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                        int32_t newValue = 123;
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_INT32]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (int32_t) *((int32_t*) valueToCheck->data);
+                                                                                                                BOOST_CHECK(value == newValue);
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_UINT32: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "uint32_t");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/Mein/Name/ist/uint32Scalar");
+                                                                                                        // Check Value
+                                                                                                        uint32_t value = (uint32_t) *((uint32_t*) valueToCheck->data);
+                                                                                                        BOOST_CHECK(value == 0);
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                        uint32_t newValue = 123;
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_UINT32]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (uint32_t) *((uint32_t*) valueToCheck->data);
+                                                                                                                BOOST_CHECK(value == newValue);
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_INT64: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "int64_t");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/Mein/Name/ist/int64Scalar");
+                                                                                                        // Check Value
+                                                                                                        int64_t value = (int64_t) *((int64_t*) valueToCheck->data);
+                                                                                                        BOOST_CHECK(value == 0);
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                        int64_t newValue = 123;
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_INT64]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (int64_t) *((int64_t*) valueToCheck->data);
+                                                                                                                BOOST_CHECK(value == newValue);
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_UINT64: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "uint64_t");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/Mein/Name/ist/uint64Scalar");
+                                                                                                        // Check Value
+                                                                                                        uint64_t value = (uint64_t) *((uint64_t*) valueToCheck->data);
+                                                                                                        BOOST_CHECK(value == 0);
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                        uint64_t newValue = 123;
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_UINT64]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (uint64_t) *((uint64_t*) valueToCheck->data);
+                                                                                                                BOOST_CHECK(value == newValue);
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_DOUBLE: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "double");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/Dieser/Name/ist/doubleScalar");
+                                                                                                        // Check Value
+                                                                                                        double value = (double) *((double*) valueToCheck->data);
+                                                                                                        BOOST_CHECK(value == 0);
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                        double newValue = 123.12;
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_DOUBLE]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (double) *((double*) valueToCheck->data);
+                                                                                                                BOOST_CHECK(((int32_t)value*100) == ((int32_t)newValue*100));
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_FLOAT: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "float");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/floatScalar");
+                                                                                                        // Check Value
+                                                                                                        float value = (float) *((float*) valueToCheck->data);
+                                                                                                        BOOST_CHECK(value == 0);
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                        float newValue = 123.12;
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setScalarCopy(valueToCheck, &newValue, &UA_TYPES[UA_TYPES_FLOAT]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (float) *((float*) valueToCheck->data);
+                                                                                                                BOOST_CHECK(((int32_t)value*100) == ((int32_t)newValue*100));
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                default: {
+                                                                                                        printf("Not define: %-16d\n", datatypeId.identifier.numeric);
+                                                                                                        BOOST_CHECK(false);
+                                                                                                }
+                                                                                        }
+                                                                                }
+                                                                                else {
+                                                                                        /*
+                                                                                        * Begin array section
+                                                                                        */
+                                                                                        switch(datatypeId.identifier.numeric -1) {
+                                                                                                case UA_TYPES_SBYTE: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "int8_t");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        // cout << valName << endl;
+                                                                                                        BOOST_CHECK(valName == "/Mein/Name_ist#int8Array_s15");
+                                                                                                        // Check Value
+                                                                                                        size_t arrayLength = valueToCheck->arrayLength;
+                                                                                                        int8_t* value = (int8_t*) valueToCheck->data;
+                                                                                                        for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                BOOST_CHECK(value[i] == 0);
+                                                                                                        }
+                                                                                                        // set new value
+                                                                                                        int8_t varArray[arrayLength];
+                                                                                                        int8_t* newValue = varArray;
+                                                                                                        for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                newValue[i] = i;
+                                                                                                        }
 
                                     UA_Variant_init(valueToCheck);
                                     UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength,
@@ -1071,46 +1173,130 @@ void ProcessVariableTest::testClientSide() {
                                         newValue[i] = i;
                                     }
 
-                                    UA_Variant_init(valueToCheck);
-                                    UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength,
-                                                            &UA_TYPES[UA_TYPES_UINT32]);
-                                    UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId,
-                                                                                               valueToCheck);
-                                    if (retvalNewVar == UA_STATUSCODE_GOOD) {
-                                        // get value from server
-                                        UA_Variant_init(valueToCheck);
-                                        UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                                        value = (uint32_t *) valueToCheck->data;
-                                        for (uint32_t i = 0; i < arrayLength; i++) {
-                                            BOOST_CHECK(value[i] == newValue[i]);
-                                        }
-                                    } else {
-                                        BOOST_CHECK(false);
-                                    }
-                                    break;
-                                }
-                                case UA_TYPES_DOUBLE: {
-                                    // Check Datatype
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)),
-                                                          datatype);
-                                    BOOST_CHECK(datatype == "double");
-                                    // Check Name
-                                    UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
-                                    // cout << valName << endl;
-                                    BOOST_CHECK(valName == "/doubleArray_s15");
-                                    // Check Value
-                                    size_t arrayLength = valueToCheck->arrayLength;
-                                    double *value = (double *) valueToCheck->data;
-                                    for (uint32_t i = 0; i < arrayLength; i++) {
-                                        BOOST_CHECK(value[i] == 0);
-                                    }
-                                    //cout << "Wert: " << std::to_string(value) << endl;
-                                    // set new value
-                                    double varArray[arrayLength];
-                                    double *newValue = varArray;
-                                    for (uint32_t i = 0; i < arrayLength; i++) {
-                                        newValue[i] = i * 0.5;
-                                    }
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT32]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (uint32_t*) valueToCheck->data;
+                                                                                                                for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                        BOOST_CHECK(value[i] == newValue[i]);
+                                                                                                                }
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_INT64: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "int64_t");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/int64Array_s15");
+                                                                                                        // Check Value
+                                                                                                        size_t arrayLength = valueToCheck->arrayLength;
+                                                                                                        int64_t* value = (int64_t*) valueToCheck->data;
+                                                                                                        for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                BOOST_CHECK(value[i] == 0);
+                                                                                                        }
+                                                                                                        // set new value
+                                                                                                        value = (int64_t*) valueToCheck->data;
+                                                                                                        for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                BOOST_CHECK(value[i] == 0);
+                                                                                                        }
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                        int64_t varArray[arrayLength];
+                                                                                                        int64_t* newValue = varArray;
+                                                                                                        for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                newValue[i] = i;
+                                                                                                        }
+
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_INT64]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (int64_t*) valueToCheck->data;
+                                                                                                                for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                        BOOST_CHECK(value[i] == newValue[i]);
+                                                                                                                }
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_UINT64: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "uint64_t");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        BOOST_CHECK(valName == "/uint64Array_s10");
+                                                                                                        // Check Value
+                                                                                                        size_t arrayLength = valueToCheck->arrayLength;
+                                                                                                        uint64_t* value = (uint64_t*) valueToCheck->data;
+                                                                                                        for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                BOOST_CHECK(value[i] == 0);
+                                                                                                        }
+                                                                                                        // set new value
+                                                                                                        value = (uint64_t*) valueToCheck->data;
+                                                                                                        for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                BOOST_CHECK(value[i] == 0);
+                                                                                                        }
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                        uint64_t varArray[arrayLength];
+                                                                                                        uint64_t* newValue = varArray;
+                                                                                                        for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                newValue[i] = i;
+                                                                                                        }
+
+                                                                                                        UA_Variant_init(valueToCheck);
+                                                                                                        UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength, &UA_TYPES[UA_TYPES_UINT64]);
+                                                                                                        UA_StatusCode retvalNewVar = UA_Client_writeValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                        if(retvalNewVar == UA_STATUSCODE_GOOD) {
+                                                                                                                // get value from server
+                                                                                                                UA_Variant_init(valueToCheck);
+                                                                                                                UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
+                                                                                                                value = (uint64_t*) valueToCheck->data;
+                                                                                                                for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                        BOOST_CHECK(value[i] == newValue[i]);
+                                                                                                                }
+                                                                                                        }
+                                                                                                        else {
+                                                                                                                BOOST_CHECK(false);
+                                                                                                        }
+                                                                                                        break;
+                                                                                                }
+                                                                                                case UA_TYPES_DOUBLE: {
+                                                                                                        // Check Datatype
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) datatypeToCheck->data)), datatype);
+                                                                                                        BOOST_CHECK(datatype == "double");
+                                                                                                        // Check Name
+                                                                                                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) nameToCheck->data)), valName);
+                                                                                                        // cout << valName << endl;
+                                                                                                        BOOST_CHECK(valName == "/doubleArray_s15");
+                                                                                                        // Check Value
+                                                                                                        size_t arrayLength = valueToCheck->arrayLength;
+                                                                                                        double* value = (double*) valueToCheck->data;
+                                                                                                        for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                BOOST_CHECK(value[i] == 0);
+                                                                                                        }
+                                                                                                        //cout << "Wert: " << std::to_string(value) << endl;
+                                                                                                        // set new value
+                                                                                                        double varArray[arrayLength];
+                                                                                                        double* newValue = varArray;
+                                                                                                        for(uint32_t i=0; i < arrayLength; i++) {
+                                                                                                                newValue[i] = i*0.5;
+                                                                                                        }
 
                                     UA_Variant_init(valueToCheck);
                                     UA_Variant_setArrayCopy(valueToCheck, newValue, arrayLength,

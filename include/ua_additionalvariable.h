@@ -67,6 +67,7 @@ public:
 
         UA_DateTime getSourceTimeStamp();
 
+        static UA_StatusCode ua_readproxy_ua_additionalvariable_getValue (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
         void setValue(string value);
         string getValue();
 

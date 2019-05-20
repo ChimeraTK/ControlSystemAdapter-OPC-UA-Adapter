@@ -28,6 +28,22 @@
 using namespace std;
 using namespace ChimeraTK;
 
+typedef enum {
+    UA_PV_UNKNOWN = 0,
+    UA_PV_INT8 = 1,
+    UA_PV_UINT8 = 2,
+    UA_PV_INT16 = 3,
+    UA_PV_UINT16 = 4,
+    UA_PV_INT32 = 5,
+    UA_PV_UINT32 = 6,
+    UA_PV_FLOAT = 8,
+    UA_PV_DOUBLE = 9,
+    UA_PV_STRING = 10,
+    UA_PV_INT64 = 11,
+    UA_PV_UINT64 = 12,
+    UA_PV_BOOL = 13
+} UA_Processvariable_Type;
+
 /** @class ua_processvariable
  *	@brief This class represent a processvariable of the controlsystemadapter in the information model of a OPC UA Server
  *
@@ -43,6 +59,8 @@ private:
         string engineeringUnit;
         string description;
         UA_NodeId ownNodeId = UA_NODEID_NULL;
+        UA_Processvariable_Type type;
+        bool array;
 
         boost::shared_ptr<ControlSystemPVManager> csManager;
         UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, string baseNodePath);
@@ -73,6 +91,8 @@ public:
         */
         UA_DateTime getSourceTimeStamp();
 
+        static UA_StatusCode ua_readproxy_ua_processvariable_getName (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
+
         /** @brief Set name of processvariable
         *
         * @param name Name of the processvariable
@@ -83,6 +103,8 @@ public:
         * @return <String> of the name of processvariable
         */
         string getName();
+
+        static UA_StatusCode ua_readproxy_ua_processvariable_getType (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
 
         /** @brief  Set type of processvariable
         *
@@ -95,6 +117,9 @@ public:
         */
         string getType();
 
+        static UA_StatusCode ua_readproxy_ua_processvariable_getEngineeringUnit (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
+        static UA_StatusCode ua_writeproxy_ua_processvariable_setEngineeringUnit (void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range);
+
         /** @brief  Set engineering unit of processvariable
         *
         * @param type Define the engineering unit of the processvariable
@@ -105,6 +130,9 @@ public:
         * @return <String> of engineering unit
         */
         string getEngineeringUnit();
+
+        static UA_StatusCode ua_writeproxy_ua_processvariable_setDescription (void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range);
+        static UA_StatusCode ua_readproxy_ua_processvariable_getDescription (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
 
         /** @brief  Get description unit of processvariable
         *
@@ -123,50 +151,35 @@ public:
         */
         UA_NodeId getOwnNodeId();
 
-        #define CREATE_READ_FUNCTION_ARRAY_DEF(_p_type)  std::vector<_p_type>  getValue_Array_##_p_type();
-        #define CREATE_WRITE_FUNCTION_ARRAY_DEF(_p_type) void setValue_Array_##_p_type(std::vector<_p_type> value);
-        #define CREATE_READ_FUNCTION_DEF(_p_type)  _p_type  getValue_##_p_type();
-        #define CREATE_WRITE_FUNCTION_DEF(_p_type) void setValue_##_p_type(_p_type value);
+    static UA_StatusCode ua_readproxy_ua_processvariable_getValue(void *handle,
+            const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp,
+            const UA_NumericRange *range, UA_DataValue *value);
+    UA_StatusCode getValue_int8(UA_Variant* v);
+    UA_StatusCode getValue_uint8(UA_Variant* v);
+    UA_StatusCode getValue_int16(UA_Variant* v);
+    UA_StatusCode getValue_uint16(UA_Variant* v);
+    UA_StatusCode getValue_int32(UA_Variant* v);
+    UA_StatusCode getValue_uint32(UA_Variant* v);
+    UA_StatusCode getValue_int64(UA_Variant* v);
+    UA_StatusCode getValue_uint64(UA_Variant* v);
+    UA_StatusCode getValue_float(UA_Variant* v);
+    UA_StatusCode getValue_double(UA_Variant* v);
+    UA_StatusCode getValue_string(UA_Variant* v);
+    UA_StatusCode getValue_bool(UA_Variant* v);
 
-    CREATE_WRITE_FUNCTION_DEF(int8_t)
-    CREATE_WRITE_FUNCTION_DEF(uint8_t)
-    CREATE_WRITE_FUNCTION_DEF(int16_t)
-    CREATE_WRITE_FUNCTION_DEF(uint16_t)
-    CREATE_WRITE_FUNCTION_DEF(int32_t)
-    CREATE_WRITE_FUNCTION_DEF(uint32_t)
-    CREATE_WRITE_FUNCTION_DEF(float)
-    CREATE_WRITE_FUNCTION_DEF(double)
-    CREATE_WRITE_FUNCTION_DEF(string)
-
-    CREATE_READ_FUNCTION_DEF(int8_t)
-    CREATE_READ_FUNCTION_DEF(uint8_t)
-    CREATE_READ_FUNCTION_DEF(int16_t)
-    CREATE_READ_FUNCTION_DEF(uint16_t)
-    CREATE_READ_FUNCTION_DEF(int32_t)
-    CREATE_READ_FUNCTION_DEF(uint32_t)
-    CREATE_READ_FUNCTION_DEF(float)
-    CREATE_READ_FUNCTION_DEF(double)
-    CREATE_READ_FUNCTION_DEF(string)
-
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(int8_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(uint8_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(int16_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(uint16_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(int32_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(uint32_t)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(float)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(double)
-    CREATE_WRITE_FUNCTION_ARRAY_DEF(string)
-
-    CREATE_READ_FUNCTION_ARRAY_DEF(int8_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(uint8_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(int16_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(uint16_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(int32_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(uint32_t)
-    CREATE_READ_FUNCTION_ARRAY_DEF(float)
-    CREATE_READ_FUNCTION_ARRAY_DEF(double)
-    CREATE_READ_FUNCTION_ARRAY_DEF(string)
+    static UA_StatusCode ua_writeproxy_ua_processvariable_setValue(void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range);
+    UA_StatusCode setValue_int8(const UA_Variant* data);
+    UA_StatusCode setValue_uint8(const UA_Variant* data);
+    UA_StatusCode setValue_int16(const UA_Variant* data);
+    UA_StatusCode setValue_uint16(const UA_Variant* data);
+    UA_StatusCode setValue_int32(const UA_Variant* data);
+    UA_StatusCode setValue_uint32(const UA_Variant* data);
+    UA_StatusCode setValue_int64(const UA_Variant* data);
+    UA_StatusCode setValue_uint64(const UA_Variant* data);
+    UA_StatusCode setValue_float(const UA_Variant* data);
+    UA_StatusCode setValue_double(const UA_Variant* data);
+    UA_StatusCode setValue_string(const UA_Variant* data);
+    UA_StatusCode setValue_bool(const UA_Variant* data);
 };
 
 #endif // UA_PROCESSVARIABLE_H
