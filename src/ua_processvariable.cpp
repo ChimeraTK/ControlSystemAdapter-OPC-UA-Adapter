@@ -1107,7 +1107,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     }
     UA_InstantiationCallback icb;
     icb.handle = (void *) &this->ownedNodes;
-    icb.method = ua_mapInstantiatedNodes;    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew+"Value").c_str()),//UA_NODEID_NUMERIC(1, 0)
+    icb.method = ua_mapInstantiatedNodes;
+    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew+"Value").c_str()),//UA_NODEID_NUMERIC(1, 0)
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME(1, (char *) this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, &icb, &createdNodeId);
     //know your own nodeId
@@ -1123,7 +1124,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     if (valueType == typeid(int8_t)) {
         type = UA_PV_INT8;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <int8_t>(this->namePV)->accessChannel(0).size() == 1)
@@ -1155,7 +1156,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     else if (valueType == typeid(uint8_t)) {
         type = UA_PV_UINT8;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <uint8_t>(this->namePV)->accessChannel(0).size() == 1)
@@ -1187,7 +1188,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     else if (valueType == typeid(int16_t)) {
         type = UA_PV_INT16;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <int16_t>(this->namePV)->accessChannel(0).size() == 1)
@@ -1219,7 +1220,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     else if (valueType == typeid(uint16_t)) {
         type = UA_PV_UINT16;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <uint16_t>(this->namePV)->accessChannel(0).size() == 1)
@@ -1251,7 +1252,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     else if (valueType == typeid(int32_t)) {
         type = UA_PV_INT32;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <int32_t>(this->namePV)->accessChannel(0).size() == 1)
@@ -1283,7 +1284,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     else if (valueType == typeid(uint32_t)) {
         type = UA_PV_UINT32;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <uint32_t>(this->namePV)->accessChannel(0).size() == 1)
@@ -1315,7 +1316,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     else if (valueType == typeid(int64_t)) {
         type = UA_PV_INT64;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <int64_t>(this->namePV)->accessChannel(0).size() == 1)
@@ -1347,7 +1348,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     else if (valueType == typeid(uint64_t)) {
         type = UA_PV_UINT64;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <uint64_t>(this->namePV)->accessChannel(0).size() == 1)
@@ -1379,7 +1380,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     else if (valueType == typeid(float)) {
         type = UA_PV_FLOAT;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <float>(this->namePV)->accessChannel(0).size() == 1)
@@ -1411,7 +1412,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     else if (valueType == typeid(double)) {
         type = UA_PV_DOUBLE;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <double>(this->namePV)->accessChannel(0).size() == 1)
@@ -1443,7 +1444,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     else if (valueType == typeid(string)) {
         type = UA_PV_STRING;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <string>(this->namePV)->accessChannel(0).size() == 1)
@@ -1475,7 +1476,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     else if (valueType == typeid(bool)) {
         type = UA_PV_BOOL;
         UA_DataSource_Map_Element mapElem;
-        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALUE);
+        mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
         mapElem.description = description;
         mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
         if (this->csManager->getProcessArray <bool>(this->namePV)->accessChannel(0).size() == 1)
