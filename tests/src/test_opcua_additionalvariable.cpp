@@ -30,7 +30,14 @@ void AdditionalVariableTest::testClassSide() {
         BOOST_CHECK(false);
     }
 
-    ua_additionalvariable *addVar1 = new ua_additionalvariable(serverSet->mappedServer, serverSet->baseNodeId, "Name",
+    string additionalVariableRootFolder = "AdditionalVars";
+    UA_ObjectAttributes oAttr;
+    memset(&oAttr, 0, sizeof(UA_ObjectAttributes));
+    UA_Server_addObjectNode(serverSet->mappedServer, UA_NODEID_STRING(1, (char *) additionalVariableRootFolder.c_str()),
+            UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+            UA_QUALIFIEDNAME(0, (char *)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL, NULL);
+
+    ua_additionalvariable *addVar1 = new ua_additionalvariable(serverSet->mappedServer, UA_NODEID_STRING(1, (char *) additionalVariableRootFolder.c_str()), "Name",
                                                                "Value", "Description");
 
     BOOST_CHECK(addVar1->getSourceTimeStamp() != 0);
@@ -66,8 +73,14 @@ void AdditionalVariableTest::testClientSide() {
         BOOST_CHECK(false);
     }
 
+    string additionalVariableRootFolder = "AdditionalVars";
+    UA_ObjectAttributes oAttr;
+    memset(&oAttr, 0, sizeof(UA_ObjectAttributes));
+    UA_Server_addObjectNode(serverSet->mappedServer, UA_NODEID_STRING(1, (char *) additionalVariableRootFolder.c_str()),
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                            UA_QUALIFIEDNAME(0, (char *)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL, NULL);
     // add set
-    ua_additionalvariable *addVar1 = new ua_additionalvariable(serverSet->mappedServer, serverSet->baseNodeId, "Name",
+    ua_additionalvariable *addVar1 = new ua_additionalvariable(serverSet->mappedServer,  UA_NODEID_STRING(1, (char *) additionalVariableRootFolder.c_str()), "Name",
                                                                "Value", "Description");
 
     // Create client to connect to server

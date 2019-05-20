@@ -48,7 +48,7 @@ struct TestFixturePVSet {
 	ProcessArray<uint16_t>::SharedPtr intAu16dev = devManager->createProcessArray<uint16_t>(controlSystemToDevice, "uint16Scalar", 1);
 	ProcessArray<int32_t>::SharedPtr intA3devMap = devManager->createProcessArray<int32_t>(controlSystemToDevice, "Dein/Name/ist/int32Scalar", 1);
 	ProcessArray<uint32_t>::SharedPtr intAu32devMap = devManager->createProcessArray<uint32_t>(controlSystemToDevice, "Mein/Name/ist/uint32Scalar", 1);
-        ProcessArray<uint64_t>::SharedPtr intAu64devMap = devManager->createProcessArray<uint64_t>(controlSystemToDevice, "Mein/Name/ist/uint64Scalar", 1);
+	ProcessArray<uint64_t>::SharedPtr intAu64devMap = devManager->createProcessArray<uint64_t>(controlSystemToDevice, "Mein/Name/ist/uint64Scalar", 1);
 	ProcessArray<float>::SharedPtr intAfdev = devManager->createProcessArray<float>(controlSystemToDevice, "floatScalar", 1);
 	ProcessArray<double>::SharedPtr doubledevMap = devManager->createProcessArray<double>(controlSystemToDevice, "Dieser/Name/ist/doubleScalar", 1);
     
@@ -83,10 +83,9 @@ struct TestFixtureServerSet {
 		server_config.networkLayersSize = 1;
 		
 		runUAServer = UA_TRUE;
-		
 		mappedServer = UA_Server_new(server_config);
-    baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-		
+        baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+
 		csa_namespaceinit_generated(mappedServer);
 	}
 };

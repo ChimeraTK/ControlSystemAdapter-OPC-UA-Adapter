@@ -118,12 +118,16 @@ void ua_uaadapter::readConfig() {
         }
         vector<xmlNodePtr> mappingExceptionsVector = this->fileHandler->getNodesByName(
                 nodeset->nodeTab[0]->children, "mapping_exceptions");
-        placeHolder = this->fileHandler->getContentFromNode(mappingExceptionsVector[0]);
-        transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
-        if(placeHolder.compare("TRUE") == 0){
-            this->mappingExceptions = UA_TRUE;
-        } else {
+        if(mappingExceptionsVector.empty()){
             this->mappingExceptions = UA_FALSE;
+        } else {
+            placeHolder = this->fileHandler->getContentFromNode(mappingExceptionsVector[0]);
+            transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
+            if(placeHolder.compare("TRUE") == 0){
+                this->mappingExceptions = UA_TRUE;
+            } else {
+                this->mappingExceptions = UA_FALSE;
+            }
         }
     }
     result = this->fileHandler->getNodeSet(xpath + "//login");

@@ -20,7 +20,7 @@
 	</additionalNodes>
 
 	<application name="TestCaseForXMLFileHandlerTest::getContent">
-		<map sourceVariableName="/int8Array__s15" rename="GainPV">
+		<map sourceVariableName="int8Array__s15" rename="GainPV">
 			<unrollPath pathSep="_">True</unrollPath>
 			<unrollPath pathSep="8">True</unrollPath>
 			<folder>NorthSideLINAC/partB</folder>
@@ -28,14 +28,14 @@
 	</application>
 
 	<application name="WinAA">
-		<map sourceVariableName="/Mein/Name_ist#int16Array" rename="Array_s15_int8">
+		<map sourceVariableName="Mein/Name_ist#int16Array" rename="Array_s15_int8">
 			<unrollPath pathSep="_">True</unrollPath>
 			<unrollPath pathSep="/">True</unrollPath>
 			<unrollPath pathSep="#">True</unrollPath>
 			<folder>NorthSide/LINAC/partA</folder>
 			<folder>NorthSide/LINAC/partX</folder>
 		</map>
-		<map sourceVariableName="/Mein/Name_ist#int8Array_s15" rename="Array" engineeringUnit="Einheit" description="Beschreibung der Variable">
+		<map sourceVariableName="Mein/Name_ist#int8Array_s15" rename="Array" engineeringUnit="Einheit" description="Beschreibung der Variable">
 			<unrollPath pathSep="_">True</unrollPath>
 			<unrollPath pathSep="/">True</unrollPath>
 			<unrollPath pathSep="#">True</unrollPath>
@@ -44,41 +44,41 @@
 		</map>
 	</application>
 	<application name="WinBB">
-		<map sourceVariableName="/Dein/Name/ist/uint8Array_s10" rename="">
+		<map sourceVariableName="Dein/Name/ist/uint8Array_s10" rename="">
 			<unrollPath pathSep="_">True</unrollPath>
 			<folder>NorthSideLINAC/partA</folder>
 		</map>
-		<map sourceVariableName="/int16Array_s15">
+		<map sourceVariableName="int16Array_s15">
 			<unrollPath pathSep="_">False</unrollPath>
 			<folder>SouthSide/LINAC/partA</folder>
 			<folder>SouthSide/LINAC/partB</folder>
 		</map>
-		<map sourceVariableName="/Dein/Name/ist/int32Scalar">
+		<map sourceVariableName="Dein/Name/ist/int32Scalar">
 			<unrollPath pathSep="-">True</unrollPath>
 			<folder>EastSide/LINAC</folder>
 		</map>
 	</application>
 	<application name="WinCC">
-		<map sourceVariableName="/Unser/Name/ist_uint8Array_s10">
+		<map sourceVariableName="Unser/Name/ist_uint8Array_s10">
 			<unrollPath pathSep="_">True</unrollPath>
 			<unrollPath pathSep="/">True</unrollPath>
 			<folder></folder>
 		</map>
-		<map sourceVariableName="/int16Array_s15">
+		<map sourceVariableName="int16Array_s15">
 			<unrollPath pathSep="_">False</unrollPath>
 			<folder>NorthSideLINAC/partB</folder>
 		</map>
-		<map sourceVariableName="/floatArray_s10" rename="Gustav">
+		<map sourceVariableName="floatArray_s10" rename="Gustav">
 			<unrollPath pathSep="_">False</unrollPath>
 		</map>
 	</application>
 	<application name="EPICS">
-		<map sourceVariableName="/Mein/Name_ist#int8Array_s15" rename="uint32S">
+		<map sourceVariableName="Mein/Name_ist#int8Array_s15" rename="uint32S">
 		</map>
-		<map sourceVariableName="/Dein/Name/ist/int32Scalar">
+		<map sourceVariableName="Dein/Name/ist/int32Scalar">
 			<folder>NorthSideLINAC/partA</folder>
 		</map>
-		<map sourceVariableName="/Dieser/Name/ist/doubleScalar">
+		<map sourceVariableName="Dieser/Name/ist/doubleScalar">
 			<unrollPath pathSep="/">True</unrollPath>
 		</map>
 	</application>

@@ -71,9 +71,9 @@ void UAAdapterTest::testExampleSet() {
     folderNodeId = adapter->existFolderPath(UA_NODEID_NULL, pathVector);
     BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
 
-        for(auto processVar:tfExampleSet.csManager.get()->getAllProcessVariables()) {
-            adapter->implicitVarMapping(processVar->getName(), tfExampleSet.csManager);
-        }
+    for (auto processVar:tfExampleSet.csManager.get()->getAllProcessVariables()) {
+        adapter->implicitVarMapping(processVar.get()->getName(), tfExampleSet.csManager);
+    }
 
     BOOST_CHECK(adapter->getVariables().size() > 0);
 
