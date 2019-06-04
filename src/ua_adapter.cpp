@@ -1114,16 +1114,15 @@ UA_NodeId ua_uaadapter::createFolder(UA_NodeId basenodeid, string folderName, st
 }
 
 vector<string> ua_uaadapter::getAllNotMappableVariablesNames() {
-
         vector<string> notMappableVariablesNames;
-        xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
+        xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//process_variable");
 
         if(result) {
                 xmlNodeSetPtr nodeset = result->nodesetval;
                 for (int32_t i=0; i < nodeset->nodeNr; i++) {
                         //for(auto var:this->variables) {
                         bool mapped = false;
-                        string mappedVar = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "sourceVariableName");
+                        string mappedVar = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
                         for(auto var:this->getVariables()) {
                                 if(var->getName().compare(mappedVar) == 0) {
                                         mapped = true;

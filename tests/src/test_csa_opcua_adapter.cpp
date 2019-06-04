@@ -55,7 +55,7 @@ void CSAOPCUATest::testWithPVSet() {
     BOOST_CHECK(csaOPCUA->isRunning() == true);
 
     // is csManager init
-    BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 17);
+    BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 20);
 
     BOOST_CHECK(csaOPCUA->getIPCManager() != NULL);
 

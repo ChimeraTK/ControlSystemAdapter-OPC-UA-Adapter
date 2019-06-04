@@ -1,12 +1,46 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <uamapping>
 	<config rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
+		<server applicationName="" port="16661" />
+		<login username="test" password="test123" />
+		<process_variable_hierarchy>
+			<unroll pathSep="/">True</unroll>
+		</process_variable_hierarchy>
+		<mapping_exceptions>False</mapping_exceptions>
+	</config>
+
+	<!-- old config
+	<config rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
 		<serverConfig applicationName="" port="16661" />
 		<login username="test" password="test123" />
-	</config>	
+	</config>
+	-->
+
+	<folder>
+		<name></name>
+		<description>DescriptionOfEmptyFolder</description>
+	</folder>
+
+	<!-- old config
 	<additionalNodes folderName="" description="DescriptionOfEmptyFolder">
 	</additionalNodes>
+	-->
 
+	<folder>
+		<name>EPICS</name>
+	</folder>
+	<process_variable sourceName="Mein/Name/ist/uint32Scalar">
+		<destination>EPICS</destination>
+		<name>uint32S</name>
+	</process_variable>
+	<process_variable sourceName="Dein/Name/ist/int32Scalar">
+		<destination>EPICS</destination>
+	</process_variable>
+	<process_variable sourceName="Dieser/Name/ist/doubleScalar">
+		<destination>EPICS</destination>
+	</process_variable>
+
+	<!-- old config
 	<application name="EPICS">
 		<map sourceVariableName="Mein/Name/ist/uint32Scalar" rename="uint32S">
 			<unrollPath pathSep="/">True</unrollPath>
@@ -19,4 +53,6 @@
 			<unrollPath pathSep="/">True</unrollPath>
     </map>
 	</application>
+	-->
+
 </uamapping>

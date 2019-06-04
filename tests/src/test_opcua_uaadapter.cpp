@@ -79,7 +79,7 @@ void UAAdapterTest::testExampleSet() {
 
     /* Check if both var are not mapped */
     cout << "Größe von: " << adapter->getAllNotMappableVariablesNames().size() << endl;
-    BOOST_CHECK(adapter->getAllNotMappableVariablesNames().size() == 5);
+    BOOST_CHECK(adapter->getAllNotMappableVariablesNames().size() == 7);
     // Check if timestamp is not enmpty
     string dateTime = "";
     UASTRING_TO_CPPSTRING(UA_DateTime_toString(adapter->getSourceTimeStamp()), dateTime);

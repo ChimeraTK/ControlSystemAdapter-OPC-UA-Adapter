@@ -1,5 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <uamapping>
+	<!-- create folder structure -->
+	<folder>
+		<name>WinAA</name>
+	</folder>
+	<folder>
+		<name>WinBB</name>
+	</folder>
+	<folder>
+		<name>WinCC</name>
+	</folder>
+
+	<process_variable sourceName="int8Array_s15">
+		<destination>WinAA/NorthSideLINAC/partB</destination>
+		<name>GainPV</name>
+	</process_variable>
+	<process_variable sourceName="uint8Array_s10">
+		<destination>WinBB/NorthSideLINAC/partA</destination>
+		<name></name>
+	</process_variable>
+	<process_variable sourceName="int16Array_s15">
+		<destination>WinBB/SouthSide/LINAC/partA</destination>
+	</process_variable>
+	<process_variable sourceName="int16Array_s15">
+		<destination>WinBB/SouthSide/LINAC/partB</destination>
+	</process_variable>
+	<process_variable sourceName="uint8Array_s10">
+		<destination>WinCC/NorthSideLINAC/partA</destination>
+		<name></name>
+	</process_variable>
+	<process_variable sourceName="int16Array_s15">
+		<destination>WinCC/NorthSideLINAC/partB</destination>
+	</process_variable>
+
+	<process_variable sourceName="uint32Scalar">
+		<destination>EPICS/EastSideLINAC/partA</destination>
+		<name></name>
+	</process_variable>
+	<process_variable sourceName="int32Scalar">
+		<destination>EPICS/EastSideLINAC/partA</destination>
+	</_variable>
+
+
+	<!-- old config
 	<application name="WinAA">
 		<map sourceVariableName="int8Array_s15" rename="GainPV">
 			<unrollPath pathSep="_">True</unrollPath>
@@ -39,4 +82,5 @@
 		        <folder>EastSideLINAC/partA</folder>
         	</mp>
 	</application>
+	-->
 </uamapping>

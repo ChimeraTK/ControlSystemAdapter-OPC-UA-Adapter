@@ -1,8 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <uamapping>
+
+	<folder>
+		<name></name>
+		<description>DescriptionOfEmptyFolder</description>
+	</folder>
+
+	<!-- old config
 	<additionalNodes folderName="" description="DescriptionOfEmptyFolder">
 	</additionalNodes>
+	-->
 
+	<folder>
+		<name>EPICS</name>
+	</folder>
+	<process_variable sourceName="Mein/Name/ist/uint32Scalar">
+		<destination>EPICS</destination>
+		<name>uint32S</name>
+	</process_variable>
+	<process_variable sourceName="Dein/Name/ist/int32Scalar">
+		<destination>EPICS</destination>
+	</process_variable>
+	<process_variable sourceName="Dieser/Name/ist/doubleScalar">
+		<destination>EPICS</destination>
+	</process_variable>
+
+	<!-- old config
 	<application name="EPICS">
 		<map sourceVariableName="Mein/Name/ist/uint32Scalar" rename="uint32S">
 			<unrollPath pathSep="/">True</unrollPath>
@@ -15,4 +38,5 @@
 			<unrollPath pathSep="/">True</unrollPath>
     </map>
 	</application>
+	-->
 </uamapping>

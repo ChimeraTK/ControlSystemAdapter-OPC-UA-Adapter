@@ -19,3 +19,5 @@ foreach( testSourceFile ${testSources})
 
 	add_test(${executableName} ${executableName})
 endforeach(testSourceFile)
+
+add_custom_target(test-verbose COMMAND ${CMAKE_CTEST_COMMAND} --verbose)

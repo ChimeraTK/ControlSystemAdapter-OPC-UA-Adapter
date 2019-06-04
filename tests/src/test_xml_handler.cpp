@@ -21,16 +21,16 @@ void XMLFileHandlerTest::readDocFile() {
     // Emtpy path
     xml_file_handler *xmlHandlerTwo = new xml_file_handler("");
     BOOST_CHECK(xmlHandlerTwo->isDocSetted() == false);
-    BOOST_CHECK(xmlHandlerTwo->getNodeSet("//application") == NULL);
+    BOOST_CHECK(xmlHandlerTwo->getNodeSet("//process_variable") == NULL);
     // Set a document
     xmlHandlerTwo->createDoc("../tests/uamapping_test_2.xml");
     BOOST_CHECK(xmlHandlerTwo->isDocSetted() == true);
-    BOOST_CHECK(xmlHandlerTwo->getNodeSet("//application") != NULL);
+    BOOST_CHECK(xmlHandlerTwo->getNodeSet("//process_variable") != NULL);
 
     // Set a not wellformed document
     xml_file_handler *xmlHandlerThree = new xml_file_handler("../tests/uamapping_test_notwellformed.xml");
     BOOST_CHECK(xmlHandlerThree->isDocSetted() == false);
-    BOOST_CHECK(xmlHandlerThree->getNodeSet("//application") == NULL);
+    BOOST_CHECK(xmlHandlerThree->getNodeSet("//process_variable") == NULL);
 
     xmlHandlerOne->~xml_file_handler();
     xmlHandlerTwo->~xml_file_handler();
@@ -42,7 +42,8 @@ void XMLFileHandlerTest::getContent() {
     xml_file_handler *xmlHandler = new xml_file_handler("../tests/uamapping_test_1.xml");
 
     xmlXPathObjectPtr result = xmlHandler->getNodeSet(
-            "//application[@name='TestCaseForXMLFileHandlerTest::getContent']//map");
+            //"//application[@name='TestCaseForXMLFileHandlerTest::getContent']//map");
+            "//process_variable[@sourceName='int8Array__s15']");
     BOOST_CHECK(result != NULL);
     xmlNodeSetPtr nodeset = NULL;
 
@@ -50,19 +51,19 @@ void XMLFileHandlerTest::getContent() {
         nodeset = result->nodesetval;
 
         // Check if Tag <map> contain a Attribute "sourceVariableName" with value
-        string sourceVariableName = xmlHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "sourceVariableName");
+        string sourceVariableName = xmlHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "sourceName");
         BOOST_CHECK(sourceVariableName != "");
 
         // We want to get a value from a not existing attribute
         BOOST_CHECK(xmlHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "notExistingAttribute") == "");
 
         // Get a nodeList
-        vector<xmlNodePtr> nodeList = xmlHandler->getNodesByName(nodeset->nodeTab[0]->children, "unrollPath");
-        BOOST_CHECK(nodeList.size() == 2);
+        vector<xmlNodePtr> nodeList = xmlHandler->getNodesByName(nodeset->nodeTab[0]->children, "destination");
+        BOOST_CHECK(nodeList.size() == 1);
 
         // Get a content from a tag element like: <tag>content</tag>
         string unrollPath = xmlHandler->getContentFromNode(nodeList[0]);
-        BOOST_CHECK(unrollPath == "True");
+        BOOST_CHECK(unrollPath == "TestCaseForXMLFileHandlerTest::getContent/NorthSideLINAC/partB");
 
         // We want to get a conten from a not existing node
         string emptyContent = xmlHandler->getContentFromNode(NULL);
@@ -70,8 +71,8 @@ void XMLFileHandlerTest::getContent() {
 
         vector<string> path = xmlHandler->praseVariablePath(sourceVariableName,
                                                             xmlHandler->getAttributeValueFromNode(nodeList[0],
-                                                                                                  "pathSep"));
-        BOOST_CHECK(path.size() == 2);
+                                                                                                  "name"));
+        BOOST_CHECK(path.size() == 1);
     } else {
         BOOST_CHECK(false);
     }
