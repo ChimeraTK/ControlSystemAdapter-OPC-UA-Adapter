@@ -635,6 +635,9 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                 } else {
                     destinationFolderNodeId = enrollFolderPathFromString(destination + "/removedPart", "/");
                 }
+                if(name.empty()){
+                    name = sourceName;
+                }
                 ua_processvariable *processvariable;
                 if (!UA_NodeId_isNull(&destinationFolderNodeId)) {
                     processvariable = new ua_processvariable(this->mappedServer, destinationFolderNodeId,
