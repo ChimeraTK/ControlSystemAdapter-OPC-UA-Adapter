@@ -500,7 +500,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
     if (result) {
         nodeset = result->nodesetval;
         for (int32_t i = 0; i < nodeset->nodeNr; i++) {
-            string sourceName, copy, destination, name, unit, description;
+            string sourceName, copy, destination, name, unit, description, unrollPath;
             vector<xmlNodePtr> nodeDestination = this->fileHandler->getNodesByName(
                     nodeset->nodeTab[i]->children, "destination");
             vector<xmlNodePtr> nodeName = this->fileHandler->getNodesByName(
@@ -515,6 +515,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
 
             if(!nodeDestination.empty()) {
                 destination = this->fileHandler->getContentFromNode(nodeDestination[0]);
+                unrollPath = this->fileHandler->getAttributeValueFromNode(nodeDestination[0], "unrollPath");
             }
             if(!nodeName.empty()) {
                 name = this->fileHandler->getContentFromNode(nodeName[0]);
@@ -633,7 +634,11 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                 if(destination.empty()){
                     destinationFolderNodeId = this->ownNodeId;
                 } else {
-                    destinationFolderNodeId = enrollFolderPathFromString(destination + "/removedPart", "/");
+                    if(unrollPath.empty()){
+                        destinationFolderNodeId = enrollFolderPathFromString(destination + "/removedPart", "/");
+                    } else {
+                        destinationFolderNodeId = enrollFolderPathFromString(destination + unrollPath + "removedPart", unrollPath);
+                    }
                 }
                 if(name.empty()){
                     name = sourceName;
