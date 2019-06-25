@@ -637,7 +637,24 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                     if(unrollPath.empty()){
                         destinationFolderNodeId = enrollFolderPathFromString(destination + "/removedPart", "/");
                     } else {
-                        destinationFolderNodeId = enrollFolderPathFromString(destination + unrollPath + "removedPart", unrollPath);
+                        //legacy code to make old mapping possible
+                        if(destination.find("Variables"+unrollPath) == 0){
+                            string requestedBrowseName = destination;
+                            requestedBrowseName.erase(0, ("Variables"+unrollPath).length());
+                            //check if the requested path still exists in the Variables folder
+                            string requestedPVBrowseName = this->serverConfig.rootFolder + "/Variables/" + requestedBrowseName;
+                            UA_NodeId requestedPVBrowseId = UA_NODEID_STRING(1, (char *) requestedPVBrowseName.c_str());
+                            UA_NodeId tmpOutput = UA_NODEID_NULL;
+                            UA_Server_readNodeId(this->mappedServer, requestedPVBrowseId, &tmpOutput);
+                            if(!UA_NodeId_isNull(&tmpOutput)) {
+                                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Using legacy code. Mapped PV is used as PV mapping target");
+                                UA_NodeId_copy(&requestedPVBrowseId, &destinationFolderNodeId);
+                            } else {
+                                destinationFolderNodeId = enrollFolderPathFromString(destination + unrollPath + "removedPart", unrollPath);
+                            }
+                        } else {
+                            destinationFolderNodeId = enrollFolderPathFromString(destination + unrollPath + "removedPart", unrollPath);
+                        }
                     }
                 }
                 if(name.empty()){
@@ -998,11 +1015,12 @@ UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderN
 
     UA_InstantiationCallback icb;
     icb.handle = (void *) &this->ownedNodes;
-    icb.method = ua_mapInstantiatedNodes;        UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char *) parentNodeIdString.c_str()), //UA_NODEID_NUMERIC(1,0)
+    icb.method = ua_mapInstantiatedNodes;
+    UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char *) parentNodeIdString.c_str()), //UA_NODEID_NUMERIC(1,0)
                           basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
                           UA_QUALIFIEDNAME(1, (char*)folderName.c_str()), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr, &icb, &createdNodeId);
 
-        return createdNodeId;
+    return createdNodeId;
 }
 
 UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
