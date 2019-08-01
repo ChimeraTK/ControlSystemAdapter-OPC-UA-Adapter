@@ -498,6 +498,8 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                 UA_Server_writeDescription(this->mappedServer, folderPathNodeId, UA_LOCALIZEDTEXT((char *) "en_US", (char *) description.c_str()));
             }
         }
+
+        xmlXPathFreeObject(result);
     }
 }
 
@@ -746,6 +748,8 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
             UA_Server_writeDisplayName(this->mappedServer, createdNodeId, UA_LOCALIZEDTEXT((char *) "en_US",
                     (char *) name.c_str()));
         }
+
+        xmlXPathFreeObject(result);
     }
 }
 
@@ -814,6 +818,8 @@ void ua_uaadapter::addAdditionalVariables() {
                     additionalVarFolderPath, name, value, description);
             this->additionalVariables.push_back(additionalvariable);
         }
+
+        xmlXPathFreeObject(result);
     }
 }
 
@@ -1165,6 +1171,8 @@ vector<string> ua_uaadapter::getAllNotMappableVariablesNames() {
                             notMappableVariablesNames.push_back(mappedVar);
                         }
                 }
+
+                xmlXPathFreeObject(result);
         }
 
         return notMappableVariablesNames;
