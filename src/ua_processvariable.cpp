@@ -48,6 +48,7 @@ ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, 
 ua_processvariable::~ua_processvariable()
 {
   //* Our ua_mapped_class destructor will take care of deleting our opcua footprint as long as all variables are mapped in this->ownedNodes
+    UA_NodeId_deleteMembers(&this->ownNodeId);
 }
 
 // Name

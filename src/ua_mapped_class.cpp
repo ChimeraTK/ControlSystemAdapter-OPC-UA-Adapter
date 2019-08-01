@@ -41,6 +41,7 @@ ua_mapped_class::~ua_mapped_class() {
   this->ua_unmapSelfFromNamespace();
   this->mappedServer = nullptr;
 	this->mappedClient = nullptr;
+	UA_NodeId_deleteMembers(&this->baseNodeId);
 }
 
 UA_StatusCode ua_mapped_class::ua_mapSelfToNamespace() {
