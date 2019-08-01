@@ -129,6 +129,8 @@ void ua_uaadapter::readConfig() {
                 this->mappingExceptions = UA_FALSE;
             }
         }
+
+        xmlXPathFreeObject(result);
     }
     result = this->fileHandler->getNodeSet(xpath + "//login");
     if(result) {
@@ -151,6 +153,7 @@ void ua_uaadapter::readConfig() {
             throw std::runtime_error ("<login>-Tag requires password");
         }
 
+        xmlXPathFreeObject(result);
     }
     else {
         this->serverConfig.UsernamePasswordLogin = UA_FALSE;
@@ -178,7 +181,9 @@ void ua_uaadapter::readConfig() {
         if (this->serverConfig.rootFolder.empty()) {
             this->serverConfig.rootFolder = this->serverConfig.applicationName;
         }
-    }
+
+        xmlXPathFreeObject(result);
+}
     else {
         cout << "No <server>-Tag in config file. Use default port 16664 and application name configuration." << endl;
         this->serverConfig.rootFolder = this->serverConfig.applicationName;
@@ -195,7 +200,9 @@ void ua_uaadapter::readConfig() {
                 this->pvSeperator += this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
             }
         }
-    } else {
+
+        xmlXPathFreeObject(result);
+} else {
         cout << "No <process_variable_hierarchy>-Tag in config file. Use default hierarchical mapping with '/'."
              << endl;
         this->pvSeperator = "/";
