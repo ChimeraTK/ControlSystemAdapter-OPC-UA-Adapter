@@ -61,7 +61,7 @@ ua_uaadapter::~ua_uaadapter() {
         if (this->isRunning()) {
                 this->doStop();
         }
-        //UA_Server_delete(this->mappedServer);
+        UA_Server_delete(this->mappedServer);
         this->fileHandler->~xml_file_handler();
         for(auto ptr : variables) delete ptr;
         for(auto ptr : additionalVariables) delete ptr;

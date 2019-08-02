@@ -37,6 +37,7 @@ ua_additionalvariable::ua_additionalvariable(UA_Server* server, UA_NodeId baseno
 	this->name = name;
   	this->value = value;
 	this->description = description;
+	this->ownNodeId = UA_NODEID_NULL;
 
 	this->mapSelfToNamespace();
 }
@@ -100,34 +101,45 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
     icb.handle = (void *) &this->ownedNodes;
     icb.method = ua_mapInstantiatedNodes;
 
+    UA_QualifiedName qualName = UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str());
 	retval |= UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/"+name+"AdditionalVariable").c_str()), this->baseNodeId,
-                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str()),
+                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName,
                               UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), vAttr ,&icb, &createdNodeId);
 	this->ownNodeId = createdNodeId;
+	UA_QualifiedName_deleteMembers(&qualName);
 
-    UA_VariableAttributes_init(&vAttr);
-    vAttr.displayName = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*) "description");
-    vAttr.description = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->description.c_str());
-    vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
+    UA_VariableAttributes_deleteMembers(&vAttr);
+
+    UA_VariableAttributes vAttr2;
+    UA_VariableAttributes_init(&vAttr2);
+    vAttr2.displayName = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*) "description");
+    vAttr2.description = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->description.c_str());
+    vAttr2.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
     UA_String addVarDescription = UA_STRING_ALLOC(description.c_str());
-    UA_Variant_setScalar(&vAttr.value, &addVarDescription, &UA_TYPES[UA_TYPES_STRING]);
+    UA_Variant_setScalarCopy(&vAttr2.value, &addVarDescription, &UA_TYPES[UA_TYPES_STRING]);
 
+    UA_QualifiedName qualName2 = UA_QUALIFIEDNAME_ALLOC(1, this->description.c_str());
     retval |= UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/"+name+"/description").c_str()),
             this->ownNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-            UA_QUALIFIEDNAME_ALLOC(1, this->description.c_str()),
-            UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr, NULL, &createdNodeId);
+            qualName2,
+            UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr2, NULL, &createdNodeId);
+
+    UA_QualifiedName_deleteMembers(&qualName2);
 
 	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
 	UA_DataSource_Map mapDs;
 	UA_DataSource_Map_Element mapElemValue;
 	mapElemValue.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE);
-	mapElemValue.description = vAttr.description;
+	mapElemValue.description = vAttr2.description;
 	mapElemValue.read = ua_readproxy_ua_additionalvariable_getValue;
 	mapElemValue.write = NULL;
 	mapDs.push_back(mapElemValue);
 	//mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE), oAttr.description, .read=UA_RDPROXY_NAME(ua_additionalvariable, getValue), .write=NULL});
 	
 	this->ua_mapDataSources((void *) this, &mapDs);
+
+	UA_String_deleteMembers(&addVarDescription);
+	UA_VariableAttributes_deleteMembers(&vAttr2);
 	
 	return retval;
 }
