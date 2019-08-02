@@ -60,6 +60,8 @@ UA_StatusCode ua_mapped_class::ua_unmapSelfFromNamespace() {
     UA_NodeId_pair *p = *(i);
     // Node is deleted by UA_Server_delete.
     //UA_Server_deleteNode(this->mappedServer, p->targetNodeId, UA_FALSE);
+    UA_NodeId_deleteMembers(&p->sourceNodeId);
+    UA_NodeId_deleteMembers(&p->targetNodeId);
     this->ownedNodes.remove(*(i));
     delete p;
   }

@@ -612,6 +612,11 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                     UA_Variant_setScalar(&value, &ua_description, &UA_TYPES[UA_TYPES_STRING]);
                     UA_Server_writeValue(this->mappedServer, UA_NODEID_STRING(1, (char *) descriptionNodeId.c_str()), value);
                 }
+
+                if (!UA_NodeId_isNull(&pvNodeId))
+                {
+                    UA_NodeId_deleteMembers(&pvNodeId);
+                }
                 continue;
             }
             //check if the source pv exists
@@ -629,6 +634,10 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                     UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV mapping. Source PV not found.");
                 }
                 continue;
+            }
+            else {
+                UA_NodeId_deleteMembers(&tmpOutput);
+                UA_NodeId_init(&tmpOutput);
             }
             //check the pv copy attribute -> copy of pv requested; false -> reference to original pv requested
             UA_NodeId createdNodeId = UA_NODEID_NULL;
@@ -748,6 +757,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
             }
             UA_Server_writeDisplayName(this->mappedServer, createdNodeId, UA_LOCALIZEDTEXT((char *) "en_US",
                     (char *) name.c_str()));
+            UA_NodeId_deleteMembers(&createdNodeId);
         }
 
         xmlXPathFreeObject(result);
@@ -796,6 +806,8 @@ void ua_uaadapter::addAdditionalVariables() {
             UA_NodeId avNode = UA_NODEID_STRING(1, (char *) avNodeString.c_str());
             UA_Server_readNodeId(this->mappedServer, avNode, &tmpOutput);
             if(!UA_NodeId_isNull(&tmpOutput)){
+                UA_NodeId_deleteMembers(&tmpOutput);
+                UA_NodeId_init(&tmpOutput);
                 if(this->mappingExceptions){
                     throw std::runtime_error ("AV node creation failed. AV already exists.");
                 }
