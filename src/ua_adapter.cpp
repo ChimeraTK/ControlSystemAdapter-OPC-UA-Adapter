@@ -313,10 +313,13 @@ void ua_uaadapter::implicitVarMapping(std::string varName, boost::shared_ptr<Con
         processvariable = new ua_processvariable(this->mappedServer, this->ownNodeId,
                                                  varName.substr(1, varName.size() - 1), csManager);
     }
-    UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
+    UA_NodeId tmpNodeId = processvariable->getOwnNodeId();
+    UA_Server_writeDisplayName(this->mappedServer, tmpNodeId,
                                UA_LOCALIZEDTEXT((char *) "en_US",
                                                 (char *) this->fileHandler->praseVariablePath(varName,
                                                          this->pvSeperator).back().c_str()));
+    UA_NodeId_deleteMembers(&tmpNodeId);
+
     this->variables.push_back(processvariable);
 
 }
@@ -691,6 +694,9 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                         UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV %s. Source and Destination must be different.", sourceName.c_str());
                         continue;
                     }
+                    else {
+                        UA_NodeId_deleteMembers(&tmpProcessVariableNodeId);
+                    }
                     this->variables.push_back(processvariable);
                 } else {
                     if(this->mappingExceptions){
@@ -701,6 +707,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                 }
                 UA_NodeId tmpPVNodeId = processvariable->getOwnNodeId();
                 UA_NodeId_copy(&tmpPVNodeId, &createdNodeId);
+                UA_NodeId_deleteMembers(&tmpPVNodeId);
             } else {
                 //get node id of the source node
                 string sourceVarName = this->fileHandler->praseVariablePath(sourceName, "/").back();
