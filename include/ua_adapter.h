@@ -94,7 +94,6 @@ class ua_uaadapter : ua_mapped_class, public ipc_managed_object {
 private:
         UA_ServerConfig					        server_config;
         UA_ServerNetworkLayer 	                server_nl;
-        UA_Logger 							    logger;
 
         UA_NodeId 							    variablesListId;
         UA_NodeId 							    constantsListId;

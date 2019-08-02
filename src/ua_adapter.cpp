@@ -47,6 +47,7 @@ using namespace ChimeraTK;
 using namespace std;
 
 ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
+        this->mappingExceptions = UA_FALSE;
         this->fileHandler = new xml_file_handler(configFile);
         this->readConfig();
 
