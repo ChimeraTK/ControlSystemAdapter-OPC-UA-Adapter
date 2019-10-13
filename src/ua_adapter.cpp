@@ -426,12 +426,12 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
             }
             if(folder.empty()){
                 if(this->mappingExceptions){
-                    throw std::runtime_error ("Error! Folder creation failed. Name is missing");
+                    throw std::runtime_error ("Error! Folder creation failed. Name is missing. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                 }
                 if(description.empty()){
-                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Folder creation failed. Name is missing");
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Folder creation failed. Name is missing. Mapping line number: %u", nodeset->nodeTab[i]->line);
                 } else {
-                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Folder creation failed. Name is missing 'description: %s'", description.c_str());
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Folder creation failed. Name is missing 'description: %s'. . Mapping line number: %u", description.c_str(), nodeset->nodeTab[i]->line);
                 }
                 continue;
             }
@@ -642,15 +642,15 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
             if(UA_NodeId_isNull(&tmpOutput)){
                 if(this->mappingExceptions){
                     if(!name.empty()){
-                        throw std::runtime_error ("Error! PV mapping failed. Source PV not found 'name' : " + name);
+                        throw std::runtime_error ("Error! PV mapping failed. Source PV not found 'name' : " + name + "Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     } else {
-                        throw std::runtime_error ("Error! PV mapping failed. Source PV not found");
+                        throw std::runtime_error ("Error! PV mapping failed. Source PV not found. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     }
                 }
                 if(!name.empty()){
-                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV mapping. Source PV not found 'name: %s'.", name.c_str());
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV mapping. Source PV not found 'name: %s'. Mapping line number: %u", name.c_str(), nodeset->nodeTab[i]->line);
                 } else {
-                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV mapping. Source PV not found.");
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV mapping. Source PV not found. Mapping line number: %u", nodeset->nodeTab[i]->line);
                 }
                 continue;
             }
@@ -705,9 +705,9 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                     UA_NodeId tmpProcessVariableNodeId = processvariable->getOwnNodeId();
                     if(UA_NodeId_isNull(&tmpProcessVariableNodeId)){
                         if(this->mappingExceptions){
-                            throw std::runtime_error ("PV Source and Destination must be different");
+                            throw std::runtime_error ("PV creation failed. PV with same name mapped. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                         }
-                        UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV %s. Source and Destination must be different.", sourceName.c_str());
+                        UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV %s. PV with same name mapped. Mapping line number: %u", sourceName.c_str(), nodeset->nodeTab[i]->line);
                         continue;
                     }
                     else {
@@ -825,7 +825,12 @@ void ua_uaadapter::addAdditionalVariables() {
             }
             //check if the av node still exists
             UA_NodeId tmpOutput = UA_NODEID_NULL;
-            string avNodeString = this->serverConfig.rootFolder + destination + "/" + name + "AdditionalVariable";
+            string avNodeString;
+            if(destination.empty()){
+                avNodeString = this->serverConfig.rootFolder + "/" + name + "AdditionalVariable";
+            } else {
+                avNodeString = this->serverConfig.rootFolder + "/" + destination + "/" + name + "AdditionalVariable";
+            }
             UA_NodeId avNode = UA_NODEID_STRING(1, (char *) avNodeString.c_str());
             UA_Server_readNodeId(this->mappedServer, avNode, &tmpOutput);
             if(!UA_NodeId_isNull(&tmpOutput)){
@@ -837,6 +842,26 @@ void ua_uaadapter::addAdditionalVariables() {
                 UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping additional variable %s. Node already exists.", name.c_str());
                 continue;
             }
+            //check if pv with same name exists in the target folder
+            UA_NodeId_deleteMembers(&tmpOutput);
+            string pvNodeString;
+            if(destination.empty()){
+                pvNodeString = this->serverConfig.rootFolder + "/" + name + "Value";
+            } else {
+                pvNodeString = this->serverConfig.rootFolder + "/" + destination + "/" + name + "Value";
+            }
+            UA_NodeId pvNode = UA_NODEID_STRING(1, (char *) pvNodeString.c_str());
+            UA_Server_readNodeId(this->mappedServer, pvNode, &tmpOutput);
+            if(!UA_NodeId_isNull(&tmpOutput)){
+                UA_NodeId_deleteMembers(&tmpOutput);
+                UA_NodeId_init(&tmpOutput);
+                if(this->mappingExceptions){
+                    throw std::runtime_error ("Additional variable node creation failed. PV with same name already exists.");
+                }
+                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping additional variable %s. PV with same name already exists.", name.c_str());
+                continue;
+            }
+
             UA_NodeId additionalVarFolderPath = UA_NODEID_NULL;
             if(!destination.empty()){
                 additionalVarFolderPath = enrollFolderPathFromString(destination+"/removePart", "/");
