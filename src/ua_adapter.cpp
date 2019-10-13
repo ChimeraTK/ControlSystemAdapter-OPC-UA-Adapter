@@ -80,6 +80,12 @@ void ua_uaadapter::constructServer() {
     this->server_config.enableUsernamePasswordLogin = this->serverConfig.UsernamePasswordLogin;
     this->server_config.enableAnonymousLogin = !this->serverConfig.UsernamePasswordLogin;
 
+    /*get hostname */
+    char hostname[HOST_NAME_MAX];
+    gethostname(hostname, HOST_NAME_MAX);
+    string hostname_uri = "opc.tcp://";
+    hostname_uri.append(hostname);
+
     UA_UsernamePasswordLogin* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
     usernamePasswordLogins->password = UA_STRING((char*)this->serverConfig.password.c_str());
     usernamePasswordLogins->username = UA_STRING((char*)this->serverConfig.username.c_str());
@@ -87,7 +93,7 @@ void ua_uaadapter::constructServer() {
     this->server_config.usernamePasswordLoginsSize = (size_t)(usernamePasswordLogins->password.length + usernamePasswordLogins->username.length);
     this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
     this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
-    this->server_config.applicationDescription.applicationUri = UA_STRING((char*)"opc.tcp://localhost");
+    this->server_config.applicationDescription.applicationUri = UA_STRING((char*) hostname_uri.c_str());
     this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
     this->server_config.buildInfo.productName = UA_STRING((char*)"csa_opcua_adapter");
     this->server_config.buildInfo.productUri = UA_STRING((char*)"HZDR OPCUA Server");
