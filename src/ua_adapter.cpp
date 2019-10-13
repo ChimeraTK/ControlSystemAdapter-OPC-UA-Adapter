@@ -818,9 +818,9 @@ void ua_uaadapter::addAdditionalVariables() {
             //check if name is empty
             if(name.empty()){
                 if(this->mappingExceptions){
-                    throw std::runtime_error ("AV node creation failed. AV name is mandatory");
+                    throw std::runtime_error ("Additional variable node creation failed. Additional variable name is mandatory. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                 }
-                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping AV. AV name is mandatory.");
+                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping additional variable. Additional variable name is mandatory. Mapping line number: %u", nodeset->nodeTab[i]->line);
                 continue;
             }
             //check if the av node still exists
@@ -832,9 +832,9 @@ void ua_uaadapter::addAdditionalVariables() {
                 UA_NodeId_deleteMembers(&tmpOutput);
                 UA_NodeId_init(&tmpOutput);
                 if(this->mappingExceptions){
-                    throw std::runtime_error ("AV node creation failed. AV already exists.");
+                    throw std::runtime_error ("Additional variable node creation failed. Additional variable already exists.");
                 }
-                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping AV %s. Node already exists.", name.c_str());
+                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping additional variable %s. Node already exists.", name.c_str());
                 continue;
             }
             UA_NodeId additionalVarFolderPath = UA_NODEID_NULL;
@@ -847,7 +847,7 @@ void ua_uaadapter::addAdditionalVariables() {
                 if(this->mappingExceptions){
                     throw std::runtime_error ("Error! Creation of additional variable folder failed.");
                 }
-                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping AV. Creation of additional variable folder failed. Skipping.");
+                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping additional variable. Creation of additional variable folder failed. Skipping.");
                 continue;
             }
             ua_additionalvariable *additionalvariable = new ua_additionalvariable(this->mappedServer,
