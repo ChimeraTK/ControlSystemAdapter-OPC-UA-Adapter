@@ -641,7 +641,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
             UA_Server_readNodeId(this->mappedServer, parentSourceId, &tmpOutput);
             if(UA_NodeId_isNull(&tmpOutput)){
                 if(this->mappingExceptions){
-                    throw std::runtime_error ("Error! PV mapping failed. Source PV not found.");
+                    throw std::runtime_error ("Error! PV mapping failed. Source PV not found 'name' : " + name);
                 }
                 if(!name.empty()){
                     UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV mapping. Source PV not found 'name: %s'.", name.c_str());
