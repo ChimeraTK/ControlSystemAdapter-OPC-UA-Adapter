@@ -46,11 +46,11 @@ extern "C" {
 using namespace ChimeraTK;
 using namespace std;
 
+
 ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
         this->mappingExceptions = UA_FALSE;
         this->fileHandler = new xml_file_handler(configFile);
         this->readConfig();
-
         this->constructServer();
 
         this->mapSelfToNamespace();
@@ -177,6 +177,12 @@ void ua_uaadapter::readConfig() {
             this->serverConfig.applicationName = placeHolder;
         } else {
             cout << "No 'applicationName'-Attribute is set in config file. Use default applicationname." << endl;
+            char buff[PATH_MAX];
+            ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
+            if (len != -1) {
+                buff[len] = '\0';
+            }
+            this->serverConfig.applicationName = string(buff).substr(string(buff).rfind("/") + 1);
         }
         //if no root folder name is set, use application name
         if (this->serverConfig.rootFolder.empty()) {
