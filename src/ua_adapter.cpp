@@ -431,25 +431,25 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                 if(description.empty()){
                     UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Folder creation failed. Name is missing. Mapping line number: %u", nodeset->nodeTab[i]->line);
                 } else {
-                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Folder creation failed. Name is missing 'description: %s'. . Mapping line number: %u", description.c_str(), nodeset->nodeTab[i]->line);
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Folder creation failed. Name is missing 'description: %s'. Mapping line number: %u", description.c_str(), nodeset->nodeTab[i]->line);
                 }
                 continue;
             }
 
             if(!copy.empty() && sourceName.empty()){
                 if(this->mappingExceptions){
-                    throw std::runtime_error ("Error! Folder creation failed. Source folder missing.");
+                    throw std::runtime_error ("Error! Folder creation failed. Source folder missing. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                 }
-                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Source 'name: %s' folder missing.", folder.c_str());
+                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Source 'name: %s' folder missing. Mapping line number: %u", folder.c_str(), nodeset->nodeTab[i]->line);
                 continue;
             }
             //check if source name is set -> map complete hierarchical structure to the destination
             if(!sourceName.empty()){
                 if(sourceName.compare(destination+"/"+folder) == 0){
                     if(this->mappingExceptions){
-                        throw std::runtime_error ("Error! Folder creation failed. Source and Destination equal.");
+                        throw std::runtime_error ("Error! Folder creation failed. Source and Destination equal. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     }
-                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Source '%s' and Destination equal.", sourceName.c_str());
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. Source '%s' and Destination equal. Mapping line number: %u", sourceName.c_str(), nodeset->nodeTab[i]->line);
                     continue;
                 }
                 //check if the src is a folder
@@ -475,9 +475,9 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                 UA_BrowseResult_deleteMembers(&br);
                 if(!isFolderType){
                     if(this->mappingExceptions){
-                        throw std::runtime_error ("Error! Folder creation failed. No corresponding source folder.");
+                        throw std::runtime_error ("Error! Folder creation failed. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     }
-                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. No corresponding source '%s' folder.", sourceName.c_str());
+                    UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. No corresponding source '%s' folder. Mapping line number: %u", sourceName.c_str(), nodeset->nodeTab[i]->line);
                     continue;
                 }
                 folderPathNodeId = enrollFolderPathFromString(destination+"/replacePart", "/");
