@@ -325,15 +325,13 @@ void ua_uaadapter::implicitVarMapping(std::string varName, boost::shared_ptr<Con
         processvariable = new ua_processvariable(this->mappedServer, this->ownNodeId,
                                                  varName.substr(1, varName.size() - 1), csManager);
     }
+    this->variables.push_back(processvariable);
     UA_NodeId tmpNodeId = processvariable->getOwnNodeId();
     UA_Server_writeDisplayName(this->mappedServer, tmpNodeId,
                                UA_LOCALIZEDTEXT((char *) "en_US",
                                                 (char *) this->fileHandler->praseVariablePath(varName,
                                                          this->pvSeperator).back().c_str()));
     UA_NodeId_deleteMembers(&tmpNodeId);
-
-    this->variables.push_back(processvariable);
-
 }
 
 void ua_uaadapter::deepCopyHierarchicalLayer(boost::shared_ptr<ControlSystemPVManager> csManager, UA_NodeId layer, UA_NodeId target){
@@ -620,32 +618,21 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                 }
                 if(!unit.empty()){
                     //update unit
-                    string unitNodeId;
-                    UASTRING_TO_CPPSTRING(pvNodeId.identifier.string, unitNodeId);
-                    unitNodeId = unitNodeId.substr(0, unitNodeId.length()-5);
-                    unitNodeId += "/engineeringunit";
-                    UA_String ua_unit = UA_STRING((char *) unit.c_str());
-                    UA_Variant value;
-                    UA_Variant_setScalar(&value, &ua_unit, &UA_TYPES[UA_TYPES_STRING]);
-                    /* currently processvariable setter is enabled -> write on runtime possible. Change?
-                    UA_Server_writeAccessLevel(this->mappedServer, UA_NODEID_STRING(1, (char *) unitNodeId.c_str()), UA_ACCESSLEVELMASK_READ^UA_ACCESSLEVELMASK_WRITE);
-                    UA_NodeId accessLevel = UA_NODEID_STRING(1, (char *) unitNodeId.c_str());
-                    UA_Byte accessLevelMask = UA_ACCESSLEVELMASK_WRITE^UA_ACCESSLEVELMASK_READ;
-                    __UA_Server_write(this->mappedServer, &accessLevel, UA_ATTRIBUTEID_USERACCESSLEVEL, &UA_TYPES[UA_TYPES_BYTE], &accessLevelMask);*/
-                    UA_Server_writeValue(this->mappedServer, UA_NODEID_STRING(1, (char *) unitNodeId.c_str()), value);
+                    for (size_t n = 0; n < this->variables.size(); n++){
+                        UA_NodeId tmpNodeId = this->variables[n]->getOwnNodeId();
+                        if(UA_NodeId_equal(&tmpNodeId, &pvNodeId)){
+                            this->variables[n]->setEngineeringUnit(unit);
+                        }
+                    }
                 }
                 if(!description.empty()){
                     //update description
-                    string descriptionNodeId;
-                    UASTRING_TO_CPPSTRING(pvNodeId.identifier.string, descriptionNodeId);
-                    descriptionNodeId = descriptionNodeId.substr(0, descriptionNodeId.length()-5);
-                    UA_LocalizedText updateDescription = UA_LOCALIZEDTEXT((char *) "en_US", (char *) description.c_str());
-                    UA_Server_writeDescription(this->mappedServer, pvNodeId, updateDescription);
-                    descriptionNodeId += "/description";
-                    UA_String ua_description = UA_STRING((char *) description.c_str());
-                    UA_Variant value;
-                    UA_Variant_setScalar(&value, &ua_description, &UA_TYPES[UA_TYPES_STRING]);
-                    UA_Server_writeValue(this->mappedServer, UA_NODEID_STRING(1, (char *) descriptionNodeId.c_str()), value);
+                    for (size_t n = 0; n < this->variables.size(); n++){
+                        UA_NodeId tmpNodeId = this->variables[n]->getOwnNodeId();
+                        if(UA_NodeId_equal(&tmpNodeId, &pvNodeId)){
+                            this->variables[n]->setDescription(description);
+                        }
+                    }
                 }
 
                 if (!UA_NodeId_isNull(&pvNodeId))
@@ -775,28 +762,20 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                 UA_NodeId_copy(&parentSourceId, &createdNodeId);
             }
             if(!unit.empty()){
-                string unitNodeId;
-                UASTRING_TO_CPPSTRING(createdNodeId.identifier.string, unitNodeId);
-                unitNodeId = unitNodeId.substr(0, unitNodeId.length()-5);
-                unitNodeId += "/engineeringunit";
-                UA_String ua_unit = UA_STRING((char *) unit.c_str());
-                UA_Variant value;
-                UA_Variant_setScalar(&value, &ua_unit, &UA_TYPES[UA_TYPES_STRING]);
-                UA_Server_writeValue(this->mappedServer,
-                        UA_NODEID_STRING(1, (char *) unitNodeId.c_str()), value);
+                for (size_t n = 0; n < this->variables.size(); n++){
+                    UA_NodeId tmpNodeId = this->variables[n]->getOwnNodeId();
+                    if(UA_NodeId_equal(&tmpNodeId, &createdNodeId)){
+                        this->variables[n]->setEngineeringUnit(unit);
+                    }
+                }
             }
             if(!description.empty()){
-                string descriptionNodeId;
-                UASTRING_TO_CPPSTRING(createdNodeId.identifier.string, descriptionNodeId);
-                descriptionNodeId = descriptionNodeId.substr(0, descriptionNodeId.length()-5);
-                UA_LocalizedText updateDescription = UA_LOCALIZEDTEXT((char *) "en_US", (char *) description.c_str());
-                UA_Server_writeDescription(this->mappedServer, createdNodeId, updateDescription);
-                descriptionNodeId += "/description";
-                UA_String ua_description = UA_STRING((char *) description.c_str());
-                UA_Variant value;
-                UA_Variant_setScalar(&value, &ua_description, &UA_TYPES[UA_TYPES_STRING]);
-                UA_Server_writeValue(this->mappedServer,
-                        UA_NODEID_STRING(1, (char *) descriptionNodeId.c_str()), value);
+                for (size_t n = 0; n < this->variables.size(); n++){
+                    UA_NodeId tmpNodeId = this->variables[n]->getOwnNodeId();
+                    if(UA_NodeId_equal(&tmpNodeId, &createdNodeId)){
+                        this->variables[n]->setDescription(description);
+                    }
+                }
             }
             UA_Server_writeDisplayName(this->mappedServer, createdNodeId, UA_LOCALIZEDTEXT((char *) "en_US",
                     (char *) name.c_str()));

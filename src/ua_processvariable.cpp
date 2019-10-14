@@ -16,7 +16,7 @@
  *
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- * Copyright (c) 2018 Andreas Ebner <Andreas.Ebner@iosb-extern.fraunhofer.de>
+ * Copyright (c) 2018-2019 Andreas Ebner <Andreas.Ebner@iosb-extern.fraunhofer.de>
  */
 
 
@@ -1524,7 +1524,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     mapElemDesc.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
     mapElemDesc.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
     mapElemDesc.read = ua_readproxy_ua_processvariable_getDescription;
-    mapElemDesc.write = ua_writeproxy_ua_processvariable_setDescription;
+    mapElemDesc.write = NULL;
     mapDs.push_back(mapElemDesc);
 
     // EngineeringUnit
@@ -1532,7 +1532,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     mapElemEU.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
     mapElemEU.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
     mapElemEU.read = ua_readproxy_ua_processvariable_getEngineeringUnit;
-    mapElemEU.write = ua_writeproxy_ua_processvariable_setEngineeringUnit;
+    mapElemEU.write = NULL;
     mapDs.push_back(mapElemEU);
 
     // Type
