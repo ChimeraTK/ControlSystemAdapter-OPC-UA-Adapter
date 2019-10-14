@@ -475,7 +475,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                 UA_BrowseResult_deleteMembers(&br);
                 if(!isFolderType){
                     if(this->mappingExceptions){
-                        throw std::runtime_error ("Error! Folder creation failed. No corresponding source" + sourceName + "folder. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
+                        throw std::runtime_error ("Error! Folder creation failed. No corresponding source" + sourceName + " folder. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     }
                     UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. No corresponding source '%s' folder. Mapping line number: %u", sourceName.c_str(), nodeset->nodeTab[i]->line);
                     continue;
@@ -487,6 +487,26 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                 //enroll path destination -> copy / link the complete tree to this place
                 transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
                 if(copy.compare("TRUE") == 0) {
+                    bool sourceAndDestinationEqual = false;
+                    if(!destination.empty()) {
+                        if (sourceName.compare(destination + "/" + folder) == 0)
+                            sourceAndDestinationEqual = true;
+                    } else {
+                        if (sourceName.compare(folder) == 0)
+                            sourceAndDestinationEqual = true;
+                    }
+                    if (sourceAndDestinationEqual) {
+                        if (this->mappingExceptions) {
+                            throw std::runtime_error(
+                                    "Error! Folder creation failed. Source and destination must be different for '" +
+                                    sourceName + "' folder. Mapping line number: " +
+                                    to_string(nodeset->nodeTab[i]->line));
+                        }
+                        UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND,
+                                       "Warning! Skipping Folder. Folder creation failed. Source and destination must be different for '%s' folder. Mapping line number: %u",
+                                       sourceName.c_str(), nodeset->nodeTab[i]->line);
+                        continue;
+                    }
                     // folder structure must be copied, pv nodes must be added
                     UA_LocalizedText foundFolderName;
                     UA_NodeId copyRoot = createFolder(folderPathNodeId, folder);
