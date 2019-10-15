@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "ua_mapped_class.h"
-#include "ipc_managed_object.h"
 #include "ua_processvariable.h"
 #include "ua_additionalvariable.h"
 #include "xml_file_handler.h"
@@ -90,7 +89,7 @@ struct ServerConfig {
  *
  *  @date 22.11.2016
  */
-class ua_uaadapter : ua_mapped_class, public ipc_managed_object {
+class ua_uaadapter : ua_mapped_class {
 private:
         UA_ServerConfig					        server_config;
         UA_ServerNetworkLayer 	                server_nl;
@@ -132,14 +131,16 @@ private:
 
 public:
 
-        /** @brief Constructor of the class.
- *
- * During the construction of the class it instanciate a xml_file_handler and read the config, after that the server will be sonstructed and the namespace ist added to them.
- * Concluding all additional nodes which are defined in the configFile are mapped into the server.
- *
- * @param configFile This file provide the configuration and the mapping of the server
- */
-        ua_uaadapter(string configPath);
+    bool running; // set to false to stop the worker thread
+
+    /** @brief Constructor of the class.
+*
+* During the construction of the class it instanciate a xml_file_handler and read the config, after that the server will be sonstructed and the namespace ist added to them.
+* Concluding all additional nodes which are defined in the configFile are mapped into the server.
+*
+* @param configFile This file provide the configuration and the mapping of the server
+*/
+    ua_uaadapter(string configPath);
 
         /** @brief Destrructor of the class.
         *

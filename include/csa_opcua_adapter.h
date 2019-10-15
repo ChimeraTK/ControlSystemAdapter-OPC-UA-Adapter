@@ -22,7 +22,7 @@
 #define CSA_OPCUA_ADAPTER_H
 
 #include <vector>
-#include "ipc_managed_object.h"
+#include <thread>
 
 #include "ua_adapter.h"
 #include "ua_processvariable.h"
@@ -44,7 +44,7 @@
 
 class csa_opcua_adapter {
 private:
-	ipc_manager    *mgr;
+    std::thread adapter_thread;
 	ua_uaadapter *adapter;
 	boost::shared_ptr<ControlSystemPVManager> csManager;
 	
@@ -59,7 +59,6 @@ public:
 	
 	/**
 	 * @brief Destructor to stop the running thread, hence it stops the OPC UA server 
-	 * 
 	 */
 	~csa_opcua_adapter();
     
@@ -78,21 +77,12 @@ public:
 	ua_uaadapter* getUAAdapter();
 	
 	/**
-	 * @brief Return the ipc_manager
-	 * 
-	 * @return Return the ipc_manager
-	 */
-	ipc_manager* getIPCManager();
-	
-	/**
 	 * @brief Start all objects in single threads for this case only the opc ua server
-	 * 
 	 */
 	void start();
 	
 	/**
 	 * @brief Stop all objects in single threads for this case only the opc ua server
-	 * 
 	 */
 	void stop();
 	

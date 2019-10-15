@@ -56,7 +56,6 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 #include "csa_opcua_adapter.h"
-#include "ipc_manager.h"
 
 boost::shared_ptr<ControlSystemPVManager> csManager;
 boost::shared_ptr<DevicePVManager> devManager;
@@ -88,7 +87,7 @@ int main() {
     sigaddset(&intmask, SIGINT);
     sigprocmask(SIG_BLOCK, &intmask, NULL);
 	
-	// Create the managers
+    cout << "Crate the Managers" << endl;
 	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers = createPVManager();
 
 	devManager = pvManagers.second;
@@ -101,11 +100,18 @@ int main() {
 	ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
 	ChimeraTK::ApplicationBase::getInstance().initialise();
 
+    cout << "Start the mapping" << endl;
 	string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
 	cout << pathToConfig << endl;
+
+    cout << "Create the adapter" << endl;
 	csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
 	
+    cout << "Run the application instance" << endl;
 	ChimeraTK::ApplicationBase::getInstance().run();
+
+    cout << "Start the OPC UA Adapter" << endl;
+    csaOPCUA->start();
 
     /* Unblock SIGINT */
     sigprocmask(SIG_UNBLOCK, &intmask, NULL);

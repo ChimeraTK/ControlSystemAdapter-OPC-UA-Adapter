@@ -36,7 +36,6 @@ extern "C" {
 #include "ua_processvariable.h"
 #include "ua_additionalvariable.h"
 #include "xml_file_handler.h"
-#include "ipc_manager.h"
 #include "ua_proxies.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
@@ -54,18 +53,17 @@ ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
         this->constructServer();
 
         this->mapSelfToNamespace();
+        this->running = false;
+
 }
 
 ua_uaadapter::~ua_uaadapter() {
+    UA_Server_delete(this->mappedServer);
+    this->fileHandler->~xml_file_handler();
+    for (auto ptr : variables) delete ptr;
+    for (auto ptr : additionalVariables) delete ptr;
+    for (auto ptr : mappedVariables) delete ptr;
 
-        if (this->isRunning()) {
-                this->doStop();
-        }
-        UA_Server_delete(this->mappedServer);
-        this->fileHandler->~xml_file_handler();
-        for(auto ptr : variables) delete ptr;
-        for(auto ptr : additionalVariables) delete ptr;
-        for(auto ptr : mappedVariables) delete ptr;
 }
 
 void ua_uaadapter::constructServer() {
@@ -260,17 +258,19 @@ void ua_uaadapter::readAdditionalNodes() {
  */
 
 void ua_uaadapter::workerThread() {
-        if (this->mappedServer == nullptr) {
-                return;
-        }
+    if(this->mappedServer == nullptr) {
+        cout << "No server mapped" << endl;
+        return;
+    }
 
         cout << "Starting the server worker thread" << endl;
 
         UA_Server_run_startup(this->mappedServer);
 
-        while(this->isRunning()) {
-            UA_Server_run_iterate(this->mappedServer, true);
-        }
+    this->running = true;
+    while (this->running) {
+        UA_Server_run_iterate(this->mappedServer, true);
+    }
 
         UA_Server_run_shutdown(this->mappedServer);
 

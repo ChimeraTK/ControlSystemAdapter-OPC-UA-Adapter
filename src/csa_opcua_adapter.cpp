@@ -28,7 +28,6 @@ extern "C" {
 #include <math.h>
 #include <typeinfo>       // std::bad_cast
 
-#include "ipc_manager.h"
 #include "ua_adapter.h"
 #include "ua_processvariable.h"
 
@@ -40,7 +39,6 @@ extern "C" {
 csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager,
                                      string configFile) {
     this->csManager = csManager;
-    this->mgr = new ipc_manager(); // Global, um vom Signalhandler stopbar zu sein
 
     // Create new server adapter
     this->adapter = new ua_uaadapter(configFile);
@@ -64,14 +62,11 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
 				cout << var << endl;
 			}
 		}
-    // add the managed ipc thread only now
-    this->mgr->addObject(this->adapter);
-    this->mgr->startAll();
 }
 
 csa_opcua_adapter::~csa_opcua_adapter() {
+    this->stop();
 	this->adapter->~ua_uaadapter();
-	this->mgr->~ipc_manager();
 }
 
 boost::shared_ptr<ControlSystemPVManager> const & csa_opcua_adapter::getControlSystemManager() const {
@@ -82,24 +77,18 @@ ua_uaadapter* csa_opcua_adapter::getUAAdapter() {
 	return this->adapter;
 }
 
-ipc_manager* csa_opcua_adapter::getIPCManager() {
-    return this->mgr;
-}
-
 void csa_opcua_adapter::start() {
-    if(this->mgr)
-        this->mgr->startAll();
-    return;
+    if(!this->adapter_thread.joinable())
+        this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter);
 }
 
 void csa_opcua_adapter::stop() {
-    if(this->mgr)
-        this->mgr->stopAll();
-    return;
+    if(this->adapter_thread.joinable()) {
+        this->adapter->running = false;
+        this->adapter_thread.join();
+    }
 }
 
 bool csa_opcua_adapter::isRunning() {
-    if(this->mgr)
-        return this->mgr->isRunning();
-    return false;
+    return this->adapter_thread.joinable();
 }
