@@ -167,6 +167,7 @@ option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prio
 option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
 option(ENABLE_RUNTIME_ANALYSIS "Build Runtime analyses" OFF)
+option(ENABLE_ASAN "Build with Address Sanitizer runtime checks" OFF)
 option(UPDATE_OPEN62541	"Build new open62541 from git repository" OFF)
 
 if(ENABLE_CREATEMODEL)
@@ -269,6 +270,12 @@ if(ENABLE_RUNTIME_ANALYSIS)
                         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler
       COMMENT "Generating valgrind runtime test" VERBATIM
      )
+endif()
+
+if(ENABLE_ASAN)
+  add_definitions(-fsanitize=address)
+  set(CMAKE_EXE_LINKER_FLAGS -fsanitize=address)
+  set(CMAKE_SHARED_LINKER_FLAGS -fsanitize=address)
 endif()
 
 if(ENABLE_DOCUMENTATION)
