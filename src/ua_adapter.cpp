@@ -181,19 +181,23 @@ void ua_uaadapter::readConfig() {
         if(!placeHolder.empty()) {
             this->serverConfig.applicationName = placeHolder;
         } else {
-            string applicationName = ApplicationBase::getInstance().getName();
-            this->serverConfig.applicationName = applicationName.c_str();
-            cout << "No 'applicationName'-Attribute is set in config file. Use default application-name." << endl;
+            string applicationName;
+            try{
+                string applicationName = ApplicationBase::getInstance().getName();
+                this->serverConfig.applicationName = applicationName.c_str();
+            } catch (ChimeraTK::logic_error){
 
-/*          Use the system application name as default name if no application or root-folder name is set
- *          cout << "No 'applicationName'-Attribute is set in config file. Use default application-name." << endl;
-            char buff[PATH_MAX];
-            ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
-            if (len != -1) {
-                buff[len] = '\0';
             }
-            this->serverConfig.applicationName = string(buff).substr(string(buff).rfind("/") + 1);
-*/
+            cout << "No 'applicationName'-Attribute is set in config file. Use default application-name." << endl;
+           //Use the system application name as default name if no application or root-folder name is set
+           if(applicationName.empty()){
+               char buff[PATH_MAX];
+               ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
+               if (len != -1) {
+                   buff[len] = '\0';
+               }
+               this->serverConfig.applicationName = string(buff).substr(string(buff).rfind("/") + 1);
+           }
         }
         //if no root folder name is set, use application name
         if (this->serverConfig.rootFolder.empty()) {
@@ -1288,4 +1292,8 @@ vector<string> ua_uaadapter::getAllNotMappableVariablesNames() {
 
 UA_DateTime ua_uaadapter::getSourceTimeStamp() {
         return UA_DateTime_now();
+}
+
+UA_Server *ua_uaadapter::getMappedServer() {
+    return this->mappedServer;
 }

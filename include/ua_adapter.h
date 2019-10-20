@@ -154,6 +154,12 @@ public:
         */
         UA_DateTime getSourceTimeStamp();
 
+        /** @brief Return the OPC UA Server instance
+        *
+        * @return UA_Server *
+        */
+        UA_Server * getMappedServer();
+
         /** @brief Create a path of folders in the given parent node
         *
         * @param basenodeid Node id of the parent node

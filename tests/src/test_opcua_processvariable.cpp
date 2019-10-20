@@ -398,7 +398,7 @@ void ProcessVariableTest::testClassSide() {
 //                                        i++;
 //                                }
 //                        }
-                }
+                } else if (valueType == "string") {}
                 else BOOST_CHECK(false);
 
         const UA_NodeId nodeId = test->getOwnNodeId();

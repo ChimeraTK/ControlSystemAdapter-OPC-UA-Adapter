@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<uamapping>
+	<config rootFolder="llrfCtrl_hzdr" description="Test application for the digital LLRF system at ELBE / HZDR">
+		<server applicationName="LLRFServer" port="16660" />
+		<login username="test" password="test123" />
+		<process_variable_hierarchy>
+			<unroll pathSep="/">True</unroll>
+		</process_variable_hierarchy>
+		<mapping_exceptions>False</mapping_exceptions>
+	</config>
+
+	<folder sourceName="1/FOLDER" copy="true">
+		<name>copyWithSourceTest</name>
+		<description>Folder description</description>
+	</folder>
+	<folder sourceName="1/FOLDER" copy="false">
+		<name>linkWithSourceTest</name>
+		<description>Folder description</description>
+	</folder>
+
+<!-- (1) Process variable options
+  Information:
+	- the path seperator for the destination tag is "/"
+	- the destination can include a folder hierachy that is created on the flight
+	- the given name is used without any modifications, e.g. myVars/myVar will result in a
+	  variable with the name myVars/myVar and no folder myVars is created
+
+  Error cases:
+   1. no sourceName attribute
+   2. sourceName attribute with no corresponding PV
+   3. source and new PV are the same and copy="True" (see below)
+   4. sourceName of the PV and new name are different and copy="False"
+
+  Default cases:
+   1. Copy attribute -> copy="False"
+   2. Description -> description from source PV
+   3. Unit -> unit from source PV
+   4. Name -> Use pv name from sourceName attribute (here: varA)
+   5. Destination -> pv is created in root directory
+-->
+	<!-- D1 [x]-->
+	<process_variable sourceName="testDoubleArray_10000">
+		<destination>A</destination>
+		<name>testDoubleArray_10000</name>
+		<description>Test Desc D1</description>
+		<unit>U1</unit>
+	</process_variable>
+	<process_variable sourceName="testDoubleArray_11000">
+		<destination>B</destination>
+		<name>testDoubleArray_11000</name>
+		<description>Test Desc D1.1</description>
+		<unit>U1.1</unit>
+	</process_variable>
+    <!-- D2 [x]-->
+    <process_variable sourceName="testDoubleArray_12000" copy="false">
+        <destination>D</destination>
+        <name>testDoubleArray_12000</name>
+        <unit>U2</unit>
+    </process_variable>
+    <process_variable sourceName="testDoubleArray_13000" copy="false">
+        <destination>E</destination>
+        <name>testDoubleArray_13000</name>
+        <description></description>
+        <unit>U2.1</unit>
+    </process_variable>
+	<!-- D3 [x]-->
+	<process_variable sourceName="testDoubleArray_14000" copy="false">
+		<destination>F</destination>
+		<name>testDoubleArray_14000</name>
+		<description>update description</description>
+	</process_variable>
+	<process_variable sourceName="testDoubleArray_15000" copy="false">
+		<destination>G</destination>
+		<name>testDoubleArray_15000</name>
+		<description>update description</description>
+		<unit></unit>
+	</process_variable>
+	<!-- D4 [x]-->
+	<process_variable sourceName="testDoubleArray_16000" copy="false">
+		<destination>A/B</destination>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<process_variable sourceName="testDoubleArray_17000" copy="false">
+		<destination>A/Dein</destination>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<!-- D5 [x]-->
+	<process_variable sourceName="testDoubleArray_18000" copy="false">
+		<name>testDoubleArray_18000</name>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<process_variable sourceName="testDoubleArray_19000" copy="false">
+		<name>testDoubleArray_19000</name>
+		<destination></destination>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<process_variable sourceName="testDoubleArray_18000" copy="true">
+		<name>testDoubleArray_18000_</name>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<process_variable sourceName="testDoubleArray_19000" copy="true">
+		<name>testDoubleArray_19000_</name>
+		<destination></destination>
+		<description>update description</description>
+		<unit>new U</unit>
+	</process_variable>
+	<!-- D6 [x]-->
+	<process_variable sourceName="testDoubleArray_20000" copy="">
+	</process_variable>
+	<process_variable sourceName="testDoubleArray_21000" copy="">
+		<name></name>
+		<destination></destination>
+		<description></description>
+		<unit></unit>
+	</process_variable>
+	<process_variable sourceName="testDoubleArray_21000" copy="true">
+		<name></name>
+		<destination></destination>
+		<description></description>
+		<unit></unit>
+	</process_variable>
+
+	<!-- E1 [x]-->
+	<process_variable sourceName="" copy="false">
+		<destination>A/B</destination>
+		<name>uint8Array_s10</name>
+		<unit>K</unit>
+		<description>newA</description>
+	</process_variable>
+	<process_variable copy="false">
+		<destination>A/B</destination>
+		<name>uint8Array_s10</name>
+		<unit>K</unit>
+		<description>newA</description>
+	</process_variable>
+	<!-- E2 [x]-->
+	<process_variable sourceName="noSourceName" copy="false">
+		<destination>A/B</destination>
+		<name>uint8Array_s10</name>
+		<unit>K</unit>
+		<description>newA</description>
+	</process_variable>
+	<!-- E3 [x]-->
+	<process_variable sourceName="Dein/Name/ist/uint8Array_s10" copy="true">
+		<destination>Dein/Name/ist</destination>
+		<name>uint8Array_s10</name>
+		<unit>K</unit>
+		<description>newA</description>
+	</process_variable>
+	<!-- E4 [x]-->
+	<process_variable sourceName="Dein/Name/ist/uint8Array_s10" copy="false">
+		<destination>Dein/Name/ist</destination>
+		<name>xx</name>
+		<unit>K</unit>
+		<description>newA</description>
+	</process_variable>
+
+	<!-- general test pv mapping -->
+	<process_variable sourceName="Dein/Name/ist/uint8Array_s10" copy="false">
+		<destination>folderB/folderC</destination>
+		<name>uint8Array_s10</name>
+		<unit>K</unit>
+		<description>Description of folderB/folderC/uint8Array_s10</description>
+	</process_variable>
+	<!-- ref in existing folder -->
+	<process_variable sourceName="Dein/Name/ist/uint8Array_s10" copy="false">
+		<destination>A/B</destination>
+		<name>uint8Array_s10</name>
+		<unit>K</unit>
+		<description>newA</description>
+	</process_variable>
+	<!-- update existing pv -->
+	<process_variable sourceName="Dein/Name/ist/uint8Array_s10" copy="false">
+		<destination>Dein/Name/ist</destination>
+		<name>uint8Array_s10</name>
+		<unit>F</unit>
+		<description>update description</description>
+	</process_variable>
+	<process_variable sourceName="Dein/Name/ist/uint8Array_s10" copy="true">
+		<destination>folderB</destination>
+		<name>varA</name>
+		<unit>G</unit>
+		<description>New deep copy description</description>
+	</process_variable>
+
+	<!-- (2) Additional variable options
+        Information:
+        - the path seperator for the destination tag is "/"
+        - the destination can include a folder hierachy that is created on the fligth
+        - variable type is ctkAdditionalVariable (UAString)
+        - value should be assigned directly to the additional variable (no subnode named value)
+
+        Error cases:
+            E1. PV with same name exists
+            E2. name is missing or is empty
+
+        Default cases:
+            D1. Description -> description empty
+            D2. Destination -> variable is created in the root folder
+            D3. Value -> empty string
+        -->
+
+	<!-- D1 [x]-->
+	<additional_variable>
+		<name>av_d1</name>
+		<destination>A</destination>
+		<value>av_value</value>
+	</additional_variable>
+	<additional_variable>
+		<name>av_d1_1</name>
+		<destination>A</destination>
+		<description></description>
+		<value>av_value</value>
+	</additional_variable>
+	<!-- D2 [x]-->
+	<additional_variable>
+		<name>av_d2</name>
+		<value>av_value</value>
+		<description>Description of AV2</description>
+	</additional_variable>
+	<additional_variable>
+		<name>av_d2_1</name>
+		<destination></destination>
+		<value>av_value</value>
+		<description>Description of AV2.1</description>
+	</additional_variable>
+	<!-- D3 [x]-->
+	<additional_variable>
+		<name>av_d3</name>
+		<destination>A</destination>
+		<description>Description of AV3</description>
+	</additional_variable>
+	<additional_variable>
+		<name>av_d3_1</name>
+		<destination>A</destination>
+		<value></value>
+		<description>Description of AV3.1</description>
+	</additional_variable>
+	<!-- D1, D2, D3 [x]-->
+	<additional_variable>
+		<name>av_d4</name>
+	</additional_variable>
+	<additional_variable>
+		<name>av_d4_1</name>
+		<destination></destination>
+		<description></description>
+		<value></value>
+	</additional_variable>
+
+	<!-- E1 [x]-->
+	<additional_variable>
+		<name>av_d4</name>
+	</additional_variable>
+	<!-- E2 [x]-->
+	<additional_variable>
+		<destination>A</destination>
+		<value>av_value</value>
+	</additional_variable>
+	<!-- E2.1 [x]-->
+	<additional_variable>
+		<name></name>
+		<destination>A</destination>
+		<value>av_value</value>
+	</additional_variable>
+
+	<!-- general test additional variable -->
+	<additional_variable>
+		<destination>A/B</destination>
+		<name>av_test</name>
+		<description>New information of AV</description>
+		<value>1</value>
+	</additional_variable>
+
+<!-- (3) Folder without source
+ 	Information:
+   - the path seperator for the destination tag is "/"
+   - the destination can include a folder hierachy that is created on the fligth
+   - allows to add a folder with or without a description
+   - allows to change the description of an existing folder
+
+  Error cases:
+   1. name is missing or is empty
+
+  Default cases:
+   1. Description -> empty description
+   2. Destination -> folder is created in the root folder
+-->
+
+	<!-- D1 [x]-->
+	<folder>
+		<destination>B</destination>
+		<name>C</name>
+	</folder>
+	<folder>
+		<destination>B</destination>
+		<name>D</name>
+		<description></description>
+	</folder>
+	<!-- D2 [x]-->
+	<folder>
+		<name>D</name>
+		<description>Folder D Description</description>
+	</folder>
+	<folder>
+		<name>E</name>
+		<description>Folder E Description</description>
+	</folder>
+	<!-- D3 [x]-->
+	<folder>
+		<name>F</name>
+	</folder>
+	<folder>
+		<name>G</name>
+		<description></description>
+		<destination></destination>
+	</folder>
+
+	<!-- E1 [x]-->
+	<folder>
+		<destination>B</destination>
+	</folder>
+	<folder>
+		<name></name>
+		<destination>B</destination>
+	</folder>
+
+	<!-- general test folder without source -->
+	<folder>
+		<destination>A/B</destination>
+		<name>C</name>
+		<description>Folder description of A/B/C</description>
+	</folder>
+	<!-- update folder description of created folder 'B' -->
+	<folder>
+		<destination>A</destination>
+		<name>B</name>
+		<description>Folder Description of A/B</description>
+	</folder>
+	<!-- update folder description of created folder 'A' -->
+	<folder>
+		<name>A</name>
+		<description>Description of A</description>
+	</folder>
+
+	<!-- (4) Folder with source
+         Information:
+          - the path seperator for the destination tag is "/"
+          - the destination can include a folder hierachy that is created on the flight
+          - allows to show folder content at another location
+          - folder content can be copied to the new location (copy="True") or simply linked to the new location
+
+         Error cases:
+          1. name is missing or is empty
+          2. new folder is equal to the source folder
+          3. sourceName with no corresponding folder
+          4. sourceName is empty or missing
+
+         Default cases:
+          1. Description -> empty description
+          2. Destination -> folder is created in the root folder
+          3. Copy attribute -> copy="False"
+    -->
+	<!-- D1 [x]-->
+	<folder sourceName="folder/f1" copy="false">
+		<destination>A</destination>
+		<name>f1</name>
+	</folder>
+	<folder sourceName="folder/f2" copy="false">
+		<destination>A</destination>
+		<name>f2</name>
+		<description></description>
+	</folder>
+	<!-- D2 [x]-->
+	<folder sourceName="folder/f3" copy="false">
+		<name>f3</name>
+		<description>Desc f3</description>
+	</folder>
+	<folder sourceName="folder/f4" copy="false">
+        <destination></destination>
+        <name>f4</name>
+		<description>Desc f4</description>
+	</folder>
+	<!-- D3 [x]-->
+	<folder sourceName="folder/f5">
+        <destination>A</destination>
+        <name>f5</name>
+        <description>Desc f5</description>
+	</folder>
+	<folder sourceName="folder/f6" copy="">
+        <destination>A</destination>
+        <name>f6</name>
+        <description>Desc f6</description>
+	</folder>
+	<!-- D1, D2, D3 [x]-->
+	<folder sourceName="folder/f7">
+		<name>f7</name>
+	</folder>
+	<folder sourceName="folder/f8" copy="">
+        <destination></destination>
+        <name>f8</name>
+        <description></description>
+	</folder>
+
+	<!-- E1 [x]-->
+	<folder sourceName="folder/f1" copy="false">
+		<destination>A</destination>
+		<description>E1</description>
+	</folder>
+	<folder sourceName="folder/f1" copy="false">
+		<destination>A</destination>
+		<description>E1.1</description>
+		<name></name>
+	</folder>
+	<!-- E2 [x]-->
+	<folder sourceName="folder/f1" copy="false">
+		<destination>folder</destination>
+		<name>E2</name>
+		<description>E2</description>
+	</folder>
+	<!-- E3 [x]-->
+	<folder sourceName="folder/f0" copy="false">
+		<destination>folder</destination>
+		<name>E3</name>
+		<description>E3</description>
+	</folder>
+	<!-- E4 [x]-->
+	<folder copy="false">
+		<destination>folder</destination>
+		<name>E4</name>
+		<description>E4</description>
+	</folder>
+
+	<!-- general test folder with source test -->
+	<folder sourceName="folder/f9" copy="false">
+		<destination>A</destination>
+		<name>f9</name>
+		<description>Desc F9</description>
+	</folder>
+
+	<folder sourceName="folder/f9" copy="true">
+		<destination>A</destination>
+		<name>f10</name>
+		<description>Desc F10</description>
+	</folder>
+
+	<!--- START OF OLD CONFIGURATION PART -->
+	<!-- DEPRECATED
+	<additionalNodes folderName="AdditionalNodesFolder" description="DescriptionOfAdditionalNodes">
+		<variable name="BrowseName1" description="myDescription1" value="Wert1" />
+		<variable name="BrowseName2" description="myDescription2" value="Wert2" />
+		<variable name="BrowseName3" description="myDescription3" value="Wert3" />
+		<variable name="BrowseName4" description="myDescription4" value="Wert4" />
+		<variable name="BrowseName5" description="myDescription5" value="Wert5" />
+	</additionalNodes>
+	<additionalNodes folderName="ConfigFolder" description="DescriptionOfConfigFolder">
+		<variable name="BrowseNameA" description="myDescriptionA" value="WertA" />
+		<variable name="BrowseNameB" description="myDescriptionB" value="WertB" />
+	</additionalNodes>
+
+	<application name="WinAA">
+		<map sourceVariableName="/Mein/Name_ist#int8Array" rename="Array_s15_int8" engineeringUnit="Test" description="">
+			<unrollPath pathSep="_">True</unrollPath>
+			<unrollPath pathSep="/">True</unrollPath>
+			<unrollPath pathSep="#">True</unrollPath>
+		  <folder>NorthSide/LINAC/partA</folder>
+			<folder>NorthSide/LINAC/partX</folder>
+  	</map>
+			<map sourceVariableName="/Mein/Name_ist#int8Array_s15" rename="Array">
+			<unrollPath pathSep="_">True</unrollPath>
+			<unrollPath pathSep="/">True</unrollPath>
+			<unrollPath pathSep="#">True</unrollPath>
+		  <folder>NorthSide/LINAC/partA</folder>
+			<folder>NorthSide/LINAC/partX</folder>
+  	</map>
+	</application>
+	<application name="WinBB">
+		<map sourceVariableName="/Dein/Name//ist/uint8Array_s10" rename="">
+			<unrollPath pathSep="/">True</unrollPath>
+		  <folder>NorthSideLINAC/partA</folder>
+   	</map>
+		<map sourceVariableName="/int16Array_s15">
+			<unrollPath pathSep="_">False</unrollPath>
+		  <folder>SouthSide/LINAC/partA</folder>
+			<folder>SouthSide/LINAC/partB</folder>
+		</map>
+		<map sourceVariableName="/Ist/Name/dieser/int32Scalar">
+			<unrollPath pathSep="/">False</unrollPath>
+			<folder>EastSide/LINAC</folder>
+  	</map>
+	</application>
+	<application name="WinCC">
+		<map sourceVariableName="/Unser/Name/ist_uint8Array_s10">
+			<unrollPath pathSep="_">True</unrollPath>
+			<unrollPath pathSep="/">True</unrollPath>
+		  <folder>SouthSide/LINAC/partA</folder>
+    </map>
+		<map sourceVariableName="/int16Array_s15">
+			<unrollPath pathSep="_">False</unrollPath>
+		  <folder>NorthSideLINAC/partB</folder>
+    </map>
+		<map sourceVariableName="/floatArray_s10" rename="Gustav">
+			<unrollPath pathSep="_">False</unrollPath>
+   	</map>
+	</application>
+	<application name="EPICS">
+		<map sourceVariableName="/Ist/Name/dieser/uint32Scalar" rename="uint32S">
+    </map>
+		<map sourceVariableName="/Ist/Name/dieser/int32Scalar">
+			<unrollPath pathSep="/">False</unrollPath>
+		  <folder>EastSide/LINAC</folder>
+    </map>
+		<map sourceVariableName="/Ist/Name/dieser/doubleScalar" engineeringUnit="Test" description="updated test desc">
+			<unrollPath pathSep="/">True</unrollPath>
+		  <folder></folder>
+    </map>
+	</application>
+	-->
+</uamapping>

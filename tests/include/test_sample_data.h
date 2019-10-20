@@ -52,7 +52,8 @@ struct TestFixturePVSet {
     ProcessArray<uint64_t>::SharedPtr intAu64devMap = devManager->createProcessArray<uint64_t>(controlSystemToDevice, "Mein/Name/ist/uint64Scalar", 1);
 	ProcessArray<float>::SharedPtr intAfdev = devManager->createProcessArray<float>(controlSystemToDevice, "floatScalar", 1);
 	ProcessArray<double>::SharedPtr doubledevMap = devManager->createProcessArray<double>(controlSystemToDevice, "Dieser/Name/ist/doubleScalar", 1);
-    
+	ProcessArray<string>::SharedPtr stringAddev2 = devManager->createProcessArray<string>(deviceToControlSystem, "1/FOLDER/defaultSep/stringScalar", 1, "my description", "desc");
+
 	ProcessArray<int8_t>::SharedPtr intB15A8devMap = devManager->createProcessArray<int8_t>(controlSystemToDevice, "Mein/Name_ist#int8Array_s15", 15, "Einheit", "Beschreibung der Variable");
 	ProcessArray<uint8_t>::SharedPtr intB10Au8devMap1 = devManager->createProcessArray<uint8_t>(controlSystemToDevice, "Dein/Name/ist/uint8Array_s10", 10);
 	ProcessArray<int16_t>::SharedPtr intB10Au16devMap2 = devManager->createProcessArray<int16_t>(controlSystemToDevice, "Unser/Name/ist_int16Array_s10", 12);
