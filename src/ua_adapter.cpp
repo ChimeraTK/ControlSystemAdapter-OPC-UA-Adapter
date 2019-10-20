@@ -459,7 +459,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                 bd.resultMask = UA_BROWSERESULTMASK_ALL;
                 bd.nodeClassMask = UA_NODECLASS_OBJECTTYPE;
                 bd.browseDirection = UA_BROWSEDIRECTION_BOTH;
-                UA_BrowseResult br = UA_Server_browse(this->mappedServer, 20, &bd);
+                UA_BrowseResult br = UA_Server_browse(this->mappedServer, 1000, &bd);
                 for (size_t j = 0; j < br.referencesSize; ++j) {
                     UA_ReferenceDescription rd = br.references[j];
                     UA_NodeId folderType = UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE);
@@ -505,20 +505,65 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                     // folder structure must be copied, pv nodes must be added
                     UA_LocalizedText foundFolderName;
                     UA_NodeId copyRoot = createFolder(folderPathNodeId, folder);
-                    deepCopyHierarchicalLayer(csManager ,sourceFolderId, copyRoot);
+                    if (UA_NodeId_isNull(&copyRoot)) {
+                        string existingDestinationFolderString;
+                        if(destination.empty()){
+                            existingDestinationFolderString = this->serverConfig.rootFolder+"/"+folder;
+                        } else {
+                            existingDestinationFolderString = this->serverConfig.rootFolder+"/"+destination+"/"+folder;
+                        }
+                        copyRoot = UA_NODEID_STRING(1, (char *) existingDestinationFolderString.c_str());
+                    }
+                    deepCopyHierarchicalLayer(csManager, sourceFolderId, copyRoot);
                     if(!description.empty()){
                         UA_Server_writeDescription(this->mappedServer, copyRoot, UA_LOCALIZEDTEXT((char *) "en_US", (char *) description.c_str()));
                     }
                 } else {
-                    UA_ExpandedNodeId enid;
-                    enid.serverIndex = 1;
-                    enid.namespaceUri = UA_STRING_NULL;
-                    enid.nodeId = sourceFolderId;
-                    UA_StatusCode addRef = UA_Server_addReference(this->mappedServer, folderPathNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), enid, UA_TRUE);
-                    const UA_StatusCodeDescription *st = UA_StatusCode_description(addRef);
-                    if(!description.empty()){
-                        UA_Server_writeDescription(this->mappedServer, sourceFolderId, UA_LOCALIZEDTEXT((char *) "en_US", (char *) description.c_str()));
+                    UA_NodeId copyRoot = createFolder(folderPathNodeId, folder);
+                    if (UA_NodeId_isNull(&copyRoot)) {
+                        string existingDestinationFolderString;
+                        if(destination.empty()){
+                            existingDestinationFolderString = this->serverConfig.rootFolder+"/"+folder;
+                        } else {
+                            existingDestinationFolderString = this->serverConfig.rootFolder+"/"+destination+"/"+folder;
+                        }
+                        copyRoot = UA_NODEID_STRING(1, (char *) existingDestinationFolderString.c_str());
+                    } else {
+                        if(!description.empty()){
+                            UA_Server_writeDescription(this->mappedServer, copyRoot, UA_LOCALIZEDTEXT((char *) "en_US", (char *) description.c_str()));
+                        }
                     }
+                    UA_BrowseDescription bd;
+                    bd.includeSubtypes = false;
+                    bd.nodeId = sourceFolderId;
+                    bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
+                    bd.resultMask = UA_BROWSERESULTMASK_ALL;
+                    bd.nodeClassMask = UA_NODECLASS_OBJECT;
+                    bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
+                    UA_BrowseResult br = UA_Server_browse(this->mappedServer, 1000, &bd);
+                    for (size_t j = 0; j < br.referencesSize; ++j) {
+                        UA_ExpandedNodeId enid;
+                        enid.serverIndex = 1;
+                        enid.namespaceUri = UA_STRING_NULL;
+                        enid.nodeId = br.references[j].nodeId.nodeId;
+                        UA_Server_addReference(this->mappedServer, copyRoot, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), enid, UA_TRUE);
+
+                    }
+                    UA_BrowseResult_deleteMembers(&br);
+                    bd.nodeId = sourceFolderId;
+                    bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
+                    bd.resultMask = UA_BROWSERESULTMASK_ALL;
+                    bd.nodeClassMask = UA_NODECLASS_VARIABLE;
+                    bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
+                    br = UA_Server_browse(this->mappedServer, 1000, &bd);
+                    for (size_t j = 0; j < br.referencesSize; ++j) {
+                        UA_ExpandedNodeId enid;
+                        enid.serverIndex = 1;
+                        enid.namespaceUri = UA_STRING_NULL;
+                        enid.nodeId = br.references[j].nodeId.nodeId;
+                        UA_Server_addReference(this->mappedServer, copyRoot, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, UA_TRUE);
+                    }
+                    UA_BrowseResult_deleteMembers(&br);
                 }
                 continue;
             }
