@@ -66,7 +66,6 @@ ua_uaadapter::~ua_uaadapter() {
         for(auto ptr : variables) delete ptr;
         for(auto ptr : additionalVariables) delete ptr;
         for(auto ptr : mappedVariables) delete ptr;
-
 }
 
 void ua_uaadapter::constructServer() {
@@ -377,21 +376,19 @@ void ua_uaadapter::deepCopyHierarchicalLayer(boost::shared_ptr<ControlSystemPVMa
     for (size_t j = 0; j < br.referencesSize; ++j) {
         UA_ReferenceDescription rd = br.references[j];
         UA_String folderName, description;
-        UA_Variant value;
-        UA_StatusCode result = UA_Server_readValue(this->mappedServer, rd.nodeId.nodeId, &value);
-        if(result != UA_STATUSCODE_GOOD){
-            //error handling, todo check also type of variant (string expected)
-            continue;
-        }
-        UA_LocalizedText foundFolderName;
+        UA_LocalizedText foundFolderName, foundFolderDescription;
+        UA_LocalizedText_init(&foundFolderDescription);
         string foundFolderNameCPP;
-        result = UA_Server_readDisplayName(this->mappedServer, rd.nodeId.nodeId, &foundFolderName);
+        UA_Server_readDescription(this->mappedServer, rd.nodeId.nodeId, &foundFolderDescription);
+        UA_StatusCode result = UA_Server_readDisplayName(this->mappedServer, rd.nodeId.nodeId, &foundFolderName);
         UASTRING_TO_CPPSTRING(foundFolderName.text, foundFolderNameCPP);
         if(result != UA_STATUSCODE_GOOD){
             //error handling
             continue;
         }
         UA_NodeId newRootFolder = createFolder(target, foundFolderNameCPP);
+        if(foundFolderDescription.text.length > 0)
+            UA_Server_writeDescription(this->mappedServer, newRootFolder, foundFolderDescription);
         deepCopyHierarchicalLayer(csManager, rd.nodeId.nodeId, newRootFolder);
     }
     UA_BrowseResult_deleteMembers(&br);
