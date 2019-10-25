@@ -480,7 +480,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                 UA_BrowseResult_deleteMembers(&br);
                 if(!isFolderType){
                     if(this->mappingExceptions){
-                        throw std::runtime_error ("Error! Folder creation failed. No corresponding source" + sourceName + " folder. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
+                        throw std::runtime_error ("Error! Folder creation failed. No corresponding source folder: " + sourceName + ". Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     }
                     UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. No corresponding source '%s' folder. Mapping line number: %u", sourceName.c_str(), nodeset->nodeTab[i]->line);
                     continue;
