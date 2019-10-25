@@ -701,7 +701,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
             if(UA_NodeId_isNull(&tmpOutput)){
                 if(this->mappingExceptions){
                     if(!name.empty()){
-                        throw std::runtime_error ("Error! PV mapping failed. Source PV not found 'name' : " + name + "Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
+                        throw std::runtime_error ("Error! PV mapping failed. Source PV not found 'name' : '" + name + "'. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     } else {
                         throw std::runtime_error ("Error! PV mapping failed. Source PV not found. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     }
