@@ -189,21 +189,11 @@ void ua_uaadapter::readConfig() {
 
             }
             cout << "No 'applicationName'-Attribute is set in config file. Use default application-name." << endl;
-           //Use the system application name as default name if no application or root-folder name is set
-           if(applicationName.empty()){
-               char buff[PATH_MAX];
-               ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
-               if (len != -1) {
-                   buff[len] = '\0';
-               }
-               this->serverConfig.applicationName = string(buff).substr(string(buff).rfind("/") + 1);
-           }
         }
         //if no root folder name is set, use application name
         if (this->serverConfig.rootFolder.empty()) {
             this->serverConfig.rootFolder = this->serverConfig.applicationName;
         }
-
         xmlXPathFreeObject(result);
 }
     else {
@@ -450,7 +440,8 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
             }
             //check if source name is set -> map complete hierarchical structure to the destination
             if(!sourceName.empty()){
-                if(sourceName.compare(destination+"/"+folder) == 0){
+                if((destination.empty() && sourceName.compare(folder) == 0) ||
+                    (!destination.empty() && sourceName.compare(destination+"/"+folder) == 0)){
                     if(this->mappingExceptions){
                         throw std::runtime_error ("Error! Folder creation failed. Source and Destination equal. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     }
@@ -529,9 +520,9 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                         UA_Server_writeDescription(this->mappedServer, copyRoot, UA_LOCALIZEDTEXT((char *) "en_US", (char *) description.c_str()));
                     }
                 } else {
+                    string existingDestinationFolderString;
                     UA_NodeId copyRoot = createFolder(folderPathNodeId, folder);
                     if (UA_NodeId_isNull(&copyRoot)) {
-                        string existingDestinationFolderString;
                         if(destination.empty()){
                             existingDestinationFolderString = this->serverConfig.rootFolder+"/"+folder;
                         } else {

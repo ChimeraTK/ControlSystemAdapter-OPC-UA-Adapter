@@ -17,6 +17,10 @@
 		<name>linkWithSourceTest</name>
 		<description>Folder description</description>
 	</folder>
+	<folder sourceName="1/FOLDER/defaultSep" copy="false">
+		<name>1/FOLDER</name>
+		<description>Folder description</description>
+	</folder>
 
 <!-- (1) Process variable options
   Information:

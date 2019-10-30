@@ -61,6 +61,19 @@ void UAMappingTest::testExampleSet() {
     }
     UA_BrowseResult_deleteMembers(&br);
 
+    bd.nodeId = UA_NODEID_STRING(1, (char *) "llrfCtrl_hzdr/1/FOLDER");
+    bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
+    bd.resultMask = UA_BROWSERESULTMASK_BROWSENAME;
+    bd.nodeClassMask = UA_NODECLASS_VARIABLE;
+    bd.browseDirection = UA_BROWSEDIRECTION_BOTH;
+    br = UA_Server_browse(uaadapter->getMappedServer(), 1000, &bd);
+    BOOST_CHECK(br.referencesSize > 0);
+    for (size_t j = 0; j < br.referencesSize; ++j) {
+        UA_String compareString = UA_STRING((char *) "stringScalar");
+        BOOST_CHECK(UA_String_equal(&br.references[j].browseName.name, &compareString) == UA_TRUE);
+    }
+    UA_BrowseResult_deleteMembers(&br);
+
     csaOPCUA->stop();
     BOOST_CHECK(csaOPCUA->isRunning() != true);
     csaOPCUA->~csa_opcua_adapter();
