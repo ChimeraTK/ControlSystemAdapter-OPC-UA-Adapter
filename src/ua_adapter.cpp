@@ -471,7 +471,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                 UA_BrowseResult_deleteMembers(&br);
                 if(!isFolderType){
                     if(this->mappingExceptions){
-                        throw std::runtime_error ("Error! Folder creation failed. No corresponding source" + sourceName + " folder. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
+                        throw std::runtime_error ("Error! Folder creation failed. No corresponding source folder: " + sourceName + ". Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     }
                     UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping Folder. No corresponding source '%s' folder. Mapping line number: %u", sourceName.c_str(), nodeset->nodeTab[i]->line);
                     continue;
@@ -692,7 +692,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
             if(UA_NodeId_isNull(&tmpOutput)){
                 if(this->mappingExceptions){
                     if(!name.empty()){
-                        throw std::runtime_error ("Error! PV mapping failed. Source PV not found 'name' : " + name + "Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
+                        throw std::runtime_error ("Error! PV mapping failed. Source PV not found 'name' : '" + name + "'. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     } else {
                         throw std::runtime_error ("Error! PV mapping failed. Source PV not found. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                     }
