@@ -136,8 +136,6 @@ link_directories(${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
 
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
-                   ${CMAKE_SOURCE_DIR}/src/ipc_managed_object.cpp
-                   ${CMAKE_SOURCE_DIR}/src/ipc_manager.cpp
                    ${CMAKE_SOURCE_DIR}/src/csa_opcua_adapter.cpp
                    ${CMAKE_SOURCE_DIR}/src/xml_file_handler.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_processvariable.cpp
