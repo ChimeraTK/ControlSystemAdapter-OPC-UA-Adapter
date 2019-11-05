@@ -45,21 +45,18 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/ProcessArray.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 
-#include "ipc_manager.h"
 #include "csa_opcua_adapter.h"
 #include "runtime_value_generator.h"
 
 using namespace std;
 using namespace ChimeraTK;
 
-	ipc_manager *mgr;
 	runtime_value_generator *valGen;
 		csa_opcua_adapter *csaOPCUA;
 	
 /* FUNCTIONS */
 static void SigHandler_Int(int sign) {
     cout << "Received SIGINT... terminating" << endl;
-    valGen->doStop();
     valGen->~runtime_value_generator();
     csaOPCUA->stop();
     csaOPCUA->~csa_opcua_adapter();
@@ -215,10 +212,7 @@ int main() {
 	csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
 	
 	// Only for Sin ValueGenerator
-	mgr = new ipc_manager();
 	valGen = new runtime_value_generator(devManager, syncDevUtility);
-	mgr->addObject(valGen);
-	mgr->doStart();	
 	
 	// Server is running
 	std::cout << "server is running..." << std::endl;
