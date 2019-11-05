@@ -1,7 +1,6 @@
 #include <ua_adapter.h>
 
 #include <csa_opcua_adapter.h>
-#include <ipc_manager.h>
 #include <test_sample_data.h>
 
 #include <boost/test/included/unit_test.hpp>

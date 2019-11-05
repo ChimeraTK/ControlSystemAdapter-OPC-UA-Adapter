@@ -8,8 +8,6 @@
 #include "ChimeraTK/ControlSystemAdapter/ProcessArray.h"
 #include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 
-#include "ipc_managed_object.h"
-
 extern "C" {
 	#include "unistd.h"
 	#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
