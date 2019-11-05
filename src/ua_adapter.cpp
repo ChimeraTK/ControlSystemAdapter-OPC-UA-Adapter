@@ -520,6 +520,24 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                         UA_Server_writeDescription(this->mappedServer, copyRoot, UA_LOCALIZEDTEXT((char *) "en_US", (char *) description.c_str()));
                     }
                 } else {
+                    //check a pv with the requested node id exists
+                    UA_NodeId tmpOutput = UA_NODEID_NULL;
+                    string pvNodeString;
+                    if(destination.empty()){
+                        pvNodeString = this->serverConfig.rootFolder + "/" + folder;
+                    } else {
+                        pvNodeString = this->serverConfig.rootFolder + "/" + destination + "/" + folder;
+                    }
+                    UA_NodeId pvNode = UA_NODEID_STRING(1, (char *) pvNodeString.c_str());
+                    UA_Server_readNodeId(this->mappedServer, pvNode, &tmpOutput);
+                    if(!UA_NodeId_isNull(&tmpOutput)){
+                        UA_NodeId_deleteMembers(&tmpOutput);
+                        if(this->mappingExceptions){
+                            throw std::runtime_error ("Warning! Folder with source mapping failed. Target folder node id exists. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
+                        }
+                        UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Folder with source mapping failed. Target folder node id exists. Folder name: %s, Mapping line number: %u", sourceName.c_str(), nodeset->nodeTab[i]->line);
+                        continue;
+                    }
                     string existingDestinationFolderString;
                     UA_NodeId copyRoot = createFolder(folderPathNodeId, folder);
                     if (UA_NodeId_isNull(&copyRoot)) {
