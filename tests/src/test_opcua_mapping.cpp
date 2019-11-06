@@ -61,7 +61,7 @@ void UAMappingTest::testExampleSet() {
     }
     UA_BrowseResult_deleteMembers(&br);
 
-    bd.nodeId = UA_NODEID_STRING(1, (char *) "llrfCtrl_hzdr/1/FOLDER");
+    bd.nodeId = UA_NODEID_STRING(1, (char *) "llrfCtrl_hzdr/2/FOLDER");
     bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
     bd.resultMask = UA_BROWSERESULTMASK_BROWSENAME;
     bd.nodeClassMask = UA_NODECLASS_VARIABLE;

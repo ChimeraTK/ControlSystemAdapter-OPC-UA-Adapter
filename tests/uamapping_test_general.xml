@@ -18,7 +18,7 @@
 		<description>Folder description</description>
 	</folder>
 	<folder sourceName="1/FOLDER/defaultSep" copy="false">
-		<name>1/FOLDER</name>
+		<name>2/FOLDER</name>
 		<description>Folder description</description>
 	</folder>
 
