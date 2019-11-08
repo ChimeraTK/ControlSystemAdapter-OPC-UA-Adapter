@@ -28,9 +28,13 @@ void UAAdapterTest::testExampleSet() {
     BOOST_CHECK_THROW(ua_uaadapter("./uamapping_test_twoconfigs.xml"), std::runtime_error);
 
     ua_uaadapter *ad1 = new ua_uaadapter("./uamapping_test_applicationismissing.xml");
+    ad1->~ua_uaadapter();
     ad1 = new ua_uaadapter("./uamapping_test_configismissing.xml");
+    ad1->~ua_uaadapter();
     ad1 = new ua_uaadapter("./uamapping_test_notwellformed.xml");
+    ad1->~ua_uaadapter();
     ad1 = new ua_uaadapter("./uamapping_test_portismissung.xml");
+    ad1->~ua_uaadapter();
 
     // is Server running?
     adapter->doStart();
@@ -82,8 +86,10 @@ void UAAdapterTest::testExampleSet() {
     BOOST_CHECK(adapter->getAllNotMappableVariablesNames().size() == 7);
     // Check if timestamp is not enmpty
     string dateTime = "";
-    UASTRING_TO_CPPSTRING(UA_DateTime_toString(adapter->getSourceTimeStamp()), dateTime);
+    UA_String dateTimeUA = UA_DateTime_toString(adapter->getSourceTimeStamp());
+    UASTRING_TO_CPPSTRING(dateTimeUA, dateTime);
     BOOST_CHECK(dateTime != "");
+    UA_String_deleteMembers(&dateTimeUA);
 
     adapter->~ua_uaadapter();
     xmlHandler->~xml_file_handler();
