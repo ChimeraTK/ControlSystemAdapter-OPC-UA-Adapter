@@ -448,9 +448,9 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                     continue;
                 }
                 if(this->mappingExceptions){
-                    throw std::runtime_error ("Warning! Folder with source mapping failed. Target folder node id exists. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
+                    throw std::runtime_error ("Error! Folder with source mapping failed. Target folder node id exists. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
                 }
-                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Error! Folder with source mapping failed. Target folder node id exists. Folder name: %s, Mapping line number: %u", sourceName.c_str(), nodeset->nodeTab[i]->line);
+                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping folder: %s. Folder with source mapping failed. Target folder node id exists. Mapping line number: %u", sourceName.c_str(), nodeset->nodeTab[i]->line);
                 continue;
             }
             if(!copy.empty() && sourceName.empty()){

@@ -597,19 +597,24 @@ UA_StatusCode ua_processvariable::getValue_string(UA_Variant* v) {
         }
         else {
             // Array
-            // currently not implemented
-            rv = UA_STATUSCODE_BADNOTIMPLEMENTED;
-            //            std::vector<string> darr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
-            //            UA_Variant_setArrayCopy(v, darr.data(), darr.size(), &UA_TYPES[UA_TYPES_STRING]);
-            //            UA_NumericRange arrayRange;
-            //            arrayRange.dimensionsSize = 1;
-            //            UA_NumericRangeDimension
-            //                scalarThisDimension = (UA_NumericRangeDimension)
-            //            {
-            //                .min = 0, .max = (unsigned)darr.size()
-            //            };
-            //            arrayRange.dimensions = &scalarThisDimension;
-            //            rv = UA_Variant_setRangeCopy(v, (UA_String *)darr.data(), darr.size(), arrayRange);
+            std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
+            UA_String* sarrayval = new UA_String[sarr.size()];
+            for (size_t i = 0; i < sarr.size(); i++) {
+                sarrayval[i] = CPPSTRING_TO_UASTRING(sarr[i]);
+            }
+
+            UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
+            UA_NumericRange arrayRange;
+            arrayRange.dimensionsSize = 1;
+            UA_NumericRangeDimension
+            scalarThisDimension = (UA_NumericRangeDimension)
+            {
+            .min = 0, .max = (unsigned)sarr.size()
+            };
+            arrayRange.dimensions = &scalarThisDimension;
+            rv = UA_Variant_setRangeCopy(v, sarrayval, sarr.size(), arrayRange);
+
+            delete[] sarrayval;
         }
     }
 
@@ -1020,13 +1025,14 @@ UA_StatusCode ua_processvariable::setValue_string(const UA_Variant* data) {
                 valueArray.push_back(cpps);
             }
             else if ((!UA_Variant_isScalar(data)) && array) {
-                // currently not implemented
-                retval = UA_STATUSCODE_BADNOTIMPLEMENTED;
-                //                string* v = (string *)data->data;
-                //                valueArray.resize(data->arrayLength);
-                //                for (uint32_t i = 0; i < valueArray.size(); i++) {
-                //                    valueArray.at(i) = v[i];
-                //                }
+                // Array
+                UA_String* vdata = (UA_String *)data->data;
+                valueArray.resize(data->arrayLength);
+                for (uint32_t i = 0; i < valueArray.size(); i++) {
+                    string cpps;
+                    UASTRING_TO_CPPSTRING(vdata[i], cpps);
+                    valueArray.at(i) = cpps;
+                }
             }
             this->csManager->getProcessArray <string>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <string>(this->namePV)->write();
