@@ -14,6 +14,7 @@ extern "C" {
 }
 
 using namespace ChimeraTK;
+using namespace std;
 
 struct TestFixtureEmptySet {
 	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers;
