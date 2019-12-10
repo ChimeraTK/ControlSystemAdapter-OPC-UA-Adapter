@@ -25,6 +25,8 @@ void UAMappingTest::testExampleSet() {
     // is Server running?
     csaOPCUA->start();
     BOOST_CHECK(csaOPCUA->isRunning());
+    while(!csaOPCUA->getUAAdapter()->running){};
+    BOOST_CHECK(csaOPCUA->getUAAdapter()->running);
     // is csManager init
     BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 21);
 
