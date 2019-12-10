@@ -263,18 +263,16 @@ void ua_uaadapter::workerThread() {
         return;
     }
 
-        cout << "Starting the server worker thread" << endl;
-
-        UA_Server_run_startup(this->mappedServer);
+    cout << "Starting the server worker thread" << endl;
+    UA_Server_run_startup(this->mappedServer);
 
     this->running = true;
     while (this->running) {
         UA_Server_run_iterate(this->mappedServer, true);
     }
 
-        UA_Server_run_shutdown(this->mappedServer);
-
-        cout << "Stopped the server worker thread" << endl;
+    UA_Server_run_shutdown(this->mappedServer);
+    cout << "Stopped the server worker thread" << endl;
 }
 
 /* DEPRECATED

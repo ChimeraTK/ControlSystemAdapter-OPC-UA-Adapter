@@ -23,6 +23,7 @@ void UAMappingTest::testExampleSet() {
     TestFixturePVSet tfExampleSet;
     csa_opcua_adapter *csaOPCUA = new csa_opcua_adapter(tfExampleSet.csManager, "../tests/uamapping_test_general.xml");
     // is Server running?
+    csaOPCUA->start();
     BOOST_CHECK(csaOPCUA->isRunning());
     // is csManager init
     BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 21);

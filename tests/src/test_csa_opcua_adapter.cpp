@@ -36,6 +36,8 @@ void CSAOPCUATest::testWithoutPVSet() {
     // is Server running?
     csaOPCUA->start();
     BOOST_CHECK(csaOPCUA->isRunning() == true);
+    while(!csaOPCUA->getUAAdapter()->running){};
+    BOOST_CHECK(csaOPCUA->getUAAdapter()->running);
     // is csManager init
     BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 0);
 
@@ -51,8 +53,10 @@ void CSAOPCUATest::testWithPVSet() {
     // Create the managers
     csa_opcua_adapter *csaOPCUA = new csa_opcua_adapter(tfExampleSet.csManager, "../tests/uamapping_test_2.xml");
     // is Server running?
+    csaOPCUA->start();
     BOOST_CHECK(csaOPCUA->isRunning() == true);
-
+    while(!csaOPCUA->getUAAdapter()->running){};
+    BOOST_CHECK(csaOPCUA->getUAAdapter()->running);
     // is csManager init
     BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 21);
 
