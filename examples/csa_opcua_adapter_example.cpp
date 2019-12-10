@@ -210,6 +210,8 @@ int main() {
 	
 	string pathToConfig = "opcuaAdapter_mapping.xml";
 	csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
+    csaOPCUA->start();
+    while(!csaOPCUA->getUAAdapter()->running){};
 	
 	// Only for Sin ValueGenerator
 	valGen = new runtime_value_generator(devManager, syncDevUtility);
