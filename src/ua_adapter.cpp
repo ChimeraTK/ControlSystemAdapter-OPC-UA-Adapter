@@ -898,7 +898,7 @@ void ua_uaadapter::addAdditionalVariables() {
                 if(this->mappingExceptions){
                     throw std::runtime_error ("Additional variable node creation failed. Additional variable already exists.");
                 }
-                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping additional variable %s. Node already exists.", name.c_str());
+                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping additional variable %s. Node already exists. Mapping line number: %u", name.c_str(), nodeset->nodeTab[i]->line);
                 continue;
             }
             //check if pv with same name exists in the target folder
@@ -917,7 +917,7 @@ void ua_uaadapter::addAdditionalVariables() {
                 if(this->mappingExceptions){
                     throw std::runtime_error ("Additional variable node creation failed. PV with same name already exists.");
                 }
-                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping additional variable %s. PV with same name already exists.", name.c_str());
+                UA_LOG_WARNING(this->server_config.logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping additional variable %s. PV with same name already exists. Mapping line number: %u", name.c_str(), nodeset->nodeTab[i]->line);
                 continue;
             }
 
