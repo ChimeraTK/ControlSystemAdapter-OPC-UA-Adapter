@@ -3242,6 +3242,9 @@ struct UA_SecureChannel {
     UA_Connection *connection;
     LIST_HEAD(session_pointerlist, SessionEntry) sessions;
     LIST_HEAD(chunk_pointerlist, ChunkEntry) chunks;
+    //WinCC workaround, count numbers of activateSession requests by the client to
+    //close SecureChannel and force the creation of a new Session
+    UA_UInt32 sessionActivationCounter;
 };
 
 void UA_SecureChannel_init(UA_SecureChannel *channel);
@@ -19948,11 +19951,15 @@ Service_ActivateSession(UA_Server *server, UA_SecureChannel *channel,
                         UA_Session *session, const UA_ActivateSessionRequest *request,
                         UA_ActivateSessionResponse *response) {
     if(session->validTill < UA_DateTime_nowMonotonic()) {
+        if(++channel->sessionActivationCounter > 3)
+          Service_CloseSecureChannel(server, channel);
+
         UA_LOG_INFO_SESSION(server->config.logger, session, "ActivateSession: SecureChannel %i wants "
                             "to activate, but the session has timed out", channel->securityToken.channelId);
         response->responseHeader.serviceResult = UA_STATUSCODE_BADSESSIONIDINVALID;
         return;
     }
+    channel->sessionActivationCounter = 0;
 
     if(request->userIdentityToken.encoding < UA_EXTENSIONOBJECT_DECODED ||
        (request->userIdentityToken.content.decoded.type != &UA_TYPES[UA_TYPES_ANONYMOUSIDENTITYTOKEN] &&
