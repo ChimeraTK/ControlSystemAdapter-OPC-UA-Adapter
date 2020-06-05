@@ -3244,7 +3244,7 @@ struct UA_SecureChannel {
     LIST_HEAD(chunk_pointerlist, ChunkEntry) chunks;
     //WinCC workaround, count numbers of activateSession requests by the client to
     //close SecureChannel and force the creation of a new Session
-    UA_UInt32 sessionActivationCounter;
+    UA_UInt32 invalidSessionAccessCounter;
 };
 
 void UA_SecureChannel_init(UA_SecureChannel *channel);
@@ -17458,6 +17458,8 @@ processMSG(UA_Server *server, UA_SecureChannel *channel,
             sendError(channel, msg, requestPos, responseType,
                       requestId, UA_STATUSCODE_BADSESSIONIDINVALID);
             UA_deleteMembers(request, requestType);
+            if(++channel->invalidSessionAccessCounter > 3)
+              Service_CloseSecureChannel(server, channel);
             return;
         }
         UA_Session_init(&anonymousSession);
@@ -17465,6 +17467,7 @@ processMSG(UA_Server *server, UA_SecureChannel *channel,
         anonymousSession.channel = channel;
         session = &anonymousSession;
     }
+  channel->invalidSessionAccessCounter = 0;
 
     /* Trying to use a non-activated session? */
     if(sessionRequired && !session->activated) {
@@ -19951,7 +19954,7 @@ Service_ActivateSession(UA_Server *server, UA_SecureChannel *channel,
                         UA_Session *session, const UA_ActivateSessionRequest *request,
                         UA_ActivateSessionResponse *response) {
     if(session->validTill < UA_DateTime_nowMonotonic()) {
-        if(++channel->sessionActivationCounter > 3)
+        if(++channel->invalidSessionAccessCounter > 3)
           Service_CloseSecureChannel(server, channel);
 
         UA_LOG_INFO_SESSION(server->config.logger, session, "ActivateSession: SecureChannel %i wants "
@@ -19959,7 +19962,7 @@ Service_ActivateSession(UA_Server *server, UA_SecureChannel *channel,
         response->responseHeader.serviceResult = UA_STATUSCODE_BADSESSIONIDINVALID;
         return;
     }
-    channel->sessionActivationCounter = 0;
+    channel->invalidSessionAccessCounter = 0;
 
     if(request->userIdentityToken.encoding < UA_EXTENSIONOBJECT_DECODED ||
        (request->userIdentityToken.content.decoded.type != &UA_TYPES[UA_TYPES_ANONYMOUSIDENTITYTOKEN] &&
