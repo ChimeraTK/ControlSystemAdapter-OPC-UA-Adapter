@@ -10,6 +10,17 @@ if(BUILD_STATIC_ANALYSIS)
 endif()
 
 ##########################################################################################################
+## Definition for the thread sanitizer. CMAKE_EXE_LINKER_FLAGS must be set before calling project()
+##########################################################################################################
+if(ENABLE_TSAN)
+  # The thread sanitizer does not run with -O0, and runs best with -O1
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O1 -fsanitize=thread")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1 -fsanitize=thread")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=thread")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=thread")
+endif()
+
+##########################################################################################################
 ## Project specification
 ##########################################################################################################
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
@@ -272,8 +283,8 @@ endif()
 
 if(ENABLE_ASAN)
   add_definitions(-fsanitize=address)
-  set(CMAKE_EXE_LINKER_FLAGS -fsanitize=address)
-  set(CMAKE_SHARED_LINKER_FLAGS -fsanitize=address)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=address")
 endif()
 
 if(ENABLE_DOCUMENTATION)
