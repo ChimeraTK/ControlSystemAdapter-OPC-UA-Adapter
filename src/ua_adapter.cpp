@@ -39,7 +39,6 @@ extern "C" {
 #include "ua_proxies.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
 
 using namespace ChimeraTK;

@@ -21,8 +21,9 @@
 #ifndef RUN_TIME_VALUE_GENERATOR_H
 #define RUN_TIME_VALUE_GENERATOR_H
 
-#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 #include <thread>
+
+#include <ChimeraTK/ControlSystemAdapter/DevicePVManager.h>
 
 using namespace ChimeraTK;
 
@@ -30,14 +31,11 @@ class runtime_value_generator {
 private:   
     bool running;
     std::thread valueGeneratorThread;
-	boost::shared_ptr<DevicePVManager> devManager;
-	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
-    
-public:
-	runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
-	~runtime_value_generator();
-	void generateValues(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
-    
+
+   public:
+    runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager);
+    ~runtime_value_generator();
+    void generateValues(boost::shared_ptr<DevicePVManager> devManager);
 };
 
 #endif // RUN_TIME_VALUE_GENERATOR_H

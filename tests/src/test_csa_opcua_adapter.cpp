@@ -9,7 +9,6 @@
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 
 extern "C" {
 #include "unistd.h"

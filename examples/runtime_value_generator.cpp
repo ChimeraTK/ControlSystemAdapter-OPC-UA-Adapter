@@ -25,17 +25,16 @@
 #include <sys/sysinfo.h> 
 #include <unistd.h>
 
+#include <ChimeraTK/ReadAnyGroup.h>
+
 #include "csa_opcua_adapter.h"
 
 using std::cout;
 using std::endl;
 using namespace ChimeraTK;
-	 
-runtime_value_generator::runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager,
-                                                 boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) {
-	this->devManager = devManager;
-	this->syncDevUtility = syncDevUtility;
-	this->valueGeneratorThread = std::thread(&runtime_value_generator::generateValues, this, this->devManager, this->syncDevUtility);
+
+runtime_value_generator::runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager) {
+  this->valueGeneratorThread = std::thread(&runtime_value_generator::generateValues, this, devManager);
 }
 
 runtime_value_generator::~runtime_value_generator() {
@@ -45,69 +44,76 @@ runtime_value_generator::~runtime_value_generator() {
     }
 }
 
-void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) {
-    this->running = true;
-    
-	// Time meassureing
-	clock_t start, end;
-	start = clock();
-	end = clock();
-	devManager->getProcessArray<int32_t>("t")->accessChannel(0) = vector<int32_t> {(int32_t)start};
-	
-	while(this->running) {
-//  FIXME -Or maybe not: The Const M_PI from math.h generate senceless values, hence I use fix value 3.141
-// 	double double_sine = csManager->getProcessScalar<double>("amplitude")->accessChannel(0) * sin(((2*M_PI)/csManager->getProcessScalar<int32_t>("period")->accessChannel(0)) * csManager->getProcessScalar<int32_t>("t")->accessChannel(0));
-		double double_sine = devManager->getProcessArray<double>("amplitude")->accessChannel(0).at(0) * sin((2*3.141)/devManager->getProcessArray<double>("period")->accessChannel(0).at(0) * devManager->getProcessArray<int32_t>("t")->accessChannel(0).at(0));
-		int32_t int_sine = round(double_sine);
-// 	bool bool_sine = (double_sine > 0)? true : false;
-// 	std::cout << "double_sine: " << double_sine << std::endl;
-// 	std::cout << "int_sine: " << int_sine << std::endl;
-// 	std::cout << "bool_sine: " << bool_sine << std::endl;
-			
-		devManager->getProcessArray<double>("double_sine")->accessChannel(0) = vector<double> {double_sine};
-		devManager->getProcessArray<double>("double_sine")->write();
-		devManager->getProcessArray<int32_t>("int_sine")->accessChannel(0) = vector<int32_t> {int_sine};
-		devManager->getProcessArray<int32_t>("int_sine")->write();
-		devManager->getProcessArray<int32_t>("t")->accessChannel(0) = vector<int32_t> {(int32_t)((end - start)/(CLOCKS_PER_SEC/1000))};
-		devManager->getProcessArray<int32_t>("t")->write();
-		
-		usleep(devManager->getProcessArray<int32_t>("dt")->accessChannel(0).at(0));
-		end = clock();
-		
-		for(int32_t i=1000; i < 65535; i=i+1000) {
-			string nameDouble = "testDoubleArray_" + to_string(i);
-			string nameInt = "testIntArray_" + to_string(i);
-			ProcessArray<double>::SharedPtr testDoubleArray = devManager->getProcessArray<double>(nameDouble);
-			ProcessArray<int32_t>::SharedPtr testIntArray = devManager->getProcessArray<int32_t>(nameInt);
-			for(int32_t k = 0; k < i; k++) {
-				if(k % 2 == 0) {
-					testDoubleArray->accessChannel(0).at(k) = rand() % 6 + 1;
-					testIntArray->accessChannel(0).at(k) = rand() % 6 + 1;
-				}
-				else {
-					testDoubleArray->accessChannel(0).at(k) = rand() % 50 + 10;
-					testIntArray->accessChannel(0).at(k) = rand() % 50 + 10;
-				}
-			}
-			testDoubleArray->write();
-			testIntArray->write();
-		}
-		
-		ProcessArray<double>::SharedPtr testDoubleArray = devManager->getProcessArray<double>("testDoubleArray_65535");
-		ProcessArray<int32_t>::SharedPtr testIntArray = devManager->getProcessArray<int32_t>("testIntArray_65535");
-		for(int32_t i = 0; i < 65535; i++) {
-			if(i % 2 == 0) {
-				testDoubleArray->accessChannel(0).at(i) = rand() % 6 + 1;
-				testIntArray->accessChannel(0).at(i) = rand() % 6 + 1;
-			}
-			else {
-				testDoubleArray->accessChannel(0).at(i) = rand() % 50 + 10;
-				testIntArray->accessChannel(0).at(i) = rand() % 50 + 10;
-			}
-		}
-		testDoubleArray->write();
-		testIntArray->write();
-		syncDevUtility->receiveAll();
-	}
-	
+void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> devManager) {
+  this->running = true;
+
+  ReadAnyGroup readAnyGroup;
+  for(auto& pv : devManager->getAllProcessVariables()) {
+    if(pv->isReadable()) readAnyGroup.add(pv);
+  }
+
+  // Time meassureing
+  clock_t start, end;
+  start = clock();
+  end = clock();
+  devManager->getProcessArray<int32_t>("t")->accessChannel(0) = vector<int32_t>{(int32_t)start};
+
+  while(this->running) {
+    //  FIXME -Or maybe not: The Const M_PI from math.h generate senceless values, hence I use fix value 3.141
+    // 	double double_sine = csManager->getProcessScalar<double>("amplitude")->accessChannel(0) * sin(((2*M_PI)/csManager->getProcessScalar<int32_t>("period")->accessChannel(0)) * csManager->getProcessScalar<int32_t>("t")->accessChannel(0));
+    double double_sine = devManager->getProcessArray<double>("amplitude")->accessChannel(0).at(0) *
+        sin((2 * 3.141) / devManager->getProcessArray<double>("period")->accessChannel(0).at(0) *
+            devManager->getProcessArray<int32_t>("t")->accessChannel(0).at(0));
+    int32_t int_sine = round(double_sine);
+    // 	bool bool_sine = (double_sine > 0)? true : false;
+    // 	std::cout << "double_sine: " << double_sine << std::endl;
+    // 	std::cout << "int_sine: " << int_sine << std::endl;
+    // 	std::cout << "bool_sine: " << bool_sine << std::endl;
+
+    devManager->getProcessArray<double>("double_sine")->accessChannel(0) = vector<double>{double_sine};
+    devManager->getProcessArray<double>("double_sine")->write();
+    devManager->getProcessArray<int32_t>("int_sine")->accessChannel(0) = vector<int32_t>{int_sine};
+    devManager->getProcessArray<int32_t>("int_sine")->write();
+    devManager->getProcessArray<int32_t>("t")->accessChannel(0) =
+        vector<int32_t>{(int32_t)((end - start) / (CLOCKS_PER_SEC / 1000))};
+    devManager->getProcessArray<int32_t>("t")->write();
+
+    usleep(devManager->getProcessArray<int32_t>("dt")->accessChannel(0).at(0));
+    end = clock();
+
+    for(int32_t i = 1000; i < 65535; i = i + 1000) {
+      string nameDouble = "testDoubleArray_" + to_string(i);
+      string nameInt = "testIntArray_" + to_string(i);
+      ProcessArray<double>::SharedPtr testDoubleArray = devManager->getProcessArray<double>(nameDouble);
+      ProcessArray<int32_t>::SharedPtr testIntArray = devManager->getProcessArray<int32_t>(nameInt);
+      for(int32_t k = 0; k < i; k++) {
+        if(k % 2 == 0) {
+          testDoubleArray->accessChannel(0).at(k) = rand() % 6 + 1;
+          testIntArray->accessChannel(0).at(k) = rand() % 6 + 1;
+        }
+        else {
+          testDoubleArray->accessChannel(0).at(k) = rand() % 50 + 10;
+          testIntArray->accessChannel(0).at(k) = rand() % 50 + 10;
+        }
+      }
+      testDoubleArray->write();
+      testIntArray->write();
+    }
+
+    ProcessArray<double>::SharedPtr testDoubleArray = devManager->getProcessArray<double>("testDoubleArray_65535");
+    ProcessArray<int32_t>::SharedPtr testIntArray = devManager->getProcessArray<int32_t>("testIntArray_65535");
+    for(int32_t i = 0; i < 65535; i++) {
+      if(i % 2 == 0) {
+        testDoubleArray->accessChannel(0).at(i) = rand() % 6 + 1;
+        testIntArray->accessChannel(0).at(i) = rand() % 6 + 1;
+      }
+      else {
+        testDoubleArray->accessChannel(0).at(i) = rand() % 50 + 10;
+        testIntArray->accessChannel(0).at(i) = rand() % 50 + 10;
+      }
+    }
+    testDoubleArray->write();
+    testIntArray->write();
+    while(readAnyGroup.readAnyNonBlocking().isValid()) continue;
+  }
 }

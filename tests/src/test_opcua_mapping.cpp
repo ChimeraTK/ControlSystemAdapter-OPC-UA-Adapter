@@ -8,7 +8,6 @@
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
 
 using namespace boost::unit_test_framework;
 using namespace std;
