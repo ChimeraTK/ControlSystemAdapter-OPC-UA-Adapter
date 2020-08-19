@@ -84,7 +84,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${ChimeraTK-ControlSystemAdapter_LINKER_FLAGS}")
 
 if(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "None")
         set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-                "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
+                "Choose the type of build, options are: Debug Release RelWithDebInfo tsan asan"
                 FORCE
         )
 endif(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "None")
@@ -165,7 +165,6 @@ option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prio
 option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
 option(ENABLE_RUNTIME_ANALYSIS "Build Runtime analyses" OFF)
-option(ENABLE_ASAN "Build with Address Sanitizer runtime checks" OFF)
 option(UPDATE_OPEN62541	"Build new open62541 from git repository" OFF)
 
 if(ENABLE_CREATEMODEL)
@@ -243,21 +242,15 @@ if(ENABLE_COVERAGE)
 endif()
 
 ##########################################################################################################
-## Definition for the thread sanitizer. Must be set before adding the test subdirectories
+## Definition for the thread and address sanitizer. Must be set before adding the test subdirectories
 ##########################################################################################################
-if(ENABLE_TSAN)
-  # The thread sanitizer does not run with -O0, and runs best with -O1
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O1 -fsanitize=thread")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1 -fsanitize=thread")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=thread")
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=thread")
-endif()
+# We need spearate configuration types becasue flags from other types are conflicting
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;asan;tsan")
+set(CMAKE_CXX_FLAGS_TSAN "${CMAKE_CXX_FLAGS} -g -O1 -fsanitize=thread")
+set(CMAKE_C_FLAGS_TSAN "${CMAKE_C_FLAGS} -g -O1 -fsanitize=thread")
 
-if(ENABLE_ASAN)
-  add_definitions(-fsanitize=address)
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=address")
-endif()
+set(CMAKE_CXX_FLAGS_ASAN "${CMAKE_CXX_FLAGS} -g -O0 -fsanitize=address -fsanitize=undefined -fsanitize=leak")
+set(CMAKE_C_FLAGS_ASAN "${CMAKE_C_FLAGS} -g -O0 -fsanitize=address -fsanitize=undefined -fsanitize=leak")
 
 if(ENABLE_UNIT_TESTS)
         file(GLOB testFiles "${CMAKE_SOURCE_DIR}/tests/uamapping_test*.xml")
