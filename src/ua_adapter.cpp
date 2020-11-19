@@ -177,6 +177,9 @@ void ua_uaadapter::readConfig() {
         placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
         if(!placeHolder.empty()) {
             this->serverConfig.applicationName = placeHolder;
+            if(this->serverConfig.rootFolder.empty()){
+                this->serverConfig.rootFolder = placeHolder;
+            }
         } else {
             string applicationName;
             try{
