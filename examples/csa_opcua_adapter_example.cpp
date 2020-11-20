@@ -66,6 +66,8 @@ int main() {
 	signal(SIGINT,  SigHandler_Int); // Registriert CTRL-C/SIGINT
 	signal(SIGTERM, SigHandler_Int); // Registriert SIGTERM
 
+    clock_t start = clock(); 
+
 	// Create the managers
 	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers = createPVManager();
     
@@ -247,6 +249,9 @@ int main() {
 	
 	// Only for Sin ValueGenerator
     valGen = new runtime_value_generator(devManager);
+
+    float duration = ((float)(clock() - start) / CLOCKS_PER_SEC) * 1000.0f;
+    printf("Start duration: %.3f ms\n", duration);
 
     // Server is running
     std::cout << "server is running..." << std::endl;
