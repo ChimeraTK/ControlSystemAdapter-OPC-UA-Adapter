@@ -53,9 +53,11 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
   }
 
   // Time meassureing
-  clock_t start, end;
+  clock_t start, end, im1, im2, writeTime;
   start = clock();
   end = clock();
+  int counter = 0;
+  float duration1 = 0.0f;
   devManager->getProcessArray<int32_t>("t")->accessChannel(0) = vector<int32_t>{(int32_t)start};
 
   while(this->running) {
@@ -81,6 +83,8 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
     usleep(devManager->getProcessArray<int32_t>("dt")->accessChannel(0).at(0));
     end = clock();
 
+    counter = 0;
+    writeTime = 0;
     for(int32_t i = 1000; i < 65535; i = i + 1000) {
       string nameDouble = "testDoubleArray_" + to_string(i);
       string nameInt = "testIntArray_" + to_string(i);
@@ -96,9 +100,16 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
           testIntArray->accessChannel(0).at(k) = rand() % 50 + 10;
         }
       }
+      im1 = clock();
       testDoubleArray->write();
       testIntArray->write();
+      im2 = clock();
+      writeTime += im2 - im1;
+      counter++;
     }
+		
+    duration1 = ((float)writeTime / CLOCKS_PER_SEC) * 1000.0f;
+    printf("1: %d write passes, duration write: %.3f ms\n", counter, duration1);
 
     ProcessArray<double>::SharedPtr testDoubleArray = devManager->getProcessArray<double>("testDoubleArray_65535");
     ProcessArray<int32_t>::SharedPtr testIntArray = devManager->getProcessArray<int32_t>("testIntArray_65535");
@@ -112,8 +123,16 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
         testIntArray->accessChannel(0).at(i) = rand() % 50 + 10;
       }
     }
+
+    clock_t tmp2 = clock();
+
     testDoubleArray->write();
     testIntArray->write();
+
+    clock_t tmp3 = clock();
+    duration1 = ((float)(tmp3 - tmp2) / CLOCKS_PER_SEC) * 1000.0f;
+    printf("write pass 2, duration write: %.3f ms\n", duration1);
+	
     while(readAnyGroup.readAnyNonBlocking().isValid()) continue;
   }
 }
