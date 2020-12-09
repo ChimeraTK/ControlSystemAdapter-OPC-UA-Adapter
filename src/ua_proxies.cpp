@@ -16,6 +16,7 @@
  * 
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
+ * Copyright (c) 2019 Andreas Ebner <Andreas.Ebner@iosb-extern.fraunhofer.de>
  */
 
 #include "open62541.h"
@@ -98,8 +99,6 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
 	// There is currently no high- level function to do this. (02.12.2016)
 	__UA_Server_write(server, &instantiatedId, UA_ATTRIBUTEID_USERACCESSLEVEL, &UA_TYPES[UA_TYPES_BYTE], &accessLevel);
 
-	ds.handle = srcClass;
-       
     UA_Server_setVariableNode_dataSource(server, instantiatedId, ds);
 		
 	UA_Server_writeDescription(server, instantiatedId, ele->description);

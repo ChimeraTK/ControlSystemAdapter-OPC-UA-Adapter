@@ -2,10 +2,9 @@
  * 	@brief Helper class to interact with open62541 in a easy way.
  * 	This class is a kind of a proxy to interact with the open62541 stack. For this, the class mapped all variables to the nodestore of the open62541.
  *
- *	@author Chris Iatrou
- *	@author Julian Rahm
- *  @date 22.11.2016
- *
+ * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
+ * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
+ * Copyright (c) 2019 Andreas Ebner  <Andreas.Ebner@iosb-extern.fraunhofer.de>
  */
 
 #ifndef HAVE_UA_PROXIES_H
@@ -28,7 +27,7 @@ typedef struct UA_NodeId_pair_t {
   UA_NodeId sourceNodeId;	// Model NodeId
   UA_NodeId targetNodeId;	// Stack NodeId
 } UA_NodeId_pair;
-typedef std::list<UA_NodeId_pair*> nodePairList;
+typedef std::list<UA_NodeId_pair *> nodePairList;
 
 /**
  * @struct UA_DataSource_Map_Element_t
@@ -36,10 +35,17 @@ typedef std::list<UA_NodeId_pair*> nodePairList;
  *
  */
 typedef struct UA_DataSource_Map_Element_t {
-  UA_NodeId     typeTemplateId;
-        UA_LocalizedText description; // individuell description for every variable
-  UA_StatusCode (*read)(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp,const UA_NumericRange *range, UA_DataValue *value);
-  UA_StatusCode (*write)(void *handle, const UA_NodeId nodeid, const UA_Variant *data, const UA_NumericRange *range);
+    UA_NodeId typeTemplateId;
+    UA_LocalizedText description; // individuell description for every variable
+    UA_StatusCode (*read)(UA_Server *server, const UA_NodeId *sessionId,
+                          void *sessionContext, const UA_NodeId *nodeId,
+                          void *nodeContext, UA_Boolean includeSourceTimeStamp,
+                          const UA_NumericRange *range, UA_DataValue *value);
+
+    UA_StatusCode (*write)(UA_Server *server, const UA_NodeId *sessionId,
+                           void *sessionContext, const UA_NodeId *nodeId,
+                           void *nodeContext, const UA_NumericRange *range,
+                           const UA_DataValue *value);
 } UA_DataSource_Map_Element;
 typedef std::list<UA_DataSource_Map_Element> UA_DataSource_Map;
 

@@ -51,9 +51,7 @@ ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
         this->readConfig();
         this->constructServer();
 
-        this->mapSelfToNamespace();
-        this->running = false;
-
+    this->mapSelfToNamespace();
 }
 
 ua_uaadapter::~ua_uaadapter() {
@@ -66,21 +64,17 @@ ua_uaadapter::~ua_uaadapter() {
 }
 
 void ua_uaadapter::constructServer() {
-
-    this->server_config = UA_ServerConfig_standard;
-    this->server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, this->serverConfig.opcuaPort);
-    this->server_config.logger = UA_Log_Stdout;
-    this->server_config.networkLayers = &this->server_nl;
-    this->server_config.networkLayersSize = 1;
-
-    this->server_config.enableUsernamePasswordLogin = this->serverConfig.UsernamePasswordLogin;
-    this->server_config.enableAnonymousLogin = !this->serverConfig.UsernamePasswordLogin;
+    //this->mappedServer = UA_Server_new();
+    this->server_config = (UA_ServerConfig *) UA_calloc(1, sizeof(UA_ServerConfig));
+    UA_ServerConfig_setMinimal(this->server_config, this->serverConfig.opcuaPort, NULL);
 
     /*get hostname */
     char hostname[HOST_NAME_MAX];
     gethostname(hostname, HOST_NAME_MAX);
     string hostname_uri = "opc.tcp://";
     hostname_uri.append(hostname);
+
+    this->mappedServer = UA_Server_newWithConfig(this->server_config);
 
     UA_UsernamePasswordLogin* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
     usernamePasswordLogins->password = UA_STRING((char*)this->serverConfig.password.c_str());

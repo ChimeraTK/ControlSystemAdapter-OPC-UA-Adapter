@@ -32,7 +32,9 @@ extern "C" {
 #include <iostream>
 #include <vector>
 
-ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV, boost::shared_ptr<ControlSystemPVManager> csManager, string overwriteNodeString) : ua_mapped_class(server, basenodeid) {
+ua_processvariable::ua_processvariable(UA_Server *server, UA_NodeId basenodeid, string namePV,
+                                       boost::shared_ptr<ControlSystemPVManager> csManager, string overwriteNodeString)
+        : ua_mapped_class(server, basenodeid) {
 
         // FIXME Check if name member of a csManager Parameter
         this->namePV = namePV;
@@ -51,9 +53,13 @@ ua_processvariable::~ua_processvariable()
     UA_NodeId_deleteMembers(&this->ownNodeId);
 }
 
-// Name
-UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getName(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
-    ua_processvariable *thisObj = static_cast<ua_processvariable *>(handle);
+UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getName(UA_Server *server, const UA_NodeId *sessionId,
+                                                                          void *sessionContext, const UA_NodeId *nodeId,
+                                                                          void *nodeContext,
+                                                                          UA_Boolean includeSourceTimeStamp,
+                                                                          const UA_NumericRange *range,
+                                                                          UA_DataValue *value) {
+    ua_processvariable *thisObj = static_cast<ua_processvariable *>(nodeContext);
     UA_String ua_val;
     char *s = (char *) malloc(thisObj->getName().length() + 1);
     strncpy(s, (char*) thisObj->getName().c_str(), thisObj->getName().length());
@@ -76,14 +82,19 @@ string ua_processvariable::getName() {
 }
 
 // EngineeringUnit
-UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setEngineeringUnit(void *handle, const UA_NodeId nodeid, const UA_Variant *data, const UA_NumericRange *range) {
-    ua_processvariable *theClass = static_cast<ua_processvariable *>(handle);
+UA_StatusCode
+ua_processvariable::ua_writeproxy_ua_processvariable_setEngineeringUnit(UA_Server *server, const UA_NodeId *sessionId,
+                                                                        void *sessionContext, const UA_NodeId *nodeId,
+                                                                        void *nodeContext, const UA_NumericRange *range,
+                                                                        const UA_DataValue *value) {
+    ua_processvariable *theClass = static_cast<ua_processvariable *>(nodeContext);
     std::string cpps;
     char *s;
-    s = (char *) malloc(((UA_String) *((UA_String *) data->data)).length + 1);
-    memset(s, 0, ((UA_String) *((UA_String *) data->data)).length + 1);
-    memcpy(s, ((UA_String) *((UA_String *) data->data)).data, ((UA_String) *((UA_String *) data->data)).length);
-    cpps.assign(s, ((UA_String) *((UA_String *) data->data)).length);
+    s = (char *) malloc(((UA_String) * ((UA_String *) value->value.data)).length + 1);
+    memset(s, 0, ((UA_String) * ((UA_String *) value->value.data)).length + 1);
+    memcpy(s, ((UA_String) * ((UA_String *) value->value.data)).data,
+           ((UA_String) * ((UA_String *) value->value.data)).length);
+    cpps.assign(s, ((UA_String) * ((UA_String *) value->value.data)).length);
     free(s);
     theClass->setEngineeringUnit(cpps);
     return UA_STATUSCODE_GOOD;
@@ -93,8 +104,14 @@ void ua_processvariable::setEngineeringUnit(string engineeringUnit) {
         this->engineeringUnit = engineeringUnit;
 }
 
-UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getEngineeringUnit(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
-    ua_processvariable *thisObj = static_cast<ua_processvariable *>(handle);
+UA_StatusCode
+ua_processvariable::ua_readproxy_ua_processvariable_getEngineeringUnit(UA_Server *server, const UA_NodeId *sessionId,
+                                                                       void *sessionContext, const UA_NodeId *nodeId,
+                                                                       void *nodeContext,
+                                                                       UA_Boolean includeSourceTimeStamp,
+                                                                       const UA_NumericRange *range,
+                                                                       UA_DataValue *value) {
+    ua_processvariable *thisObj = static_cast<ua_processvariable *>(nodeContext);
     UA_String ua_val;
     char *s = (char *) malloc(thisObj->getEngineeringUnit().length() + 1);
     strncpy(s, (char*) thisObj->getEngineeringUnit().c_str(), thisObj->getEngineeringUnit().length());
@@ -125,14 +142,19 @@ string ua_processvariable::getEngineeringUnit() {
 }
 
 // Description
-UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setDescription(void *handle, const UA_NodeId nodeid, const UA_Variant *data, const UA_NumericRange *range) {
-    ua_processvariable *theClass = static_cast<ua_processvariable *>(handle);
+UA_StatusCode
+ua_processvariable::ua_writeproxy_ua_processvariable_setDescription(UA_Server *server, const UA_NodeId *sessionId,
+                                                                    void *sessionContext, const UA_NodeId *nodeId,
+                                                                    void *nodeContext, const UA_NumericRange *range,
+                                                                    const UA_DataValue *value) {
+    ua_processvariable *theClass = static_cast<ua_processvariable *>(nodeContext);
     std::string cpps;
     char *s;
-    s = (char *) malloc(((UA_String) *((UA_String *) data->data)).length + 1);
-    memset(s, 0, ((UA_String) *((UA_String *) data->data)).length + 1);
-    memcpy(s, ((UA_String) *((UA_String *) data->data)).data, ((UA_String) *((UA_String *) data->data)).length);
-    cpps.assign(s, ((UA_String) *((UA_String *) data->data)).length);
+    s = (char *) malloc(((UA_String) * ((UA_String *) value->value.data)).length + 1);
+    memset(s, 0, ((UA_String) * ((UA_String *) value->value.data)).length + 1);
+    memcpy(s, ((UA_String) * ((UA_String *) value->value.data)).data,
+           ((UA_String) * ((UA_String *) value->value.data)).length);
+    cpps.assign(s, ((UA_String) * ((UA_String *) value->value.data)).length);
     free(s);
     theClass->setDescription(cpps);
     return UA_STATUSCODE_GOOD;
@@ -142,9 +164,12 @@ void ua_processvariable::setDescription(string description) {
         this->description = description;
 }
 
-UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getDescription(void *handle, const UA_NodeId nodeid,
-        UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
-    ua_processvariable *thisObj = static_cast<ua_processvariable *>(handle);
+UA_StatusCode
+ua_processvariable::ua_readproxy_ua_processvariable_getDescription(UA_Server *server, const UA_NodeId *sessionId,
+                                                                   void *sessionContext, const UA_NodeId *nodeId,
+                                                                   void *nodeContext, UA_Boolean includeSourceTimeStamp,
+                                                                   const UA_NumericRange *range, UA_DataValue *value) {
+    ua_processvariable *thisObj = static_cast<ua_processvariable *>(nodeContext);
     UA_String ua_val;
     char *s = (char *) malloc(thisObj->getDescription().length() + 1);
     strncpy(s, (char*) thisObj->getDescription().c_str(), thisObj->getDescription().length());
@@ -174,8 +199,13 @@ string ua_processvariable::getDescription() {
 }
 
 // Type
-UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getType(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
-    ua_processvariable *thisObj = static_cast<ua_processvariable *>(handle);
+UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getType(UA_Server *server, const UA_NodeId *sessionId,
+                                                                          void *sessionContext, const UA_NodeId *nodeId,
+                                                                          void *nodeContext,
+                                                                          UA_Boolean includeSourceTimeStamp,
+                                                                          const UA_NumericRange *range,
+                                                                          UA_DataValue *value) {
+    ua_processvariable *thisObj = static_cast<ua_processvariable *>(nodeContext);
     UA_String ua_val;
     char *s = (char *) malloc(thisObj->getType().length() + 1);
     strncpy(s, (char*) thisObj->getType().c_str(), thisObj->getType().length());
@@ -211,11 +241,12 @@ string ua_processvariable::getType() {
     else                                    return "Unsupported type";
 }
 
-UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(void *handle,
-    const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp,
-    const UA_NumericRange *range, UA_DataValue *value) {
-    ua_processvariable *thisObj = static_cast<ua_processvariable *>(handle);
-
+UA_StatusCode
+ua_processvariable::ua_readproxy_ua_processvariable_getValue(UA_Server *server, const UA_NodeId *sessionId,
+                                                             void *sessionContext, const UA_NodeId *nodeId,
+                                                             void *nodeContext, UA_Boolean includeSourceTimeStamp,
+                                                             const UA_NumericRange *range, UA_DataValue *value) {
+    ua_processvariable *thisObj = static_cast<ua_processvariable *>(nodeContext);
     UA_StatusCode rv;
     switch (thisObj->type) {
     case UA_PV_INT8:
@@ -660,61 +691,65 @@ UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
     return rv;
 }
 
-UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setValue(void *handle, const UA_NodeId nodeid, const UA_Variant *data, const UA_NumericRange *range) {
+UA_StatusCode
+ua_processvariable::ua_writeproxy_ua_processvariable_setValue(UA_Server *server, const UA_NodeId *sessionId,
+                                                              void *sessionContext, const UA_NodeId *nodeId,
+                                                              void *nodeContext, const UA_NumericRange *range,
+                                                              const UA_DataValue *value) {
     UA_StatusCode retval = UA_STATUSCODE_BADINTERNALERROR;
-    ua_processvariable *theClass = static_cast<ua_processvariable *> (handle);
+    ua_processvariable *theClass = static_cast<ua_processvariable *> (nodeContext);
     switch (theClass->type) {
-    case UA_PV_INT8:
-        retval = theClass->setValue_int8(data);
-        break;
+        case UA_PV_INT8:
+            retval = theClass->setValue_int8(&value->value);
+            break;
 
-    case UA_PV_UINT8:
-        retval = theClass->setValue_uint8(data);
-        break;
+        case UA_PV_UINT8:
+            retval = theClass->setValue_uint8(&value->value);
+            break;
 
-    case UA_PV_INT16:
-        retval = theClass->setValue_int16(data);
-        break;
+        case UA_PV_INT16:
+            retval = theClass->setValue_int16(&value->value);
+            break;
 
-    case UA_PV_UINT16:
-        retval = theClass->setValue_uint16(data);
-        break;
+        case UA_PV_UINT16:
+            retval = theClass->setValue_uint16(&value->value);
+            break;
 
-    case UA_PV_INT32:
-        retval = theClass->setValue_int32(data);
-        break;
+        case UA_PV_INT32:
+            retval = theClass->setValue_int32(&value->value);
+            break;
 
-    case UA_PV_UINT32:
-        retval = theClass->setValue_uint32(data);
-        break;
+        case UA_PV_UINT32:
+            retval = theClass->setValue_uint32(&value->value);
+            break;
 
-    case UA_PV_INT64:
-        retval = theClass->setValue_int64(data);
-        break;
+        case UA_PV_INT64:
+            retval = theClass->setValue_int64(&value->value);
+            break;
 
-    case UA_PV_UINT64:
-        retval = theClass->setValue_uint64(data);
-        break;
+        case UA_PV_UINT64:
+            retval = theClass->setValue_uint64(&value->value);
+            break;
 
-    case UA_PV_FLOAT:
-        retval = theClass->setValue_float(data);
-        break;
+        case UA_PV_FLOAT:
+            retval = theClass->setValue_float(&value->value);
+            break;
 
-    case UA_PV_DOUBLE:
-        retval = theClass->setValue_double(data);
-        break;
+        case UA_PV_DOUBLE:
+            retval = theClass->setValue_double(&value->value);
+            break;
 
-    case UA_PV_STRING:
-        retval = theClass->setValue_string(data);
-        break;
+        case UA_PV_STRING:
+            retval = theClass->setValue_string(&value->value);
+            break;
 
-    case UA_PV_BOOL:
-        retval = theClass->setValue_bool(data);
-        break;
+        case UA_PV_BOOL:
+            retval = theClass->setValue_bool(&value->value);
+            break;
 
-    default:
-        std::cout << "Unknown type: " << theClass->type;
-        break;
+        default:
+            std::cout << "Unknown type: " << theClass->type;
+            break;
     }
 
     return retval;
@@ -1090,6 +1125,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     // Create our toplevel instance
     UA_VariableAttributes attr;
     UA_VariableAttributes_init(&attr);
+    attr = UA_VariableAttributes_default;
 
     attr.displayName = UA_LOCALIZEDTEXT((char*) "en_US", (char*) this->nameNew.c_str());
     attr.description = description;
@@ -1109,18 +1145,19 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 
     //check if the nodeId is used by another mapping and find next free NodeId
     UA_NodeId result;
-    if(UA_Server_readDataType(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew+"Value").c_str()), &result) == UA_STATUSCODE_GOOD){
+    if (UA_Server_readDataType(this->mappedServer,
+                               UA_NODEID_STRING(1, (char *) (baseNodeIdName + "/" + this->nameNew + "Value").c_str()),
+                               &result) == UA_STATUSCODE_GOOD) {
         return UA_STATUSCODE_BADNODEIDEXISTS;
     }
-    UA_InstantiationCallback icb;
-    icb.handle = (void *) &this->ownedNodes;
-    icb.method = ua_mapInstantiatedNodes;
-    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew+"Value").c_str()),//UA_NODEID_NUMERIC(1, 0)
-                            this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                            UA_QUALIFIEDNAME(1, (char *) this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, &icb, &createdNodeId);
-    //know your own nodeId
+
+    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName + "/" + this->nameNew +
+                                                                                "Value").c_str()),//UA_NODEID_NUMERIC(1, 0)
+                              this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                              UA_QUALIFIEDNAME(1, (char *) this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001),
+                              attr, (void *) this, &createdNodeId);
     UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
-    //this->ownNodeId = createdNodeId;
+    ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, 1001), &this->ownedNodes);
 
     this->addPVChildNodes(createdNodeId, baseNodeIdName);
 
@@ -1562,20 +1599,23 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
 
     //Adding the Name node to the PV
     UA_VariableAttributes_init(&attr);
-    attr.displayName = UA_LOCALIZEDTEXT((char *)"", (char *)"Name");
-    attr.description = UA_LOCALIZEDTEXT((char *)"", (char *)"");
+    attr = UA_VariableAttributes_default;
+    attr.displayName = UA_LOCALIZEDTEXT((char *) "", (char *) "Name");
+    attr.description = UA_LOCALIZEDTEXT((char *) "", (char *) "");
     attr.accessLevel = 3;
     attr.userAccessLevel = 3;
     attr.valueRank = -1;
     UA_String opcua_node_variable_t_ns_2_i_6004_variant_DataContents = UA_STRING_ALLOC((char *) "");
     UA_Variant_setScalar(&attr.value, &opcua_node_variable_t_ns_2_i_6004_variant_DataContents,
                          &UA_TYPES[UA_TYPES_STRING]);
-    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/name").c_str()), pvNodeId,
-                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                              UA_QUALIFIEDNAME(1, (char *) "Name"),
-                              UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, NULL,
-                              &createdNodeId);
-    if(addResult == UA_STATUSCODE_GOOD) {
+    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" +
+                                                                                            this->nameNew +
+                                                                                            "/name").c_str()), pvNodeId,
+                                          UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                                          UA_QUALIFIEDNAME(1, (char *) "Name"),
+                                          UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, this,
+                                          &createdNodeId);
+    if (addResult == UA_STATUSCODE_GOOD) {
         UA_NodeId nameVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
         NODE_PAIR_PUSH(this->ownedNodes, nameVariable, createdNodeId);
     } else
@@ -1583,17 +1623,22 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
 
     //Adding the Description node to the PV
     UA_VariableAttributes_init(&attr);
-    attr.displayName = UA_LOCALIZEDTEXT((char *)"", (char *)"Description");
-    attr.description = UA_LOCALIZEDTEXT((char *)"", (char *)"");
+    attr = UA_VariableAttributes_default;
+    attr.displayName = UA_LOCALIZEDTEXT((char *) "", (char *) "Description");
+    attr.description = UA_LOCALIZEDTEXT((char *) "", (char *) "");
     attr.accessLevel = 3;
     attr.userAccessLevel = 3;
     attr.valueRank = -1;
     UA_String opcua_node_variable_t_ns_2_i_6001_variant_DataContents = UA_STRING((char *) "");
-    UA_Variant_setScalar( &attr.value, &opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
-    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/description").c_str()),
-                              pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char *)"Description"), UA_NODEID_NUMERIC(0, 63),
-                              attr, NULL, &createdNodeId);
-    if(addResult == UA_STATUSCODE_GOOD) {
+    UA_Variant_setScalar(&attr.value, &opcua_node_variable_t_ns_2_i_6001_variant_DataContents,
+                         &UA_TYPES[UA_TYPES_STRING]);
+    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" +
+                                                                                            this->nameNew +
+                                                                                            "/description").c_str()),
+                                          pvNodeId, UA_NODEID_NUMERIC(0, 47),
+                                          UA_QUALIFIEDNAME(1, (char *) "Description"), UA_NODEID_NUMERIC(0, 63),
+                                          attr, this, &createdNodeId);
+    if (addResult == UA_STATUSCODE_GOOD) {
         UA_NodeId descVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
         NODE_PAIR_PUSH(this->ownedNodes, descVariable, createdNodeId);
     } else
@@ -1601,15 +1646,19 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
 
     //Adding the EngineeringUnit node to the PV
     UA_VariableAttributes_init(&attr);
-    attr.displayName = UA_LOCALIZEDTEXT((char *)"en_US", (char *)"EngineeringUnit");
-    attr.description = UA_LOCALIZEDTEXT((char *)"", (char *)"");
+    attr = UA_VariableAttributes_default;
+    attr.displayName = UA_LOCALIZEDTEXT((char *) "en_US", (char *) "EngineeringUnit");
+    attr.description = UA_LOCALIZEDTEXT((char *) "", (char *) "");
     attr.accessLevel = 3;
     attr.userAccessLevel = 3;
     attr.valueRank = -1;
-    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/engineeringunit").c_str()),
-                              pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char *)"EngineeringUnit"),
-                              UA_NODEID_NUMERIC(0, 63), attr, NULL, &createdNodeId);
-    if(addResult == UA_STATUSCODE_GOOD) {
+    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" +
+                                                                                            this->nameNew +
+                                                                                            "/engineeringunit").c_str()),
+                                          pvNodeId, UA_NODEID_NUMERIC(0, 47),
+                                          UA_QUALIFIEDNAME(1, (char *) "EngineeringUnit"),
+                                          UA_NODEID_NUMERIC(0, 63), attr, this, &createdNodeId);
+    if (addResult == UA_STATUSCODE_GOOD) {
         UA_NodeId engineeringunitVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
         NODE_PAIR_PUSH(this->ownedNodes, engineeringunitVariable, createdNodeId);
     } else
@@ -1617,20 +1666,25 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
 
     //Adding the Type node to the PV
     UA_VariableAttributes_init(&attr);
-    attr.displayName = UA_LOCALIZEDTEXT((char *)"", (char *)"Type");
-    attr.description = UA_LOCALIZEDTEXT((char *)"", (char *)"");
+    attr = UA_VariableAttributes_default;
+    attr.displayName = UA_LOCALIZEDTEXT((char *) "", (char *) "Type");
+    attr.description = UA_LOCALIZEDTEXT((char *) "", (char *) "");
     attr.accessLevel = 3;
     attr.userAccessLevel = 3;
     attr.valueRank = -1;
     UA_String opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING((char *) "");
-    UA_Variant_setScalar( &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
+    UA_Variant_setScalar(&attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents,
+                         &UA_TYPES[UA_TYPES_STRING]);
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6012);
     UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
-    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/type").c_str()),
-                                          pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char *)"Type"), UA_NODEID_NUMERIC(0, 63),
-                                          attr, NULL, &createdNodeId);
-    if(addResult == UA_STATUSCODE_GOOD) {
+    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" +
+                                                                                            this->nameNew +
+                                                                                            "/type").c_str()),
+                                          pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char *) "Type"),
+                                          UA_NODEID_NUMERIC(0, 63),
+                                          attr, this, &createdNodeId);
+    if (addResult == UA_STATUSCODE_GOOD) {
         UA_NodeId typeVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
         NODE_PAIR_PUSH(this->ownedNodes, typeVariable, createdNodeId);
     } else
@@ -1645,7 +1699,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
 UA_DateTime ua_processvariable::getSourceTimeStamp() {
     auto t = this->csManager->getProcessVariable(this->namePV)->getVersionNumber().getTime();
     auto microseconds = std::chrono::time_point_cast<std::chrono::microseconds>(t).time_since_epoch().count();
-    return (microseconds * UA_USEC_TO_DATETIME) + UA_DATETIME_UNIX_EPOCH;
+    return (microseconds * UA_DATETIME_USEC) + UA_DATETIME_UNIX_EPOCH;
 }
 
 UA_NodeId ua_processvariable::getOwnNodeId() {

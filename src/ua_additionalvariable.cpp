@@ -32,12 +32,13 @@ extern "C" {
 
 using namespace std;
 
-ua_additionalvariable::ua_additionalvariable(UA_Server* server, UA_NodeId basenodeid, string name, string value, string description) : ua_mapped_class(server, basenodeid) {
-	
-	this->name = name;
-  	this->value = value;
-	this->description = description;
-	this->ownNodeId = UA_NODEID_NULL;
+ua_additionalvariable::ua_additionalvariable(UA_Server *server, UA_NodeId basenodeid, string name, string value,
+                                             string description) : ua_mapped_class(server, basenodeid) {
+
+    this->name = name;
+    this->value = value;
+    this->description = description;
+    this->ownNodeId = UA_NODEID_NULL;
 
 	this->mapSelfToNamespace();
 }
@@ -48,12 +49,16 @@ ua_additionalvariable::~ua_additionalvariable()
 }
 
 // Value
-UA_StatusCode ua_additionalvariable::ua_readproxy_ua_additionalvariable_getValue(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
-    ua_additionalvariable *thisObj = static_cast<ua_additionalvariable *>(handle);
+UA_StatusCode
+ua_additionalvariable::ua_readproxy_ua_additionalvariable_getValue(UA_Server *server, const UA_NodeId *sessionId,
+                                                                   void *sessionContext, const UA_NodeId *nodeId,
+                                                                   void *nodeContext, UA_Boolean includeSourceTimeStamp,
+                                                                   const UA_NumericRange *range, UA_DataValue *value) {
+    ua_additionalvariable *thisObj = static_cast<ua_additionalvariable *>(nodeContext);
     UA_String ua_val;
     {
         char *s = (char *) malloc(thisObj->getValue().length() + 1);
-        strncpy(s, (char*) thisObj->getValue().c_str(), thisObj->getValue().length());
+        strncpy(s, (char *) thisObj->getValue().c_str(), thisObj->getValue().length());
         ua_val.length = thisObj->getValue().length();
         ua_val.data = (UA_Byte *) malloc(ua_val.length);
         memcpy(ua_val.data, s, ua_val.length);
@@ -69,9 +74,10 @@ UA_StatusCode ua_additionalvariable::ua_readproxy_ua_additionalvariable_getValue
     return UA_STATUSCODE_GOOD;
 }
 
+
 //UA_RDPROXY_STRING(ua_additionalvariable, getValue)
 string ua_additionalvariable::getValue() {
-	return this->value;
+    return this->value;
 }
 
 UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
@@ -87,64 +93,68 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
 	string baseNodeIdStringCPP;
 	UASTRING_TO_CPPSTRING(baseNodeIdString, baseNodeIdStringCPP);
 
-    UA_String *opcua_node_variable_t_ns_2_variant_DataContents =  UA_String_new();
+    UA_String *opcua_node_variable_t_ns_2_variant_DataContents = UA_String_new();
     *opcua_node_variable_t_ns_2_variant_DataContents = UA_STRING_ALLOC(this->value.c_str());
     UA_VariableAttributes vAttr;
     UA_VariableAttributes_init(&vAttr);
-    vAttr.displayName = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->name.c_str());
-    vAttr.description = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->description.c_str());
+    vAttr = UA_VariableAttributes_default;
+    vAttr.displayName = UA_LOCALIZEDTEXT_ALLOC((char *) "en_US", (char *) this->name.c_str());
+    vAttr.description = UA_LOCALIZEDTEXT_ALLOC((char *) "en_US", (char *) this->description.c_str());
     vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
     UA_Variant_setScalar(&vAttr.value, opcua_node_variable_t_ns_2_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
 
-    //    UA_INSTATIATIONCALLBACK(icb);
-    UA_InstantiationCallback icb;
-    icb.handle = (void *) &this->ownedNodes;
-    icb.method = ua_mapInstantiatedNodes;
-
     UA_QualifiedName qualName = UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str());
-	retval |= UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/"+name+"AdditionalVariable").c_str()), this->baseNodeId,
-                              UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName,
-                              UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), vAttr ,&icb, &createdNodeId);
-	this->ownNodeId = createdNodeId;
-	UA_QualifiedName_deleteMembers(&qualName);
+    retval |= UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP + "/" +
+                                                                                          name +
+                                                                                          "AdditionalVariable").c_str()),
+                                        this->baseNodeId,
+                                        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName,
+                                        UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), vAttr,
+                                        (void *) this, &createdNodeId);
+    this->ownNodeId = createdNodeId;
+    ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE),
+                            &this->ownedNodes);
 
+    UA_QualifiedName_deleteMembers(&qualName);
     UA_VariableAttributes_deleteMembers(&vAttr);
 
     UA_VariableAttributes vAttr2;
     UA_VariableAttributes_init(&vAttr2);
-    vAttr2.displayName = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*) "description");
-    vAttr2.description = UA_LOCALIZEDTEXT_ALLOC((char*) "en_US", (char*)this->description.c_str());
+    vAttr2 = UA_VariableAttributes_default;
+    vAttr2.displayName = UA_LOCALIZEDTEXT_ALLOC((char *) "en_US", (char *) "description");
+    vAttr2.description = UA_LOCALIZEDTEXT_ALLOC((char *) "en_US", (char *) this->description.c_str());
     vAttr2.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
     UA_String addVarDescription = UA_STRING_ALLOC(description.c_str());
     UA_Variant_setScalarCopy(&vAttr2.value, &addVarDescription, &UA_TYPES[UA_TYPES_STRING]);
 
     UA_QualifiedName qualName2 = UA_QUALIFIEDNAME_ALLOC(1, this->description.c_str());
-    retval |= UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP+"/"+name+"/description").c_str()),
-            this->ownNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-            qualName2,
-            UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr2, NULL, &createdNodeId);
+    retval |= UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdStringCPP + "/" +
+                                                                                          name +
+                                                                                          "/description").c_str()),
+                                        this->ownNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                                        qualName2,
+                                        UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr2, NULL,
+                                        &createdNodeId);
 
     UA_QualifiedName_deleteMembers(&qualName2);
 
-	/* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
-	UA_DataSource_Map mapDs;
-	UA_DataSource_Map_Element mapElemValue;
-	mapElemValue.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE);
-	mapElemValue.description = vAttr2.description;
-	mapElemValue.read = ua_readproxy_ua_additionalvariable_getValue;
-	mapElemValue.write = NULL;
-	mapDs.push_back(mapElemValue);
-	//mapDs.push_back((UA_DataSource_Map_Element) { .typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE), oAttr.description, .read=UA_RDPROXY_NAME(ua_additionalvariable, getValue), .write=NULL});
-	
-	this->ua_mapDataSources((void *) this, &mapDs);
+    /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
+    UA_DataSource_Map mapDs;
+    UA_DataSource_Map_Element mapElemValue;
+    mapElemValue.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE);
+    mapElemValue.description = vAttr2.description;
+    mapElemValue.read = ua_readproxy_ua_additionalvariable_getValue;
+    mapElemValue.write = NULL;
+    mapDs.push_back(mapElemValue);
 
-	UA_String_deleteMembers(&addVarDescription);
-	UA_VariableAttributes_deleteMembers(&vAttr2);
-	
-	return retval;
+    this->ua_mapDataSources((void *) this, &mapDs);
+
+    UA_String_deleteMembers(&addVarDescription);
+    UA_VariableAttributes_deleteMembers(&vAttr2);
+
+    return retval;
 }
-	
 
 UA_DateTime ua_additionalvariable::getSourceTimeStamp() {
-	return UA_DateTime_now();
+    return UA_DateTime_now();
 }

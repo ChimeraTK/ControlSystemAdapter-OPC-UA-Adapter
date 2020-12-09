@@ -16,6 +16,7 @@
  * 
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
+ * Copyright (c) 2019 Andreas Ebner  <Andreas.Ebner@iosb-extern.fraunhofer.de>
  */
 
 #ifndef MTCA_ADDITIONALVARIABLE_H
@@ -67,10 +68,13 @@ public:
 
         UA_DateTime getSourceTimeStamp();
 
-        static UA_StatusCode ua_readproxy_ua_additionalvariable_getValue (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
-        void setValue(string value);
-        string getValue();
+    static UA_StatusCode ua_readproxy_ua_additionalvariable_getValue(UA_Server *server, const UA_NodeId *sessionId,
+                                                                     void *sessionContext, const UA_NodeId *nodeId,
+                                                                     void *nodeContext,
+                                                                     UA_Boolean includeSourceTimeStamp,
+                                                                     const UA_NumericRange *range, UA_DataValue *value);
 
+    string getValue();
 };
 
 #endif // MTCA_ADDITIONALVARIABLE_H

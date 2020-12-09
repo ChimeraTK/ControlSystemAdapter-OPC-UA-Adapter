@@ -16,6 +16,7 @@
  * 
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
+ * Copyright (c) 2019 Andreas Ebner  <Andreas.Ebner@iosb-extern.fraunhofer.de>
  */
 
 #ifndef UA_PROCESSVARIABLE_H
@@ -91,7 +92,10 @@ public:
         */
         UA_DateTime getSourceTimeStamp();
 
-        static UA_StatusCode ua_readproxy_ua_processvariable_getName (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
+    static UA_StatusCode ua_readproxy_ua_processvariable_getName(UA_Server *server, const UA_NodeId *sessionId,
+                                                                 void *sessionContext, const UA_NodeId *nodeId,
+                                                                 void *nodeContext, UA_Boolean includeSourceTimeStamp,
+                                                                 const UA_NumericRange *range, UA_DataValue *value);
 
         /** @brief Set name of processvariable
         *
@@ -104,7 +108,10 @@ public:
         */
         string getName();
 
-        static UA_StatusCode ua_readproxy_ua_processvariable_getType (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
+    static UA_StatusCode ua_readproxy_ua_processvariable_getType(UA_Server *server, const UA_NodeId *sessionId,
+                                                                 void *sessionContext, const UA_NodeId *nodeId,
+                                                                 void *nodeContext, UA_Boolean includeSourceTimeStamp,
+                                                                 const UA_NumericRange *range, UA_DataValue *value);
 
         /** @brief  Set type of processvariable
         *
@@ -117,8 +124,17 @@ public:
         */
         string getType();
 
-        static UA_StatusCode ua_readproxy_ua_processvariable_getEngineeringUnit (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
-        static UA_StatusCode ua_writeproxy_ua_processvariable_setEngineeringUnit (void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range);
+    static UA_StatusCode
+    ua_readproxy_ua_processvariable_getEngineeringUnit(UA_Server *server, const UA_NodeId *sessionId,
+                                                       void *sessionContext, const UA_NodeId *nodeId,
+                                                       void *nodeContext, UA_Boolean includeSourceTimeStamp,
+                                                       const UA_NumericRange *range, UA_DataValue *value);
+
+    static UA_StatusCode
+    ua_writeproxy_ua_processvariable_setEngineeringUnit(UA_Server *server, const UA_NodeId *sessionId,
+                                                        void *sessionContext, const UA_NodeId *nodeId,
+                                                        void *nodeContext, const UA_NumericRange *range,
+                                                        const UA_DataValue *value);
 
         /** @brief  Set engineering unit of processvariable
         *
@@ -131,8 +147,18 @@ public:
         */
         string getEngineeringUnit();
 
-        static UA_StatusCode ua_writeproxy_ua_processvariable_setDescription (void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range);
-        static UA_StatusCode ua_readproxy_ua_processvariable_getDescription (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
+    static UA_StatusCode ua_writeproxy_ua_processvariable_setDescription(UA_Server *server, const UA_NodeId *sessionId,
+                                                                         void *sessionContext, const UA_NodeId *nodeId,
+                                                                         void *nodeContext,
+                                                                         const UA_NumericRange *range,
+                                                                         const UA_DataValue *value);
+
+    static UA_StatusCode ua_readproxy_ua_processvariable_getDescription(UA_Server *server, const UA_NodeId *sessionId,
+                                                                        void *sessionContext, const UA_NodeId *nodeId,
+                                                                        void *nodeContext,
+                                                                        UA_Boolean includeSourceTimeStamp,
+                                                                        const UA_NumericRange *range,
+                                                                        UA_DataValue *value);
 
         /** @brief  Get description unit of processvariable
         *
@@ -151,35 +177,63 @@ public:
         */
         UA_NodeId getOwnNodeId();
 
-    static UA_StatusCode ua_readproxy_ua_processvariable_getValue(void *handle,
-            const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp,
-            const UA_NumericRange *range, UA_DataValue *value);
-    UA_StatusCode getValue_int8(UA_Variant* v);
-    UA_StatusCode getValue_uint8(UA_Variant* v);
-    UA_StatusCode getValue_int16(UA_Variant* v);
-    UA_StatusCode getValue_uint16(UA_Variant* v);
-    UA_StatusCode getValue_int32(UA_Variant* v);
-    UA_StatusCode getValue_uint32(UA_Variant* v);
-    UA_StatusCode getValue_int64(UA_Variant* v);
-    UA_StatusCode getValue_uint64(UA_Variant* v);
-    UA_StatusCode getValue_float(UA_Variant* v);
-    UA_StatusCode getValue_double(UA_Variant* v);
-    UA_StatusCode getValue_string(UA_Variant* v);
-    UA_StatusCode getValue_bool(UA_Variant* v);
+    static UA_StatusCode ua_readproxy_ua_processvariable_getValue(UA_Server *server, const UA_NodeId *sessionId,
+                                                                  void *sessionContext, const UA_NodeId *nodeId,
+                                                                  void *nodeContext, UA_Boolean includeSourceTimeStamp,
+                                                                  const UA_NumericRange *range, UA_DataValue *value);
 
-    static UA_StatusCode ua_writeproxy_ua_processvariable_setValue(void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range);
-    UA_StatusCode setValue_int8(const UA_Variant* data);
-    UA_StatusCode setValue_uint8(const UA_Variant* data);
-    UA_StatusCode setValue_int16(const UA_Variant* data);
-    UA_StatusCode setValue_uint16(const UA_Variant* data);
-    UA_StatusCode setValue_int32(const UA_Variant* data);
-    UA_StatusCode setValue_uint32(const UA_Variant* data);
-    UA_StatusCode setValue_int64(const UA_Variant* data);
-    UA_StatusCode setValue_uint64(const UA_Variant* data);
-    UA_StatusCode setValue_float(const UA_Variant* data);
-    UA_StatusCode setValue_double(const UA_Variant* data);
-    UA_StatusCode setValue_string(const UA_Variant* data);
-    UA_StatusCode setValue_bool(const UA_Variant* data);
+    UA_StatusCode getValue_int8(UA_Variant *v);
+
+    UA_StatusCode getValue_uint8(UA_Variant *v);
+
+    UA_StatusCode getValue_int16(UA_Variant *v);
+
+    UA_StatusCode getValue_uint16(UA_Variant *v);
+
+    UA_StatusCode getValue_int32(UA_Variant *v);
+
+    UA_StatusCode getValue_uint32(UA_Variant *v);
+
+    UA_StatusCode getValue_int64(UA_Variant *v);
+
+    UA_StatusCode getValue_uint64(UA_Variant *v);
+
+    UA_StatusCode getValue_float(UA_Variant *v);
+
+    UA_StatusCode getValue_double(UA_Variant *v);
+
+    UA_StatusCode getValue_string(UA_Variant *v);
+
+    UA_StatusCode getValue_bool(UA_Variant *v);
+
+    static UA_StatusCode ua_writeproxy_ua_processvariable_setValue(UA_Server *server, const UA_NodeId *sessionId,
+                                                                   void *sessionContext, const UA_NodeId *nodeId,
+                                                                   void *nodeContext, const UA_NumericRange *range,
+                                                                   const UA_DataValue *value);
+
+    UA_StatusCode setValue_int8(const UA_Variant *data);
+
+    UA_StatusCode setValue_uint8(const UA_Variant *data);
+
+    UA_StatusCode setValue_int16(const UA_Variant *data);
+
+    UA_StatusCode setValue_uint16(const UA_Variant *data);
+
+    UA_StatusCode setValue_int32(const UA_Variant *data);
+
+    UA_StatusCode setValue_uint32(const UA_Variant *data);
+
+    UA_StatusCode setValue_int64(const UA_Variant *data);
+
+    UA_StatusCode setValue_uint64(const UA_Variant *data);
+
+    UA_StatusCode setValue_float(const UA_Variant *data);
+
+    UA_StatusCode setValue_double(const UA_Variant *data);
+
+    UA_StatusCode setValue_string(const UA_Variant *data);
+
+    UA_StatusCode setValue_bool(const UA_Variant *data);
 };
 
 #endif // UA_PROCESSVARIABLE_H
