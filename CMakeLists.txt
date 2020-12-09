@@ -165,7 +165,7 @@ option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prio
 option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
 option(ENABLE_RUNTIME_ANALYSIS "Build Runtime analyses" OFF)
-option(UPDATE_OPEN62541	"Build new open62541 from git repository" OFF)
+option(UPDATE_OPEN62541	"Build new open62541 from git repository" ON)
 
 if(ENABLE_CREATEMODEL)
   set(MODEL_XML_FILE "adapterim.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
@@ -180,13 +180,12 @@ endif()
 if(UPDATE_OPEN62541)
                 ExternalProject_Add(external-open62541
                         GIT_REPOSITORY "https://github.com/open62541/open62541.git"
-                        GIT_TAG "93e79321c1b40bbdada49f3bf3d52095b8f64100"
-                        #GIT_TAG "0.2-rc2" // Array outlier occure
-                        #GIT_TAG "2cabd7c5d960dadcebc75c194daafc09cfa74ce2" // Tag during the first integration Meeting
+                        #GIT_TAG "93e79321c1b40bbdada49f3bf3d52095b8f64100"
+                        GIT_TAG "0e8505832555a32354a6ecdd8d858596228be743" ##Tag of V1.1.3
                         PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
                         CMAKE_ARGS
                         "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/open62541"
-                        "-DUA_ENABLE_AMALGAMATION=On"
+                        "-DUA_ENABLE_AMALGAMATION=ON"
                         #"-DUA_ENABLE_GENERATE_NAMESPACE0=On"
                         "-DUA_ENABLE_METHODCALLS=ON"
                         "-DUA_ENABLE_NODEMANAGEMENT=ON"
@@ -201,14 +200,14 @@ if(UPDATE_OPEN62541)
                 add_custom_target(copyOpen62541Header ALL
                                 DEPENDS external-open62541
                                 COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.h
-                ${CMAKE_SOURCE_DIR}/include/open62541.h
+                                ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.h
+                                ${CMAKE_SOURCE_DIR}/include/open62541.h
                 )
                 add_custom_target(copyOpen62541Source ALL
                                 DEPENDS external-open62541
-        COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.c
-                ${CMAKE_SOURCE_DIR}/src/open62541.c
+                                COMMAND ${CMAKE_COMMAND} -E copy
+                                        ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.c
+                                        ${CMAKE_SOURCE_DIR}/src/open62541.c
                 )
 
                 # file(RENAME <oldname> <newname>)
