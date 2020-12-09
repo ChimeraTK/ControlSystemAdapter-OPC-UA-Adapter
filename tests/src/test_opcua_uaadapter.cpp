@@ -81,10 +81,7 @@ void UAAdapterTest::testExampleSet() {
     BOOST_CHECK(adapter->getAllNotMappableVariablesNames().size() == 7);
     // Check if timestamp is not enmpty
     string dateTime = "";
-    UA_String dateTimeUA = UA_DateTime_toString(adapter->getSourceTimeStamp());
-    UASTRING_TO_CPPSTRING(dateTimeUA, dateTime);
-    BOOST_CHECK(dateTime != "");
-    UA_String_deleteMembers(&dateTimeUA);
+    BOOST_CHECK(adapter->getSourceTimeStamp() != 0);
 
     adapter->~ua_uaadapter();
     xmlHandler->~xml_file_handler();

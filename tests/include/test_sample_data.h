@@ -86,28 +86,26 @@ struct TestFixturePVSet {
 };
 
 struct TestFixtureServerSet {
-  uint32_t opcuaPort;
-  /* Create new Server */
-  UA_ServerConfig server_config;
-  UA_ServerNetworkLayer server_nl;
-  UA_Server* mappedServer;
-  UA_NodeId baseNodeId;
-  UA_Boolean runUAServer;
 
-  TestFixtureServerSet() {
-    opcuaPort = 16663;
-    server_config = UA_ServerConfig_standard;
-    server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, opcuaPort);
-    server_config.logger = UA_Log_Stdout;
-    server_config.networkLayers = &server_nl;
-    server_config.networkLayersSize = 1;
+    uint32_t opcuaPort = 16663;
+    /* Create new Server */
+    UA_ServerConfig *server_config;
+    UA_ServerNetworkLayer server_nl;
+    UA_Server *mappedServer;
+    UA_NodeId baseNodeId;
+    UA_Boolean runUAServer;
 
-    runUAServer = UA_TRUE;
-    mappedServer = UA_Server_new(server_config);
-    baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+    TestFixtureServerSet() {
 
-    csa_namespaceinit_generated(mappedServer);
-  }
+        this->mappedServer = UA_Server_new();
+        UA_ServerConfig_setMinimal(UA_Server_getConfig(this->mappedServer), opcuaPort, NULL);
+        server_config = UA_Server_getConfig(mappedServer);
+
+        runUAServer = UA_TRUE;
+        baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+
+        csa_namespaceinit_generated(mappedServer);
+    }
 };
 
 #endif // _TEST_SAMPLE_DATA_H_

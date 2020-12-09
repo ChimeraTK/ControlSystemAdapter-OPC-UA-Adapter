@@ -34,10 +34,13 @@ void AdditionalVariableTest::testClassSide() {
     UA_ObjectAttributes oAttr;
     memset(&oAttr, 0, sizeof(UA_ObjectAttributes));
     UA_Server_addObjectNode(serverSet->mappedServer, UA_NODEID_STRING(1, (char *) additionalVariableRootFolder.c_str()),
-            UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-            UA_QUALIFIEDNAME(0, (char *)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL, NULL);
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+                            UA_QUALIFIEDNAME(0, (char *) "AdditionalVarsFolder"),
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL, NULL);
 
-    ua_additionalvariable *addVar1 = new ua_additionalvariable(serverSet->mappedServer, UA_NODEID_STRING(1, (char *) additionalVariableRootFolder.c_str()), "Name",
+    ua_additionalvariable *addVar1 = new ua_additionalvariable(serverSet->mappedServer, UA_NODEID_STRING(1,
+                                                                                                         (char *) additionalVariableRootFolder.c_str()),
+                                                               "Name",
                                                                "Value", "Description");
 
     BOOST_CHECK(addVar1->getSourceTimeStamp() != 0);
@@ -50,8 +53,6 @@ void AdditionalVariableTest::testClassSide() {
     }
 
     UA_Server_delete(serverSet->mappedServer);
-
-    serverSet->server_nl.deleteMembers(&serverSet->server_nl);
 
     delete serverSet;
     serverSet = NULL;
@@ -78,13 +79,18 @@ void AdditionalVariableTest::testClientSide() {
     memset(&oAttr, 0, sizeof(UA_ObjectAttributes));
     UA_Server_addObjectNode(serverSet->mappedServer, UA_NODEID_STRING(1, (char *) additionalVariableRootFolder.c_str()),
                             UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                            UA_QUALIFIEDNAME(0, (char *)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL, NULL);
+                            UA_QUALIFIEDNAME(0, (char *) "AdditionalVarsFolder"),
+                            UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL, NULL);
     // add set
-    ua_additionalvariable *addVar1 = new ua_additionalvariable(serverSet->mappedServer,  UA_NODEID_STRING(1, (char *) additionalVariableRootFolder.c_str()), "Name",
+    ua_additionalvariable *addVar1 = new ua_additionalvariable(serverSet->mappedServer, UA_NODEID_STRING(1,
+                                                                                                         (char *) additionalVariableRootFolder.c_str()),
+                                                               "Name",
                                                                "Value", "Description");
 
     // Create client to connect to server
-    UA_Client *client = UA_Client_new(UA_ClientConfig_standard);
+    UA_Client *client = UA_Client_new();
+    UA_ClientConfig *cc = UA_Client_getConfig(client);
+    UA_ClientConfig_setDefault(cc);
     string endpointURL = "opc.tcp://localhost:" + to_string(serverSet->opcuaPort);
     UA_StatusCode retval = UA_Client_connect(client, endpointURL.c_str());
     sleep(1);
@@ -181,7 +187,7 @@ void AdditionalVariableTest::testClientSide() {
                         string valName = "";
 
                         // Check Description -> for all the same
-                        UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) valueToCheck.data)), valName);
+                        UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String *) valueToCheck.data)), valName);
                         //cout << "Description: " << valName << endl;
                         BOOST_CHECK(valName == "Value");
 
@@ -210,7 +216,7 @@ void AdditionalVariableTest::testClientSide() {
     cout << "Delete ServerSet" << endl;
     UA_Server_delete(serverSet->mappedServer);
 
-    serverSet->server_nl.deleteMembers(&serverSet->server_nl);
+    //serverSet->server_nl.deleteMembers(&serverSet->server_nl);
     cout << "Delete ServerSet" << endl;
     delete serverSet;
     serverSet = NULL;

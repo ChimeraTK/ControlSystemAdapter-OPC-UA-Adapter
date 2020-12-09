@@ -60,7 +60,7 @@ void ProcessVariableTest::testClassSide() {
 
         auto time = oneProcessVariable->getVersionNumber().getTime();
         auto usecs = std::chrono::duration_cast<std::chrono::microseconds>(time.time_since_epoch()).count();
-        BOOST_CHECK(test->getSourceTimeStamp() == usecs * UA_USEC_TO_DATETIME + UA_DATETIME_UNIX_EPOCH);
+        BOOST_CHECK(test->getSourceTimeStamp() == usecs * UA_DATETIME_USEC + UA_DATETIME_UNIX_EPOCH);
         std::string valueType = test->getType();
 
                 cout << "Check Processvariable: " << test->getName() << endl;
@@ -418,7 +418,7 @@ void ProcessVariableTest::testClassSide() {
 
     UA_Server_delete(serverSet->mappedServer);
 
-    serverSet->server_nl.deleteMembers(&serverSet->server_nl);
+    //serverSet->server_nl.deleteMembers(&serverSet->server_nl);
 
     delete serverSet;
     serverSet = NULL;
@@ -449,7 +449,9 @@ void ProcessVariableTest::testClientSide() {
     }
 
     // Create client to connect to server
-    UA_Client *client = UA_Client_new(UA_ClientConfig_standard);
+    UA_Client *client = UA_Client_new();
+    UA_ClientConfig *cc = UA_Client_getConfig(client);
+    UA_ClientConfig_setDefault(cc);
     string endpointURL = "opc.tcp://localhost:" + to_string(serverSet->opcuaPort);
     UA_StatusCode retval = UA_Client_connect(client, endpointURL.c_str());
     sleep(1);
@@ -1387,7 +1389,7 @@ void ProcessVariableTest::testClientSide() {
 
     cout << "Delete Server" << endl;
     UA_Server_delete(serverSet->mappedServer);
-    serverSet->server_nl.deleteMembers(&serverSet->server_nl);
+    //serverSet->server_nl.deleteMembers(&serverSet->server_nl);
     cout << "Delete ServerSet" << endl;
     delete serverSet;
     serverSet = NULL;
