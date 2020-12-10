@@ -97,7 +97,12 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
 
 	UA_Server_writeAccessLevel(server, instantiatedId, accessLevel);
 	// There is currently no high- level function to do this. (02.12.2016)
-	__UA_Server_write(server, &instantiatedId, UA_ATTRIBUTEID_USERACCESSLEVEL, &UA_TYPES[UA_TYPES_BYTE], &accessLevel);
+	// -> Update to Stack 1.X https://open62541.org/doc/current/server.html?highlight=useraccesslevel
+	// The following attributes cannot be written from the server, as they are specific to the different users and set by the access control callback://
+	//    UserWriteMask
+	//    UserAccessLevel
+	//    UserExecutable
+	//__UA_Server_write(server, &instantiatedId, UA_ATTRIBUTEID_USERACCESSLEVEL, &UA_TYPES[UA_TYPES_BYTE], &accessLevel);
 
     UA_Server_setVariableNode_dataSource(server, instantiatedId, ds);
 		
