@@ -91,9 +91,12 @@ void ua_uaadapter::constructServer() {
     this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
     this->server_config.applicationDescription.applicationUri = UA_STRING((char*) hostname_uri.c_str());
     this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
-    this->server_config.buildInfo.productName = UA_STRING((char*)"csa_opcua_adapter");
-    this->server_config.buildInfo.productUri = UA_STRING((char*)"HZDR OPCUA Server");
-    this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"TU Dresden - Professur für Prozessleittechnik");
+    this->server_config.buildInfo.productName = UA_STRING((char*)"Watchdog Server");
+    this->server_config.buildInfo.productUri = UA_STRING((char*)"urn:ChimeraTK:WatchdogServer");
+    this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"ChimeraTK Team");
+    //TODO use this fields form the cmake config
+    this->server_config.buildInfo.softwareVersion = UA_STRING("open62541: 0.2.2, ControlSystemAdapter-OPC-UA-Adapter: 0.2.2");
+    this->server_config.buildInfo.buildDate = UA_DateTime_now();
     this->mappedServer = UA_Server_new(this->server_config);
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
 
@@ -177,6 +180,9 @@ void ua_uaadapter::readConfig() {
         placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
         if(!placeHolder.empty()) {
             this->serverConfig.applicationName = placeHolder;
+            if(this->serverConfig.rootFolder.empty()){
+                this->serverConfig.rootFolder = placeHolder;
+            }
         } else {
             string applicationName;
             try{
