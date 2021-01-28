@@ -24747,6 +24747,14 @@ UA_ClientState UA_Client_getState(UA_Client *client) {
     return client->state;
 }
 
+UA_ConnectionState UA_Client_getConnectionState(UA_Client *client) {
+    if(!client)
+        return UA_CONNECTION_CLOSED;
+    UA_Connection* conn = &client->connection;
+    return conn->state;
+}
+
+
 /*************************/
 /* Manage the Connection */
 /*************************/
@@ -27430,12 +27438,12 @@ UA_ClientConnectionTCP(UA_ConnectionConfig conf, const char *endpointUrl,
                        NULL, WSAGetLastError(),
                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                        (LPWSTR)&s, 0, NULL);
-        UA_LOG_WARNING(logger, UA_LOGCATEGORY_NETWORK,
+        UA_LOG_DEBUG(logger, UA_LOGCATEGORY_NETWORK,
                        "Connection to %s failed. Error: %d: %S",
                        endpointUrl, WSAGetLastError(), s);
         LocalFree(s);
 #else
-        UA_LOG_WARNING(logger, UA_LOGCATEGORY_NETWORK,
+        UA_LOG_DEBUG(logger, UA_LOGCATEGORY_NETWORK,
                        "Connection to %s failed. Error: %d: %s",
                        endpointUrl, errno, strerror(errno));
 #endif

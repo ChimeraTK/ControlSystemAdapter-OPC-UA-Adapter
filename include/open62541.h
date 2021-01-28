@@ -10693,6 +10693,8 @@ UA_Client UA_EXPORT * UA_Client_new(UA_ClientConfig config);
 /* Get the client connection status */
 UA_ClientState UA_EXPORT UA_Client_getState(UA_Client *client);
 
+UA_ConnectionState UA_EXPORT UA_Client_getConnectionState(UA_Client *client);
+
 /* Reset a client */
 void UA_EXPORT UA_Client_reset(UA_Client *client);
 
