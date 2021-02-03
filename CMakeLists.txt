@@ -17,8 +17,8 @@ project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 include(ExternalProject)
 
 SET(${PROJECT_NAME}_MAJOR_VERSION 02)
-SET(${PROJECT_NAME}_MINOR_VERSION 00)
-SET(${PROJECT_NAME}_PATCH_VERSION 03)
+SET(${PROJECT_NAME}_MINOR_VERSION 01)
+SET(${PROJECT_NAME}_PATCH_VERSION 00)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
@@ -34,6 +34,7 @@ find_package(PythonInterp REQUIRED)
 #Do not put any of the following packages as required. We will install it if it is not found.
 find_package(ChimeraTK-ControlSystemAdapter 01.00)
 find_package(ChimeraTK-DeviceAccess 01.00)
+find_package(open62541 00.01 REQUIRED)
 
 #Install the DeviceAccess if it is not pre-installed
 if(NOT ChimeraTK-DeviceAccess_FOUND)
@@ -126,6 +127,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(SYSTEM ${ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS})
 include_directories(SYSTEM ${ChimeraTK-DeviceAccess_INCLUDE_DIRS})
+include_directories(SYSTEM ${open62541_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/examples/)
 include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR})
 
@@ -133,6 +135,7 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 link_directories(${LIBXML2_LIBRARIES})
 link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
 link_directories(${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
+#link_directories(${open62541_LIBRARIES})
 
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
@@ -143,7 +146,7 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_adapter.cpp
                    ${CMAKE_SOURCE_DIR}/src/csa_opcua_application.cpp
 
-                   ${CMAKE_SOURCE_DIR}/src/open62541.c
+#                   ${CMAKE_SOURCE_DIR}/src/open62541.c
                    # Example HelperClass
                    #${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp
 )
@@ -322,6 +325,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_FULL_
                                                  SOVERSION ${${PROJECT_NAME}_SOVERSION})
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-DeviceAccess_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${open62541_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} pthread)
 target_link_libraries(${PROJECT_NAME} dl)
