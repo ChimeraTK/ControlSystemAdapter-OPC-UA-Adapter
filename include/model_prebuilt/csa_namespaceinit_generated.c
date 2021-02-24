@@ -46,15 +46,15 @@ UA_Server_addObjectTypeNode(server, nodeId, parentNodeId, parentReferenceNodeId,
 
 do {
 // Referencing node found and declared as parent: i=58/BaseObjectType using i=45/HasSubtype
-// Node: opcua_node_objectType_t(ns=2;i=1002), 1:ctkModule
+// Node: opcua_node_objectType_t(ns=2;i=1002), 1:ctkApplication
 UA_ObjectTypeAttributes attr;
 UA_ObjectTypeAttributes_init(&attr);
-attr.displayName = UA_LOCALIZEDTEXT("", "ctkModule");
+attr.displayName = UA_LOCALIZEDTEXT("", "ctkApplication");
 attr.description = UA_LOCALIZEDTEXT("", "");
 UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 1002);
 UA_NodeId parentNodeId = UA_NODEID_NUMERIC(0, 58);
 UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 45);
-UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "ctkModule");
+UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "ctkApplication");
 UA_Server_addObjectTypeNode(server, nodeId, parentNodeId, parentReferenceNodeId, nodeName
        , attr, NULL, NULL);
 } while(0);
@@ -108,7 +108,7 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6002), UA_NODEID_NUMERIC(0, 
 */
 
 do {
-// Referencing node found and declared as parent: ns=2;i=1002/1:ctkModule using i=47/HasComponent
+// Referencing node found and declared as parent: ns=2;i=1002/1:ctkApplication using i=47/HasComponent
 // Node: opcua_node_object_t(ns=2;i=5001), 1:Variables
 UA_ObjectAttributes attr;
 UA_ObjectAttributes_init(&attr);

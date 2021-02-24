@@ -41,6 +41,10 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
 
+#define xstr(a) str(a)
+#define str(a) #a
+
+
 using namespace ChimeraTK;
 using namespace std;
 
@@ -88,15 +92,16 @@ void ua_uaadapter::constructServer() {
     this->server_config.usernamePasswordLogins = usernamePasswordLogins;
     this->server_config.usernamePasswordLoginsSize = (size_t)(usernamePasswordLogins->password.length + usernamePasswordLogins->username.length);
     this->server_config.applicationDescription.applicationName =  UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
-    this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"GatewayURI");
+    this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"");
     this->server_config.applicationDescription.applicationUri = UA_STRING((char*) hostname_uri.c_str());
     this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
     this->server_config.buildInfo.productName = UA_STRING((char*)"Watchdog Server");
     this->server_config.buildInfo.productUri = UA_STRING((char*)"urn:ChimeraTK:WatchdogServer");
     this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"ChimeraTK Team");
-    //TODO use this fields form the cmake config
-    this->server_config.buildInfo.softwareVersion = UA_STRING("open62541: 0.2.2, ControlSystemAdapter-OPC-UA-Adapter: 0.2.2");
+    std::string versionString = "open62541: " xstr(UA_OPEN62541_VER_MAJOR) "." xstr(UA_OPEN62541_VER_MINOR) "." xstr(UA_OPEN62541_VER_PATCH) ", ControlSystemAdapter-OPC-UA-Adapter: 0.2.2";
+    this->server_config.buildInfo.softwareVersion = UA_STRING((char*) versionString.c_str());
     this->server_config.buildInfo.buildDate = UA_DateTime_now();
+    this->server_config.buildInfo.buildNumber = UA_STRING((char*) "");
     this->mappedServer = UA_Server_new(this->server_config);
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
 
@@ -1176,13 +1181,20 @@ UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
         oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.rootFolder.c_str());
         oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.descriptionFolder.c_str());
 
-    UA_InstantiationCallback icb;
-    icb.handle = (void *) &this->ownedNodes;
-    icb.method = ua_mapInstantiatedNodes;        UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char*) this->serverConfig.rootFolder.c_str()),
-                            UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-                            UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &icb, &createdNodeId);
+        UA_InstantiationCallback icb;
+        icb.handle = (void *) &this->ownedNodes;
+        icb.method = ua_mapInstantiatedNodes;
+        UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char*) this->serverConfig.rootFolder.c_str()),
+                                                                             UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
+                                                                             UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKAPPLICATION), oAttr, &icb, &createdNodeId);
+        UA_VariableAttributes  vAttr;
+        UA_VariableAttributes_init(&vAttr);
+        UA_String versionString = UA_STRING((char *)"1.1");
+        UA_Variant_setScalarCopy(&vAttr.value, &versionString, &UA_TYPES[UA_TYPES_STRING]);
+        UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char*) "CHTK_Version"), UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
+                UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), UA_QUALIFIEDNAME(1, (char*) "ChimeraTK Version"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),vAttr, NULL, NULL);
 
-        this->ownNodeId = createdNodeId;
+    this->ownNodeId = createdNodeId;
         // Nodes "Variables" where created on object instantiation, we need these IDs to add new process variables to them...
         //UA_NodeId_copy(nodePairList_getTargetIdBySourceId(this->ownedNodes, UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLES)), &this->variablesListId);
         return UA_STATUSCODE_GOOD;

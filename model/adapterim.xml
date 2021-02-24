@@ -32,8 +32,8 @@
             <uax:String></uax:String>
         </Value>
     </UAVariable>
-    <UAObjectType NodeId="ns=1;i=1002" BrowseName="1:ctkModule">
-        <DisplayName>ctkModule</DisplayName>
+    <UAObjectType NodeId="ns=1;i=1002" BrowseName="1:ctkApplication">
+        <DisplayName>ctkApplication</DisplayName>
         <References>
             <Reference ReferenceType="HasSubtype" IsForward="false">i=58</Reference>
             <Reference ReferenceType="HasComponent">ns=1;i=5001</Reference>
