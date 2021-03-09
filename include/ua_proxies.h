@@ -37,7 +37,7 @@ typedef std::list<UA_NodeId_pair*> nodePairList;
  */
 typedef struct UA_DataSource_Map_Element_t {
   UA_NodeId     typeTemplateId;
-        UA_LocalizedText description; // individuell description for every variable
+  UA_LocalizedText description;
   UA_StatusCode (*read)(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp,const UA_NumericRange *range, UA_DataValue *value);
   UA_StatusCode (*write)(void *handle, const UA_NodeId nodeid, const UA_Variant *data, const UA_NumericRange *range);
 } UA_DataSource_Map_Element;
