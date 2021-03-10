@@ -134,7 +134,12 @@ public:
         static UA_StatusCode ua_writeproxy_ua_processvariable_setDescription (void *handle, const UA_NodeId nodeid,const UA_Variant *data, const UA_NumericRange *range);
         static UA_StatusCode ua_readproxy_ua_processvariable_getDescription (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
 
-        /** @brief  Get description unit of processvariable
+        /** @brief  Get vadility  of processvariable
+        */
+        static UA_StatusCode ua_readproxy_ua_processvariable_getValidity (void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value);
+
+
+    /** @brief  Get description unit of processvariable
         *
         * @return <String> of description
         */

@@ -162,6 +162,30 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getDescription
     return UA_STATUSCODE_GOOD;
 }
 
+UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValidity(void *handle, const UA_NodeId nodeid,
+        UA_Boolean includeSourceTimeStamp, const UA_NumericRange *range, UA_DataValue *value) {
+    ua_processvariable *thisObj = static_cast<ua_processvariable *>(handle);
+    DataValidity dv = thisObj->csManager->getProcessVariable(thisObj->namePV)->dataValidity();
+    UA_Int32 validity;
+    switch (dv) {
+        case DataValidity::ok :
+            validity = 1;
+            break;
+        case DataValidity::faulty :
+            validity = 0;
+            break;
+        default:
+            validity = -1;
+    }
+    UA_Variant_setScalarCopy(&value->value, &validity, &UA_TYPES[UA_TYPES_UINT32]);
+    value->hasValue = true;
+    if (includeSourceTimeStamp) {
+        value->sourceTimestamp = thisObj->getSourceTimeStamp();
+        value->hasSourceTimestamp = true;
+    }
+    return UA_STATUSCODE_GOOD;
+}
+
 string ua_processvariable::getDescription() {
         if(!this->description.empty()) {
                 return this->description;
@@ -305,6 +329,10 @@ UA_StatusCode ua_processvariable::getValue_int8(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_SByte *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -1127,6 +1155,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 
     this->addPVChildNodes(createdNodeId, baseNodeIdName);
 
+    UA_Variant arrayDimensions;
+    UA_Variant_init(&arrayDimensions);
     /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
     UA_DataSource_Map mapDs;
     // FIXME: We should not be using std::cout here... Where's our logger?
@@ -1160,6 +1190,12 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = this->csManager->getProcessArray <int8_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArrayCopy(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_StatusCode s = UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
+            cout << "Debug " << UA_StatusCode_name(s) << " name: " << this->namePV << " is array size: " << this->csManager->getProcessArray <int8_t>(this->namePV)->accessChannel(0).size() << endl;
         }
         mapDs.push_back(mapElem);
     }
@@ -1552,6 +1588,14 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     mapElemType.write = NULL;
     mapDs.push_back(mapElemType);
 
+    // Validity
+    UA_DataSource_Map_Element mapElemValidity;
+    mapElemValidity.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
+    mapElemValidity.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+    mapElemValidity.read = ua_readproxy_ua_processvariable_getValidity;
+    mapElemValidity.write = NULL;
+    mapDs.push_back(mapElemValidity);
+
     this->ua_mapDataSources((void *) this, &mapDs);
 
     return UA_STATUSCODE_GOOD;
@@ -1638,6 +1682,23 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
         NODE_PAIR_PUSH(this->ownedNodes, typeVariable, createdNodeId);
     } else
         return addResult;
+
+    //Adding the Validity node to the PV
+    UA_VariableAttributes_init(&attr);
+    attr.displayName = UA_LOCALIZEDTEXT((char *)"en_US", (char *)"Validity");
+    attr.description = UA_LOCALIZEDTEXT((char *)"", (char *)"");
+    attr.accessLevel = 3;
+    attr.userAccessLevel = 3;
+    attr.valueRank = -1;
+    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/validity").c_str()),
+                                          pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char *)"Validity"),
+                                          UA_NODEID_NUMERIC(0, 63), attr, NULL, &createdNodeId);
+    if(addResult == UA_STATUSCODE_GOOD) {
+        UA_NodeId vadilityVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
+        NODE_PAIR_PUSH(this->ownedNodes, vadilityVariable, createdNodeId);
+    } else
+        return addResult;
+
 
     return addResult;
 }

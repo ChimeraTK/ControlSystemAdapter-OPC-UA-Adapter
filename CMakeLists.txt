@@ -36,6 +36,9 @@ find_package(ChimeraTK-ControlSystemAdapter 01.00)
 find_package(ChimeraTK-DeviceAccess 01.00)
 find_package(open62541 00.01 REQUIRED)
 
+include(cmake/add_dependency.cmake)
+add_dependency(open62541 00.01 REQUIRED)
+
 #Install the DeviceAccess if it is not pre-installed
 if(NOT ChimeraTK-DeviceAccess_FOUND)
                 ExternalProject_Add(external-ChimeraTK-DeviceAccess
@@ -146,7 +149,7 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_adapter.cpp
                    ${CMAKE_SOURCE_DIR}/src/csa_opcua_application.cpp
 
-#                   ${CMAKE_SOURCE_DIR}/src/open62541.c
+                   #${CMAKE_SOURCE_DIR}/src/open62541.c
                    # Example HelperClass
                    #${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp
 )
@@ -336,7 +339,7 @@ target_link_libraries(${PROJECT_NAME}
   ${Boost_CHRONO_LIBRARY}
 )
 target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
-set_source_files_properties(${CMAKE_SOURCE_DIR}/src/open62541.c PROPERTIES COMPILE_FLAGS -w)
+#set_source_files_properties(${CMAKE_SOURCE_DIR}/src/open62541.c PROPERTIES COMPILE_FLAGS -w)
 
 # do not remove runtime path of the library when installing
 set_property(TARGET ${PROJECT_NAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -381,6 +384,7 @@ link_directories(${CMAKE_BINARY_DIR})
 add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${open62541_LIBRARIES})
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
@@ -391,6 +395,7 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
 add_executable(ControlSystem-OPCUA_Sample_Application ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example2.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Application ${PROJECT_NAME})
 target_link_libraries(ControlSystem-OPCUA_Sample_Application pthread)
+target_link_libraries(ControlSystem-OPCUA_Sample_Application ${open62541_LIBRARIES})
 target_link_libraries(ControlSystem-OPCUA_Sample_Application
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}

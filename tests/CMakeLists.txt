@@ -9,6 +9,7 @@ foreach( testSourceFile ${testSources})
 	add_executable(${executableName} ${testSourceFile} ${testAuxSources})
 	target_link_libraries(${executableName} ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 	target_link_libraries(${executableName} ChimeraTK-ControlSystemAdapter)
+	target_link_libraries(${executableName} ${open62541_LIBRARIES})
 	target_link_libraries(${executableName} pthread)
 	target_link_libraries(${executableName}
 		${Boost_FILESYSTEM_LIBRARY}
