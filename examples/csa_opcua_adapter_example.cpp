@@ -36,7 +36,6 @@ extern "C" {
 #include <stdlib.h>
 #include <time.h>
 
-#include "open62541.h"
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"

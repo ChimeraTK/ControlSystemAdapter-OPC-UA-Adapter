@@ -19,8 +19,6 @@
  * Copyright (c) 2019 Andreas Ebner <Andreas.Ebner@iosb-extern.fraunhofer.de>
  */
 
-#include "open62541.h"
-
 #include "ua_proxies.h"
 #include "csa_config.h"
 
@@ -77,7 +75,7 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
     
     // Found a mapping, now register the dataSource
     UA_DataSource ds;
-    ds.read = ele->read;		
+    ds.read = ele->read;
     ds.write = ele->write;
 		
 	// Set accesslevel depending on callback functions

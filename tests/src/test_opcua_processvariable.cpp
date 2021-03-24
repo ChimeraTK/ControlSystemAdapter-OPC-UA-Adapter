@@ -1,6 +1,5 @@
 #include <ua_adapter.h>
 #include <csa_opcua_adapter.h>
-#include <open62541.h>
 #include <string.h>
 #include <test_sample_data.h>
 

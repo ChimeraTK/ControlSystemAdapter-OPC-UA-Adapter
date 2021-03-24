@@ -10,7 +10,7 @@
 #ifndef HAVE_UA_PROXIES_H
 #define HAVE_UA_PROXIES_H
 
-#include "open62541.h"
+#include <open62541/server.h>
 #include <list>
 #include <iostream>
 

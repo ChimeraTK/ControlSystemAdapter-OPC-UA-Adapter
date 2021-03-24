@@ -11,6 +11,13 @@ extern "C" {
 	#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
 
+#include <open62541/server_config.h>
+#include <open62541/server_config_default.h>
+#include <open62541/client_highlevel.h>
+#include <open62541/client_config_default.h>
+#include <open62541/client.h>
+
+
 using namespace ChimeraTK;
 using namespace std;
 

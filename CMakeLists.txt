@@ -35,6 +35,16 @@ find_package(PythonInterp REQUIRED)
 find_package(ChimeraTK-ControlSystemAdapter 01.00)
 find_package(ChimeraTK-DeviceAccess 01.00)
 
+#include(cmake/add_dependency.cmake)
+#add_dependency(open62541 1.1 REQUIRED)
+
+find_package(open62541 01.00 REQUIRED)
+IF (${open62541_FOUND})
+    MESSAGE(STATUS "Found open62541 in Version: ${open62541_VERSION}. Include DIR ${open62541_LIBRARY_DIRS}")
+ELSE (${open62541_FOUND})
+    MESSAGE(STATUS "Could not locate open62541.")
+ENDIF (${open62541_FOUND})
+
 #Install the DeviceAccess if it is not pre-installed
 if(NOT ChimeraTK-DeviceAccess_FOUND)
                 ExternalProject_Add(external-ChimeraTK-DeviceAccess
@@ -143,7 +153,7 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_adapter.cpp
                    ${CMAKE_SOURCE_DIR}/src/csa_opcua_application.cpp
 
-                   ${CMAKE_SOURCE_DIR}/src/open62541.c
+                   #${CMAKE_SOURCE_DIR}/src/open62541.c
                    # Example HelperClass
                    #${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp
 )
@@ -165,7 +175,6 @@ option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prio
 option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
 option(ENABLE_RUNTIME_ANALYSIS "Build Runtime analyses" OFF)
-option(UPDATE_OPEN62541	"Build new open62541 from git repository" ON)
 
 if(ENABLE_CREATEMODEL)
   set(MODEL_XML_FILE "adapterim.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
@@ -175,46 +184,6 @@ else()
   include_directories(${CMAKE_SOURCE_DIR}/include/model_prebuilt/)
   list(APPEND objectSources ${CMAKE_SOURCE_DIR}/include/model_prebuilt/csa_namespaceinit_generated.c)
 endif()
-
-#Install the open62541 if it is not pre-installed
-if(UPDATE_OPEN62541)
-                ExternalProject_Add(external-open62541
-                        GIT_REPOSITORY "https://github.com/open62541/open62541.git"
-                        #GIT_TAG "93e79321c1b40bbdada49f3bf3d52095b8f64100"
-                        GIT_TAG "0e8505832555a32354a6ecdd8d858596228be743" ##Tag of V1.1.3
-                        PREFIX "${CMAKE_BINARY_DIR}/open62541_src"
-                        CMAKE_ARGS
-                        "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/open62541"
-                        "-DUA_ENABLE_AMALGAMATION=ON"
-                        #"-DUA_ENABLE_GENERATE_NAMESPACE0=On"
-                        "-DUA_ENABLE_METHODCALLS=ON"
-                        "-DUA_ENABLE_NODEMANAGEMENT=ON"
-                        "-DUA_ENABLE_SUBSCRIPTIONS=ON"
-                        #"-DUA_ENABLE_ENABLE_MULTITHREADING=ON"
-                        "-DUA_LOGLEVEL=300"
-                        "-DCMAKE_BUILD_TYPE=DEBUG"
-                )
-
-                set(UPDATE_Open62541 TRUE)
-
-                add_custom_target(copyOpen62541Header ALL
-                                DEPENDS external-open62541
-                                COMMAND ${CMAKE_COMMAND} -E copy
-                                ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.h
-                                ${CMAKE_SOURCE_DIR}/include/open62541.h
-                )
-                add_custom_target(copyOpen62541Source ALL
-                                DEPENDS external-open62541
-                                COMMAND ${CMAKE_COMMAND} -E copy
-                                        ${CMAKE_BINARY_DIR}/open62541_src/src/external-open62541-build/open62541.c
-                                        ${CMAKE_SOURCE_DIR}/src/open62541.c
-                )
-
-                # file(RENAME <oldname> <newname>)
-                file(COPY ${CMAKE_SOURCE_DIR}/src/open62541.c DESTINATION ${CMAKE_SOURCE_DIR}/src/open62541.bak)
-                file(COPY ${CMAKE_SOURCE_DIR}/include/open62541.h DESTINATION ${CMAKE_SOURCE_DIR}/include/open62541.bak)
-
-endif(UPDATE_OPEN62541)
 
 if(ENABLE_COVERAGE)
   set(CMAKE_BUILD_TYPE DEBUG)
@@ -310,10 +279,6 @@ if(USE_ControlSystemAdapter)
         add_dependencies(mtca_objects external-ChimeraTK-DeviceAccess)
 endif()
 
-if(UPDATE_Open62541)
-        add_dependencies(mtca_objects external-open62541)
-endif()
-
 ## Early declaration due to the requirement to run the dependencies update prior to building
 ## Create shared lib
 add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects>)
@@ -331,7 +296,7 @@ target_link_libraries(${PROJECT_NAME}
   ${Boost_CHRONO_LIBRARY}
 )
 target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
-set_source_files_properties(${CMAKE_SOURCE_DIR}/src/open62541.c PROPERTIES COMPILE_FLAGS -w)
+#set_source_files_properties(${CMAKE_SOURCE_DIR}/src/open62541.c PROPERTIES COMPILE_FLAGS -w)
 
 # do not remove runtime path of the library when installing
 set_property(TARGET ${PROJECT_NAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -376,6 +341,7 @@ link_directories(${CMAKE_BINARY_DIR})
 add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
@@ -386,6 +352,7 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
 add_executable(ControlSystem-OPCUA_Sample_Application ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example2.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Application ${PROJECT_NAME})
 target_link_libraries(ControlSystem-OPCUA_Sample_Application pthread)
+target_link_libraries(ControlSystem-OPCUA_Sample_Application open62541)
 target_link_libraries(ControlSystem-OPCUA_Sample_Application
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
@@ -420,3 +387,9 @@ set(${PROJECT_NAME}_LIBRARY_DIRS "${CMAKE_INSTALL_PREFIX}/lib ${ChimeraTK-Contro
 set(${PROJECT_NAME}_CXX_FLAGS "${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
 set(${PROJECT_NAME}_LINKER_FLAGS "${ChimeraTK-ControlSystemAdapter_LINKER_FLAGS} -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib,--enable-new-dtags")
 include(${CMAKE_SOURCE_DIR}/cmake/create_cmake_config_files.cmake)
+
+
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+foreach(dir ${dirs})
+    message(STATUS "dir='${dir}'")
+endforeach()

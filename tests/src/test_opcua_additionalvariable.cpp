@@ -2,7 +2,6 @@
 #include <test_sample_data.h>
 #include <ua_proxies_typeconversion.h>
 #include <ua_additionalvariable.h>
-#include "open62541.h"
 
 #include <boost/test/included/unit_test.hpp>
 
