@@ -35,10 +35,7 @@ find_package(PythonInterp REQUIRED)
 find_package(ChimeraTK-ControlSystemAdapter 01.00)
 find_package(ChimeraTK-DeviceAccess 01.00)
 
-#include(cmake/add_dependency.cmake)
-#add_dependency(open62541 1.1 REQUIRED)
-
-find_package(open62541 01.00 REQUIRED)
+find_package(open62541 1.2 REQUIRED)
 IF (${open62541_FOUND})
     MESSAGE(STATUS "Found open62541 in Version: ${open62541_VERSION}. Include DIR ${open62541_LIBRARY_DIRS}")
 ELSE (${open62541_FOUND})
