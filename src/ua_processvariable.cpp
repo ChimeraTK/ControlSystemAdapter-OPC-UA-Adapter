@@ -363,6 +363,10 @@ UA_StatusCode ua_processvariable::getValue_uint8(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Byte *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -393,6 +397,10 @@ UA_StatusCode ua_processvariable::getValue_int16(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Int16 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -423,6 +431,10 @@ UA_StatusCode ua_processvariable::getValue_uint16(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_UInt16 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -454,6 +466,10 @@ UA_StatusCode ua_processvariable::getValue_int32(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Int32 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -484,6 +500,10 @@ UA_StatusCode ua_processvariable::getValue_uint32(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_UInt32 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -514,6 +534,10 @@ UA_StatusCode ua_processvariable::getValue_int64(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Int64 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -544,6 +568,10 @@ UA_StatusCode ua_processvariable::getValue_uint64(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_UInt64 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -573,6 +601,10 @@ UA_StatusCode ua_processvariable::getValue_float(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Float *)darr.data(), darr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = darr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -604,6 +636,10 @@ UA_StatusCode ua_processvariable::getValue_double(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Double *)darr.data(), darr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = darr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -641,6 +677,10 @@ UA_StatusCode ua_processvariable::getValue_string(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, sarrayval, sarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = sarr.size();
+            v->arrayDimensions = arrayDims;
 
             delete[] sarrayval;
         }
@@ -681,6 +721,10 @@ UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Boolean*)barr, bvector.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = bvector.size();
+            v->arrayDimensions = arrayDims;
             delete [] barr;
         }
     }
@@ -1195,7 +1239,6 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     UA_Variant_init(&arrayDimensions);
     /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
     UA_DataSource_Map mapDs;
-    // FIXME: We should not be using std::cout here... Where's our logger?
     std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
     if (valueType == typeid(int8_t)) {
         type = UA_PV_INT8;
@@ -1227,11 +1270,10 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
                 mapElem.write = NULL;
             }
             UA_Variant uaArrayDimensions;
-            UA_UInt32 *arrayDims = UA_UInt32_new();
-            *arrayDims = this->csManager->getProcessArray <int8_t>(this->namePV)->accessChannel(0).size();
-            UA_Variant_setArrayCopy(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-            UA_StatusCode s = UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
-            cout << "Debug " << UA_StatusCode_name(s) << " name: " << this->namePV << " is array size: " << this->csManager->getProcessArray <int8_t>(this->namePV)->accessChannel(0).size() << endl;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <int8_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1264,6 +1306,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <uint8_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1296,6 +1343,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <int16_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1328,6 +1380,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <uint16_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1360,6 +1417,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <int32_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1392,6 +1454,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <uint32_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1424,6 +1491,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <int64_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1456,6 +1528,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <uint64_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1488,6 +1565,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <float>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1520,6 +1602,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <double>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1552,6 +1639,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <string>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1584,6 +1676,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <bool>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
