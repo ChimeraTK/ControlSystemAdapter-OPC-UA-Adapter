@@ -52,6 +52,7 @@ using namespace std;
 ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
         this->mappingExceptions = UA_FALSE;
         this->fileHandler = new xml_file_handler(configFile);
+        this->server_config = UA_ServerConfig_standard;
         this->readConfig();
         this->constructServer();
 
@@ -71,7 +72,6 @@ ua_uaadapter::~ua_uaadapter() {
 
 void ua_uaadapter::constructServer() {
 
-    this->server_config = UA_ServerConfig_standard;
     this->server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, this->serverConfig.opcuaPort);
     this->server_config.logger = UA_Log_Stdout;
     this->server_config.networkLayers = &this->server_nl;
@@ -95,12 +95,10 @@ void ua_uaadapter::constructServer() {
     this->server_config.applicationDescription.gatewayServerUri = UA_STRING((char*)"");
     this->server_config.applicationDescription.applicationUri = UA_STRING((char*) hostname_uri.c_str());
     this->server_config.applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
-    this->server_config.buildInfo.productName = UA_STRING((char*)"ControlSystemAdapter-OPC-UA");
-    this->server_config.buildInfo.productUri = UA_STRING((char*)"urn:ChimeraTK:ControlSystemAdapter-OPC-UA");
     this->server_config.buildInfo.manufacturerName = UA_STRING((char*)"ChimeraTK Team");
     std::string versionString = "open62541: " xstr(UA_OPEN62541_VER_MAJOR) "." xstr(UA_OPEN62541_VER_MINOR) "." xstr(UA_OPEN62541_VER_PATCH)
             ", ControlSystemAdapter-OPC-UA-Adapter: " xstr(PROJECT_VER_MAJOR) "." xstr(PROJECT_VER_MINOR) "." xstr(PTOJECT_VER_PATCH) "";
-    this->server_config.buildInfo.softwareVersion = UA_STRING((char*) versionString.c_str());
+    this->server_config.buildInfo.softwareVersion = UA_STRING_ALLOC((char*) versionString.c_str());
     this->server_config.buildInfo.buildDate = UA_DateTime_now();
     this->server_config.buildInfo.buildNumber = UA_STRING((char*) "");
     this->mappedServer = UA_Server_new(this->server_config);
@@ -185,8 +183,11 @@ void ua_uaadapter::readConfig() {
 
         placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
         if(!placeHolder.empty()) {
-            this->serverConfig.applicationName = placeHolder;
-            if(this->serverConfig.rootFolder.empty()){
+          this->serverConfig.applicationName = placeHolder;
+          this->server_config.buildInfo.productName = UA_STRING_ALLOC((char*)placeHolder.c_str());
+          string product_urn = "urn:ChimeraTK:" + placeHolder;
+          this->server_config.buildInfo.productUri = UA_STRING_ALLOC((char *)product_urn.c_str());
+          if(this->serverConfig.rootFolder.empty()){
                 this->serverConfig.rootFolder = placeHolder;
             }
         } else {
@@ -194,6 +195,9 @@ void ua_uaadapter::readConfig() {
             try{
                 string applicationName = ApplicationBase::getInstance().getName();
                 this->serverConfig.applicationName = applicationName.c_str();
+                this->server_config.buildInfo.productName = UA_STRING_ALLOC((char*)applicationName.c_str());
+                string product_urn = "urn:ChimeraTK:" + applicationName;
+                this->server_config.buildInfo.productUri = UA_STRING((char *)product_urn.c_str());
             } catch (ChimeraTK::logic_error){
 
             }
