@@ -534,8 +534,8 @@ void ProcessVariableTest::testClientSide() {
                         }
                     }
                 }
-                UA_BrowseRequest_deleteMembers(&bReq2);
-                UA_BrowseResponse_deleteMembers(&bResp2);
+                UA_BrowseRequest_clear(&bReq2);
+                UA_BrowseResponse_clear(&bResp2);
 
                 if (!UA_NodeId_isNull(&valueNodeId)) {
                     UA_Variant *valueToCheck = UA_Variant_new();
@@ -615,7 +615,7 @@ void ProcessVariableTest::testClientSide() {
                         if (retvalNewEU != UA_STATUSCODE_GOOD) {
                             BOOST_CHECK(false);
                         }
-                        UA_String_deleteMembers(&newEU);
+                        UA_String_clear(&newEU);
                         UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) euToCheck->data)), engineeringUnit);
                         BOOST_CHECK(engineeringUnit == "mHensel/Iatrou");
 
@@ -639,7 +639,7 @@ void ProcessVariableTest::testClientSide() {
                         if (retvalNewDesc != UA_STATUSCODE_GOOD) {
                             BOOST_CHECK(false);
                         }
-                        UA_String_deleteMembers(&newDesc);
+                        UA_String_clear(&newDesc);
                         UASTRING_TO_CPPSTRING(((UA_String) *((UA_String *) descToCheck->data)), valName);
                         BOOST_CHECK(valName == "Beschreibung");
 
@@ -1374,8 +1374,8 @@ void ProcessVariableTest::testClientSide() {
         }
     }
 
-    UA_BrowseRequest_deleteMembers(&bReq);
-    UA_BrowseResponse_deleteMembers(&bResp);
+    UA_BrowseRequest_clear(&bReq);
+    UA_BrowseResponse_clear(&bResp);
     UA_Client_disconnect(client);
     /* Some times there is a double free corruption. */
     UA_Client_delete(client);

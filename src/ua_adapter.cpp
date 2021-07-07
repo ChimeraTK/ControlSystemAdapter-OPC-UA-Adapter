@@ -83,17 +83,14 @@ void ua_uaadapter::constructServer() {
             (char *) "TU Dresden / Fraunhofer IOSB | open62541");
     this->server_config->applicationDescription.productUri = UA_STRING_ALLOC((char *) "HZDR OPCUA Server");
 
-
     this->mappedServer = UA_Server_newWithConfig(this->server_config);
 
     //Username/Password handling
-    UA_UsernamePasswordLogin *usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
-    usernamePasswordLogins->password = UA_STRING((char *) this->serverConfig.password.c_str());
-    usernamePasswordLogins->username = UA_STRING((char *) this->serverConfig.username.c_str());
-    UA_AccessControl_default(UA_Server_getConfig(this->mappedServer),
-                             !this->serverConfig.UsernamePasswordLogin,
-                             &this->server_config->securityPolicies[this->server_config->securityPoliciesSize -
-                                                                    1].policyUri,
+    auto *usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
+    usernamePasswordLogins->password = UA_STRING_ALLOC((char *) this->serverConfig.password.c_str());
+    usernamePasswordLogins->username = UA_STRING_ALLOC((char *) this->serverConfig.username.c_str());
+    UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
+                             &this->server_config->securityPolicies[this->server_config->securityPoliciesSize-1].policyUri,
                              1, usernamePasswordLogins);
 
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
@@ -330,7 +327,7 @@ void ua_uaadapter::implicitVarMapping(std::string varName, boost::shared_ptr<Con
                                UA_LOCALIZEDTEXT((char *) "en_US",
                                                 (char *) this->fileHandler->praseVariablePath(varName,
                                                          this->pvSeperator).back().c_str()));
-    UA_NodeId_deleteMembers(&tmpNodeId);
+    UA_NodeId_clear(&tmpNodeId);
 }
 
 void ua_uaadapter::deepCopyHierarchicalLayer(boost::shared_ptr<ControlSystemPVManager> csManager, UA_NodeId layer, UA_NodeId target){
@@ -364,7 +361,7 @@ void ua_uaadapter::deepCopyHierarchicalLayer(boost::shared_ptr<ControlSystemPVMa
         ua_processvariable *processvariable = new ua_processvariable(this->mappedServer, target, foundPVSourceNameCPP, csManager, foundPVNameCPP);
         this->variables.push_back(processvariable);
     }
-    UA_BrowseResult_deleteMembers(&br);
+    UA_BrowseResult_clear(&br);
     //copy folders of current layer
     bd.includeSubtypes = false;
     bd.nodeId = layer;
@@ -391,7 +388,7 @@ void ua_uaadapter::deepCopyHierarchicalLayer(boost::shared_ptr<ControlSystemPVMa
             UA_Server_writeDescription(this->mappedServer, newRootFolder, foundFolderDescription);
         deepCopyHierarchicalLayer(csManager, rd.nodeId.nodeId, newRootFolder);
     }
-    UA_BrowseResult_deleteMembers(&br);
+    UA_BrowseResult_clear(&br);
 }
 
 void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager> csManager){
@@ -441,7 +438,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
             UA_NodeId pvNode = UA_NODEID_STRING(1, (char *) pvNodeString.c_str());
             UA_Server_readNodeId(this->mappedServer, pvNode, &tmpOutput);
             if(!UA_NodeId_isNull(&tmpOutput)){
-                UA_NodeId_deleteMembers(&tmpOutput);
+                UA_NodeId_clear(&tmpOutput);
                 //set folder description
                 if(sourceName.empty() && !description.empty()){
                     UA_Server_writeDescription(this->mappedServer, pvNode, UA_LOCALIZEDTEXT((char *) "en_US", (char *) description.c_str()));
@@ -494,7 +491,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                         isFolderType = true;
                     }
                 }
-                UA_BrowseResult_deleteMembers(&br);
+                UA_BrowseResult_clear(&br);
                 if(!isFolderType){
                     if(this->mappingExceptions){
                         throw std::runtime_error ("Error! Folder creation failed. No corresponding source folder: " + sourceName + ". Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
@@ -572,7 +569,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                         UA_Server_addReference(this->mappedServer, copyRoot, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), enid, UA_TRUE);
 
                     }
-                    UA_BrowseResult_deleteMembers(&br);
+                    UA_BrowseResult_clear(&br);
                     bd.nodeId = sourceFolderId;
                     bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
                     bd.resultMask = UA_BROWSERESULTMASK_ALL;
@@ -586,7 +583,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                         enid.nodeId = br.references[j].nodeId.nodeId;
                         UA_Server_addReference(this->mappedServer, copyRoot, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, UA_TRUE);
                     }
-                    UA_BrowseResult_deleteMembers(&br);
+                    UA_BrowseResult_clear(&br);
                 }
                 continue;
             }
@@ -666,7 +663,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                          UA_NodeId_copy(&br.references[j].nodeId.nodeId, &pvNodeId);
                      }
                 }
-                UA_BrowseResult_deleteMembers(&br);
+                UA_BrowseResult_clear(&br);
                 if(UA_NodeId_isNull(&pvNodeId)) {
                     if(this->mappingExceptions){
                         throw std::runtime_error ("Error! PV mapping failed. No corresponding source pv.");
@@ -699,7 +696,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
 
                 if (!UA_NodeId_isNull(&pvNodeId))
                 {
-                    UA_NodeId_deleteMembers(&pvNodeId);
+                    UA_NodeId_clear(&pvNodeId);
                 }
                 continue;
             }
@@ -724,7 +721,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                 continue;
             }
             else {
-                UA_NodeId_deleteMembers(&tmpOutput);
+                UA_NodeId_clear(&tmpOutput);
                 UA_NodeId_init(&tmpOutput);
             }
             //check the pv copy attribute -> copy of pv requested; false -> reference to original pv requested
@@ -780,7 +777,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                         continue;
                     }
                     else {
-                        UA_NodeId_deleteMembers(&tmpProcessVariableNodeId);
+                        UA_NodeId_clear(&tmpProcessVariableNodeId);
                     }
                     this->variables.push_back(processvariable);
                 } else {
@@ -792,7 +789,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                 }
                 UA_NodeId tmpPVNodeId = processvariable->getOwnNodeId();
                 UA_NodeId_copy(&tmpPVNodeId, &createdNodeId);
-                UA_NodeId_deleteMembers(&tmpPVNodeId);
+                UA_NodeId_clear(&tmpPVNodeId);
             } else {
                 //get node id of the source node
                 string sourceVarName = this->fileHandler->praseVariablePath(sourceName, "/").back();
@@ -841,7 +838,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
             }
             UA_Server_writeDisplayName(this->mappedServer, createdNodeId, UA_LOCALIZEDTEXT((char *) "en_US",
                     (char *) name.c_str()));
-            UA_NodeId_deleteMembers(&createdNodeId);
+            UA_NodeId_clear(&createdNodeId);
         }
 
         xmlXPathFreeObject(result);
@@ -895,7 +892,7 @@ void ua_uaadapter::addAdditionalVariables() {
             UA_NodeId avNode = UA_NODEID_STRING(1, (char *) avNodeString.c_str());
             UA_Server_readNodeId(this->mappedServer, avNode, &tmpOutput);
             if(!UA_NodeId_isNull(&tmpOutput)){
-                UA_NodeId_deleteMembers(&tmpOutput);
+                UA_NodeId_clear(&tmpOutput);
                 UA_NodeId_init(&tmpOutput);
                 if(this->mappingExceptions){
                     throw std::runtime_error ("Additional variable node creation failed. Additional variable already exists.");
@@ -904,7 +901,7 @@ void ua_uaadapter::addAdditionalVariables() {
                 continue;
             }
             //check if pv with same name exists in the target folder
-            UA_NodeId_deleteMembers(&tmpOutput);
+            UA_NodeId_clear(&tmpOutput);
             string pvNodeString;
             if(destination.empty()){
                 pvNodeString = this->serverConfig.rootFolder + "/" + name + "Value";
@@ -914,7 +911,7 @@ void ua_uaadapter::addAdditionalVariables() {
             UA_NodeId pvNode = UA_NODEID_STRING(1, (char *) pvNodeString.c_str());
             UA_Server_readNodeId(this->mappedServer, pvNode, &tmpOutput);
             if(!UA_NodeId_isNull(&tmpOutput)){
-                UA_NodeId_deleteMembers(&tmpOutput);
+                UA_NodeId_clear(&tmpOutput);
                 UA_NodeId_init(&tmpOutput);
                 if(this->mappingExceptions){
                     throw std::runtime_error ("Additional variable node creation failed. PV with same name already exists.");

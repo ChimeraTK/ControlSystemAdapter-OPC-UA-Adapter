@@ -61,7 +61,7 @@ void UAMappingTest::testExampleSet() {
         UA_String compareString = UA_STRING((char *) "defaultSep");
         BOOST_CHECK(UA_String_equal(&br.references[j].browseName.name, &compareString) == UA_TRUE);
     }
-    UA_BrowseResult_deleteMembers(&br);
+    UA_BrowseResult_clear(&br);
 
     bd.nodeId = UA_NODEID_STRING(1, (char *) "llrfCtrl_hzdr/2/FOLDER");
     bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
@@ -74,7 +74,7 @@ void UAMappingTest::testExampleSet() {
         UA_String compareString = UA_STRING((char *) "stringScalar");
         BOOST_CHECK(UA_String_equal(&br.references[j].browseName.name, &compareString) == UA_TRUE);
     }
-    UA_BrowseResult_deleteMembers(&br);
+    UA_BrowseResult_clear(&br);
 
     csaOPCUA->stop();
     BOOST_CHECK(csaOPCUA->isRunning() != true);

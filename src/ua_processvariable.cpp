@@ -50,7 +50,7 @@ ua_processvariable::ua_processvariable(UA_Server *server, UA_NodeId basenodeid, 
 ua_processvariable::~ua_processvariable()
 {
   //* Our ua_mapped_class destructor will take care of deleting our opcua footprint as long as all variables are mapped in this->ownedNodes
-    UA_NodeId_deleteMembers(&this->ownNodeId);
+    UA_NodeId_clear(&this->ownNodeId);
 }
 
 UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getName(UA_Server *server, const UA_NodeId *sessionId,
@@ -68,7 +68,7 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getName(UA_Ser
     memcpy(ua_val.data, s, ua_val.length);
     free(s);
     UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
-    UA_String_deleteMembers(&ua_val);
+    UA_String_clear(&ua_val);
     value->hasValue = true;
     if (includeSourceTimeStamp) {
         value->sourceTimestamp = thisObj->getSourceTimeStamp();
@@ -121,7 +121,7 @@ ua_processvariable::ua_readproxy_ua_processvariable_getEngineeringUnit(UA_Server
     free(s);
 
     UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
-    UA_String_deleteMembers(&ua_val);
+    UA_String_clear(&ua_val);
     value->hasValue = true;
     if (includeSourceTimeStamp) {
         value->sourceTimestamp = thisObj->getSourceTimeStamp();
@@ -178,7 +178,7 @@ ua_processvariable::ua_readproxy_ua_processvariable_getDescription(UA_Server *se
     memcpy(ua_val.data, s, ua_val.length);
     free(s);
     UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
-    UA_String_deleteMembers(&ua_val);
+    UA_String_clear(&ua_val);
     value->hasValue = true;
     if (includeSourceTimeStamp) {
         value->sourceTimestamp = thisObj->getSourceTimeStamp();
@@ -214,7 +214,7 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getType(UA_Ser
     memcpy(ua_val.data, s, ua_val.length);
     free(s);
     UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
-    UA_String_deleteMembers(&ua_val);
+    UA_String_clear(&ua_val);
     value->hasValue = true;
     if (includeSourceTimeStamp) {
         value->sourceTimestamp = thisObj->getSourceTimeStamp();
@@ -624,7 +624,7 @@ UA_StatusCode ua_processvariable::getValue_string(UA_Variant* v) {
             string sval = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).at(0);
             UA_String ua_val = CPPSTRING_TO_UASTRING(sval);
             rv = UA_Variant_setScalarCopy(v, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
-            UA_String_deleteMembers(&ua_val);
+            UA_String_clear(&ua_val);
         }
         else {
             // Array

@@ -151,8 +151,8 @@ void AdditionalVariableTest::testClientSide() {
                         }
                     }
                 }
-                UA_BrowseRequest_deleteMembers(&bReq2);
-                UA_BrowseResponse_deleteMembers(&bResp2);
+                UA_BrowseRequest_clear(&bReq2);
+                UA_BrowseResponse_clear(&bResp2);
 
                 if (!UA_NodeId_isNull(&valueNodeId)) {
                     UA_Variant valueToCheck;
@@ -194,15 +194,15 @@ void AdditionalVariableTest::testClientSide() {
                     } else {
                         BOOST_CHECK(false);
                     }
-                    UA_Variant_deleteMembers(&valueToCheck);
-                    UA_Variant_deleteMembers(&datatypeToCheck);
+                    UA_Variant_clear(&valueToCheck);
+                    UA_Variant_clear(&datatypeToCheck);
                 }
             }
         }
     }
 
-    UA_BrowseRequest_deleteMembers(&bReq);
-    UA_BrowseResponse_deleteMembers(&bResp);
+    UA_BrowseRequest_clear(&bReq);
+    UA_BrowseResponse_clear(&bResp);
 
     UA_Client_disconnect(client);
     UA_Client_delete(client);

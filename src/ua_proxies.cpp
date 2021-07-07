@@ -143,7 +143,7 @@ UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instan
 		// the right Datatype
 		retval = UA_Server_writeDataType(server, instantiatedId, variantVal.type->typeId);
 
-		UA_Variant_deleteMembers(&variantVal);
+		UA_Variant_clear(&variantVal);
 		}
 	}
   

@@ -65,7 +65,7 @@ ua_additionalvariable::ua_readproxy_ua_additionalvariable_getValue(UA_Server *se
         free(s);
     };
     UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[11]);
-    UA_String_deleteMembers(&ua_val);
+    UA_String_clear(&ua_val);
     value->hasValue = true;
     if (includeSourceTimeStamp) {
         value->sourceTimestamp = thisObj->getSourceTimeStamp();
@@ -115,8 +115,8 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
     ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE),
                             &this->ownedNodes);
 
-    UA_QualifiedName_deleteMembers(&qualName);
-    UA_VariableAttributes_deleteMembers(&vAttr);
+    UA_QualifiedName_clear(&qualName);
+    UA_VariableAttributes_clear(&vAttr);
 
     UA_VariableAttributes vAttr2;
     UA_VariableAttributes_init(&vAttr2);
@@ -136,7 +136,7 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
                                         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr2, NULL,
                                         &createdNodeId);
 
-    UA_QualifiedName_deleteMembers(&qualName2);
+    UA_QualifiedName_clear(&qualName2);
 
     /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
     UA_DataSource_Map mapDs;
@@ -149,8 +149,8 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
 
     this->ua_mapDataSources((void *) this, &mapDs);
 
-    UA_String_deleteMembers(&addVarDescription);
-    UA_VariableAttributes_deleteMembers(&vAttr2);
+    UA_String_clear(&addVarDescription);
+    UA_VariableAttributes_clear(&vAttr2);
 
     return retval;
 }

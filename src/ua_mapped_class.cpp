@@ -41,7 +41,7 @@ ua_mapped_class::~ua_mapped_class() {
   this->ua_unmapSelfFromNamespace();
   this->mappedServer = nullptr;
 	this->mappedClient = nullptr;
-	UA_NodeId_deleteMembers(&this->baseNodeId);
+	UA_NodeId_clear(&this->baseNodeId);
 }
 
 UA_StatusCode ua_mapped_class::ua_mapSelfToNamespace() {
@@ -60,8 +60,8 @@ UA_StatusCode ua_mapped_class::ua_unmapSelfFromNamespace() {
     UA_NodeId_pair *p = *(i);
     // Node is deleted by UA_Server_delete.
     //UA_Server_deleteNode(this->mappedServer, p->targetNodeId, UA_FALSE);
-    UA_NodeId_deleteMembers(&p->sourceNodeId);
-    UA_NodeId_deleteMembers(&p->targetNodeId);
+    UA_NodeId_clear(&p->sourceNodeId);
+    UA_NodeId_clear(&p->targetNodeId);
     this->ownedNodes.remove(*(i));
     delete p;
   }
