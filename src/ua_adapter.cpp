@@ -84,6 +84,7 @@ void ua_uaadapter::constructServer() {
     this->server_config->applicationDescription.productUri = UA_STRING_ALLOC((char *) "HZDR OPCUA Server");
 
     this->mappedServer = UA_Server_newWithConfig(this->server_config);
+    this->server_config = UA_Server_getConfig(this->mappedServer);
 
     //Username/Password handling
     auto *usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
