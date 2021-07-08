@@ -46,7 +46,7 @@ protected:
 	
 public:
 	
-		UA_Client *mappedClient;
+        UA_Client *mappedClient;
 	UA_Server *mappedServer;
 	
 	/** @brief Constructor of the class with parameter

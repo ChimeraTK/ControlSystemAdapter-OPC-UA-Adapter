@@ -77,8 +77,10 @@ void ua_uaadapter::constructServer() {
     this->server_config->applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
     this->server_config->buildInfo.productName = UA_STRING_ALLOC((char *) "csa_opcua_adapter");
     this->server_config->buildInfo.productUri = UA_STRING_ALLOC((char *) "HZDR OPC UA Server");
-    UA_String hostName = UA_STRING_ALLOC(hostname);
-    this->server_config->applicationDescription.discoveryUrls = &hostName;
+    UA_String *hostName = UA_String_new();
+    *hostName = UA_STRING_ALLOC(hostname);
+    this->server_config->applicationDescription.discoveryUrls = hostName;
+    this->server_config->applicationDescription.discoveryUrlsSize = 1;
     this->server_config->buildInfo.manufacturerName = UA_STRING_ALLOC(
             (char *) "TU Dresden / Fraunhofer IOSB | open62541");
     this->server_config->applicationDescription.productUri = UA_STRING_ALLOC((char *) "HZDR OPCUA Server");
@@ -561,14 +563,13 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                     bd.resultMask = UA_BROWSERESULTMASK_ALL;
                     bd.nodeClassMask = UA_NODECLASS_OBJECT;
                     bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
-                    UA_BrowseResult br = UA_Server_browse(this->mappedServer, 1000, &bd);
+                    UA_BrowseResult br = UA_Server_browse(this->mappedServer,      1000, &bd);
                     for (size_t j = 0; j < br.referencesSize; ++j) {
                         UA_ExpandedNodeId enid;
-                        enid.serverIndex = 1;
+                        enid.serverIndex = 0;
                         enid.namespaceUri = UA_STRING_NULL;
                         enid.nodeId = br.references[j].nodeId.nodeId;
                         UA_Server_addReference(this->mappedServer, copyRoot, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), enid, UA_TRUE);
-
                     }
                     UA_BrowseResult_clear(&br);
                     bd.nodeId = sourceFolderId;
@@ -579,7 +580,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                     br = UA_Server_browse(this->mappedServer, 1000, &bd);
                     for (size_t j = 0; j < br.referencesSize; ++j) {
                         UA_ExpandedNodeId enid;
-                        enid.serverIndex = 1;
+                        enid.serverIndex = 0;
                         enid.namespaceUri = UA_STRING_NULL;
                         enid.nodeId = br.references[j].nodeId.nodeId;
                         UA_Server_addReference(this->mappedServer, copyRoot, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, UA_TRUE);

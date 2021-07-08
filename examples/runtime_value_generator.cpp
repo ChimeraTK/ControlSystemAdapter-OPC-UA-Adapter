@@ -51,6 +51,7 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
   for(auto& pv : devManager->getAllProcessVariables()) {
     if(pv->isReadable()) readAnyGroup.add(pv);
   }
+  readAnyGroup.finalise();
 
   // Time meassureing
   clock_t start, end, im1, im2, writeTime;
@@ -132,7 +133,7 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
     clock_t tmp3 = clock();
     duration1 = ((float)(tmp3 - tmp2) / CLOCKS_PER_SEC) * 1000.0f;
     printf("write pass 2, duration write: %.3f ms\n", duration1);
-    
+
     while(readAnyGroup.readAnyNonBlocking().isValid())
         continue;
   }
