@@ -283,6 +283,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_FULL_
                                                  SOVERSION ${${PROJECT_NAME}_SOVERSION})
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} ${ChimeraTK-DeviceAccess_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} open62541::open62541)
 target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} pthread)
 target_link_libraries(${PROJECT_NAME} dl)
@@ -338,7 +339,7 @@ link_directories(${CMAKE_BINARY_DIR})
 add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541::open62541)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
@@ -349,7 +350,7 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
 add_executable(ControlSystem-OPCUA_Sample_Application ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example2.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Application ${PROJECT_NAME})
 target_link_libraries(ControlSystem-OPCUA_Sample_Application pthread)
-target_link_libraries(ControlSystem-OPCUA_Sample_Application open62541)
+target_link_libraries(ControlSystem-OPCUA_Sample_Application open62541::open62541)
 target_link_libraries(ControlSystem-OPCUA_Sample_Application
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
