@@ -16,7 +16,7 @@
  *
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- * Copyright (c) 2018 Andreas Ebner <Andreas.Ebner@iosb-extern.fraunhofer.de>
+ * Copyright (c) 2018-2021 Andreas Ebner <Andreas.Ebner@iosb-extern.fraunhofer.de>
  */
 
 extern "C" {
@@ -41,16 +41,18 @@ extern "C" {
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
 
+#define xstr(a) str(a)
+#define str(a) #a
+
 using namespace ChimeraTK;
 using namespace std;
 
 
 ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
-        this->mappingExceptions = UA_FALSE;
-        this->fileHandler = new xml_file_handler(configFile);
-        this->readConfig();
-        this->constructServer();
-
+    this->mappingExceptions = UA_FALSE;
+    this->fileHandler = new xml_file_handler(configFile);
+    this->readConfig();
+    this->constructServer();
     this->mapSelfToNamespace();
 }
 
@@ -75,15 +77,23 @@ void ua_uaadapter::constructServer() {
     hostname_uri.append(hostname);
 
     this->server_config->applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
-    this->server_config->buildInfo.productName = UA_STRING_ALLOC((char *) "csa_opcua_adapter");
-    this->server_config->buildInfo.productUri = UA_STRING_ALLOC((char *) "HZDR OPC UA Server");
     UA_String *hostName = UA_String_new();
     *hostName = UA_STRING_ALLOC(hostname);
     this->server_config->applicationDescription.discoveryUrls = hostName;
     this->server_config->applicationDescription.discoveryUrlsSize = 1;
-    this->server_config->buildInfo.manufacturerName = UA_STRING_ALLOC(
-            (char *) "TU Dresden / Fraunhofer IOSB | open62541");
-    this->server_config->applicationDescription.productUri = UA_STRING_ALLOC((char *) "HZDR OPCUA Server");
+    this->server_config->applicationDescription.applicationName =  UA_LOCALIZEDTEXT_ALLOC((char*)"en_US",
+        (char*)this->serverConfig.applicationName.c_str());
+    this->server_config->applicationDescription.applicationUri = UA_STRING_ALLOC((char*) hostname_uri.c_str());
+    this->server_config->buildInfo.manufacturerName = UA_STRING_ALLOC((char*)"ChimeraTK Team");
+    std::string versionString = "open62541: " xstr(UA_OPEN62541_VER_MAJOR) "." xstr(UA_OPEN62541_VER_MINOR) "." xstr(UA_OPEN62541_VER_PATCH)
+    ", ControlSystemAdapter-OPC-UA-Adapter: " xstr(PROJECT_VER_MAJOR) "." xstr(PROJECT_VER_MINOR) "." xstr(PTOJECT_VER_PATCH) "";
+    this->server_config->buildInfo.softwareVersion = UA_STRING_ALLOC((char*) versionString.c_str());
+    this->server_config->buildInfo.buildDate = UA_DateTime_now();
+    this->server_config->buildInfo.buildNumber = UA_STRING_ALLOC((char*) "");
+
+    this->server_config->buildInfo.productName = UA_STRING_ALLOC((char*) this->serverConfig.applicationName.c_str());
+    string product_urn = "urn:ChimeraTK:" + this->serverConfig.applicationName;
+    this->server_config->buildInfo.productUri = UA_STRING_ALLOC((char *)product_urn.c_str());
 
     this->mappedServer = UA_Server_newWithConfig(this->server_config);
     this->server_config = UA_Server_getConfig(this->mappedServer);
@@ -176,8 +186,8 @@ void ua_uaadapter::readConfig() {
 
         placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
         if(!placeHolder.empty()) {
-            this->serverConfig.applicationName = placeHolder;
-            if(this->serverConfig.rootFolder.empty()){
+          this->serverConfig.applicationName = placeHolder;
+          if(this->serverConfig.rootFolder.empty()){
                 this->serverConfig.rootFolder = placeHolder;
             }
         } else {
@@ -230,35 +240,6 @@ void ua_uaadapter::applyMapping(boost::shared_ptr<ControlSystemPVManager> csMana
     this->addAdditionalVariables();
 }
 
-/* DEPRECATED
-void ua_uaadapter::readAdditionalNodes() {
-        xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//additionalNodes");
-        if(result) {
-                xmlNodeSetPtr nodeset = result->nodesetval;
-                for (int32_t i=0; i < nodeset->nodeNr; i++) {
-
-                        string folderName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "folderName");
-                        string folderDescription = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "description");
-                        if(folderName.empty()) {
-                                cout << "There is no folder name specified, ignore <additionalNode>-Element. Please set a name" << endl;
-                        }
-                        else {
-                                UA_NodeId folderNodeId = this->createFolder(this->ownNodeId, folderName, folderDescription);
-
-                                vector<xmlNodePtr> variableNodeList = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "variable");
-
-                                for(auto variableNode: variableNodeList) {
-                                        string name = this->fileHandler->getAttributeValueFromNode(variableNode, "name").c_str();
-                                        string value = this->fileHandler->getAttributeValueFromNode(variableNode, "value");
-                                        string description = this->fileHandler->getAttributeValueFromNode(variableNode, "description");
-                                        this->additionalVariables.push_back(new ua_additionalvariable(this->mappedServer, folderNodeId, name, value, description));
-                                }
-                        }
-                }
-        }
-}
- */
-
 void ua_uaadapter::workerThread() {
     if(this->mappedServer == nullptr) {
         cout << "No server mapped" << endl;
@@ -276,28 +257,6 @@ void ua_uaadapter::workerThread() {
     UA_Server_run_shutdown(this->mappedServer);
     cout << "Stopped the server worker thread" << endl;
 }
-
-/* DEPRECATED
-vector<int32_t> ua_uaadapter::findMappingIndex(std::string varName) {
-        xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
-        xmlNodeSetPtr nodeset;
-        string srcVarName = "";
-        vector<int32_t> pvIndexes;
-
-        if(result) {
-                nodeset = result->nodesetval;
-                for (int32_t i = 0; i < nodeset->nodeNr; i++) {
-                        srcVarName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i],
-                                                                                  "sourceVariableName");
-                        if (varName.compare(srcVarName) == 0) {
-                            pvIndexes.push_back(i);
-                        }
-                }
-        }
-        xmlXPathFreeObject (result);
-        return pvIndexes;
-}
-*/
 
 UA_NodeId ua_uaadapter::enrollFolderPathFromString(string path, string seperator){
     vector<string> varPathVector;
@@ -943,181 +902,6 @@ void ua_uaadapter::addAdditionalVariables() {
         xmlXPathFreeObject(result);
     }
 }
-
-/* DEPRECATED
-void ua_uaadapter::addVariable(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
-    vector<int32_t> mappedVariableIndex = findMappingIndex(varName);
-    //there is no mapping entry contained in the xml file
-    if (this->pvSeperator.compare("") != 0) {//implicit var mapping is enabled
-        UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeperator);
-        ua_processvariable *processvariable;
-        if (!UA_NodeId_isNull(&folderPathNodeId)) {
-            processvariable = new ua_processvariable(this->mappedServer, folderPathNodeId,
-                                                     varName.substr(1, varName.size() - 1), csManager,
-                                                     this->fileHandler->praseVariablePath(varName,
-                                                                                          this->pvSeperator).back());
-        } else {
-            processvariable = new ua_processvariable(this->mappedServer, this->ownNodeId,
-                                                     varName.substr(1, varName.size() - 1), csManager);
-        }
-        UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
-                                   UA_LOCALIZEDTEXT((char *) "en_US",
-                                                    (char *) this->fileHandler->praseVariablePath(varName,
-                                                                                                  this->pvSeperator).back().c_str()));
-        this->variables.push_back(processvariable);
-    }
-    if(!mappedVariableIndex.empty()) { //mapping node exists in xml file
-        xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//map");
-        xmlNodeSetPtr nodeset;
-        if (result) {
-            nodeset = result->nodesetval;
-            for (size_t mappingPosition = 0; mappingPosition < mappedVariableIndex.size(); mappingPosition++) {
-                string srcVarName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)],
-                                                                                 "sourceVariableName");
-                string applicName = this->fileHandler->getAttributeValueFromNode(
-                        nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)]->parent, "name");
-                // Check if "rename" is not empty
-                string renameVar = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)],
-                                                                                "rename");
-                string engineeringUnit = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)],
-                                                                                      "engineeringUnit");
-                string description = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)], "description");
-                // TODO. What happen if application name are not unique?
-                // Application Name have to be unique!!!
-                UA_NodeId appliFolderNodeId = this->existFolder(this->ownNodeId, applicName);
-                FolderInfo newFolder;
-                if (UA_NodeId_isNull(&appliFolderNodeId)) {
-                    newFolder.folderName = applicName;
-                    newFolder.folderNodeId = this->createFolder(this->ownNodeId, applicName);
-                    this->folderVector.push_back(newFolder);
-                    appliFolderNodeId = newFolder.folderNodeId;
-                }
-
-                vector<string> varPathVector;
-                vector<xmlNodePtr> nodeVectorUnrollPath = this->fileHandler->getNodesByName(
-                        nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)]->children, "unrollPath");
-                string seperator = "";
-                bool unrollPathIs = false;
-                for (auto nodeUnrollPath: nodeVectorUnrollPath) {
-                    string shouldUnrollPath = this->fileHandler->getContentFromNode(nodeUnrollPath);
-                    transform(shouldUnrollPath.begin(), shouldUnrollPath.end(), shouldUnrollPath.begin(), ::toupper);
-                    if (shouldUnrollPath.compare("TRUE") == 0) {
-                        seperator = seperator + this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
-                        unrollPathIs = true;
-                    }
-                }
-
-                if (!seperator.empty()) {
-                    vector<string> newPathVector = this->fileHandler->praseVariablePath(srcVarName, seperator);
-                    varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
-                }
-
-                // assumption last element is name of variable, hence no folder for name is needed
-                if (renameVar.compare("") == 0 && !unrollPathIs) {
-                    renameVar = srcVarName;
-                    // std::cout << "Variable '" << srcVarName << "' renamed in '" << renameVar << "' and listed in folder '" << applicName << "'." << std::endl;
-                } else {
-                    if (unrollPathIs && renameVar.compare("") == 0) {
-                        renameVar = varPathVector.at(varPathVector.size() - 1);
-                        varPathVector.pop_back();
-                    } else {
-                        if (varPathVector.size() > 0) {
-                            varPathVector.pop_back();
-                        }
-                    }
-                    // std::cout << "Variable '" << srcVarName << "' listed in folder '" << applicName << "'." << std::endl;
-                }
-
-                vector<xmlNodePtr> nodeVectorFolderPath = this->fileHandler->getNodesByName(
-                        nodeset->nodeTab[mappedVariableIndex.at(mappingPosition)]->children, "folder");
-                vector<string> folderPathVector;
-                bool createdVar = false;
-                UA_NodeId newFolderNodeId = UA_NODEID_NULL;
-                vector<UA_NodeId> mappedVariables;
-                for (auto nodeFolderPath: nodeVectorFolderPath) {
-
-                    string folderPath = this->fileHandler->getContentFromNode(nodeFolderPath);
-                    if (folderPath.empty() && unrollPathIs) {
-                        break;
-                    }
-
-                    folderPathVector = this->fileHandler->praseVariablePath(folderPath);
-                    // Create folders
-                    newFolderNodeId = appliFolderNodeId;
-                    if (folderPathVector.size() > 0) {
-                        newFolderNodeId = this->createFolderPath(newFolderNodeId, folderPathVector);
-                    }
-
-                    if (varPathVector.size() > 0) {
-                        newFolderNodeId = this->createFolderPath(newFolderNodeId, varPathVector);
-                    }
-                    mappedVariables.push_back(newFolderNodeId);
-                    createdVar = true;
-                }
-
-                // in case no <folder> or <unrollpath> is set
-                if (!createdVar) {
-                    newFolderNodeId = appliFolderNodeId;
-
-                    if (varPathVector.size() > 0) {
-                        mappedVariables.push_back(this->createFolderPath(newFolderNodeId, varPathVector));
-                    } else {
-                        // No <folder>
-                        mappedVariables.push_back(appliFolderNodeId);
-                    }
-                }
-
-                for (auto objectNodeId:mappedVariables) {
-                    UA_NodeId createdNodeId = UA_NODEID_NULL;
-
-                    ua_processvariable *processvariable;
-                    if (renameVar.compare(srcVarName) == 0)
-                        //default short name based on implicit var mapping param, alternativ a hard coded delimiter '/' can be used(this->pvSeperator -> instead "/")
-                        processvariable = new ua_processvariable(this->mappedServer, objectNodeId, varName, csManager,
-                                                                 this->fileHandler->praseVariablePath(varName,
-                                                                                                      this->pvSeperator).back());
-                    else
-                        processvariable = new ua_processvariable(this->mappedServer, objectNodeId, varName, csManager,
-                                                                 renameVar);
-                    this->variables.push_back(processvariable);
-
-                    //checks if a mapped variable has no rename option or unrollPathIds option
-                    //in this case the name will be shorten using the default path delimiters, (string node id is still the full name)
-                    if (renameVar.compare(srcVarName) == 0 && !unrollPathIs)
-                        UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
-                                                   UA_LOCALIZEDTEXT((char *) "en_US",
-                                                                          (char *) this->fileHandler->praseVariablePath(
-                                                                                  varName, this->pvSeperator).back().c_str()));
-                    else
-                        UA_Server_writeDisplayName(this->mappedServer, processvariable->getOwnNodeId(),
-                                                   UA_LOCALIZEDTEXT((char *) "en_US", (char *) renameVar.c_str()));
-
-                    createdNodeId = objectNodeId;
-
-                    UA_Variant newValue;
-                    string childNodeId;
-                    //get the nodeId string from the created pv node
-                    UA_String parentNodeString = processvariable->getOwnNodeId().identifier.string;
-                    UA_STRING_TO_CPPSTRING_COPY(&parentNodeString, &childNodeId);
-                    if (!description.empty()) {
-                        UA_Server_writeDescription(this->mappedServer, processvariable->getOwnNodeId(),
-                                                   UA_LOCALIZEDTEXT((char *)"en_US", (char *) description.c_str()));
-                        processvariable->setDescription(description);
-                    }
-                    if (!engineeringUnit.empty())
-                        processvariable->setEngineeringUnit(engineeringUnit);
-
-                    UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/description").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Description"));
-                    UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/engineeringunit").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "EngineeringUnit"));
-                    UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/name").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Name"));
-                    UA_Server_writeDescription(this->mappedServer, UA_NODEID_STRING(1, (char *) (childNodeId+"/type").c_str()), UA_LOCALIZEDTEXT((char *) "en_US", (char *) "Type"));
-                }
-            }
-            xmlXPathFreeObject(result);
-        }
-    }
-}
-*/
 
 vector<ua_processvariable *> ua_uaadapter::getVariables() {
         return this->variables;
