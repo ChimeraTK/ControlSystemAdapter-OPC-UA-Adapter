@@ -187,6 +187,32 @@ ua_processvariable::ua_readproxy_ua_processvariable_getDescription(UA_Server *se
     return UA_STATUSCODE_GOOD;
 }
 
+UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValidity(UA_Server *server, const UA_NodeId *sessionId,
+                                                                              void *sessionContext, const UA_NodeId *nodeId,
+                                                                              void *nodeContext, UA_Boolean includeSourceTimeStamp,
+                                                                              const UA_NumericRange *range, UA_DataValue *value) {
+    ua_processvariable *thisObj = static_cast<ua_processvariable *>(nodeContext);
+    DataValidity dv = thisObj->csManager->getProcessVariable(thisObj->namePV)->dataValidity();
+    UA_Int32 validity;
+    switch (dv) {
+        case DataValidity::ok :
+            validity = 1;
+            break;
+        case DataValidity::faulty :
+            validity = 0;
+            break;
+        default:
+            validity = -1;
+    }
+    UA_Variant_setScalarCopy(&value->value, &validity, &UA_TYPES[UA_TYPES_UINT32]);
+    value->hasValue = true;
+    if (includeSourceTimeStamp) {
+        value->sourceTimestamp = thisObj->getSourceTimeStamp();
+        value->hasSourceTimestamp = true;
+    }
+    return UA_STATUSCODE_GOOD;
+}
+
 string ua_processvariable::getDescription() {
         if(!this->description.empty()) {
                 return this->description;
@@ -336,6 +362,10 @@ UA_StatusCode ua_processvariable::getValue_int8(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_SByte *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -366,6 +396,10 @@ UA_StatusCode ua_processvariable::getValue_uint8(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Byte *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -396,6 +430,10 @@ UA_StatusCode ua_processvariable::getValue_int16(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Int16 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -426,6 +464,10 @@ UA_StatusCode ua_processvariable::getValue_uint16(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_UInt16 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -457,6 +499,10 @@ UA_StatusCode ua_processvariable::getValue_int32(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Int32 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -487,6 +533,10 @@ UA_StatusCode ua_processvariable::getValue_uint32(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_UInt32 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -517,6 +567,10 @@ UA_StatusCode ua_processvariable::getValue_int64(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Int64 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -547,6 +601,10 @@ UA_StatusCode ua_processvariable::getValue_uint64(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_UInt64 *)iarr.data(), iarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = iarr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -576,6 +634,10 @@ UA_StatusCode ua_processvariable::getValue_float(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Float *)darr.data(), darr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = darr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -607,6 +669,10 @@ UA_StatusCode ua_processvariable::getValue_double(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Double *)darr.data(), darr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = darr.size();
+            v->arrayDimensions = arrayDims;
         }
     }
 
@@ -644,6 +710,10 @@ UA_StatusCode ua_processvariable::getValue_string(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, sarrayval, sarr.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = sarr.size();
+            v->arrayDimensions = arrayDims;
 
             delete[] sarrayval;
         }
@@ -684,6 +754,10 @@ UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
             };
             arrayRange.dimensions = &scalarThisDimension;
             rv = UA_Variant_setRangeCopy(v, (UA_Boolean*)barr, bvector.size(), arrayRange);
+            v->arrayDimensionsSize = 1;
+            UA_UInt32 *arrayDims = UA_UInt32_new();
+            *arrayDims = bvector.size();
+            v->arrayDimensions = arrayDims;
             delete [] barr;
         }
     }
@@ -772,6 +846,9 @@ UA_StatusCode ua_processvariable::setValue_int8(const UA_Variant* data) {
                     valueArray.at(i) = v[i];
                 }
             }
+            if(this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
+            }
             this->csManager->getProcessArray <int8_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <int8_t>(this->namePV)->write();
             retval = UA_STATUSCODE_GOOD;
@@ -800,6 +877,9 @@ UA_StatusCode ua_processvariable::setValue_uint8(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
+            }
+            if(this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
             }
             this->csManager->getProcessArray <uint8_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <uint8_t>(this->namePV)->write();
@@ -830,6 +910,9 @@ UA_StatusCode ua_processvariable::setValue_int16(const UA_Variant* data) {
                     valueArray.at(i) = v[i];
                 }
             }
+            if(this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
+            }
             this->csManager->getProcessArray <int16_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <int16_t>(this->namePV)->write();
             retval = UA_STATUSCODE_GOOD;
@@ -858,6 +941,9 @@ UA_StatusCode ua_processvariable::setValue_uint16(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
+            }
+            if(this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
             }
             this->csManager->getProcessArray <uint16_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <uint16_t>(this->namePV)->write();
@@ -889,6 +975,9 @@ UA_StatusCode ua_processvariable::setValue_int32(const UA_Variant* data) {
                     valueArray.at(i) = v[i];
                 }
             }
+            if(this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
+            }
             this->csManager->getProcessArray < int32_t >(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray < int32_t >(this->namePV)->write();
             retval = UA_STATUSCODE_GOOD;
@@ -917,6 +1006,9 @@ UA_StatusCode ua_processvariable::setValue_uint32(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
+            }
+            if(this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
             }
             this->csManager->getProcessArray <uint32_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <uint32_t>(this->namePV)->write();
@@ -948,6 +1040,9 @@ UA_StatusCode ua_processvariable::setValue_int64(const UA_Variant* data) {
                     valueArray.at(i) = v[i];
                 }
             }
+            if(this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
+            }
             this->csManager->getProcessArray < int64_t >(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray < int64_t >(this->namePV)->write();
             retval = UA_STATUSCODE_GOOD;
@@ -976,6 +1071,9 @@ UA_StatusCode ua_processvariable::setValue_uint64(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
+            }
+            if(this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
             }
             this->csManager->getProcessArray <uint64_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <uint64_t>(this->namePV)->write();
@@ -1006,6 +1104,9 @@ UA_StatusCode ua_processvariable::setValue_float(const UA_Variant* data) {
                     valueArray.at(i) = v[i];
                 }
             }
+            if(this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
+            }
             this->csManager->getProcessArray <float>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <float>(this->namePV)->write();
             retval = UA_STATUSCODE_GOOD;
@@ -1034,6 +1135,9 @@ UA_StatusCode ua_processvariable::setValue_double(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
+            }
+            if(this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
             }
             this->csManager->getProcessArray <double>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <double>(this->namePV)->write();
@@ -1069,6 +1173,9 @@ UA_StatusCode ua_processvariable::setValue_string(const UA_Variant* data) {
                     valueArray.at(i) = cpps;
                 }
             }
+            if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
+            }
             this->csManager->getProcessArray <string>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <string>(this->namePV)->write();
             retval = UA_STATUSCODE_GOOD;
@@ -1097,6 +1204,9 @@ UA_StatusCode ua_processvariable::setValue_bool(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
+            }
+            if(this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+                return UA_STATUSCODE_BADINVALIDARGUMENT;
             }
             this->csManager->getProcessArray <bool>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <bool>(this->namePV)->write();
@@ -1161,9 +1271,10 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 
     this->addPVChildNodes(createdNodeId, baseNodeIdName);
 
+    UA_Variant arrayDimensions;
+    UA_Variant_init(&arrayDimensions);
     /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
     UA_DataSource_Map mapDs;
-    // FIXME: We should not be using std::cout here... Where's our logger?
     std::type_info const & valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
     if (valueType == typeid(int8_t)) {
         type = UA_PV_INT8;
@@ -1194,6 +1305,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <int8_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1226,6 +1342,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <uint8_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1258,6 +1379,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <int16_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1290,6 +1416,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <uint16_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1322,6 +1453,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <int32_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1354,6 +1490,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <uint32_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1386,6 +1527,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <int64_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1418,6 +1564,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <uint64_t>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1450,6 +1601,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <float>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1482,6 +1638,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <double>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1514,6 +1675,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <string>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1546,6 +1712,11 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Variant uaArrayDimensions;
+            UA_UInt32 arrayDims[1];
+            arrayDims[0] = this->csManager->getProcessArray <bool>(this->namePV)->accessChannel(0).size();
+            UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+            UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
         }
         mapDs.push_back(mapElem);
     }
@@ -1585,6 +1756,14 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     mapElemType.read = ua_readproxy_ua_processvariable_getType;
     mapElemType.write = NULL;
     mapDs.push_back(mapElemType);
+
+    // Validity
+    UA_DataSource_Map_Element mapElemValidity;
+    mapElemValidity.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
+    mapElemValidity.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+    mapElemValidity.read = ua_readproxy_ua_processvariable_getValidity;
+    mapElemValidity.write = NULL;
+    mapDs.push_back(mapElemValidity);
 
     this->ua_mapDataSources((void *) this, &mapDs);
 
@@ -1690,6 +1869,22 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
     } else
         return addResult;
 
+    //Adding the Validity node to the PV
+    UA_VariableAttributes_init(&attr);
+    attr = UA_VariableAttributes_default;
+    attr.displayName = UA_LOCALIZEDTEXT((char *)"en_US", (char *)"Validity");
+    attr.description = UA_LOCALIZEDTEXT((char *)"", (char *)"");
+    attr.accessLevel = 3;
+    attr.userAccessLevel = 3;
+    attr.valueRank = -1;
+    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/validity").c_str()),
+                                          pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char *)"Validity"),
+                                          UA_NODEID_NUMERIC(0, 63), attr, this, &createdNodeId);
+    if(addResult == UA_STATUSCODE_GOOD) {
+        UA_NodeId vadilityVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
+        NODE_PAIR_PUSH(this->ownedNodes, vadilityVariable, createdNodeId);
+    } else
+        return addResult;
     return addResult;
 }
 
