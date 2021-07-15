@@ -1305,6 +1305,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <int8_t>(this->namePV)->accessChannel(0).size();
@@ -1342,6 +1343,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <uint8_t>(this->namePV)->accessChannel(0).size();
@@ -1379,6 +1381,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <int16_t>(this->namePV)->accessChannel(0).size();
@@ -1416,6 +1419,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <uint16_t>(this->namePV)->accessChannel(0).size();
@@ -1453,6 +1457,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <int32_t>(this->namePV)->accessChannel(0).size();
@@ -1490,6 +1495,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <uint32_t>(this->namePV)->accessChannel(0).size();
@@ -1527,6 +1533,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <int64_t>(this->namePV)->accessChannel(0).size();
@@ -1564,6 +1571,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <uint64_t>(this->namePV)->accessChannel(0).size();
@@ -1601,6 +1609,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <float>(this->namePV)->accessChannel(0).size();
@@ -1638,6 +1647,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <double>(this->namePV)->accessChannel(0).size();
@@ -1675,6 +1685,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <string>(this->namePV)->accessChannel(0).size();
@@ -1712,6 +1723,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
             {
                 mapElem.write = NULL;
             }
+            UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
             UA_Variant uaArrayDimensions;
             UA_UInt32 arrayDims[1];
             arrayDims[0] = this->csManager->getProcessArray <bool>(this->namePV)->accessChannel(0).size();
