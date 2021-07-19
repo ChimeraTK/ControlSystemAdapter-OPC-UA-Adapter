@@ -135,7 +135,7 @@ link_directories(${CMAKE_SOURCE_DIR}/lib)
 link_directories(${LIBXML2_LIBRARIES})
 link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
 link_directories(${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
-#link_directories(${open62541_LIBRARIES})
+link_directories(${open62541_LIBRARY_DIRS})
 
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
                    ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
