@@ -29,6 +29,8 @@ extern "C" {
 #include <thread>
 #include <future>
 #include <functional>     // std::ref
+#include <string>
+#include <regex>
 
 #include "csa_config.h"
 
@@ -65,6 +67,17 @@ ua_uaadapter::~ua_uaadapter() {
 
 }
 
+string cleanUri(string s){
+    //replace multiple with a single space
+    std::regex r1("\\s+");
+    s = std::regex_replace(s, r1, " ");
+    s = std::regex_replace(s, r1, "-");
+    //remove all not printable basic ASCII character
+    std::regex r2("[^ -~]+");
+    s = std::regex_replace(s, r2, "");
+    return s;
+}
+
 void ua_uaadapter::constructServer() {
     //this->mappedServer = UA_Server_new();
     this->server_config = (UA_ServerConfig *) UA_calloc(1, sizeof(UA_ServerConfig));
@@ -83,7 +96,7 @@ void ua_uaadapter::constructServer() {
     this->server_config->applicationDescription.discoveryUrlsSize = 1;
     this->server_config->applicationDescription.applicationName =  UA_LOCALIZEDTEXT_ALLOC((char*)"en_US",
         (char*)this->serverConfig.applicationName.c_str());
-    this->server_config->applicationDescription.applicationUri = UA_STRING_ALLOC((char*) hostname_uri.c_str());
+    this->server_config->applicationDescription.applicationUri = UA_STRING_ALLOC((char*) (cleanUri(hostname_uri)).c_str());
     this->server_config->buildInfo.manufacturerName = UA_STRING_ALLOC((char*)"ChimeraTK Team");
     std::string versionString = "open62541: " xstr(UA_OPEN62541_VER_MAJOR) "." xstr(UA_OPEN62541_VER_MINOR) "." xstr(UA_OPEN62541_VER_PATCH)
     ", ControlSystemAdapter-OPC-UA-Adapter: " xstr(PROJECT_VER_MAJOR) "." xstr(PROJECT_VER_MINOR) "." xstr(PTOJECT_VER_PATCH) "";
@@ -93,7 +106,7 @@ void ua_uaadapter::constructServer() {
 
     this->server_config->buildInfo.productName = UA_STRING_ALLOC((char*) this->serverConfig.applicationName.c_str());
     string product_urn = "urn:ChimeraTK:" + this->serverConfig.applicationName;
-    this->server_config->buildInfo.productUri = UA_STRING_ALLOC((char *)product_urn.c_str());
+    this->server_config->buildInfo.productUri = UA_STRING_ALLOC((char *)(cleanUri(product_urn)).c_str());
 
     this->mappedServer = UA_Server_newWithConfig(this->server_config);
     this->server_config = UA_Server_getConfig(this->mappedServer);
