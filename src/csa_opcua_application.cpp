@@ -73,8 +73,8 @@ static void SigHandler_Int(int sign) {
 }
 
 int main() {
-	signal(SIGINT,  SigHandler_Int); // Registriert CTRL-C/SIGINT
-	signal(SIGTERM, SigHandler_Int); // Registriert SIGTERM
+    signal(SIGINT,  SigHandler_Int); // Registriert CTRL-C/SIGINT
+    signal(SIGTERM, SigHandler_Int); // Registriert SIGTERM
 
     /* Block SIGINT until the OPC UA Adapter is running.
      * So the adapter is in a consistent state when we shut it down. */
@@ -109,9 +109,9 @@ int main() {
     /* Unblock SIGINT */
     sigprocmask(SIG_UNBLOCK, &intmask, NULL);
 
-	while(!terminateMain)
-        sleep(3600);  // sleep will be interrupted when signal is received
-	csManager.reset();
+    while(!terminateMain)
+    sleep(3600);  // sleep will be interrupted when signal is received
+    csManager.reset();
 
-	cout << "Application termianted." << endl;
+    cout << "Application termianted." << endl;
 }

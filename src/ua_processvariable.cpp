@@ -845,9 +845,9 @@ UA_StatusCode ua_processvariable::setValue_int8(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
-            }
-            if(this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
             this->csManager->getProcessArray <int8_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <int8_t>(this->namePV)->write();
@@ -877,9 +877,9 @@ UA_StatusCode ua_processvariable::setValue_uint8(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
-            }
-            if(this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
             this->csManager->getProcessArray <uint8_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <uint8_t>(this->namePV)->write();
@@ -909,9 +909,9 @@ UA_StatusCode ua_processvariable::setValue_int16(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
-            }
-            if(this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
             this->csManager->getProcessArray <int16_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <int16_t>(this->namePV)->write();
@@ -941,9 +941,9 @@ UA_StatusCode ua_processvariable::setValue_uint16(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
-            }
-            if(this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
             this->csManager->getProcessArray <uint16_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <uint16_t>(this->namePV)->write();
@@ -974,9 +974,9 @@ UA_StatusCode ua_processvariable::setValue_int32(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
-            }
-            if(this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
             this->csManager->getProcessArray < int32_t >(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray < int32_t >(this->namePV)->write();
@@ -1006,9 +1006,9 @@ UA_StatusCode ua_processvariable::setValue_uint32(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
-            }
-            if(this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
             this->csManager->getProcessArray <uint32_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <uint32_t>(this->namePV)->write();
@@ -1039,9 +1039,9 @@ UA_StatusCode ua_processvariable::setValue_int64(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
-            }
-            if(this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
             this->csManager->getProcessArray < int64_t >(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray < int64_t >(this->namePV)->write();
@@ -1071,9 +1071,9 @@ UA_StatusCode ua_processvariable::setValue_uint64(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
-            }
-            if(this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
             this->csManager->getProcessArray <uint64_t>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <uint64_t>(this->namePV)->write();
@@ -1103,9 +1103,9 @@ UA_StatusCode ua_processvariable::setValue_float(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
-            }
-            if(this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
             this->csManager->getProcessArray <float>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <float>(this->namePV)->write();
@@ -1135,10 +1135,11 @@ UA_StatusCode ua_processvariable::setValue_double(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
-            }
-            if(this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
+
             this->csManager->getProcessArray <double>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <double>(this->namePV)->write();
             retval = UA_STATUSCODE_GOOD;
@@ -1172,9 +1173,9 @@ UA_StatusCode ua_processvariable::setValue_string(const UA_Variant* data) {
                     UASTRING_TO_CPPSTRING(vdata[i], cpps);
                     valueArray.at(i) = cpps;
                 }
-            }
-            if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
             this->csManager->getProcessArray <string>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <string>(this->namePV)->write();
@@ -1204,9 +1205,9 @@ UA_StatusCode ua_processvariable::setValue_bool(const UA_Variant* data) {
                 for (uint32_t i = 0; i < valueArray.size(); i++) {
                     valueArray.at(i) = v[i];
                 }
-            }
-            if(this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0).size() != data->arrayLength){
+              if(this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0).size() != data->arrayLength){
                 return UA_STATUSCODE_BADINVALIDARGUMENT;
+              }
             }
             this->csManager->getProcessArray <bool>(this->namePV)->accessChannel(0) = valueArray;
             this->csManager->getProcessArray <bool>(this->namePV)->write();
