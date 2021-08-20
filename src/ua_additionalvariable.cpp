@@ -134,7 +134,7 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
                                         this->ownNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                                         qualName2,
                                         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr2, NULL,
-                                        &createdNodeId);
+                                        NULL);
 
     UA_QualifiedName_clear(&qualName2);
 
@@ -151,6 +151,7 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
 
     UA_String_clear(&addVarDescription);
     UA_VariableAttributes_clear(&vAttr2);
+    UA_NodeId_clear(&createdNodeId);
 
     return retval;
 }
