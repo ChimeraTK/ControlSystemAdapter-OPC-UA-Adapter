@@ -1780,6 +1780,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 
     this->ua_mapDataSources((void *) this, &mapDs);
 
+    UA_NodeId_clear(&createdNodeId);
+
     return UA_STATUSCODE_GOOD;
 }
 
@@ -1898,6 +1900,9 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
         NODE_PAIR_PUSH(this->ownedNodes, vadilityVariable, createdNodeId);
     } else
         return addResult;
+
+    UA_NodeId_clear(&createdNodeId);
+
     return addResult;
 }
 
