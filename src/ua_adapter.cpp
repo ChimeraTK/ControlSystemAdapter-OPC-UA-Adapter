@@ -656,6 +656,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                         if(UA_NodeId_equal(&tmpNodeId, &pvNodeId)){
                             this->variables[n]->setEngineeringUnit(unit);
                         }
+                        UA_NodeId_clear(&tmpNodeId);
                     }
                 }
                 if(!description.empty()){
@@ -665,6 +666,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                         if(UA_NodeId_equal(&tmpNodeId, &pvNodeId)){
                             this->variables[n]->setDescription(description);
                         }
+                        UA_NodeId_clear(&tmpNodeId);
                     }
                 }
 
@@ -800,6 +802,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                     if(UA_NodeId_equal(&tmpNodeId, &createdNodeId)){
                         this->variables[n]->setEngineeringUnit(unit);
                     }
+                    UA_NodeId_clear(&tmpNodeId);
                 }
             }
             if(!description.empty()){
@@ -808,6 +811,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                     if(UA_NodeId_equal(&tmpNodeId, &createdNodeId)){
                         this->variables[n]->setDescription(description);
                     }
+                    UA_NodeId_clear(&tmpNodeId);
                 }
             }
             UA_Server_writeDisplayName(this->mappedServer, createdNodeId, UA_LOCALIZEDTEXT((char *) "en_US",
