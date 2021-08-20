@@ -46,6 +46,7 @@ ua_additionalvariable::ua_additionalvariable(UA_Server *server, UA_NodeId baseno
 ua_additionalvariable::~ua_additionalvariable()
 {
   // Our ua_mapped_class destructor will take care of deleting our opcua footprint as long as all variables are mapped in this->ownedNodes
+    UA_NodeId_clear(&this->ownNodeId);
 }
 
 // Value
@@ -111,7 +112,8 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
                                         UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName,
                                         UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), vAttr,
                                         (void *) this, &createdNodeId);
-    this->ownNodeId = createdNodeId;
+    //this->ownNodeId = createdNodeId;
+    UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
     ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE),
                             &this->ownedNodes);
 
