@@ -1815,6 +1815,9 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
     } else
         return addResult;
 
+    UA_NodeId_clear(&createdNodeId);
+    createdNodeId = UA_NODEID_NULL;
+
     //Adding the Description node to the PV
     UA_VariableAttributes_init(&attr);
     attr = UA_VariableAttributes_default;
@@ -1838,6 +1841,9 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
     } else
         return addResult;
 
+    UA_NodeId_clear(&createdNodeId);
+    createdNodeId = UA_NODEID_NULL;
+
     //Adding the EngineeringUnit node to the PV
     UA_VariableAttributes_init(&attr);
     attr = UA_VariableAttributes_default;
@@ -1857,6 +1863,9 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
         NODE_PAIR_PUSH(this->ownedNodes, engineeringunitVariable, createdNodeId);
     } else
         return addResult;
+
+    UA_NodeId_clear(&createdNodeId);
+    createdNodeId = UA_NODEID_NULL;
 
     //Adding the Type node to the PV
     UA_VariableAttributes_init(&attr);
@@ -1883,6 +1892,9 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
         NODE_PAIR_PUSH(this->ownedNodes, typeVariable, createdNodeId);
     } else
         return addResult;
+
+    UA_NodeId_clear(&createdNodeId);
+    createdNodeId = UA_NODEID_NULL;
 
     //Adding the Validity node to the PV
     UA_VariableAttributes_init(&attr);
