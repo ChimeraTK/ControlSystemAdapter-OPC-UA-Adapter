@@ -56,13 +56,16 @@ UA_StatusCode ua_mapped_class::ua_mapSelfToNamespace() {
 }
 
 UA_StatusCode ua_mapped_class::ua_unmapSelfFromNamespace() {
-  for (nodePairList::reverse_iterator i = this->ownedNodes.rbegin(); i != this->ownedNodes.rend(); ++i) {
-    UA_NodeId_pair *p = *(i);
+  //for (nodePairList::reverse_iterator i = this->ownedNodes.rbegin(); i != this->ownedNodes.rend(); ++i) {
+  while(!this->ownedNodes.empty()) {
+    //UA_NodeId_pair *p = *(i);
+      UA_NodeId_pair *p = *(this->ownedNodes.begin());
     // Node is deleted by UA_Server_delete.
     //UA_Server_deleteNode(this->mappedServer, p->targetNodeId, UA_FALSE);
     UA_NodeId_clear(&p->sourceNodeId);
     UA_NodeId_clear(&p->targetNodeId);
-    this->ownedNodes.remove(*(i));
+    //this->ownedNodes.remove(*(i));
+    this->ownedNodes.remove(p);
     delete p;
   }
   return UA_STATUSCODE_GOOD;
