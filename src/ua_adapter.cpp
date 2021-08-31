@@ -121,6 +121,10 @@ void ua_uaadapter::constructServer() {
 
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
     csa_namespaceinit_generated(this->mappedServer);
+
+    UA_String_clear(&usernamePasswordLogins->password);
+    UA_String_clear(&usernamePasswordLogins->username);
+    delete usernamePasswordLogins;
 }
 
 void ua_uaadapter::readConfig() {
