@@ -80,8 +80,10 @@ string cleanUri(string s){
 
 void ua_uaadapter::constructServer() {
     //this->mappedServer = UA_Server_new();
-    this->server_config = (UA_ServerConfig *) UA_calloc(1, sizeof(UA_ServerConfig));
-    UA_ServerConfig_setMinimal(this->server_config, this->serverConfig.opcuaPort, NULL);
+    //this->server_config = (UA_ServerConfig *) UA_calloc(1, sizeof(UA_ServerConfig));
+    this->server_config = NULL;
+    UA_ServerConfig* config = (UA_ServerConfig *) UA_calloc(1, sizeof(UA_ServerConfig));
+    UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, NULL);
 
     /*get hostname */
     char hostname[HOST_NAME_MAX];
@@ -89,26 +91,26 @@ void ua_uaadapter::constructServer() {
     string hostname_uri = "opc.tcp://";
     hostname_uri.append(hostname);
 
-    this->server_config->applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
+    config->applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
     UA_String *hostName = UA_String_new();
     *hostName = UA_STRING_ALLOC(hostname);
-    this->server_config->applicationDescription.discoveryUrls = hostName;
-    this->server_config->applicationDescription.discoveryUrlsSize = 1;
-    this->server_config->applicationDescription.applicationName =  UA_LOCALIZEDTEXT_ALLOC((char*)"en_US",
+    config->applicationDescription.discoveryUrls = hostName;
+    config->applicationDescription.discoveryUrlsSize = 1;
+    config->applicationDescription.applicationName =  UA_LOCALIZEDTEXT_ALLOC((char*)"en_US",
         (char*)this->serverConfig.applicationName.c_str());
-    this->server_config->applicationDescription.applicationUri = UA_STRING_ALLOC((char*) (cleanUri(hostname_uri)).c_str());
-    this->server_config->buildInfo.manufacturerName = UA_STRING_ALLOC((char*)"ChimeraTK Team");
+    config->applicationDescription.applicationUri = UA_STRING_ALLOC((char*) (cleanUri(hostname_uri)).c_str());
+    config->buildInfo.manufacturerName = UA_STRING_ALLOC((char*)"ChimeraTK Team");
     std::string versionString = "open62541: " xstr(UA_OPEN62541_VER_MAJOR) "." xstr(UA_OPEN62541_VER_MINOR) "." xstr(UA_OPEN62541_VER_PATCH)
     ", ControlSystemAdapter-OPC-UA-Adapter: " xstr(PROJECT_VER_MAJOR) "." xstr(PROJECT_VER_MINOR) "." xstr(PTOJECT_VER_PATCH) "";
-    this->server_config->buildInfo.softwareVersion = UA_STRING_ALLOC((char*) versionString.c_str());
-    this->server_config->buildInfo.buildDate = UA_DateTime_now();
-    this->server_config->buildInfo.buildNumber = UA_STRING_ALLOC((char*) "");
+    config->buildInfo.softwareVersion = UA_STRING_ALLOC((char*) versionString.c_str());
+    config->buildInfo.buildDate = UA_DateTime_now();
+    config->buildInfo.buildNumber = UA_STRING_ALLOC((char*) "");
 
-    this->server_config->buildInfo.productName = UA_STRING_ALLOC((char*) this->serverConfig.applicationName.c_str());
+    config->buildInfo.productName = UA_STRING_ALLOC((char*) this->serverConfig.applicationName.c_str());
     string product_urn = "urn:ChimeraTK:" + this->serverConfig.applicationName;
-    this->server_config->buildInfo.productUri = UA_STRING_ALLOC((char *)(cleanUri(product_urn)).c_str());
+    config->buildInfo.productUri = UA_STRING_ALLOC((char *)(cleanUri(product_urn)).c_str());
 
-    this->mappedServer = UA_Server_newWithConfig(this->server_config);
+    this->mappedServer = UA_Server_newWithConfig(config);
     this->server_config = UA_Server_getConfig(this->mappedServer);
 
     //Username/Password handling
@@ -122,6 +124,7 @@ void ua_uaadapter::constructServer() {
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
     csa_namespaceinit_generated(this->mappedServer);
 
+    UA_free(config);
     UA_String_clear(&usernamePasswordLogins->password);
     UA_String_clear(&usernamePasswordLogins->username);
     delete usernamePasswordLogins;
