@@ -570,7 +570,8 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
             }
             //create the requested folder hierarchy
             //enrollFolderPathFromString((destination+"/"+folder)+"/removedPart", "/");
-            createFolder(folderPathNodeId, folder);
+            UA_NodeId retnode = createFolder(folderPathNodeId, folder);
+            UA_NodeId_clear(&retnode);
         }
 
         xmlXPathFreeObject(result);
