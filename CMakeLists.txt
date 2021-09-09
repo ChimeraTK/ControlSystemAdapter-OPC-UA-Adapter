@@ -274,6 +274,7 @@ add_library(mtca_objects OBJECT ${objectSources})
 if(USE_ControlSystemAdapter)
         add_dependencies(mtca_objects external-ChimeraTK-ControlSystemAdapter)
         add_dependencies(mtca_objects external-ChimeraTK-DeviceAccess)
+        add_dependencies(mtca_objects external-open62541)
 endif()
 
 ## Early declaration due to the requirement to run the dependencies update prior to building
