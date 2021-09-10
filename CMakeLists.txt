@@ -37,7 +37,7 @@ find_package(ChimeraTK-DeviceAccess 01.00)
 
 find_package(open62541 1.2 REQUIRED)
 IF (${open62541_FOUND})
-    MESSAGE(STATUS "Found open62541 in Version: ${open62541_VERSION}. Include DIR ${open62541_LIBRARY_DIRS}")
+    MESSAGE(STATUS "Found open62541 in Version: ${open62541_VERSION}. Include DIR ${open62541_LIBRARIES}")
 ELSE (${open62541_FOUND})
     MESSAGE(STATUS "Could not locate open62541.")
 ENDIF (${open62541_FOUND})
