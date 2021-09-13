@@ -72,6 +72,14 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${ChimeraTK-ControlSystemAdapter_LINKER_FLAGS}")
 
+
+##debug
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+    message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()
+
 ##########################################################################################################
 ## Set the build type to Release if none is specified
 ## Force it into Release if "None" is specified (needed to overrule dkpg_buildpackage)
