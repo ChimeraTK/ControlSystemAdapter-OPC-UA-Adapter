@@ -19,17 +19,16 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framework REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
-
-#Do not put any of the following packages as required. We will install it if it is not found.
-find_package(ChimeraTK-ControlSystemAdapter 01.00)
-find_package(ChimeraTK-DeviceAccess 01.00)
-
 find_package(open62541 1.2 REQUIRED)
 IF (${open62541_FOUND})
     MESSAGE(STATUS "Found open62541 in Version: ${open62541_VERSION}. Include DIR ${open62541_LIBRARIES}")
 ELSE (${open62541_FOUND})
     MESSAGE(STATUS "Could not locate open62541.")
 ENDIF (${open62541_FOUND})
+
+#Do not put any of the following packages as required. We will install it if it is not found.
+find_package(ChimeraTK-ControlSystemAdapter 01.00)
+find_package(ChimeraTK-DeviceAccess 01.00)
 
 #Install the DeviceAccess if it is not pre-installed
 if(NOT ChimeraTK-DeviceAccess_FOUND)
