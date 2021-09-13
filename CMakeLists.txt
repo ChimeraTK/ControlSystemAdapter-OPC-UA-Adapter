@@ -1,15 +1,6 @@
 cmake_minimum_required(VERSION 2.8.0)
 
 ##########################################################################################################
-## Definition for compiler for static analysis
-##########################################################################################################
-if(BUILD_STATIC_ANALYSIS)
-        set(CMAKE_C_COMPILER   ccc-analyzer)
-        set(CMAKE_CXX_COMPILER c++-analyzer)
-        add_definitions(-o ${PROJECT_BINARY_DIR}/static-analysis})
-endif()
-
-##########################################################################################################
 ## Project specification
 ##########################################################################################################
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
@@ -204,6 +195,15 @@ if(ENABLE_COVERAGE)
       COMMENT "Generating test coverage documentation" VERBATIM
   )
 
+endif()
+
+##########################################################################################################
+## Definition for compiler for static analysis
+##########################################################################################################
+if(BUILD_STATIC_ANALYSIS)
+        set(CMAKE_C_COMPILER   ccc-analyzer)
+        set(CMAKE_CXX_COMPILER c++-analyzer)
+        add_definitions(-o ${PROJECT_BINARY_DIR}/static-analysis})
 endif()
 
 ##########################################################################################################
