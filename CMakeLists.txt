@@ -5,8 +5,6 @@ cmake_minimum_required(VERSION 2.8.0)
 ##########################################################################################################
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 
-include(ExternalProject)
-
 SET(${PROJECT_NAME}_MAJOR_VERSION 02)
 SET(${PROJECT_NAME}_MINOR_VERSION 00)
 SET(${PROJECT_NAME}_PATCH_VERSION 02)
