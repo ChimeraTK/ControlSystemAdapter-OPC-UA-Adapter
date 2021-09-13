@@ -127,7 +127,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(SYSTEM ${ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS})
 include_directories(SYSTEM ${ChimeraTK-DeviceAccess_INCLUDE_DIRS})
-#include_directories(SYSTEM ${open62541_INCLUDE_DIRS})
+include_directories(SYSTEM ${open62541_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/examples/)
 include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR})
 
