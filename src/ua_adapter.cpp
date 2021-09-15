@@ -71,7 +71,7 @@ string cleanUri(string s){
     //replace multiple with a single space
     std::regex r1("\\s+");
     s = std::regex_replace(s, r1, " ");
-    s = std::regex_replace(s, r1, "-");
+    s = std::regex_replace(s, r1, "_");
     //remove all not printable basic ASCII character
     std::regex r2("[^ -~]+");
     s = std::regex_replace(s, r2, "");
