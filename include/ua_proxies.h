@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- * Copyright (c) 2019 Andreas Ebner  <Andreas.Ebner@iosb-extern.fraunhofer.de>
+ * Copyright (c) 2019-2021 Andreas Ebner  <Andreas.Ebner@iosb.fraunhofer.de>
  */
 
 #ifndef HAVE_UA_PROXIES_H

@@ -16,6 +16,7 @@
  * 
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
+ * Copyright (c) 2021 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
 
 #include "ua_mapped_class.h"
