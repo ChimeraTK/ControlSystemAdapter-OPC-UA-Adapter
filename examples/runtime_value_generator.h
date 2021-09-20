@@ -28,7 +28,7 @@
 using namespace ChimeraTK;
 
 class runtime_value_generator {
-private:   
+   private:
     bool running;
     std::thread valueGeneratorThread;
 

@@ -12,7 +12,7 @@ using namespace boost::unit_test_framework;
 using namespace std;
 
 class UAAdapterTest {
-public:
+   public:
     static void testExampleSet();
 };
 
@@ -20,13 +20,13 @@ void UAAdapterTest::testExampleSet() {
     cout << "UAAdapterTest with ExampleSet started." << endl;
     TestFixturePVSet tfExampleSet;
     // Create the managers
-    ua_uaadapter *adapter = new ua_uaadapter("./uamapping_test_2.xml");
-    xml_file_handler *xmlHandler = new xml_file_handler("./uamapping_test_2.xml");
+    ua_uaadapter* adapter = new ua_uaadapter("./uamapping_test_2.xml");
+    xml_file_handler* xmlHandler = new xml_file_handler("./uamapping_test_2.xml");
 
     // Test config handling
     BOOST_CHECK_THROW(ua_uaadapter("./uamapping_test_twoconfigs.xml"), std::runtime_error);
 
-    ua_uaadapter *ad1 = new ua_uaadapter("./uamapping_test_applicationismissing.xml");
+    ua_uaadapter* ad1 = new ua_uaadapter("./uamapping_test_applicationismissing.xml");
     ad1->~ua_uaadapter();
     ad1 = new ua_uaadapter("./uamapping_test_configismissing.xml");
     ad1->~ua_uaadapter();
@@ -70,7 +70,7 @@ void UAAdapterTest::testExampleSet() {
     folderNodeId = adapter->existFolderPath(UA_NODEID_NULL, pathVector);
     BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
 
-    for (auto processVar:tfExampleSet.csManager.get()->getAllProcessVariables()) {
+    for(auto processVar : tfExampleSet.csManager.get()->getAllProcessVariables()) {
         adapter->implicitVarMapping(processVar.get()->getName(), tfExampleSet.csManager);
     }
 
@@ -85,18 +85,16 @@ void UAAdapterTest::testExampleSet() {
 
     adapter->~ua_uaadapter();
     xmlHandler->~xml_file_handler();
-
 }
 
 class UAAdapterTestSuite : public test_suite {
-public:
+   public:
     UAAdapterTestSuite() : test_suite("ua_uaadapter Test Suite") {
         add(BOOST_TEST_CASE(&UAAdapterTest::testExampleSet));
     }
 };
 
-test_suite *
-init_unit_test_suite(int argc, char *argv[]) {
+test_suite* init_unit_test_suite(int argc, char* argv[]) {
     framework::master_test_suite().add(new UAAdapterTestSuite);
     return 0;
 }

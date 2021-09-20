@@ -29,7 +29,6 @@
 
 #include <vector>
 
-
 #include "ua_mapped_class.h"
 #include "ua_processvariable.h"
 #include "ua_additionalvariable.h"
@@ -48,19 +47,16 @@ using namespace std;
  *
  */
 struct FolderInfo {
-        /** @brief Name of the folder
+    /** @brief Name of the folder
          *
          */
-        string folderName;
-        /** @brief NodeId from the folder from opcua server
-         */
-        UA_NodeId folderNodeId = UA_NODEID_NULL;
-        /** @brief NodeId from the child folder
-         */
-        UA_NodeId nextFolderNodeId = UA_NODEID_NULL;
-        /** @brief NodeId from the parent folder
-         */
-        UA_NodeId prevFolderNodeId = UA_NODEID_NULL;
+    string folderName;
+    /** @brief NodeId from the folder from opcua server */
+    UA_NodeId folderNodeId = UA_NODEID_NULL;
+    /** @brief NodeId from the child folder */
+    UA_NodeId nextFolderNodeId = UA_NODEID_NULL;
+    /** @brief NodeId from the parent folder */
+    UA_NodeId prevFolderNodeId = UA_NODEID_NULL;
 };
 
 /** @struct ServerConfig
@@ -81,7 +77,6 @@ struct ServerConfig {
     uint16_t opcuaPort = 16664;
 };
 
-
 /** @class ua_uaadapter
  *	@brief This class provide the opcua server and manage the variable mapping.
  *
@@ -96,8 +91,8 @@ struct ServerConfig {
  *  @date 22.11.2016
  */
 class ua_uaadapter : ua_mapped_class {
-private:
-    UA_ServerConfig *server_config;
+   private:
+    UA_ServerConfig* server_config;
     UA_ServerNetworkLayer server_nl;
 
     UA_NodeId variablesListId;
@@ -110,11 +105,11 @@ private:
 
     ServerConfig serverConfig;
 
-    vector<ua_processvariable *> variables;
-    vector<ua_additionalvariable *> additionalVariables;
-    vector<ua_processvariable *> mappedVariables;
+    vector<ua_processvariable*> variables;
+    vector<ua_additionalvariable*> additionalVariables;
+    vector<ua_processvariable*> mappedVariables;
 
-    xml_file_handler *fileHandler;
+    xml_file_handler* fileHandler;
 
     /** @brief This methode construct the parameter for the opcua server, depending of the <serverConfig> struct
     */
@@ -136,8 +131,7 @@ private:
     */
     UA_NodeId createUAFolder(UA_NodeId basenodeId, string folderName, string description = "");
 
-public:
-
+   public:
     bool running; // set to false to stop the worker thread
 
     /** @brief Constructor of the class.
@@ -162,18 +156,18 @@ public:
     */
     UA_DateTime getSourceTimeStamp();
 
-        /** @brief Return the OPC UA Server instance
+    /** @brief Return the OPC UA Server instance
         *
         * @return UA_Server *
         */
-        UA_Server * getMappedServer();
+    UA_Server* getMappedServer();
 
-        /** @brief Create a path of folders in the given parent node
+    /** @brief Create a path of folders in the given parent node
         *
         * @param basenodeid Node id of the parent node
         * @param folderPathVector Every single string is a folder name, the path ist createt in the given order
         */
-        UA_NodeId createFolderPath(UA_NodeId basenodeid, vector<string> folderPathVector);
+    UA_NodeId createFolderPath(UA_NodeId basenodeid, vector<string> folderPathVector);
 
     /** @brief Creates a folder in the given parent node
     *
@@ -262,8 +256,8 @@ public:
     * @param layer source folder
     * @param target destination folder
     */
-    void
-    deepCopyHierarchicalLayer(boost::shared_ptr<ControlSystemPVManager> csManager, UA_NodeId layer, UA_NodeId target);
+    void deepCopyHierarchicalLayer(
+        boost::shared_ptr<ControlSystemPVManager> csManager, UA_NodeId layer, UA_NodeId target);
 
     /** @brief Methode that returns the node id of the instanced class
     *
@@ -275,7 +269,7 @@ public:
     *
     * @return A vector of all <ua_processvariable>
     */
-    vector<ua_processvariable *> getVariables();
+    vector<ua_processvariable*> getVariables();
 
     /** @brief Create and start a thread for the opcua server instance
     *

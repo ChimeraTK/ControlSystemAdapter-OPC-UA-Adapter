@@ -7,19 +7,18 @@ using namespace boost::unit_test_framework;
 using namespace std;
 
 class XMLFileHandlerTest {
-public:
+   public:
     static void readDocFile();
-
     static void getContent();
 };
 
 void XMLFileHandlerTest::readDocFile() {
     std::cout << "Enter XMLFileHandlerTest - readDocFile" << std::endl;
-    xml_file_handler *xmlHandlerOne = new xml_file_handler("../tests/uamapping_test_1.xml");
+    xml_file_handler* xmlHandlerOne = new xml_file_handler("../tests/uamapping_test_1.xml");
     BOOST_CHECK(xmlHandlerOne != NULL);
 
     // Emtpy path
-    xml_file_handler *xmlHandlerTwo = new xml_file_handler("");
+    xml_file_handler* xmlHandlerTwo = new xml_file_handler("");
     BOOST_CHECK(xmlHandlerTwo->isDocSetted() == false);
     BOOST_CHECK(xmlHandlerTwo->getNodeSet("//process_variable") == NULL);
     // Set a document
@@ -28,7 +27,7 @@ void XMLFileHandlerTest::readDocFile() {
     BOOST_CHECK(xmlHandlerTwo->getNodeSet("//process_variable") != NULL);
 
     // Set a not wellformed document
-    xml_file_handler *xmlHandlerThree = new xml_file_handler("../tests/uamapping_test_notwellformed.xml");
+    xml_file_handler* xmlHandlerThree = new xml_file_handler("../tests/uamapping_test_notwellformed.xml");
     BOOST_CHECK(xmlHandlerThree->isDocSetted() == false);
     BOOST_CHECK(xmlHandlerThree->getNodeSet("//process_variable") == NULL);
 
@@ -39,15 +38,15 @@ void XMLFileHandlerTest::readDocFile() {
 
 void XMLFileHandlerTest::getContent() {
     std::cout << "Enter XMLFileHandlerTest - getContent" << std::endl;
-    xml_file_handler *xmlHandler = new xml_file_handler("../tests/uamapping_test_1.xml");
+    xml_file_handler* xmlHandler = new xml_file_handler("../tests/uamapping_test_1.xml");
 
     xmlXPathObjectPtr result = xmlHandler->getNodeSet(
-            //"//application[@name='TestCaseForXMLFileHandlerTest::getContent']//map");
-            "//process_variable[@sourceName='int8Array__s15']");
+        //"//application[@name='TestCaseForXMLFileHandlerTest::getContent']//map");
+        "//process_variable[@sourceName='int8Array__s15']");
     BOOST_CHECK(result != NULL);
     xmlNodeSetPtr nodeset = NULL;
 
-    if (result) {
+    if(result) {
         nodeset = result->nodesetval;
 
         // Check if Tag <map> contain a Attribute "sourceVariableName" with value
@@ -69,11 +68,11 @@ void XMLFileHandlerTest::getContent() {
         string emptyContent = xmlHandler->getContentFromNode(NULL);
         BOOST_CHECK(emptyContent == "");
 
-        vector<string> path = xmlHandler->praseVariablePath(sourceVariableName,
-                                                            xmlHandler->getAttributeValueFromNode(nodeList[0],
-                                                                                                  "name"));
+        vector<string> path = xmlHandler->praseVariablePath(
+            sourceVariableName, xmlHandler->getAttributeValueFromNode(nodeList[0], "name"));
         BOOST_CHECK(path.size() == 1);
-    } else {
+    }
+    else {
         BOOST_CHECK(false);
     }
 
@@ -83,21 +82,18 @@ void XMLFileHandlerTest::getContent() {
     xmlHandler->~xml_file_handler();
 }
 
-
 /**
    * The boost test suite
    */
 class XMLFileHandlerTestSuite : public test_suite {
-public:
+   public:
     XMLFileHandlerTestSuite() : test_suite("XMLFileHandler Test Suite") {
         add(BOOST_TEST_CASE(&XMLFileHandlerTest::readDocFile));
         add(BOOST_TEST_CASE(&XMLFileHandlerTest::getContent));
     }
 };
 
-test_suite *
-init_unit_test_suite(int argc, char *argv[]) {
-
+test_suite* init_unit_test_suite(int argc, char* argv[]) {
     framework::master_test_suite().add(new XMLFileHandlerTestSuite);
     return 0;
 }

@@ -44,8 +44,8 @@
  * @date 22.11.2016
  */
 extern "C" {
-    #include <unistd.h>
-    #include <signal.h>
+#include <unistd.h>
+#include <signal.h>
 }
 
 #include <iostream>
@@ -57,23 +57,23 @@ extern "C" {
 
 boost::shared_ptr<ControlSystemPVManager> csManager;
 boost::shared_ptr<DevicePVManager> devManager;
-csa_opcua_adapter *csaOPCUA;
+csa_opcua_adapter* csaOPCUA;
 
 std::atomic<bool> terminateMain;
 
 static void SigHandler_Int(int sign) {
-	cout << "Received SIGINT... terminating" << endl;
-	terminateMain = true;
+    cout << "Received SIGINT... terminating" << endl;
+    terminateMain = true;
     if(csaOPCUA) {
         csaOPCUA->stop();
         csaOPCUA->~csa_opcua_adapter();
     }
     ChimeraTK::ApplicationBase::getInstance().shutdown();
-	cout << "OPC UA adapter termianted." << endl;
+    cout << "OPC UA adapter termianted." << endl;
 }
 
 int main() {
-    signal(SIGINT,  SigHandler_Int); // Registriert CTRL-C/SIGINT
+    signal(SIGINT, SigHandler_Int);  // Registriert CTRL-C/SIGINT
     signal(SIGTERM, SigHandler_Int); // Registriert SIGTERM
 
     /* Block SIGINT until the OPC UA Adapter is running.
@@ -82,26 +82,27 @@ int main() {
     sigemptyset(&intmask);
     sigaddset(&intmask, SIGINT);
     sigprocmask(SIG_BLOCK, &intmask, NULL);
-	
+
     cout << "Crate the Managers" << endl;
-	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers = createPVManager();
+    std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager>> pvManagers =
+        createPVManager();
 
-	devManager = pvManagers.second;
-	csManager = pvManagers.first;
+    devManager = pvManagers.second;
+    csManager = pvManagers.first;
 
-	csManager->enablePersistentDataStorage();
-	ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
-	ChimeraTK::ApplicationBase::getInstance().initialise();
+    csManager->enablePersistentDataStorage();
+    ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
+    ChimeraTK::ApplicationBase::getInstance().initialise();
 
     cout << "Start the mapping" << endl;
-	string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
-	cout << pathToConfig << endl;
+    string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
+    cout << pathToConfig << endl;
 
     cout << "Create the adapter" << endl;
-	csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
-	
+    csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
+
     cout << "Run the application instance" << endl;
-	ChimeraTK::ApplicationBase::getInstance().run();
+    ChimeraTK::ApplicationBase::getInstance().run();
 
     cout << "Start the OPC UA Adapter" << endl;
     csaOPCUA->start();
@@ -109,8 +110,7 @@ int main() {
     /* Unblock SIGINT */
     sigprocmask(SIG_UNBLOCK, &intmask, NULL);
 
-    while(!terminateMain)
-    sleep(3600);  // sleep will be interrupted when signal is received
+    while(!terminateMain) sleep(3600); // sleep will be interrupted when signal is received
     csManager.reset();
 
     cout << "Application termianted." << endl;

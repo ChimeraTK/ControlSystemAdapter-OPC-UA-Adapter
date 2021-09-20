@@ -24,10 +24,10 @@ using namespace std;
  *
  */
 typedef struct UA_NodeId_pair_t {
-  UA_NodeId sourceNodeId;	// Model NodeId
-  UA_NodeId targetNodeId;	// Stack NodeId
+    UA_NodeId sourceNodeId; // Model NodeId
+    UA_NodeId targetNodeId; // Stack NodeId
 } UA_NodeId_pair;
-typedef std::list<UA_NodeId_pair *> nodePairList;
+typedef std::list<UA_NodeId_pair*> nodePairList;
 
 /**
  * @struct UA_DataSource_Map_Element_t
@@ -37,24 +37,21 @@ typedef std::list<UA_NodeId_pair *> nodePairList;
 typedef struct UA_DataSource_Map_Element_t {
     UA_NodeId typeTemplateId;
     UA_LocalizedText description; // individuell description for every variable
-    UA_StatusCode (*read)(UA_Server *server, const UA_NodeId *sessionId,
-                          void *sessionContext, const UA_NodeId *nodeId,
-                          void *nodeContext, UA_Boolean includeSourceTimeStamp,
-                          const UA_NumericRange *range, UA_DataValue *value);
+    UA_StatusCode (*read)(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId,
+        void* nodeContext, UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value);
 
-    UA_StatusCode (*write)(UA_Server *server, const UA_NodeId *sessionId,
-                           void *sessionContext, const UA_NodeId *nodeId,
-                           void *nodeContext, const UA_NumericRange *range,
-                           const UA_DataValue *value);
+    UA_StatusCode (*write)(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId,
+        void* nodeContext, const UA_NumericRange* range, const UA_DataValue* value);
 } UA_DataSource_Map_Element;
 typedef std::list<UA_DataSource_Map_Element> UA_DataSource_Map;
 
-
-#define NODE_PAIR_PUSH(_p_listname, _p_srcId, _p_targetId) do {\
-UA_NodeId_pair *tmp = new UA_NodeId_pair;\
-UA_NodeId_copy(&_p_srcId, &tmp->sourceNodeId);\
-UA_NodeId_copy(&_p_targetId, &tmp->targetNodeId);\
-_p_listname.push_back(tmp); } while (0);
+#define NODE_PAIR_PUSH(_p_listname, _p_srcId, _p_targetId)                                                             \
+    do {                                                                                                               \
+        UA_NodeId_pair* tmp = new UA_NodeId_pair;                                                                      \
+        UA_NodeId_copy(&_p_srcId, &tmp->sourceNodeId);                                                                 \
+        UA_NodeId_copy(&_p_targetId, &tmp->targetNodeId);                                                              \
+        _p_listname.push_back(tmp);                                                                                    \
+    } while(0);
 
 /**
  * @brief Searching for NodeId's in <pairList> with the same NodeId from <remoteId>
@@ -65,7 +62,7 @@ _p_listname.push_back(tmp); } while (0);
  * @return UA_NodeId from the found node
  *
  */
-UA_NodeId *nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId remoteId);
+UA_NodeId* nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId remoteId);
 
 /**
  * @brief Node function and proxy mapping for new nodes
@@ -76,7 +73,7 @@ UA_NodeId *nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId r
  *
  * @return UA_StatusCode
  */
-UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void *handle);
+UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void* handle);
 
 /**
  * @brief This methode map all variables in sort of a <UA_DataSourceMap> from the called class to the open62541
@@ -88,8 +85,7 @@ UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId
  *
  * @return UA_StatusCode
  */
-UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instantiatedNodesList, UA_DataSource_Map *map, void *srcClass);
-
+UA_StatusCode ua_callProxy_mapDataSources(
+    UA_Server* server, nodePairList instantiatedNodesList, UA_DataSource_Map* map, void* srcClass);
 
 #endif // Header include
-

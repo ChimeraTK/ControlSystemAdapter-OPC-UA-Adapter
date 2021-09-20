@@ -34,45 +34,42 @@ using namespace std;
  *
  */
 class ua_additionalvariable : ua_mapped_class {
-private:
-        /// Kurzbeschreibung Variable a
-  string value;
-        string name;
-        string description;
+   private:
+    /// Kurzbeschreibung Variable a
+    string value;
+    string name;
+    string description;
 
-        /** @brief  Get node id of this processvariable instance
-        *
-        * @return <UA_NodeId> of this processvariable
-        */
-        UA_NodeId ownNodeId;
+    /** @brief  Get node id of this processvariable instance
+    *
+    * @return <UA_NodeId> of this processvariable
+    */
+    UA_NodeId ownNodeId;
 
-        /** @brief  This methode mapped all own nodes into the opcua server
-        *
-        * @return <UA_StatusCode>
-        */
-        UA_StatusCode mapSelfToNamespace();
+    /** @brief  This methode mapped all own nodes into the opcua server
+    *
+    * @return <UA_StatusCode>
+    */
+    UA_StatusCode mapSelfToNamespace();
 
-public:
+   public:
+    /** @brief Constructor from <ua_additionalvariable> for generic creation
+    *
+    * @param server A UA_Server type, with all server specific information from the used server
+    * @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
+    * @param name Name of the additinal node
+    * @param value Value of the additinal node
+    * @param description Descripption of the additinal node
+    */
+    ua_additionalvariable(UA_Server* server, UA_NodeId basenodeid, string name, string value, string description);
 
-        /** @brief Constructor from <ua_additionalvariable> for generic creation
-        *
-        * @param server A UA_Server type, with all server specific information from the used server
-        * @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
-        * @param name Name of the additinal node
-        * @param value Value of the additinal node
-        * @param description Descripption of the additinal node
-        */
-        ua_additionalvariable(UA_Server *server, UA_NodeId basenodeid, string name, string value, string description);
+    ~ua_additionalvariable();
 
-        ~ua_additionalvariable();
+    UA_DateTime getSourceTimeStamp();
 
-        UA_DateTime getSourceTimeStamp();
-
-    static UA_StatusCode ua_readproxy_ua_additionalvariable_getValue(UA_Server *server, const UA_NodeId *sessionId,
-                                                                     void *sessionContext, const UA_NodeId *nodeId,
-                                                                     void *nodeContext,
-                                                                     UA_Boolean includeSourceTimeStamp,
-                                                                     const UA_NumericRange *range, UA_DataValue *value);
+    static UA_StatusCode ua_readproxy_ua_additionalvariable_getValue(UA_Server* server, const UA_NodeId* sessionId,
+        void* sessionContext, const UA_NodeId* nodeId, void* nodeContext, UA_Boolean includeSourceTimeStamp,
+        const UA_NumericRange* range, UA_DataValue* value);
 
     string getValue();
 };
