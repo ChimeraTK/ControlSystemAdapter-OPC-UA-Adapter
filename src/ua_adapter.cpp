@@ -21,34 +21,29 @@
 
 extern "C" {
 #include "unistd.h"
-#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
+#include "csa_namespaceinit_generated.h"
 #include <stdio.h>
 #include <stdlib.h>
 }
 
-#include <thread>
-#include <future>
-#include <functional>     // std::ref
+
+#include <functional>
 #include <string>
 #include <regex>
 
 #include "csa_config.h"
-
 #include "ua_adapter.h"
 #include "ua_processvariable.h"
 #include "ua_additionalvariable.h"
 #include "xml_file_handler.h"
 #include "ua_proxies.h"
 
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/PVManager.h"
-
+//These defines allow the use of an define as a string
 #define xstr(a) str(a)
 #define str(a) #a
 
 using namespace ChimeraTK;
 using namespace std;
-
 
 ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
     this->mappingExceptions = UA_FALSE;
@@ -67,7 +62,7 @@ ua_uaadapter::~ua_uaadapter() {
 
 }
 
-string cleanUri(string s){
+static string cleanUri(string s){
     //replace multiple with a single space
     std::regex r1("\\s+");
     s = std::regex_replace(s, r1, " ");
@@ -79,10 +74,7 @@ string cleanUri(string s){
 }
 
 void ua_uaadapter::constructServer() {
-    //this->mappedServer = UA_Server_new();
-    //this->server_config = (UA_ServerConfig *) UA_calloc(1, sizeof(UA_ServerConfig));
-    this->server_config = NULL;
-    UA_ServerConfig* config = (UA_ServerConfig *) UA_calloc(1, sizeof(UA_ServerConfig));
+    auto config = (UA_ServerConfig *) UA_calloc(1, sizeof(UA_ServerConfig));
     UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, NULL);
 
     /*get hostname */
@@ -133,7 +125,7 @@ void ua_uaadapter::constructServer() {
 void ua_uaadapter::readConfig() {
     string xpath = "//config";
     xmlXPathObjectPtr result = this->fileHandler->getNodeSet(xpath);
-    string placeHolder = "";
+    string placeHolder;
     if(result) {
         xmlNodeSetPtr nodeset = result->nodesetval;
         if(nodeset->nodeNr > 1) {
@@ -215,9 +207,7 @@ void ua_uaadapter::readConfig() {
             try{
                 string applicationName = ApplicationBase::getInstance().getName();
                 this->serverConfig.applicationName = applicationName.c_str();
-            } catch (ChimeraTK::logic_error){
-
-            }
+            } catch (ChimeraTK::logic_error){}
             cout << "No 'applicationName'-Attribute is set in config file. Use default application-name." << endl;
         }
         //if no root folder name is set, use application name
@@ -340,7 +330,7 @@ void ua_uaadapter::deepCopyHierarchicalLayer(boost::shared_ptr<ControlSystemPVMa
         foundPVSourceName = *((UA_String *) value.data);
         UASTRING_TO_CPPSTRING(foundPVSourceName, foundPVSourceNameCPP);
         string varName = this->fileHandler->praseVariablePath(foundPVNameCPP, "/").back();
-        ua_processvariable *processvariable = new ua_processvariable(this->mappedServer, target, foundPVSourceNameCPP, csManager, foundPVNameCPP);
+        auto *processvariable = new ua_processvariable(this->mappedServer, target, foundPVSourceNameCPP, csManager, foundPVNameCPP);
         this->variables.push_back(processvariable);
     }
     UA_BrowseResult_clear(&br);
