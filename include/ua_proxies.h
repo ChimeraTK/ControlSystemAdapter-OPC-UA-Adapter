@@ -24,8 +24,8 @@ using namespace std;
  *
  */
 typedef struct UA_NodeId_pair_t {
-    UA_NodeId sourceNodeId; // Model NodeId
-    UA_NodeId targetNodeId; // Stack NodeId
+  UA_NodeId sourceNodeId; // Model NodeId
+  UA_NodeId targetNodeId; // Stack NodeId
 } UA_NodeId_pair;
 typedef std::list<UA_NodeId_pair*> nodePairList;
 
@@ -35,13 +35,13 @@ typedef std::list<UA_NodeId_pair*> nodePairList;
  *
  */
 typedef struct UA_DataSource_Map_Element_t {
-    UA_NodeId typeTemplateId;
-    UA_LocalizedText description; // individuell description for every variable
-    UA_StatusCode (*read)(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId,
-        void* nodeContext, UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value);
+  UA_NodeId typeTemplateId;
+  UA_LocalizedText description; // individuell description for every variable
+  UA_StatusCode (*read)(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId,
+                        void* nodeContext, UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value);
 
-    UA_StatusCode (*write)(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId,
-        void* nodeContext, const UA_NumericRange* range, const UA_DataValue* value);
+  UA_StatusCode (*write)(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId,
+                         void* nodeContext, const UA_NumericRange* range, const UA_DataValue* value);
 } UA_DataSource_Map_Element;
 typedef std::list<UA_DataSource_Map_Element> UA_DataSource_Map;
 
