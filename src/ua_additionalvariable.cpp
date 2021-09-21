@@ -82,12 +82,15 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
     UA_NodeId createdNodeId = UA_NODEID_NULL;
 
     if(UA_NodeId_equal(&this->baseNodeId, &createdNodeId) == UA_TRUE)
-        return UA_STATUSCODE_BADINVALIDARGUMENT; // Something went UA_WRING (initializer should have set this!)
+        return UA_STATUSCODE_BADINVALIDARGUMENT;
 
     //Generate additional variable node id
     UA_String baseNodeIdString = baseNodeId.identifier.string;
     string baseNodeIdStringCPP;
     UASTRING_TO_CPPSTRING(baseNodeIdString, baseNodeIdStringCPP);
+    if (!baseNodeIdStringCPP.empty()) {
+      baseNodeIdStringCPP.resize(baseNodeIdStringCPP.size() - 3);
+    }
 
     UA_String* opcua_node_variable_t_ns_2_variant_DataContents = UA_String_new();
     *opcua_node_variable_t_ns_2_variant_DataContents = UA_STRING_ALLOC(this->value.c_str());

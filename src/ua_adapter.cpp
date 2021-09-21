@@ -240,7 +240,6 @@ void ua_uaadapter::readConfig() {
                 this->pvSeperator += this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
             }
         }
-
         xmlXPathFreeObject(result);
     }
     else {
@@ -334,7 +333,6 @@ void ua_uaadapter::deepCopyHierarchicalLayer(
         string foundPVSourceNameCPP;
         UA_Variant value;
         UA_STRING_TO_CPPSTRING_COPY(&rd.nodeId.nodeId.identifier.string, &pvSourceNameid);
-        pvSourceNameid = pvSourceNameid.substr(0, pvSourceNameid.length() - 5);
         UA_Server_readValue(this->mappedServer, UA_NODEID_STRING(1, (char*)(pvSourceNameid + "/name").c_str()), &value);
         foundPVSourceName = *((UA_String*)value.data);
         UASTRING_TO_CPPSTRING(foundPVSourceName, foundPVSourceNameCPP);
@@ -415,14 +413,14 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                 }
                 continue;
             }
-            //check a pv with the requested node id exists
+            //check if a pv with the requested node id exists
             UA_NodeId tmpOutput = UA_NODEID_NULL;
             string pvNodeString;
             if(destination.empty()) {
-                pvNodeString = this->serverConfig.rootFolder + "/" + folder;
+                pvNodeString += this->serverConfig.rootFolder + "/" + folder + "Dir";
             }
             else {
-                pvNodeString = this->serverConfig.rootFolder + "/" + destination + "/" + folder;
+                pvNodeString += this->serverConfig.rootFolder + "/" + destination + "/" + folder + "Dir";
             }
             UA_NodeId pvNode = UA_NODEID_STRING(1, (char*)pvNodeString.c_str());
             UA_Server_readNodeId(this->mappedServer, pvNode, &tmpOutput);
@@ -458,7 +456,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
             }
             folderPathNodeId = enrollFolderPathFromString(destination + "/replacePart", "/");
             if(UA_NodeId_isNull(&folderPathNodeId)) {
-                folderPathNodeId = UA_NODEID_STRING(1, (char*)this->serverConfig.rootFolder.c_str());
+                folderPathNodeId = UA_NODEID_STRING(1, (char*)(this->serverConfig.rootFolder + "Dir").c_str());
             }
             //check if source name is set -> map complete hierarchical structure to the destination
             if(!sourceName.empty()) {
@@ -475,7 +473,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                     continue;
                 }
                 //check if the src is a folder
-                string sourceFolder = this->serverConfig.rootFolder + "/" + sourceName;
+                string sourceFolder = this->serverConfig.rootFolder + "/" + sourceName + "Dir";
                 bool isFolderType = false;
                 UA_NodeId sourceFolderId = UA_NODEID_STRING(1, (char*)sourceFolder.c_str());
 
@@ -533,11 +531,11 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                     if(UA_NodeId_isNull(&copyRoot)) {
                         string existingDestinationFolderString;
                         if(destination.empty()) {
-                            existingDestinationFolderString = this->serverConfig.rootFolder + "/" + folder;
+                            existingDestinationFolderString += this->serverConfig.rootFolder + "/" + folder + "Dir";
                         }
                         else {
                             existingDestinationFolderString =
-                                this->serverConfig.rootFolder + "/" + destination + "/" + folder;
+                                this->serverConfig.rootFolder += "/" + destination + "/" + folder + "Dir";
                         }
                         copyRoot = UA_NODEID_STRING(1, (char*)existingDestinationFolderString.c_str());
                     }
@@ -602,8 +600,12 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
                 continue;
             }
             //create the requested folder hierarchy
-            //enrollFolderPathFromString((destination+"/"+folder)+"/removedPart", "/");
             UA_NodeId retnode = createFolder(folderPathNodeId, folder);
+            //set folder description
+            if(copy.empty() && sourceName.empty() && !description.empty()) {
+              UA_Server_writeDescription(this->mappedServer, retnode,
+                                         UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
+            }
             UA_NodeId_clear(&retnode);
         }
 
@@ -663,7 +665,6 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                     (sourceName.substr(0,
                         sourceName.length() - this->fileHandler->praseVariablePath(sourceName, "/").back().length() -
                             1));
-                //cout << "Folder of the var " << parentSourceFolder << endl;
                 UA_NodeId parentSourceFolderId = UA_NODEID_STRING(1, (char*)parentSourceFolder.c_str());
                 UA_NodeId pvNodeId = UA_NODEID_NULL;
                 UA_BrowseDescription bd;
@@ -991,11 +992,13 @@ void ua_uaadapter::addAdditionalVariables() {
             }
 
             UA_NodeId additionalVarFolderPath = UA_NODEID_NULL;
+            string additionalVarFolderPathNodeId;
             if(!destination.empty()) {
                 additionalVarFolderPath = enrollFolderPathFromString(destination + "/removePart", "/");
             }
             else {
-                additionalVarFolderPath = UA_NODEID_STRING(1, (char*)this->serverConfig.rootFolder.c_str());
+                additionalVarFolderPathNodeId = this->serverConfig.rootFolder + "Dir";
+                additionalVarFolderPath = UA_NODEID_STRING_ALLOC(1, (char*) additionalVarFolderPathNodeId.c_str());
             }
             if(UA_NodeId_isNull(&additionalVarFolderPath)) {
                 if(this->mappingExceptions) {
@@ -1037,6 +1040,9 @@ UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderN
     string parentNodeIdString;
     if(basenodeid.identifierType == UA_NODEIDTYPE_STRING) {
         UASTRING_TO_CPPSTRING(basenodeid.identifier.string, parentNodeIdString);
+        if (!parentNodeIdString.empty()) {
+          parentNodeIdString.resize(parentNodeIdString.size() - 3);
+        }
         parentNodeIdString += '/' + folderName;
     }
     else if(basenodeid.identifierType == UA_NODEIDTYPE_NUMERIC) {
@@ -1044,7 +1050,7 @@ UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderN
     }
 
     UA_Server_addObjectNode(this->mappedServer,
-        UA_NODEID_STRING(1, (char*)parentNodeIdString.c_str()), //UA_NODEID_NUMERIC(1,0)
+        UA_NODEID_STRING(1, ((char*) (parentNodeIdString + "Dir").c_str())), //UA_NODEID_NUMERIC(1,0)
         basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), UA_QUALIFIEDNAME(1, (char*)folderName.c_str()),
         UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr, &this->ownedNodes, &createdNodeId);
 
@@ -1067,7 +1073,7 @@ UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
     oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.rootFolder.c_str());
     oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.descriptionFolder.c_str());
 
-    UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char*)this->serverConfig.rootFolder.c_str()),
+    UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, ((char*) (this->serverConfig.rootFolder+"Dir").c_str())),
         UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
         UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()),
         UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &this->ownedNodes, &createdNodeId);
