@@ -606,7 +606,6 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
         UA_Server_writeDescription(this->mappedServer, retnode,
                                    UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
       }
-      UA_NodeId_clear(&retnode);
     }
 
     xmlXPathFreeObject(result);
@@ -997,7 +996,7 @@ void ua_uaadapter::addAdditionalVariables() {
         additionalVarFolderPath = enrollFolderPathFromString(destination + "/removePart", "/");
       }
       else {
-        additionalVarFolderPathNodeId = this->serverConfig.rootFolder + "Dir";
+        additionalVarFolderPathNodeId += this->serverConfig.rootFolder + "Dir";
         additionalVarFolderPath = UA_NODEID_STRING_ALLOC(1, (char*) additionalVarFolderPathNodeId.c_str());
       }
       if(UA_NodeId_isNull(&additionalVarFolderPath)) {
@@ -1027,7 +1026,7 @@ UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderN
   UA_NodeId createdNodeId = UA_NODEID_NULL;
 
   if(UA_NodeId_equal(&baseNodeId, &createdNodeId) == UA_TRUE) {
-    return createdNodeId; // Something went UA_WRING (initializer should have set this!)
+    return createdNodeId; // Something went wrong (initializer should set this!)
   }
 
   // Create our toplevel instance
@@ -1043,14 +1042,14 @@ UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderN
     if (!parentNodeIdString.empty()) {
       parentNodeIdString.resize(parentNodeIdString.size() - 3);
     }
-    parentNodeIdString += '/' + folderName;
+    parentNodeIdString += '/' + folderName + "Dir";
   }
   else if(basenodeid.identifierType == UA_NODEIDTYPE_NUMERIC) {
-    parentNodeIdString += '/' + to_string(basenodeid.identifier.numeric);
+    parentNodeIdString += '/' + to_string(basenodeid.identifier.numeric) + "Dir";
   }
 
   UA_Server_addObjectNode(this->mappedServer,
-                          UA_NODEID_STRING(1, ((char*) (parentNodeIdString + "Dir").c_str())), //UA_NODEID_NUMERIC(1,0)
+                          UA_NODEID_STRING(1, (char*) parentNodeIdString.c_str()), //UA_NODEID_NUMERIC(1,0)
                           basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), UA_QUALIFIEDNAME(1, (char*)folderName.c_str()),
                           UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr, &this->ownedNodes, &createdNodeId);
 

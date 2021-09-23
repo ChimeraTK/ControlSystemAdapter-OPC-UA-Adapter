@@ -29,29 +29,29 @@ void UAMappingTest::testExampleSet() {
   ua_uaadapter* uaadapter = csaOPCUA->getUAAdapter();
 
   UA_NodeId result = UA_NODEID_NULL;
-  UA_Server_readNodeId(uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/1/FOLDER"), &result);
+  UA_Server_readNodeId(uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/1/FOLDERDir"), &result);
   BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
   // check if target folder for copy with source was created
   result = UA_NODEID_NULL;
   UA_Server_readNodeId(
-      uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest"), &result);
+      uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTestDir"), &result);
   BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
   result = UA_NODEID_NULL;
   UA_Server_readNodeId(uaadapter->getMappedServer(),
-                       UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSep"), &result);
+                       UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSepDir"), &result);
   BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
   result = UA_NODEID_NULL;
   UA_Server_readNodeId(uaadapter->getMappedServer(),
-                       UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSep/stringScalarValue"), &result);
+                       UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSep/stringScalar"), &result);
   BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
 
   result = UA_NODEID_NULL;
   UA_Server_readNodeId(
-      uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/linkWithSourceTest"), &result);
+      uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/linkWithSourceTestDir"), &result);
   BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
   UA_BrowseDescription bd;
   bd.includeSubtypes = false;
-  bd.nodeId = UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/linkWithSourceTest");
+  bd.nodeId = UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/linkWithSourceTestDir");
   bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
   bd.resultMask = UA_BROWSERESULTMASK_BROWSENAME;
   bd.nodeClassMask = UA_NODECLASS_OBJECT;
@@ -64,7 +64,7 @@ void UAMappingTest::testExampleSet() {
   }
   UA_BrowseResult_clear(&br);
 
-  bd.nodeId = UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/2/FOLDER");
+  bd.nodeId = UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/2/FOLDERDir");
   bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
   bd.resultMask = UA_BROWSERESULTMASK_BROWSENAME;
   bd.nodeClassMask = UA_NODECLASS_VARIABLE;

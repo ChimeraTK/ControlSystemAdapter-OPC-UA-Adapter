@@ -124,8 +124,9 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
   UA_Variant_setScalarCopy(&vAttr2.value, &addVarDescription, &UA_TYPES[UA_TYPES_STRING]);
 
   UA_QualifiedName qualName2 = UA_QUALIFIEDNAME_ALLOC(1, this->description.c_str());
+  string parentNodeStringDescription = baseNodeIdStringCPP + "/" + name + "/description";
   retval |= UA_Server_addVariableNode(this->mappedServer,
-                                      UA_NODEID_STRING(1, (char*)(baseNodeIdStringCPP + "/" + name + "/description").c_str()), this->ownNodeId,
+                                      UA_NODEID_STRING(1, (char*) parentNodeStringDescription.c_str()), this->ownNodeId,
                                       UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName2, UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
                                       vAttr2, NULL, NULL);
 
