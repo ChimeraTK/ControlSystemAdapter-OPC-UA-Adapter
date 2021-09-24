@@ -724,7 +724,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
         continue;
       }
       //check if the source pv exists
-      string parentSourceString = this->serverConfig.rootFolder + "/" + sourceName + "Value";
+      string parentSourceString = this->serverConfig.rootFolder + "/" + sourceName;
       UA_NodeId parentSourceId = UA_NODEID_STRING(1, (char*)parentSourceString.c_str());
       UA_NodeId tmpOutput = UA_NODEID_NULL;
       UA_Server_readNodeId(this->mappedServer, parentSourceId, &tmpOutput);
