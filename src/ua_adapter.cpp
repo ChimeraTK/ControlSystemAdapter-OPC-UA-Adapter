@@ -102,6 +102,11 @@ void ua_uaadapter::constructServer() {
   string product_urn = "urn:ChimeraTK:" + this->serverConfig.applicationName;
   config->buildInfo.productUri = UA_STRING_ALLOC((char*)(cleanUri(product_urn)).c_str());
 
+  for(size_t i = 0; i < config->endpointsSize; ++i){
+    UA_ApplicationDescription_clear(&config->endpoints[i].server);
+    UA_ApplicationDescription_copy(&config->applicationDescription, &config->endpoints[i].server);
+  }
+
   this->mappedServer = UA_Server_newWithConfig(config);
   this->server_config = UA_Server_getConfig(this->mappedServer);
 
