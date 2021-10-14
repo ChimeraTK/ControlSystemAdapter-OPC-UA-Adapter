@@ -1697,7 +1697,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   UA_Variant_setScalar(
       &attr.value, &opcua_node_variable_t_ns_2_i_6004_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
   addResult = UA_Server_addVariableNode(this->mappedServer,
-                                        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/name").c_str()), pvNodeId,
+                                        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Name").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*)"Name"),
                                         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, this, &createdNodeId);
   if(addResult == UA_STATUSCODE_GOOD) {
@@ -1722,7 +1722,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   UA_Variant_setScalar(
       &attr.value, &opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
   addResult = UA_Server_addVariableNode(this->mappedServer,
-                                        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/description").c_str()), pvNodeId,
+                                        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Description").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"Description"), UA_NODEID_NUMERIC(0, 63), attr, this,
                                         &createdNodeId);
   if(addResult == UA_STATUSCODE_GOOD) {
@@ -1744,7 +1744,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.userAccessLevel = 3;
   attr.valueRank = -1;
   addResult = UA_Server_addVariableNode(this->mappedServer,
-                                        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/engineeringunit").c_str()), pvNodeId,
+                                        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/EngineeringUnit").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"EngineeringUnit"), UA_NODEID_NUMERIC(0, 63), attr, this,
                                         &createdNodeId);
   if(addResult == UA_STATUSCODE_GOOD) {
@@ -1772,7 +1772,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
   UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
   addResult = UA_Server_addVariableNode(this->mappedServer,
-                                        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/type").c_str()), pvNodeId,
+                                        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Type").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"Type"), UA_NODEID_NUMERIC(0, 63), attr, this,
                                         &createdNodeId);
   if(addResult == UA_STATUSCODE_GOOD) {
@@ -1794,7 +1794,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.userAccessLevel = 3;
   attr.valueRank = -1;
   addResult = UA_Server_addVariableNode(this->mappedServer,
-                                        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/validity").c_str()), pvNodeId,
+                                        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Validity").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"Validity"), UA_NODEID_NUMERIC(0, 63), attr, this,
                                         &createdNodeId);
   if(addResult == UA_STATUSCODE_GOOD) {

@@ -333,7 +333,7 @@ void ua_uaadapter::deepCopyHierarchicalLayer(
     string foundPVSourceNameCPP;
     UA_Variant value;
     UA_STRING_TO_CPPSTRING_COPY(&rd.nodeId.nodeId.identifier.string, &pvSourceNameid);
-    UA_Server_readValue(this->mappedServer, UA_NODEID_STRING(1, (char*)(pvSourceNameid + "/name").c_str()), &value);
+    UA_Server_readValue(this->mappedServer, UA_NODEID_STRING(1, (char*)(pvSourceNameid + "/Name").c_str()), &value);
     foundPVSourceName = *((UA_String*)value.data);
     UASTRING_TO_CPPSTRING(foundPVSourceName, foundPVSourceNameCPP);
     string varName = this->fileHandler->praseVariablePath(foundPVNameCPP, "/").back();

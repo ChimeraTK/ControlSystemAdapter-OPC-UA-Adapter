@@ -117,14 +117,14 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
   UA_VariableAttributes vAttr2;
   UA_VariableAttributes_init(&vAttr2);
   vAttr2 = UA_VariableAttributes_default;
-  vAttr2.displayName = UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)"description");
+  vAttr2.displayName = UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)"Description");
   vAttr2.description = UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)this->description.c_str());
   vAttr2.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
   UA_String addVarDescription = UA_STRING_ALLOC(description.c_str());
   UA_Variant_setScalarCopy(&vAttr2.value, &addVarDescription, &UA_TYPES[UA_TYPES_STRING]);
 
   UA_QualifiedName qualName2 = UA_QUALIFIEDNAME_ALLOC(1, this->description.c_str());
-  string parentNodeStringDescription = baseNodeIdStringCPP + "/" + name + "/description";
+  string parentNodeStringDescription = baseNodeIdStringCPP + "/" + name + "/Description";
   retval |= UA_Server_addVariableNode(this->mappedServer,
                                       UA_NODEID_STRING(1, (char*) parentNodeStringDescription.c_str()), this->ownNodeId,
                                       UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName2, UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
