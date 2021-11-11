@@ -75,6 +75,13 @@ struct ServerConfig {
   string username = "";
   string applicationName = "OPCUA-Adapter";
   uint16_t opcuaPort = 16664;
+  bool enableSecurity = false;
+  bool unsecure = false;
+  string certPath = "";
+  string keyPath = "";
+  string allowListFolder = "";
+  string blockListFolder = "";
+  string issuerListFolder = "";
 };
 
 /** @class ua_uaadapter
