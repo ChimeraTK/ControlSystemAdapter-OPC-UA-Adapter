@@ -254,8 +254,8 @@ string ua_processvariable::getType() {
     return "double";
   else if(valueType == typeid(string))
     return "string";
-  else if(valueType == typeid(bool))
-    return "bool";
+  else if(valueType == typeid(Boolean))
+    return "Boolean";
   else
     return "Unsupported type";
 }
@@ -688,15 +688,15 @@ UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
       while(this->csManager->getProcessArray<bool>(this->namePV)->readNonBlocking()) {
       }
     }
-    if(this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0).size() == 1) {
-      bool bval = this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0).at(0);
+    if(this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size() == 1) {
+      Boolean bval = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &bval, &UA_TYPES[UA_TYPES_BOOLEAN]);
     }
     else {
       // Array
-      std::vector<bool> bvector = this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0);
+      std::vector<Boolean> bvector = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0);
       // Da vector<bool> kein Array liefert, müssen die Daten umkopiert werden
-      bool* barr = new bool[bvector.size()];
+      Boolean* barr = new Boolean[bvector.size()];
       for(size_t i = 0; i < bvector.size(); i++) {
         barr[i] = bvector[i];
       }
@@ -1157,23 +1157,23 @@ UA_StatusCode ua_processvariable::setValue_bool(const UA_Variant* data) {
 
   if(type == UA_PV_BOOL) {
     if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-      vector<bool> valueArray;
+      vector<Boolean> valueArray;
       if(UA_Variant_isScalar(data) && (!array)) {
-        bool value = *((bool*)data->data);
+        Boolean value = *((Boolean*)data->data);
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        bool* v = (bool*)data->data;
+        Boolean* v = (Boolean*)data->data;
         valueArray.resize(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
           valueArray.at(i) = v[i];
         }
-        if(this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0).size() != data->arrayLength) {
+        if(this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size() != data->arrayLength) {
           return UA_STATUSCODE_BADINVALIDARGUMENT;
         }
       }
-      this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0) = valueArray;
-      this->csManager->getProcessArray<bool>(this->namePV)->write();
+      this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0) = valueArray;
+      this->csManager->getProcessArray<Boolean>(this->namePV)->write();
       retval = UA_STATUSCODE_GOOD;
     }
     else {
@@ -1595,13 +1595,13 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     }
     mapDs.push_back(mapElem);
   }
-  else if(valueType == typeid(bool)) {
+  else if(valueType == typeid(Boolean)) {
     type = UA_PV_BOOL;
     UA_DataSource_Map_Element mapElem;
     mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
     mapElem.description = description;
     mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
-    if(this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0).size() == 1) {
+    if(this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
       if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
         mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
@@ -1621,7 +1621,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
       UA_Variant uaArrayDimensions;
       UA_UInt32 arrayDims[1];
-      arrayDims[0] = this->csManager->getProcessArray<bool>(this->namePV)->accessChannel(0).size();
+      arrayDims[0] = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size();
       UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
       UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }

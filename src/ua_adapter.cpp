@@ -114,7 +114,7 @@ void ua_uaadapter::constructServer() {
   auto* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
   usernamePasswordLogins->password = UA_STRING_ALLOC((char*)this->serverConfig.password.c_str());
   usernamePasswordLogins->username = UA_STRING_ALLOC((char*)this->serverConfig.username.c_str());
-  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
+  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin, NULL,
                            &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
                            usernamePasswordLogins);
 
