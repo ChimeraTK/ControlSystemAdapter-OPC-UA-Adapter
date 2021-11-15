@@ -27,7 +27,7 @@ ELSE (${open62541_FOUND})
 ENDIF (${open62541_FOUND})
 
 #Do not put any of the following packages as required. We will install it if it is not found.
-find_package(ChimeraTK-ControlSystemAdapter 01.00)
+find_package(ChimeraTK-ControlSystemAdapter 02.03)
 find_package(ChimeraTK-DeviceAccess 02.06)
 
 #Install the DeviceAccess if it is not pre-installed
