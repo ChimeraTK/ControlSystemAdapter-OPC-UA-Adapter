@@ -685,7 +685,7 @@ UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
 
   if(this->type == UA_PV_BOOL) {
     if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
-      while(this->csManager->getProcessArray<bool>(this->namePV)->readNonBlocking()) {
+      while(this->csManager->getProcessArray<Boolean>(this->namePV)->readNonBlocking()) {
       }
     }
     if(this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size() == 1) {
