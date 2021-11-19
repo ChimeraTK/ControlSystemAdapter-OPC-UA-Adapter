@@ -22,7 +22,7 @@
 
 #include <iostream>
 #include <math.h>
-#include <sys/sysinfo.h> 
+#include <sys/sysinfo.h>
 #include <unistd.h>
 
 #include <ChimeraTK/ReadAnyGroup.h>
@@ -38,10 +38,10 @@ runtime_value_generator::runtime_value_generator(boost::shared_ptr<DevicePVManag
 }
 
 runtime_value_generator::~runtime_value_generator() {
-    this->running = false;
-    if(this->valueGeneratorThread.joinable()) {
-        this->valueGeneratorThread.join();
-    }
+  this->running = false;
+  if(this->valueGeneratorThread.joinable()) {
+    this->valueGeneratorThread.join();
+  }
 }
 
 void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> devManager) {
@@ -51,6 +51,7 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
   for(auto& pv : devManager->getAllProcessVariables()) {
     if(pv->isReadable()) readAnyGroup.add(pv);
   }
+  readAnyGroup.finalise();
 
   // Time meassureing
   clock_t start, end, im1, im2, writeTime;
@@ -61,16 +62,10 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
   devManager->getProcessArray<int32_t>("t")->accessChannel(0) = vector<int32_t>{(int32_t)start};
 
   while(this->running) {
-    //  FIXME -Or maybe not: The Const M_PI from math.h generate senceless values, hence I use fix value 3.141
-    // 	double double_sine = csManager->getProcessScalar<double>("amplitude")->accessChannel(0) * sin(((2*M_PI)/csManager->getProcessScalar<int32_t>("period")->accessChannel(0)) * csManager->getProcessScalar<int32_t>("t")->accessChannel(0));
     double double_sine = devManager->getProcessArray<double>("amplitude")->accessChannel(0).at(0) *
-        sin((2 * 3.141) / devManager->getProcessArray<double>("period")->accessChannel(0).at(0) *
-            devManager->getProcessArray<int32_t>("t")->accessChannel(0).at(0));
+                         sin((2 * 3.141) / devManager->getProcessArray<double>("period")->accessChannel(0).at(0) *
+                             devManager->getProcessArray<int32_t>("t")->accessChannel(0).at(0));
     int32_t int_sine = round(double_sine);
-    // 	bool bool_sine = (double_sine > 0)? true : false;
-    // 	std::cout << "double_sine: " << double_sine << std::endl;
-    // 	std::cout << "int_sine: " << int_sine << std::endl;
-    // 	std::cout << "bool_sine: " << bool_sine << std::endl;
 
     devManager->getProcessArray<double>("double_sine")->accessChannel(0) = vector<double>{double_sine};
     devManager->getProcessArray<double>("double_sine")->write();
@@ -107,7 +102,7 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
       writeTime += im2 - im1;
       counter++;
     }
-		
+
     duration1 = ((float)writeTime / CLOCKS_PER_SEC) * 1000.0f;
     printf("1: %d write passes, duration write: %.3f ms\n", counter, duration1);
 
@@ -132,7 +127,7 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
     clock_t tmp3 = clock();
     duration1 = ((float)(tmp3 - tmp2) / CLOCKS_PER_SEC) * 1000.0f;
     printf("write pass 2, duration write: %.3f ms\n", duration1);
-	
+
     while(readAnyGroup.readAnyNonBlocking().isValid()) continue;
   }
 }

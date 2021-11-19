@@ -28,14 +28,14 @@
 using namespace ChimeraTK;
 
 class runtime_value_generator {
-private:   
-    bool running;
-    std::thread valueGeneratorThread;
+ private:
+  bool running;
+  std::thread valueGeneratorThread;
 
-   public:
-    runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager);
-    ~runtime_value_generator();
-    void generateValues(boost::shared_ptr<DevicePVManager> devManager);
+ public:
+  runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager);
+  ~runtime_value_generator();
+  void generateValues(boost::shared_ptr<DevicePVManager> devManager);
 };
 
 #endif // RUN_TIME_VALUE_GENERATOR_H

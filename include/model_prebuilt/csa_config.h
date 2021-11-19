@@ -4,7 +4,7 @@
 /* Example parameter expansion:
  * #define ENABLE_BUILDMODEL ""
  */
- 
+
 // Namespace ID for UA Information Model
 #define CSA_NSID 2
 
@@ -15,10 +15,10 @@
 
 // ... of ProcessVariable
 #define CSA_NSID_VARIABLE 1001
-#define CSA_NSID_VARIABLE_NAME  6004
-#define CSA_NSID_VARIABLE_DESC	6001
-#define CSA_NSID_VARIABLE_UNIT  6006
-#define CSA_NSID_VARIABLE_TYPE  6012
+#define CSA_NSID_VARIABLE_NAME 6004
+#define CSA_NSID_VARIABLE_DESC 6001
+#define CSA_NSID_VARIABLE_UNIT 6006
+#define CSA_NSID_VARIABLE_TYPE 6012
 
 // .... of AdditionalVariable
 #define CSA_NSID_ADDITIONAL_VARIABLE_VALUE 6002

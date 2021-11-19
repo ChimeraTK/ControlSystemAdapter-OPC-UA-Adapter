@@ -22,73 +22,63 @@ extern "C" {
 #include "unistd.h"
 }
 
-#include "csa_opcua_adapter.h"
-
 #include <iostream>
-#include <math.h>
-#include <typeinfo>       // std::bad_cast
 
+#include "csa_opcua_adapter.h"
 #include "ua_adapter.h"
 #include "ua_processvariable.h"
 
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/PVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
+csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
+  this->csManager = csManager;
 
-csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager,
-                                     string configFile) {
-    this->csManager = csManager;
+  // Create new server adapter
+  this->adapter = new ua_uaadapter(configFile);
 
-    // Create new server adapter
-    this->adapter = new ua_uaadapter(configFile);
+  // Initialize the process variables
+  // This internally starts the managed threads in the mgr...
+  vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
 
-    // Initialize the process variables
-    // This internally starts the managed threads in the mgr...
-    vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
+  //start implicit var mapping
+  for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
+    //adapter->addVariable(oneProcessVariable->getName(), this->csManager);
+    adapter->implicitVarMapping(oneProcessVariable->getName(), this->csManager);
+  }
 
-    //start implicit var mapping
-    for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
-        //adapter->addVariable(oneProcessVariable->getName(), this->csManager);
-        adapter->implicitVarMapping(oneProcessVariable->getName(), this->csManager);
+  adapter->applyMapping(this->csManager);
+
+  vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
+  if(!allNotMappedVariables.empty()) {
+    cout << "The following VariableNodes cant be mapped, because they are not member in PV-Manager:" << endl;
+    for(string var : allNotMappedVariables) {
+      cout << var << endl;
     }
-
-    adapter->applyMapping(this->csManager);
-
-    vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
-		if(!allNotMappedVariables.empty()) {
-			cout << "The following VariableNodes cant be mapped, because they are not member in PV-Manager:" << endl;
-			for(string var:allNotMappedVariables) {
-				cout << var << endl;
-			}
-		}
+  }
 }
 
 csa_opcua_adapter::~csa_opcua_adapter() {
-    this->stop();
-	this->adapter->~ua_uaadapter();
+  this->stop();
+  this->adapter->~ua_uaadapter();
 }
 
-boost::shared_ptr<ControlSystemPVManager> const & csa_opcua_adapter::getControlSystemManager() const {
-    return this->csManager;
+boost::shared_ptr<ControlSystemPVManager> const& csa_opcua_adapter::getControlSystemManager() const {
+  return this->csManager;
 }
 
 ua_uaadapter* csa_opcua_adapter::getUAAdapter() {
-	return this->adapter;
+  return this->adapter;
 }
 
 void csa_opcua_adapter::start() {
-    if(!this->adapter_thread.joinable())
-        this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter);
+  if(!this->adapter_thread.joinable()) this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter);
 }
 
 void csa_opcua_adapter::stop() {
-    if(this->adapter_thread.joinable()) {
-        this->adapter->running = false;
-        this->adapter_thread.join();
-    }
+  if(this->adapter_thread.joinable()) {
+    this->adapter->running = false;
+    this->adapter_thread.join();
+  }
 }
 
 bool csa_opcua_adapter::isRunning() {
-    return this->adapter_thread.joinable();
+  return this->adapter_thread.joinable();
 }

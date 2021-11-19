@@ -13,7 +13,7 @@
   #include "ua_types_generated_encoding_binary.h"
   #include "ua_transport_generated_encoding_binary.h"
 #else
-  #include "open62541.h"
+  #include <open62541/server.h>
 #endif
 
 /* Definition that (in userspace models) may be 

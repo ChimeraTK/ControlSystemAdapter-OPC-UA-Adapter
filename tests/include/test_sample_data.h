@@ -7,9 +7,14 @@
 #include "ChimeraTK/ControlSystemAdapter/ProcessArray.h"
 
 extern "C" {
-	#include "unistd.h"
-	#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
+#include "unistd.h"
+#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
+
+#include <open62541/server_config_default.h>
+#include <open62541/client_highlevel.h>
+#include <open62541/client_config_default.h>
+#include <open62541/client.h>
 
 using namespace ChimeraTK;
 using namespace std;
@@ -40,8 +45,8 @@ struct TestFixturePVSet {
         devManager->createProcessArray<uint8_t>(SynchronizationDirection::controlSystemToDevice, "uint8Scalar", 1);
     ProcessArray<int16_t>::SharedPtr intA16dev =
         devManager->createProcessArray<int16_t>(SynchronizationDirection::controlSystemToDevice, "int16Scalar", 1);
-    ProcessArray<uint16_t>::SharedPtr intAu16dev =
-        devManager->createProcessArray<uint16_t>(SynchronizationDirection::controlSystemToDevice, "uint16Scalar", 1);
+    ProcessArray<uint16_t>::SharedPtr intAu16dev = devManager->createProcessArray<uint16_t>(
+        SynchronizationDirection::controlSystemToDevice, "uint16Scalar", 1);
     ProcessArray<int32_t>::SharedPtr intA3devMap = devManager->createProcessArray<int32_t>(
         SynchronizationDirection::controlSystemToDevice, "Dein/Name/ist/int32Scalar", 1);
     ProcessArray<uint32_t>::SharedPtr intAu32devMap = devManager->createProcessArray<uint32_t>(
@@ -56,28 +61,28 @@ struct TestFixturePVSet {
         SynchronizationDirection::controlSystemToDevice, "Dieser/Name/ist/doubleScalar", 1);
     ProcessArray<string>::SharedPtr stringAddev2 =
         devManager->createProcessArray<string>(SynchronizationDirection::deviceToControlSystem,
-            "1/FOLDER/defaultSep/stringScalar", 1, "my description", "desc");
+                                               "1/FOLDER/defaultSep/stringScalar", 1, "my description", "desc");
 
     ProcessArray<int8_t>::SharedPtr intB15A8devMap =
         devManager->createProcessArray<int8_t>(SynchronizationDirection::controlSystemToDevice,
-            "Mein/Name_ist#int8Array_s15", 15, "Einheit", "Beschreibung der Variable");
+                                               "Mein/Name_ist#int8Array_s15", 15, "Einheit", "Beschreibung der Variable");
     ProcessArray<uint8_t>::SharedPtr intB10Au8devMap1 = devManager->createProcessArray<uint8_t>(
         SynchronizationDirection::controlSystemToDevice, "Dein/Name/ist/uint8Array_s10", 10);
     ProcessArray<int16_t>::SharedPtr intB10Au16devMap2 = devManager->createProcessArray<int16_t>(
         SynchronizationDirection::controlSystemToDevice, "Unser/Name/ist_int16Array_s10", 12);
     ProcessArray<uint16_t>::SharedPtr intB10Au8devMap2 =
         devManager->createProcessArray<uint16_t>(SynchronizationDirection::controlSystemToDevice,
-            "Unser/Name/ist_uint8Array_s10", 10, "Einheit", "Beschreibung der Variable");
-    ProcessArray<int32_t>::SharedPtr intB15A32dev =
-        devManager->createProcessArray<int32_t>(SynchronizationDirection::controlSystemToDevice, "int32Array_s15", 15);
+                                                 "Unser/Name/ist_uint8Array_s10", 10, "Einheit", "Beschreibung der Variable");
+    ProcessArray<int32_t>::SharedPtr intB15A32dev = devManager->createProcessArray<int32_t>(
+        SynchronizationDirection::controlSystemToDevice, "int32Array_s15", 15);
     ProcessArray<uint32_t>::SharedPtr intB10Au32dev = devManager->createProcessArray<uint32_t>(
         SynchronizationDirection::controlSystemToDevice, "uint32Array_s10", 10);
-    ProcessArray<int64_t>::SharedPtr intB15A64dev =
-        devManager->createProcessArray<int64_t>(SynchronizationDirection::controlSystemToDevice, "int64Array_s15", 15);
+    ProcessArray<int64_t>::SharedPtr intB15A64dev = devManager->createProcessArray<int64_t>(
+        SynchronizationDirection::controlSystemToDevice, "int64Array_s15", 15);
     ProcessArray<uint64_t>::SharedPtr intB15Au64dev = devManager->createProcessArray<uint64_t>(
         SynchronizationDirection::controlSystemToDevice, "uint64Array_s10", 10);
-    ProcessArray<double>::SharedPtr intB15Afdev =
-        devManager->createProcessArray<double>(SynchronizationDirection::controlSystemToDevice, "doubleArray_s15", 15);
+    ProcessArray<double>::SharedPtr intB15Afdev = devManager->createProcessArray<double>(
+        SynchronizationDirection::controlSystemToDevice, "doubleArray_s15", 15);
     ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(
         SynchronizationDirection::controlSystemToDevice, "floatArray_s101234", 10);
 
@@ -86,24 +91,20 @@ struct TestFixturePVSet {
 };
 
 struct TestFixtureServerSet {
-  uint32_t opcuaPort;
+  uint32_t opcuaPort = 16663;
   /* Create new Server */
-  UA_ServerConfig server_config;
+  UA_ServerConfig* server_config;
   UA_ServerNetworkLayer server_nl;
   UA_Server* mappedServer;
   UA_NodeId baseNodeId;
   UA_Boolean runUAServer;
 
   TestFixtureServerSet() {
-    opcuaPort = 16663;
-    server_config = UA_ServerConfig_standard;
-    server_nl = UA_ServerNetworkLayerTCP(UA_ConnectionConfig_standard, opcuaPort);
-    server_config.logger = UA_Log_Stdout;
-    server_config.networkLayers = &server_nl;
-    server_config.networkLayersSize = 1;
+    this->mappedServer = UA_Server_new();
+    UA_ServerConfig_setMinimal(UA_Server_getConfig(this->mappedServer), opcuaPort, NULL);
+    server_config = UA_Server_getConfig(mappedServer);
 
     runUAServer = UA_TRUE;
-    mappedServer = UA_Server_new(server_config);
     baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
 
     csa_namespaceinit_generated(mappedServer);

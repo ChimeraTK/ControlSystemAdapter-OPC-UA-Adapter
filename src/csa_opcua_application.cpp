@@ -44,8 +44,8 @@
  * @date 22.11.2016
  */
 extern "C" {
-    #include <unistd.h>
-    #include <signal.h>
+#include <unistd.h>
+#include <signal.h>
 }
 
 #include <iostream>
@@ -57,61 +57,61 @@ extern "C" {
 
 boost::shared_ptr<ControlSystemPVManager> csManager;
 boost::shared_ptr<DevicePVManager> devManager;
-csa_opcua_adapter *csaOPCUA;
+csa_opcua_adapter* csaOPCUA;
 
 std::atomic<bool> terminateMain;
 
 static void SigHandler_Int(int sign) {
-	cout << "Received SIGINT... terminating" << endl;
-	terminateMain = true;
-    if(csaOPCUA) {
-        csaOPCUA->stop();
-        csaOPCUA->~csa_opcua_adapter();
-    }
-    ChimeraTK::ApplicationBase::getInstance().shutdown();
-	cout << "OPC UA adapter termianted." << endl;
+  cout << "Received SIGINT... terminating" << endl;
+  terminateMain = true;
+  if(csaOPCUA) {
+    csaOPCUA->stop();
+    csaOPCUA->~csa_opcua_adapter();
+  }
+  ChimeraTK::ApplicationBase::getInstance().shutdown();
+  cout << "OPC UA adapter termianted." << endl;
 }
 
 int main() {
-	signal(SIGINT,  SigHandler_Int); // Registriert CTRL-C/SIGINT
-	signal(SIGTERM, SigHandler_Int); // Registriert SIGTERM
+  signal(SIGINT, SigHandler_Int);  // Registriert CTRL-C/SIGINT
+  signal(SIGTERM, SigHandler_Int); // Registriert SIGTERM
 
-    /* Block SIGINT until the OPC UA Adapter is running.
-     * So the adapter is in a consistent state when we shut it down. */
-    sigset_t intmask;
-    sigemptyset(&intmask);
-    sigaddset(&intmask, SIGINT);
-    sigprocmask(SIG_BLOCK, &intmask, NULL);
-	
-    cout << "Crate the Managers" << endl;
-	std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager> > pvManagers = createPVManager();
+  /* Block SIGINT until the OPC UA Adapter is running.
+   * So the adapter is in a consistent state when we shut it down. */
+  sigset_t intmask;
+  sigemptyset(&intmask);
+  sigaddset(&intmask, SIGINT);
+  sigprocmask(SIG_BLOCK, &intmask, NULL);
 
-	devManager = pvManagers.second;
-	csManager = pvManagers.first;
+  cout << "Crate the Managers" << endl;
+  std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager>> pvManagers =
+      createPVManager();
 
-	csManager->enablePersistentDataStorage();
-	ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
-	ChimeraTK::ApplicationBase::getInstance().initialise();
+  devManager = pvManagers.second;
+  csManager = pvManagers.first;
 
-    cout << "Start the mapping" << endl;
-	string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
-	cout << pathToConfig << endl;
+  csManager->enablePersistentDataStorage();
+  ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
+  ChimeraTK::ApplicationBase::getInstance().initialise();
 
-    cout << "Create the adapter" << endl;
-	csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
-	
-    cout << "Run the application instance" << endl;
-	ChimeraTK::ApplicationBase::getInstance().run();
+  cout << "Start the mapping" << endl;
+  string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
+  cout << pathToConfig << endl;
 
-    cout << "Start the OPC UA Adapter" << endl;
-    csaOPCUA->start();
+  cout << "Create the adapter" << endl;
+  csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
 
-    /* Unblock SIGINT */
-    sigprocmask(SIG_UNBLOCK, &intmask, NULL);
+  cout << "Run the application instance" << endl;
+  ChimeraTK::ApplicationBase::getInstance().run();
 
-	while(!terminateMain)
-        sleep(3600);  // sleep will be interrupted when signal is received
-	csManager.reset();
+  cout << "Start the OPC UA Adapter" << endl;
+  csaOPCUA->start();
 
-	cout << "Application termianted." << endl;
+  /* Unblock SIGINT */
+  sigprocmask(SIG_UNBLOCK, &intmask, NULL);
+
+  while(!terminateMain) sleep(3600); // sleep will be interrupted when signal is received
+  csManager.reset();
+
+  cout << "Application termianted." << endl;
 }

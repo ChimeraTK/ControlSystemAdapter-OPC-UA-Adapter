@@ -16,7 +16,8 @@ UA_VariableTypeAttributes attr;
 UA_VariableTypeAttributes_init(&attr);
 attr.displayName = UA_LOCALIZEDTEXT("", "ctkAdditionalVariable");
 attr.description = UA_LOCALIZEDTEXT("", "");
-attr.valueRank = -2;
+attr.valueRank = UA_VALUERANK_ANY;
+attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
 UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 1005);
 UA_NodeId parentNodeId = UA_NODEID_NUMERIC(0, 62);
 UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEVARIABLETYPE);
@@ -62,8 +63,7 @@ UA_Server_addObjectTypeNode(server, nodeId, parentNodeId, parentReferenceNodeId,
 do {
 // Referencing node found and declared as parent: i=62/BaseVariableType using i=45/HasSubtype
 // Node: opcua_node_variableType_t(ns=2;i=1001), 1:ctkProcessVariable
-UA_VariableTypeAttributes attr;
-UA_VariableTypeAttributes_init(&attr);
+UA_VariableTypeAttributes attr = UA_VariableTypeAttributes_default;
 attr.displayName = UA_LOCALIZEDTEXT("", "ctkProcessVariable");
 attr.description = UA_LOCALIZEDTEXT("", "");
 attr.valueRank = -2;
@@ -130,13 +130,13 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 5001), UA_NODEID_NUMERIC(0, 
 do {
 // Referencing node found and declared as parent: ns=2;i=1001/1:ctkProcessVariable using i=47/HasComponent
 // Node: opcua_node_variable_t(ns=2;i=6001), 1:Description
-UA_VariableAttributes attr;
-UA_VariableAttributes_init(&attr);
+UA_VariableAttributes attr = UA_VariableAttributes_default;
 attr.displayName = UA_LOCALIZEDTEXT("", "Description");
 attr.description = UA_LOCALIZEDTEXT("", "");
 attr.accessLevel = 3;
 attr.userAccessLevel = 3;
 attr.valueRank = -1;
+attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
 //UA_String *opcua_node_variable_t_ns_2_i_6001_variant_DataContents =  UA_String_new();
 //*opcua_node_variable_t_ns_2_i_6001_variant_DataContents = UA_STRING_ALLOC("");
 UA_String opcua_node_variable_t_ns_2_i_6001_variant_DataContents = UA_STRING_ALLOC("");
@@ -157,13 +157,14 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6001), UA_NODEID_NUMERIC(0, 
 do {
 // Referencing node found and declared as parent: ns=2;i=1001/1:ctkProcessVariable using i=47/HasComponent
 // Node: opcua_node_variable_t(ns=2;i=6006), 1:EngineeringUnit
-UA_VariableAttributes attr;
-UA_VariableAttributes_init(&attr);
+UA_VariableAttributes attr = UA_VariableAttributes_default;
 attr.displayName = UA_LOCALIZEDTEXT("", "EngineeringUnit");
 attr.description = UA_LOCALIZEDTEXT("", "");
 attr.accessLevel = 3;
 attr.userAccessLevel = 3;
-attr.valueRank = -1;
+attr.valueRank = UA_VALUERANK_ANY;
+attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
+
 UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6006);
 UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
 UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
@@ -180,13 +181,13 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6006), UA_NODEID_NUMERIC(0, 
 do {
 // Referencing node found and declared as parent: ns=2;i=1001/1:ctkProcessVariable using i=47/HasComponent
 // Node: opcua_node_variable_t(ns=2;i=6004), 1:Name
-UA_VariableAttributes attr;
-UA_VariableAttributes_init(&attr);
+UA_VariableAttributes attr = UA_VariableAttributes_default;
 attr.displayName = UA_LOCALIZEDTEXT("", "Name");
 attr.description = UA_LOCALIZEDTEXT("", "");
 attr.accessLevel = 3;
 attr.userAccessLevel = 3;
 attr.valueRank = -1;
+attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
 //UA_String *opcua_node_variable_t_ns_2_i_6004_variant_DataContents =  UA_String_new();
 //*opcua_node_variable_t_ns_2_i_6004_variant_DataContents = UA_STRING_ALLOC("");
 UA_String opcua_node_variable_t_ns_2_i_6004_variant_DataContents = UA_STRING_ALLOC("");
@@ -207,13 +208,13 @@ UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6004), UA_NODEID_NUMERIC(0, 
 do {
 // Referencing node found and declared as parent: ns=2;i=1001/1:ctkProcessVariable using i=47/HasComponent
 // Node: opcua_node_variable_t(ns=2;i=6012), 1:Type
-UA_VariableAttributes attr;
-UA_VariableAttributes_init(&attr);
+UA_VariableAttributes attr = UA_VariableAttributes_default;
 attr.displayName = UA_LOCALIZEDTEXT("", "Type");
 attr.description = UA_LOCALIZEDTEXT("", "");
 attr.accessLevel = 3;
 attr.userAccessLevel = 3;
 attr.valueRank = -1;
+attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
 //UA_String *opcua_node_variable_t_ns_2_i_6012_variant_DataContents =  UA_String_new();
 //*opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING_ALLOC("");
 UA_String opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING_ALLOC("");

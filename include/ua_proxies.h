@@ -2,16 +2,15 @@
  * 	@brief Helper class to interact with open62541 in a easy way.
  * 	This class is a kind of a proxy to interact with the open62541 stack. For this, the class mapped all variables to the nodestore of the open62541.
  *
- *	@author Chris Iatrou
- *	@author Julian Rahm
- *  @date 22.11.2016
- *
+ * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
+ * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
+ * Copyright (c) 2019-2021 Andreas Ebner  <Andreas.Ebner@iosb.fraunhofer.de>
  */
 
 #ifndef HAVE_UA_PROXIES_H
 #define HAVE_UA_PROXIES_H
 
-#include "open62541.h"
+#include <open62541/server.h>
 #include <list>
 #include <iostream>
 
@@ -25,8 +24,8 @@ using namespace std;
  *
  */
 typedef struct UA_NodeId_pair_t {
-  UA_NodeId sourceNodeId;	// Model NodeId
-  UA_NodeId targetNodeId;	// Stack NodeId
+  UA_NodeId sourceNodeId; // Model NodeId
+  UA_NodeId targetNodeId; // Stack NodeId
 } UA_NodeId_pair;
 typedef std::list<UA_NodeId_pair*> nodePairList;
 
@@ -36,19 +35,23 @@ typedef std::list<UA_NodeId_pair*> nodePairList;
  *
  */
 typedef struct UA_DataSource_Map_Element_t {
-  UA_NodeId     typeTemplateId;
-        UA_LocalizedText description; // individuell description for every variable
-  UA_StatusCode (*read)(void *handle, const UA_NodeId nodeid, UA_Boolean includeSourceTimeStamp,const UA_NumericRange *range, UA_DataValue *value);
-  UA_StatusCode (*write)(void *handle, const UA_NodeId nodeid, const UA_Variant *data, const UA_NumericRange *range);
+  UA_NodeId typeTemplateId;
+  UA_LocalizedText description; // individuell description for every variable
+  UA_StatusCode (*read)(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId,
+                        void* nodeContext, UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value);
+
+  UA_StatusCode (*write)(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId,
+                         void* nodeContext, const UA_NumericRange* range, const UA_DataValue* value);
 } UA_DataSource_Map_Element;
 typedef std::list<UA_DataSource_Map_Element> UA_DataSource_Map;
 
-
-#define NODE_PAIR_PUSH(_p_listname, _p_srcId, _p_targetId) do {\
-UA_NodeId_pair *tmp = new UA_NodeId_pair;\
-UA_NodeId_copy(&_p_srcId, &tmp->sourceNodeId);\
-UA_NodeId_copy(&_p_targetId, &tmp->targetNodeId);\
-_p_listname.push_back(tmp); } while (0);
+#define NODE_PAIR_PUSH(_p_listname, _p_srcId, _p_targetId)                                                             \
+    do {                                                                                                               \
+        UA_NodeId_pair* tmp = new UA_NodeId_pair;                                                                      \
+        UA_NodeId_copy(&_p_srcId, &tmp->sourceNodeId);                                                                 \
+        UA_NodeId_copy(&_p_targetId, &tmp->targetNodeId);                                                              \
+        _p_listname.push_back(tmp);                                                                                    \
+    } while(0);
 
 /**
  * @brief Searching for NodeId's in <pairList> with the same NodeId from <remoteId>
@@ -59,7 +62,7 @@ _p_listname.push_back(tmp); } while (0);
  * @return UA_NodeId from the found node
  *
  */
-UA_NodeId *nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId remoteId);
+UA_NodeId* nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId remoteId);
 
 /**
  * @brief Node function and proxy mapping for new nodes
@@ -70,7 +73,7 @@ UA_NodeId *nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId r
  *
  * @return UA_StatusCode
  */
-UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void *handle);
+UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void* handle);
 
 /**
  * @brief This methode map all variables in sort of a <UA_DataSourceMap> from the called class to the open62541
@@ -82,8 +85,7 @@ UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId
  *
  * @return UA_StatusCode
  */
-UA_StatusCode ua_callProxy_mapDataSources(UA_Server* server, nodePairList instantiatedNodesList, UA_DataSource_Map *map, void *srcClass);
-
+UA_StatusCode ua_callProxy_mapDataSources(
+    UA_Server* server, nodePairList instantiatedNodesList, UA_DataSource_Map* map, void* srcClass);
 
 #endif // Header include
-

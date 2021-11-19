@@ -26,7 +26,7 @@ CMAKE_SOURCE_DIR=$1
 PROJECT_BINARY_DIR=$2
 
 rm -f `find . -name "*\.gcda"`
-make test
+cmake --build . --target test
 lcov --capture --directory . --output-file coverage_all.info --ignore-errors gcov
 
 #lcov capture also includes external stuff like glibc, boost etc.
