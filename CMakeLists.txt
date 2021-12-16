@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 3.1.0)
 ##########################################################################################################
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 
-SET(${PROJECT_NAME}_MAJOR_VERSION 03)
-SET(${PROJECT_NAME}_MINOR_VERSION 00)
+SET(${PROJECT_NAME}_MAJOR_VERSION 02)
+SET(${PROJECT_NAME}_MINOR_VERSION 99)
 SET(${PROJECT_NAME}_PATCH_VERSION 00)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
@@ -27,8 +27,8 @@ ELSE (${open62541_FOUND})
 ENDIF (${open62541_FOUND})
 
 #Do not put any of the following packages as required. We will install it if it is not found.
-find_package(ChimeraTK-ControlSystemAdapter 02.03)
-find_package(ChimeraTK-DeviceAccess 02.06)
+find_package(ChimeraTK-ControlSystemAdapter 01.00)
+find_package(ChimeraTK-DeviceAccess 01.00)
 
 #Install the DeviceAccess if it is not pre-installed
 if(NOT ChimeraTK-DeviceAccess_FOUND)
@@ -334,41 +334,41 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/csa_namespaceinit_
 
 link_directories(${CMAKE_BINARY_DIR})
 
-add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541::open62541)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
-        ${Boost_FILESYSTEM_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
-        ${Boost_THREAD_LIBRARY}
-        ${Boost_CHRONO_LIBRARY}
-        )
+#add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
+#target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
+#target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
+#target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541::open62541)
+#target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
+#        ${Boost_FILESYSTEM_LIBRARY}
+#        ${Boost_SYSTEM_LIBRARY}
+#        ${Boost_THREAD_LIBRARY}
+#        ${Boost_CHRONO_LIBRARY}
+#        )
 
-add_executable(ControlSystem-OPCUA_Sample_Application ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example2.cpp)
-target_link_libraries(ControlSystem-OPCUA_Sample_Application ${PROJECT_NAME})
-target_link_libraries(ControlSystem-OPCUA_Sample_Application pthread)
-target_link_libraries(ControlSystem-OPCUA_Sample_Application open62541::open62541)
-target_link_libraries(ControlSystem-OPCUA_Sample_Application
-        ${Boost_FILESYSTEM_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
-        ${Boost_THREAD_LIBRARY}
-        ${Boost_CHRONO_LIBRARY}
-        )
+#add_executable(ControlSystem-OPCUA_Sample_Application ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example2.cpp)
+#target_link_libraries(ControlSystem-OPCUA_Sample_Application ${PROJECT_NAME})
+#target_link_libraries(ControlSystem-OPCUA_Sample_Application pthread)
+#target_link_libraries(ControlSystem-OPCUA_Sample_Application open62541::open62541)
+#target_link_libraries(ControlSystem-OPCUA_Sample_Application
+#        ${Boost_FILESYSTEM_LIBRARY}
+#        ${Boost_SYSTEM_LIBRARY}
+#        ${Boost_THREAD_LIBRARY}
+#        ${Boost_CHRONO_LIBRARY}
+#        )
 
-file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
+#file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
 
-if(ENABLE_LINTING)
-    file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/static_analysis")
-    add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
-            PRE_BUILD
-            COMMAND /usr/bin/cppcheck --std=c++11 --inline-suppr --force --template=gcc --enable=all ${objectSources} 2> ${CMAKE_BINARY_DIR}/static_analysis/cppcheck.log
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMENT "Running CppCheck on all CPP Sources" VERBATIM)
-endif()
+#if(ENABLE_LINTING)
+#    file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/static_analysis")
+#    add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
+#            PRE_BUILD
+#            COMMAND /usr/bin/cppcheck --std=c++11 --inline-suppr --force --template=gcc --enable=all ${objectSources} 2> ${CMAKE_BINARY_DIR}/static_analysis/cppcheck.log
+#            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+#            COMMENT "Running CppCheck on all CPP Sources" VERBATIM)
+#endif()
 ## Ends binary ControlSystem-OPCUA_Sample_Adapter
 
-install(TARGETS ControlSystem-OPCUA_Sample_Adapter RUNTIME DESTINATION bin)
+#install(TARGETS ControlSystem-OPCUA_Sample_Adapter RUNTIME DESTINATION bin)
 
 ##########################################################################################################
 ## Create the config files by filling the correct variables into the template (*.cmake.in).

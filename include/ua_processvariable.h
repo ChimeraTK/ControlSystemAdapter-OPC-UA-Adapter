@@ -198,7 +198,7 @@ class ua_processvariable : ua_mapped_class {
 
   UA_StatusCode getValue_string(UA_Variant* v);
 
-  UA_StatusCode getValue_bool(UA_Variant* v);
+//  UA_StatusCode getValue_bool(UA_Variant* v);
 
   static UA_StatusCode ua_writeproxy_ua_processvariable_setValue(UA_Server* server, const UA_NodeId* sessionId,
                                                                  void* sessionContext, const UA_NodeId* nodeId, void* nodeContext, const UA_NumericRange* range,
@@ -226,7 +226,7 @@ class ua_processvariable : ua_mapped_class {
 
   UA_StatusCode setValue_string(const UA_Variant* data);
 
-  UA_StatusCode setValue_bool(const UA_Variant* data);
+//  UA_StatusCode setValue_bool(const UA_Variant* data);
 };
 
 #endif // UA_PROCESSVARIABLE_H

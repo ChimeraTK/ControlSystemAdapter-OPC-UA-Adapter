@@ -175,7 +175,7 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValidity(UA
                                                                               const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
                                                                               UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
   ua_processvariable* thisObj = static_cast<ua_processvariable*>(nodeContext);
-  DataValidity dv = thisObj->csManager->getProcessVariable(thisObj->namePV)->dataValidity();
+  /*DataValidity dv = thisObj->csManager->getProcessVariable(thisObj->namePV)->dataValidity();
   UA_Int32 validity;
   switch(dv) {
     case DataValidity::ok:
@@ -186,7 +186,8 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValidity(UA
       break;
     default:
       validity = -1;
-  }
+  }*/
+  UA_Int32 validity = 1;
   UA_Variant_setScalarCopy(&value->value, &validity, &UA_TYPES[UA_TYPES_UINT32]);
   value->hasValue = true;
   if(includeSourceTimeStamp) {
@@ -254,8 +255,8 @@ string ua_processvariable::getType() {
     return "double";
   else if(valueType == typeid(string))
     return "string";
-  else if(valueType == typeid(Boolean))
-    return "Boolean";
+//  else if(valueType == typeid(Boolean))
+//    return "Boolean";
   else
     return "Unsupported type";
 }
@@ -310,10 +311,10 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(UA_Se
       rv = thisObj->getValue_string(&value->value);
       break;
 
-    case UA_PV_BOOL:
+/*    case UA_PV_BOOL:
       rv = thisObj->getValue_bool(&value->value);
       break;
-
+*/
     default:
       std::cout << "ua_readproxy_ua_processvariable_getValue: Unknown type: " << thisObj->type;
       break;
@@ -680,7 +681,7 @@ UA_StatusCode ua_processvariable::getValue_string(UA_Variant* v) {
   return rv;
 }
 
-UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
+/*UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
   UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
 
   if(this->type == UA_PV_BOOL) {
@@ -718,7 +719,7 @@ UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
 
   return rv;
 }
-
+*/
 UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setValue(UA_Server* server,
                                                                             const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
                                                                             const UA_NumericRange* range, const UA_DataValue* value) {
@@ -769,10 +770,10 @@ UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setValue(UA_S
       retval = theClass->setValue_string(&value->value);
       break;
 
-    case UA_PV_BOOL:
+/*    case UA_PV_BOOL:
       retval = theClass->setValue_bool(&value->value);
       break;
-
+*/
     default:
       std::cout << "Unknown type: " << theClass->type;
       break;
@@ -1152,7 +1153,7 @@ UA_StatusCode ua_processvariable::setValue_string(const UA_Variant* data) {
   return retval;
 }
 
-UA_StatusCode ua_processvariable::setValue_bool(const UA_Variant* data) {
+/*UA_StatusCode ua_processvariable::setValue_bool(const UA_Variant* data) {
   UA_StatusCode retval = UA_STATUSCODE_BADINTERNALERROR;
 
   if(type == UA_PV_BOOL) {
@@ -1183,7 +1184,7 @@ UA_StatusCode ua_processvariable::setValue_bool(const UA_Variant* data) {
 
   return retval;
 }
-
+*/
 UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   UA_StatusCode retval = UA_STATUSCODE_GOOD;
   UA_NodeId createdNodeId = UA_NODEID_NULL;
@@ -1595,7 +1596,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     }
     mapDs.push_back(mapElem);
   }
-  else if(valueType == typeid(Boolean)) {
+  /*else if(valueType == typeid(Boolean)) {
     type = UA_PV_BOOL;
     UA_DataSource_Map_Element mapElem;
     mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
@@ -1626,7 +1627,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
     mapDs.push_back(mapElem);
-  }
+  }*/
   else
     std::cout << "Cannot proxy unknown type " << typeid(valueType).name() << std::endl;
 
