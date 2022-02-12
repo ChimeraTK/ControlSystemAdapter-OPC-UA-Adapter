@@ -20,11 +20,6 @@ find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framewor
 find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 find_package(open62541 1.2 REQUIRED)
-IF (${open62541_FOUND})
-    MESSAGE(STATUS "Found open62541 in Version: ${open62541_VERSION}. Include DIR ${open62541_LIBRARIES}")
-ELSE (${open62541_FOUND})
-    MESSAGE(STATUS "Could not locate open62541.")
-ENDIF (${open62541_FOUND})
 
 #Do not put any of the following packages as required. We will install it if it is not found.
 find_package(ChimeraTK-ControlSystemAdapter 02.03)
