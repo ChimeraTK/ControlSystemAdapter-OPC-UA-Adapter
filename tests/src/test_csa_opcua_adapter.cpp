@@ -1,11 +1,9 @@
-#include <ua_adapter.h>
-
 #include <iostream>
 
+#include <ua_adapter.h>
 #include <csa_opcua_adapter.h>
 #include <test_sample_data.h>
 #include <boost/test/included/unit_test.hpp>
-
 
 extern "C" {
 #include "unistd.h"
@@ -30,15 +28,14 @@ void CSAOPCUATest::testWithoutPVSet() {
 
   // is Server running?
   csaOPCUA->start();
-  BOOST_CHECK(csaOPCUA->isRunning() == true);
-  while(!csaOPCUA->getUAAdapter()->running) {
-  };
+  while(!csaOPCUA->getUAAdapter()->running) {};
+  BOOST_CHECK(csaOPCUA->isRunning());
   BOOST_CHECK(csaOPCUA->getUAAdapter()->running);
   // is csManager init
   BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 0);
 
   csaOPCUA->stop();
-  BOOST_CHECK(csaOPCUA->isRunning() != true);
+  BOOST_CHECK(!csaOPCUA->isRunning());
 
   csaOPCUA->~csa_opcua_adapter();
 }
@@ -48,7 +45,7 @@ void CSAOPCUATest::testWithPVSet() {
   TestFixturePVSet tfExampleSet;
   csa_opcua_adapter* csaOPCUA = new csa_opcua_adapter(tfExampleSet.csManager, "../tests/uamapping_test_2.xml");
   csaOPCUA->start();
-  BOOST_CHECK(csaOPCUA->isRunning() == true);
+  BOOST_CHECK(csaOPCUA->isRunning());
   while(!csaOPCUA->getUAAdapter()->running) {
   };
   BOOST_CHECK(csaOPCUA->getUAAdapter()->running);
@@ -58,7 +55,7 @@ void CSAOPCUATest::testWithPVSet() {
   BOOST_CHECK(csaOPCUA->getUAAdapter() != NULL);
 
   csaOPCUA->stop();
-  BOOST_CHECK(csaOPCUA->isRunning() != true);
+  BOOST_CHECK(!csaOPCUA->isRunning());
 
   csaOPCUA->~csa_opcua_adapter();
 }

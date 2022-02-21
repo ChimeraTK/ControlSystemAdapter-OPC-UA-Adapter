@@ -132,7 +132,7 @@ class ua_uaadapter : ua_mapped_class {
   UA_NodeId createUAFolder(UA_NodeId basenodeId, string folderName, string description = "");
 
  public:
-  bool running; // set to false to stop the worker thread
+  bool running = false; // set to false to stop the worker thread
 
   /** @brief Constructor of the class.
 *
