@@ -69,7 +69,9 @@ ua_uaadapter* csa_opcua_adapter::getUAAdapter() {
 }
 
 void csa_opcua_adapter::start() {
-  if(!this->adapter_thread.joinable()) this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter);
+  if(!this->adapter_thread.joinable()){
+    this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter);
+  }
 }
 
 void csa_opcua_adapter::stop() {
