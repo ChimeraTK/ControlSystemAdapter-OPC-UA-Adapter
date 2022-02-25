@@ -53,15 +53,15 @@ extern "C" {
 #include <atomic>
 
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
-#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
+//#include "ChimeraTK/ControlSystemAdapter/ControlSystemSynchronizationUtility.h"
+//#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 #include "csa_opcua_adapter.h"
 #include "ipc_manager.h"
 
 boost::shared_ptr<ControlSystemPVManager> csManager;
 boost::shared_ptr<DevicePVManager> devManager;
-boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
-boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
+//boost::shared_ptr<ControlSystemSynchronizationUtility> syncCsUtility;
+//boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
 csa_opcua_adapter *csaOPCUA;
 
 std::atomic<bool> terminateMain;
@@ -94,8 +94,8 @@ int main() {
 	devManager = pvManagers.second;
 	csManager = pvManagers.first;
 
-	syncCsUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
-	syncDevUtility.reset(new ChimeraTK::DeviceSynchronizationUtility(devManager));
+//	syncCsUtility.reset(new ChimeraTK::ControlSystemSynchronizationUtility(csManager));
+//	syncDevUtility.reset(new ChimeraTK::DeviceSynchronizationUtility(devManager));
 
 	csManager->enablePersistentDataStorage();
 	ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);

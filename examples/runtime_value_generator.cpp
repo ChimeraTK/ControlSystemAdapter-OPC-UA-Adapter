@@ -33,9 +33,9 @@ using std::cout;
 using std::endl;
 using namespace ChimeraTK;
 	 
-runtime_value_generator::runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) {
+runtime_value_generator::runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager) {
 	this->devManager = devManager;
-	this->syncDevUtility = syncDevUtility;
+//	this->syncDevUtility = syncDevUtility;
 	this->doStart();
 }
 
@@ -45,7 +45,7 @@ runtime_value_generator::~runtime_value_generator() {
 	}
 }
 
-void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility) {
+void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> devManager) {
 	// Time meassureing
 	clock_t start, end;
 	start = clock();
@@ -107,7 +107,7 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
 		testDoubleArray->write();
 		testIntArray->write();
 		
-		syncDevUtility->receiveAll();
+//		syncDevUtility->receiveAll();
 	}
 	
 }
@@ -115,7 +115,7 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
 void runtime_value_generator::workerThread() {
 	bool run = true;
 	
-	thread *valueGeneratorThread = new std::thread(generateValues, this->devManager, this->syncDevUtility);
+	thread *valueGeneratorThread = new std::thread(generateValues, this->devManager);
 	
 	while (run == true) {
 		if (! this->isRunning()) {

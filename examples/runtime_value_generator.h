@@ -22,20 +22,21 @@
 #define RUN_TIME_VALUE_GENERATOR_H
 
 #include "ipc_managed_object.h"
-#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
+#include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
+//#include "ChimeraTK/ControlSystemAdapter/DeviceSynchronizationUtility.h"
 
 using namespace ChimeraTK;
 
 class runtime_value_generator : public ipc_managed_object {
 private:   
 	boost::shared_ptr<DevicePVManager> devManager;
-	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
+//	boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility;
     
 public:
-	runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
+	runtime_value_generator(boost::shared_ptr<DevicePVManager> devManager);
 	~runtime_value_generator();
 	void workerThread();
-	static void generateValues(boost::shared_ptr<DevicePVManager> devManager, boost::shared_ptr<DeviceSynchronizationUtility> syncDevUtility);
+	static void generateValues(boost::shared_ptr<DevicePVManager> devManager);
     
 };
 
