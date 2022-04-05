@@ -1,0 +1,267 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
+            xmlns="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+     Map file description schema for ChimeraTK ControlSystemAdapter-OPC-UA-Adapter.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="uamapping" type="UAMappingType"/>
+
+  <xsd:complexType name="UAMappingType">
+    <xsd:sequence>
+      <xsd:element name="config" type="configType" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            General settings realted to the mapping and the OPC UA server.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="process_variable" type="pvType" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Used to edit OPC UA nodes and to copy or link OPC UA nodes to new OPC UA nodes.
+            If new nodes are created they will still be connected to the same ChimeraTK process variable
+            as the source OPC UA node.
+            
+            This can be used to do different things:
+            - change unit/description of an existing OPC UA node
+            - create a link to an existing OPC UA node with different browse name
+              Attention: If a link is used and the unit/description is changed this will affect 
+                         the source node too!
+            - create a new node (different browse name and node ID) connected to an existing OPC UA node
+              This allows to change name/unit/description independent of the source node
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="additional_variable" type="additionalPVType" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Used to add additional OPC UA nodes, that have a fixed value and are not linked to a ChimeraTK process variable.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>        
+      <xsd:element name="folder" type="folderType" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Used to create, copy or link folders.
+          </xsd:documentation>
+        </xsd:annotation>        
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="configType">
+    <xsd:sequence>
+      <xsd:element name="server" type="serverType"  minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Change server properties, else defaults are used.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>      
+      <xsd:element name="login" type="loginType"  minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            If clients should be requiered to login with username and password, use
+            this element to set this data.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="process_variable_hierarchy" type="hierarchyType" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Change the behaviour of how process varibale names and the hierarchy included in the 
+            process variable name are represented in OPC UA.
+            The default is that process variable names are unrooled at "/" characters.
+            Folders are created for all string before the last delimiter. The last string
+            is used as OPC UA node browse name. However the OPC UA node ID is a string node ID
+            that includes the complete register path corresponding to the CHimeraTK process variable.
+            E.g. from a variable "A/B/myvar" the folders "A" and "B" are created and the OPC UA node "myvar"
+            is put into folder B. The Browse name is "myvar" and the Node ID is "/A/B/myvar".
+            
+            This default behaviour corresponds to:
+              <unroll pathSep="/"> True </unroll>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="mapping_exceptions" type="exceptionType" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Set the bahaviour in case error occur while parsing this mapping file.
+            If True Exceptions occuring in the mapping process are thrown. 
+            Else error messages are send to std::cerr and the mapping block caused exception is ignored. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="rootFolder" type="nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation>
+          Set the name of the root node of the OPC UA server.
+          If not set the application name of the ChimeraTK application is used.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="description" type="nonEmptyString"/>
+  </xsd:complexType>
+  <xsd:complexType name="serverType">
+    <xsd:attribute name="applicationName" type="nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation>
+          Set the name application name. 
+          If not set the default is the ChimeraTK application name.
+          It is used e.g. as the Configuration Name of the end point.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="port" type="xsd:positiveInteger">
+      <xsd:annotation>
+        <xsd:documentation>
+          Set the name OPC UA server port. 
+          If not set the default 16664 is used.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType> 
+  <xsd:complexType name="loginType">
+    <xsd:attribute name="username" type="nonEmptyString" use="required"/>
+    <xsd:attribute name="password" type="nonEmptyString" use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="hierarchyType">
+    <xsd:sequence>
+      <xsd:element name="unroll" type="unrollType" minOccurs="1" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Change the default path seperator.
+            Example: 
+            a) To change the seperator to "_" one has to use:
+               <unroll pathSep="/"> False </unroll>
+               <unroll pathSep="_"> True </unroll>
+            b) To use two seperators:
+               <unroll pathSep="/"> True </unroll>
+               <unroll pathSep="_"> True </unroll>
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="unrollType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:boolean">
+        <xsd:attribute name="pathSep" type="nonEmptyString"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <xsd:complexType name="exceptionType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:boolean"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="pvType">
+    <xsd:sequence minOccurs="0" maxOccurs="1">
+      <xsd:element name="destination" type="nonEmptyString"/>
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Give target browse path of the OPC UA node.
+            If not used the root node of the OPC UA server is used.
+            The delimiter "/" should be used.
+          </xsd:documentation>
+        </xsd:annotation>
+      <xsd:element name="name" type="nonEmptyString">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Give the name of the new OPC UA node. 
+            If not used the name of the original process variable is used. 
+            This could be the case if only a destination is given, where to copy the original process variable.
+            The name should not contain the delimiter "/".
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="unit" type="nonEmptyString"/>
+      <xsd:element name="description" type="nonEmptyString"/>
+    </xsd:sequence>
+    <xsd:attribute name="sourceName" type="nonEmptyString" use="required">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The node ID of the node to be used as reference.
+          The delimiter used here is "/".
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="copy" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          If copy=flase a link is created to the source process variable.
+          Else a new OPC UA node is created - it is still connected to the same ChimeraTK process variable.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+  <xsd:complexType name="additionalPVType">
+   <xsd:sequence minOccurs="0" maxOccurs="1">
+      <xsd:element name="destination" type="nonEmptyString"/>
+      <xsd:element name="name" type="nonEmptyString"/>
+      <xsd:element name="value" type="xsd:string"/>
+      <xsd:element name="description" type="nonEmptyString"/>
+    </xsd:sequence> 
+  </xsd:complexType>   
+  <xsd:complexType name="folderType">  
+    <xsd:sequence>
+      <xsd:element name="name" type="nonEmptyString" minOccurs="1" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Allows to change the folder name. 
+            If not used the description of the original folder is used. 
+            In case a folder is created the default description is empty.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>    
+      <xsd:element name="destination" type="nonEmptyString" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Folder destination. The destination can include a hierachy, e.g. A/B. Folders in the target hierachy that do not exist are created on the fly.
+            The path seperator for the destination tag is "/".
+            If not set the default destination is the root node of the OPC UA server.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="description" type="nonEmptyString" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Allows to change the folder description. 
+            If not used the description of the original folder is used. 
+            In case a folder is created the default description is empty.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="sourceName" type="nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          If moving or linking exsisting folders give the path to the existing folder.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="copy" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          If using exsisting folders decide if the directory should be only linked to the source 
+          folder or if it should be copied.
+          By default copying is enabled.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:simpleType name="nonEmptyString">
+   <xsd:restriction base='xsd:string'>
+      <xsd:minLength value='1'/>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

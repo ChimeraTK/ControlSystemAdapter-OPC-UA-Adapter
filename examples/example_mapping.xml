@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<uamapping xmlns="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
+  <config rootFolder="TopLevel" description="My test server configuration">
+    <server applicationName="Test Server" port="16664"/>
+    <!--login username="user" password="test"/-->
+  </config>
+</uamapping>
