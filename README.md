@@ -4,7 +4,7 @@ ControlSystem-OPCUA_Adapter
 Welcome to the ControlSystem-OPCUA_Adapter project. 
 This project add an control system adapter to [ChimeraTK](https://github.com/ChimeraTK), that is based on the OPC UA stack [open62541](https://open62541.org/).
 
-In order to use the control system adapter a dedicated map file is required. The name of the map file is expected to be _ApplicationName__mapping.xml, where _ApplicationName_ is the name of the ChiemraTK application.
+In order to use the control system adapter a dedicated map file is required. The name of the map file is expected to be _ApplicationName_\_mapping.xml, where _ApplicationName_ is the name of the ChiemraTK application.
 
 If no map file is present a default server is created using port 16664. The map file allows to change general OPC UA settings and the process of mapping ChimarTK process variables to OPC UA nodes.
 In principle all process variables are mapped in the OPC UA server. Node IDs and browse names are derived from the process variables register paths.
