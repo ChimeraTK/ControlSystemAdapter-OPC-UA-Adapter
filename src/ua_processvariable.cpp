@@ -1107,15 +1107,18 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
         UA_STRING_TO_CPPSTRING_COPY(&this->baseNodeId.identifier.string, &baseNodeIdName);
     }
 
+    if (!baseNodeIdName.empty()) {
+      baseNodeIdName.resize(baseNodeIdName.size() - 3);
+    }
     //check if the nodeId is used by another mapping and find next free NodeId
     UA_NodeId result;
-    if(UA_Server_readDataType(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew+"Value").c_str()), &result) == UA_STATUSCODE_GOOD){
+    if(UA_Server_readDataType(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew).c_str()), &result) == UA_STATUSCODE_GOOD){
         return UA_STATUSCODE_BADNODEIDEXISTS;
     }
     UA_InstantiationCallback icb;
     icb.handle = (void *) &this->ownedNodes;
     icb.method = ua_mapInstantiatedNodes;
-    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew+"Value").c_str()),//UA_NODEID_NUMERIC(1, 0)
+    UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodeIdName+"/"+this->nameNew).c_str()),//UA_NODEID_NUMERIC(1, 0)
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME(1, (char *) this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, &icb, &createdNodeId);
     //know your own nodeId
