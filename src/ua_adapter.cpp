@@ -589,13 +589,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
             }
             //create the requested folder hierarchy
             //enrollFolderPathFromString((destination+"/"+folder)+"/removedPart", "/");
-            UA_NodeId retnode = createFolder(folderPathNodeId, folder);
-            //set folder description
-            if(copy.empty() && sourceName.empty() && !description.empty()) {
-              UA_Server_writeDescription(this->mappedServer, retnode,
-                                         UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
-            }
-            UA_NodeId_clear(&retnode);
+            createFolder(folderPathNodeId, folder);
         }
 
         xmlXPathFreeObject(result);
