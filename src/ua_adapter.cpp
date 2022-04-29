@@ -104,7 +104,6 @@ void ua_uaadapter::constructServer() {
   if(!this->serverConfig.enableSecurity){
     UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, NULL);
   }
-
   /*get hostname */
   char hostname[HOST_NAME_MAX];
   gethostname(hostname, HOST_NAME_MAX);
@@ -139,8 +138,8 @@ void ua_uaadapter::constructServer() {
     UA_ByteString *trustList = NULL;
     size_t issuerListSize = 0;
     UA_ByteString *issuerList = NULL;
-    UA_ByteString *revocationList = NULL;
-    size_t revocationListSize = 0;
+    size_t blockListSize = 0;
+    UA_ByteString *blockList = NULL;
 
     /* Load certificate and private key */
     certificate = loadFile(this->serverConfig.certPath.c_str());
@@ -155,37 +154,75 @@ void ua_uaadapter::constructServer() {
     DIR *dp = nullptr;
     dp = opendir(this->serverConfig.allowListFolder.c_str());
     if (dp != nullptr) {
-      while ((entry = readdir(dp))){
+      while((entry = readdir(dp))) {
+        if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+          continue;
         trustListSize++;
-        trustList = (UA_ByteString *) UA_realloc(trustList, sizeof(UA_ByteString)*trustListSize);
-        printf ("%s\n", entry->d_name);
-        trustList[trustListSize-1] = loadFile(entry->d_name);
+        trustList = (UA_ByteString*) UA_realloc(trustList, sizeof(UA_ByteString) * trustListSize);
+        char sbuf[1024];
+        sprintf (sbuf, "%s/%s", this->serverConfig.allowListFolder.c_str(), entry->d_name);
+        printf("Trust List entry:  %s\n", entry->d_name);
+        trustList[trustListSize - 1] = loadFile(sbuf);
+      }
+    }
+    closedir(dp);
+
+    /* Load Issuer list */
+    dp = nullptr;
+    dp = opendir(this->serverConfig.issuerListFolder.c_str());
+    if (dp != nullptr) {
+      while((entry = readdir(dp))) {
+        if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+          continue;
+        issuerListSize++;
+        issuerList = (UA_ByteString*) UA_realloc(issuerList, sizeof(UA_ByteString) * issuerListSize);
+        char sbuf[1024];
+        sprintf (sbuf, "%s/%s", this->serverConfig.allowListFolder.c_str(), entry->d_name);
+        printf("Issuer List entry:  %s\n", entry->d_name);
+        issuerList[issuerListSize - 1] = loadFile(sbuf);
+      }
+    }
+    closedir(dp);
+
+    /* Load Block list */
+    dp = nullptr;
+    dp = opendir(this->serverConfig.blockListFolder.c_str());
+    if (dp != nullptr) {
+      while((entry = readdir(dp))) {
+        if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+          continue;
+        blockListSize++;
+        blockList = (UA_ByteString*) UA_realloc(blockList, sizeof(UA_ByteString) * blockListSize);
+        char sbuf[1024];
+        sprintf (sbuf, "%s/%s", this->serverConfig.allowListFolder.c_str(), entry->d_name);
+        printf("Trust List entry:  %s\n", entry->d_name);
+        blockList[blockListSize - 1] = loadFile(sbuf);
       }
     }
     closedir(dp);
 
     //setup encrypted endpoints
-    UA_ServerConfig_setDefaultWithSecurityPolicies(config, 16660,
+    UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(config, 16660,
         &certificate, &privateKey,
         trustList, trustListSize,
         issuerList, issuerListSize,
-        revocationList, revocationListSize);
+        blockList, blockListSize);
 
-    if(!this->serverConfig.unsecure){
+    if(this->serverConfig.unsecure){
       for(size_t i = 0; i < config->endpointsSize; i++) {
         UA_EndpointDescription *ep = &config->endpoints[i];
         if(ep->securityMode != UA_MESSAGESECURITYMODE_NONE)
           continue;
 
         UA_EndpointDescription_clear(ep);
-        /* Move the last to this position */
+         //Move the last to this position
         if(i + 1 < config->endpointsSize) {
           config->endpoints[i] = config->endpoints[config->endpointsSize-1];
           i--;
         }
         config->endpointsSize--;
       }
-      /* Delete the entire array if the last Endpoint was removed */
+       //Delete the entire array if the last Endpoint was removed
       if(config->endpointsSize== 0) {
         UA_free(config->endpoints);
         config->endpoints = NULL;
@@ -365,12 +402,19 @@ void ua_uaadapter::readConfig() {
     else {
       cout << "Invalid security configuration. No 'trustlist'-Attribute in config file is set." << endl;
     }
-    string blockListFolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "revocaitionlist");
+    string blockListFolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "blocklist");
     if(!blockListFolder.empty()) {
       this->serverConfig.blockListFolder = blockListFolder;
     }
     else {
       cout << "No 'blockListFolder'-Attribute in config file is set." << endl;
+    }
+    string issuerListFolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "issuerlist");
+    if(!issuerListFolder.empty()) {
+      this->serverConfig.issuerListFolder = issuerListFolder;
+    }
+    else {
+      cout << "No 'issuerListFolder'-Attribute in config file is set." << endl;
     }
     xmlXPathFreeObject(result);
   }
