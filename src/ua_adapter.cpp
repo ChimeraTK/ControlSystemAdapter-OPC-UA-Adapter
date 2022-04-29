@@ -73,9 +73,103 @@ static string cleanUri(string s) {
   return s;
 }
 
+<<<<<<< Upstream, based on origin/master
 static UA_ByteString loadFile(const char* const path) {
   UA_ByteString fileContents = UA_STRING_NULL;
+=======
+static void pubSubExampleConfiguration(UA_Server *server, UA_NodeId *pdsIdent){
+  /* PubSub configuration Parameters */
+  UA_UInt32 publisherId = 2234;
+  UA_Duration publishInterval = 100;
+  UA_UInt16 writerGroupId = 100;
+  UA_UInt16 dataSetWriterId = 62541;
+  char const *transportProfileChr = "http://opcfoundation.org/UA-Profile/Transport/pubsub-udp-uadp";
+  char const *pubsuba_address = "opc.udp://224.0.0.22:4840/";
 
+  UA_String transportProfile = UA_String_fromChars(transportProfileChr);
+  UA_NetworkAddressUrlDataType networkAddressUrl =
+      {UA_STRING_NULL , UA_String_fromChars(pubsuba_address)};
+
+  /* Add PubSubConnection */
+  UA_PubSubConnectionConfig connectionConfig;
+  UA_NodeId connectionIdent;
+  memset(&connectionConfig, 0, sizeof(connectionConfig));
+  connectionConfig.name = UA_String_fromChars("PubSub Connection 1");
+  connectionConfig.transportProfileUri = transportProfile;k
+  connectionConfig.enabled = UA_TRUE;
+  UA_Variant_setScalar(&connectionConfig.address, &networkAddressUrl,
+      &UA_TYPES[UA_TYPES_NETWORKADDRESSURLDATATYPE]);
+  /* Changed to static publisherId from random generation to identify
+     * the publisher on Subscriber side */
+  connectionConfig.publisherId.numeric = publisherId;
+  UA_Server_addPubSubConnection(server, &connectionConfig, &connectionIdent);
+
+  /* Add PublishedDataSet */
+  UA_PublishedDataSetConfig publishedDataSetConfig;
+  memset(&publishedDataSetConfig, 0, sizeof(UA_PublishedDataSetConfig));
+  publishedDataSetConfig.publishedDataSetType = UA_PUBSUB_DATASET_PUBLISHEDITEMS;
+  publishedDataSetConfig.name = UA_String_fromChars("Demo PDS");
+  /* Create new PublishedDataSet based on the PublishedDataSetConfig. */
+  UA_Server_addPublishedDataSet(server, &publishedDataSetConfig, pdsIdent);
+
+  /* Fields are added separately to the PDS */
+
+  /* Add WriterGroup */
+  UA_WriterGroupConfig writerGroupConfig;
+  UA_NodeId writerGroupIdent;
+  memset(&writerGroupConfig, 0, sizeof(UA_WriterGroupConfig));
+  writerGroupConfig.name = UA_String_fromChars("Demo WriterGroup");
+  writerGroupConfig.publishingInterval = publishInterval;
+  writerGroupConfig.enabled = UA_FALSE;
+  writerGroupConfig.writerGroupId = writerGroupId;
+  writerGroupConfig.encodingMimeType = UA_PUBSUB_ENCODING_UADP;
+  writerGroupConfig.messageSettings.encoding             = UA_EXTENSIONOBJECT_DECODED;
+  writerGroupConfig.messageSettings.content.decoded.type = &UA_TYPES[UA_TYPES_UADPWRITERGROUPMESSAGEDATATYPE];
+  /* The configuration flags for the messages are encapsulated inside the
+     * message- and transport settings extension objects. These extension
+     * objects are defined by the standard. e.g.
+     * UadpWriterGroupMessageDataType */
+  UA_UadpWriterGroupMessageDataType *writerGroupMessage  = UA_UadpWriterGroupMessageDataType_new();
+  /* Change message settings of writerGroup to send PublisherId,
+     * WriterGroupId in GroupHeader and DataSetWriterId in PayloadHeader
+     * of NetworkMessage */
+  writerGroupMessage->networkMessageContentMask          = (UA_UadpNetworkMessageContentMask)(UA_UADPNETWORKMESSAGECONTENTMASK_PUBLISHERID |
+      (UA_UadpNetworkMessageContentMask)UA_UADPNETWORKMESSAGECONTENTMASK_GROUPHEADER |
+      (UA_UadpNetworkMessageContentMask)UA_UADPNETWORKMESSAGECONTENTMASK_WRITERGROUPID |
+      (UA_UadpNetworkMessageContentMask)UA_UADPNETWORKMESSAGECONTENTMASK_PAYLOADHEADER);
+  writerGroupConfig.messageSettings.content.decoded.data = writerGroupMessage;
+  UA_Server_addWriterGroup(server, connectionIdent, &writerGroupConfig, &writerGroupIdent);
+  UA_Server_setWriterGroupOperational(server, writerGroupIdent);
+  UA_UadpWriterGroupMessageDataType_delete(writerGroupMessage);
+
+  /* Add DataSet writer */
+  UA_NodeId dataSetWriterIdent;
+  UA_DataSetWriterConfig dataSetWriterConfig;
+  memset(&dataSetWriterConfig, 0, sizeof(UA_DataSetWriterConfig));
+  dataSetWriterConfig.name = UA_String_fromChars("Demo DataSetWriter");
+  dataSetWriterConfig.dataSetWriterId = dataSetWriterId;
+  dataSetWriterConfig.keyFrameCount = 10;
+  UA_Server_addDataSetWriter(server, writerGroupIdent, *pdsIdent,
+      &dataSetWriterConfig, &dataSetWriterIdent);
+}
+
+static void pubSubExampleField(UA_Server *server, UA_String fieldName, UA_NodeId fieldNodeId, UA_NodeId PDSIdent){
+  UA_DataSetFieldConfig dataSetFieldConfig;
+  memset(&dataSetFieldConfig, 0, sizeof(UA_DataSetFieldConfig));
+  dataSetFieldConfig.dataSetFieldType = UA_PUBSUB_DATASETFIELD_VARIABLE;
+  dataSetFieldConfig.field.variable.fieldNameAlias = fieldName;
+  dataSetFieldConfig.field.variable.promotedField = UA_FALSE;
+  dataSetFieldConfig.field.variable.publishParameters.publishedVariable = fieldNodeId;
+  dataSetFieldConfig.field.variable.publishParameters.attributeId = UA_ATTRIBUTEID_VALUE;
+  UA_Server_addDataSetField(server, PDSIdent, &dataSetFieldConfig, NULL);
+}
+
+void ua_uaadapter::constructServer() {
+  auto config = (UA_ServerConfig*)UA_calloc(1, sizeof(UA_ServerConfig));
+  UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, NULL);
+>>>>>>> 6c8af0b feat(adapter) add pubsub showcase
+
+<<<<<<< Upstream, based on origin/master
   /* Open the file */
   FILE* fp = fopen(path, "rb");
   if(!fp) {
@@ -101,6 +195,10 @@ static UA_ByteString loadFile(const char* const path) {
 }
 
 void ua_uaadapter::fillBuildInfo(UA_ServerConfig* config) {
+=======
+  UA_ServerConfig_addPubSubTransportLayer(config, UA_PubSubTransportLayerUDPMP());
+
+>>>>>>> 6c8af0b feat(adapter) add pubsub showcase
   /*get hostname */
   char hostname[HOST_NAME_MAX];
   gethostname(hostname, HOST_NAME_MAX);
@@ -244,15 +342,33 @@ void ua_uaadapter::constructServer() {
   this->mappedServer = UA_Server_newWithConfig(config);
   this->server_config = UA_Server_getConfig(this->mappedServer);
 
+<<<<<<< Upstream, based on origin/master
   // Username/Password handling
+=======
+  /* Add PubSub configuration */
+  UA_NodeId pds;
+  pubSubExampleConfiguration(this->mappedServer, &pds);
+  /* Add a example field to the PDS. This function could later be used to add
+   * Fields which are configured for PubSub in the XML */
+  pubSubExampleField(this->mappedServer, UA_String_fromChars("Test Field 1"), UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER_SERVERSTATUS_CURRENTTIME), pds);
+
+  //Username/Password handling
+>>>>>>> 6c8af0b feat(adapter) add pubsub showcase
   auto* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
   usernamePasswordLogins->password = UA_STRING_ALLOC((char*)this->serverConfig.password.c_str());
   usernamePasswordLogins->username = UA_STRING_ALLOC((char*)this->serverConfig.username.c_str());
+<<<<<<< Upstream, based on origin/master
   UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
       &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
       usernamePasswordLogins);
+=======
+  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin, NULL,
+                           &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
+                           usernamePasswordLogins);
+>>>>>>> 6c8af0b feat(adapter) add pubsub showcase
 
   this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+
   csa_namespaceinit_generated(this->mappedServer);
 
   UA_free(config);
