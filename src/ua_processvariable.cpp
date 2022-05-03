@@ -1609,7 +1609,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
     attr.accessLevel = 3;
     attr.userAccessLevel = 3;
     attr.valueRank = -1;
-    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/engineeringunit").c_str()),
+    addResult = UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char *) (baseNodePath + "/" + this->nameNew +"/EngineeringUnit").c_str()),
                               pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char *)"EngineeringUnit"),
                               UA_NODEID_NUMERIC(0, 63), attr, NULL, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
