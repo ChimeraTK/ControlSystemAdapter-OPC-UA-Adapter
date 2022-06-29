@@ -1627,8 +1627,19 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     }
     mapDs.push_back(mapElem);
   }
-  else
-    std::cout << "Cannot proxy unknown type " << typeid(valueType).name() << std::endl;
+  else {
+    int status;
+    auto* demangledName = abi::__cxa_demangle(valueType.name(), nullptr, nullptr, &status);
+    std::cout << "Cannot proxy unknown type ";
+    if(status == 0) {
+      std::cout << demangledName;
+      free(demangledName);
+    }
+    else {
+      std::cout << " (demangling failed) " << valueType.name();
+    }
+    std::cout << " for variable " << this->namePV << std::endl;
+  }
 
   UA_NodeId nodeIdVariableType = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
   NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, createdNodeId);
