@@ -83,7 +83,7 @@ int main() {
   sigaddset(&intmask, SIGINT);
   sigprocmask(SIG_BLOCK, &intmask, NULL);
 
-  cout << "Crate the Managers" << endl;
+  cout << "Create the Managers" << endl;
   std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager>> pvManagers =
       createPVManager();
 
