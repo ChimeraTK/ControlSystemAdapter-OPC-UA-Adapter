@@ -7,7 +7,7 @@ project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 
 SET(${PROJECT_NAME}_MAJOR_VERSION 03)
 SET(${PROJECT_NAME}_MINOR_VERSION 00)
-SET(${PROJECT_NAME}_PATCH_VERSION 02)
+SET(${PROJECT_NAME}_PATCH_VERSION 03)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
