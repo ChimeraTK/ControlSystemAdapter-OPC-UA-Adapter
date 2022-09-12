@@ -6,8 +6,8 @@ cmake_minimum_required(VERSION 3.1.0)
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 
 SET(${PROJECT_NAME}_MAJOR_VERSION 03)
-SET(${PROJECT_NAME}_MINOR_VERSION 00)
-SET(${PROJECT_NAME}_PATCH_VERSION 03)
+SET(${PROJECT_NAME}_MINOR_VERSION 01)
+SET(${PROJECT_NAME}_PATCH_VERSION 00)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
@@ -19,7 +19,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framework REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
-find_package(open62541 1.2 REQUIRED)
+find_package(open62541 1.3 REQUIRED)
 
 #Do not put any of the following packages as required. We will install it if it is not found.
 find_package(ChimeraTK-ControlSystemAdapter 02.03)
