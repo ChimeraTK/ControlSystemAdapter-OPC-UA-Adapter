@@ -20,25 +20,26 @@
  */
 
 extern "C" {
-#include "unistd.h"
 #include "csa_namespaceinit_generated.h"
+#include "unistd.h"
+
+#include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <dirent.h>
 }
-
-#include <functional>
-#include <string>
-#include <regex>
 
 #include "csa_config.h"
 #include "ua_adapter.h"
-#include "ua_processvariable.h"
 #include "ua_additionalvariable.h"
-#include "xml_file_handler.h"
+#include "ua_processvariable.h"
 #include "ua_proxies.h"
+#include "xml_file_handler.h"
 
-//These defines allow the use of an define as a string
+#include <functional>
+#include <regex>
+#include <string>
+
+// These defines allow the use of an define as a string
 #define xstr(a) str(a)
 #define str(a) #a
 
@@ -62,21 +63,21 @@ ua_uaadapter::~ua_uaadapter() {
 }
 
 static string cleanUri(string s) {
-  //replace multiple with a single space
+  // replace multiple with a single space
   std::regex r1("\\s+");
   s = std::regex_replace(s, r1, " ");
   s = std::regex_replace(s, r1, "_");
-  //remove all not printable basic ASCII character
+  // remove all not printable basic ASCII character
   std::regex r2("[^ -~]+");
   s = std::regex_replace(s, r2, "");
   return s;
 }
 
-static UA_ByteString loadFile(const char *const path) {
+static UA_ByteString loadFile(const char* const path) {
   UA_ByteString fileContents = UA_STRING_NULL;
 
   /* Open the file */
-  FILE *fp = fopen(path, "rb");
+  FILE* fp = fopen(path, "rb");
   if(!fp) {
     errno = 0; /* We read errno also from the tcp layer... */
     return fileContents;
@@ -85,13 +86,13 @@ static UA_ByteString loadFile(const char *const path) {
   /* Get the file length, allocate the data and read */
   fseek(fp, 0, SEEK_END);
   fileContents.length = (size_t)ftell(fp);
-  fileContents.data = (UA_Byte *)UA_malloc(fileContents.length * sizeof(UA_Byte));
+  fileContents.data = (UA_Byte*)UA_malloc(fileContents.length * sizeof(UA_Byte));
   if(fileContents.data) {
     fseek(fp, 0, SEEK_SET);
     size_t read = fread(fileContents.data, sizeof(UA_Byte), fileContents.length, fp);
-    if(read != fileContents.length)
-      UA_ByteString_clear(&fileContents);
-  } else {
+    if(read != fileContents.length) UA_ByteString_clear(&fileContents);
+  }
+  else {
     fileContents.length = 0;
   }
   fclose(fp);
@@ -100,8 +101,8 @@ static UA_ByteString loadFile(const char *const path) {
 }
 
 void ua_uaadapter::constructServer() {
-  auto config = (UA_ServerConfig*) UA_calloc(1, sizeof(UA_ServerConfig));
-  if(!this->serverConfig.enableSecurity){
+  auto config = (UA_ServerConfig*)UA_calloc(1, sizeof(UA_ServerConfig));
+  if(!this->serverConfig.enableSecurity) {
     UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, NULL);
   }
   /*get hostname */
@@ -116,13 +117,13 @@ void ua_uaadapter::constructServer() {
   config->applicationDescription.discoveryUrls = hostName;
   config->applicationDescription.discoveryUrlsSize = 1;
   config->applicationDescription.applicationName =
-      UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*) this->serverConfig.applicationName.c_str());
+      UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
   config->applicationDescription.applicationUri = UA_STRING_ALLOC((char*)(cleanUri(hostname_uri)).c_str());
-  config->buildInfo.manufacturerName = UA_STRING_ALLOC((char*) "ChimeraTK Team");
+  config->buildInfo.manufacturerName = UA_STRING_ALLOC((char*)"ChimeraTK Team");
   std::string
       versionString =
-      "open62541: " xstr(UA_OPEN62541_VER_MAJOR) "." xstr(UA_OPEN62541_VER_MINOR) "." xstr(UA_OPEN62541_VER_PATCH) ", ControlSystemAdapter-OPC-UA-Adapter: " xstr(
-          PROJECT_VER_MAJOR) "." xstr(PROJECT_VER_MINOR) "." xstr(PTOJECT_VER_PATCH) "";
+          "open62541: " xstr(UA_OPEN62541_VER_MAJOR) "." xstr(UA_OPEN62541_VER_MINOR) "." xstr(UA_OPEN62541_VER_PATCH) ", ControlSystemAdapter-OPC-UA-Adapter: " xstr(
+              PROJECT_VER_MAJOR) "." xstr(PROJECT_VER_MINOR) "." xstr(PTOJECT_VER_PATCH) "";
   config->buildInfo.softwareVersion = UA_STRING_ALLOC((char*)versionString.c_str());
   config->buildInfo.buildDate = UA_DateTime_now();
   config->buildInfo.buildNumber = UA_STRING_ALLOC((char*)"");
@@ -131,36 +132,35 @@ void ua_uaadapter::constructServer() {
   string product_urn = "urn:ChimeraTK:" + this->serverConfig.applicationName;
   config->buildInfo.productUri = UA_STRING_ALLOC((char*)(cleanUri(product_urn)).c_str());
 
-  if(this->serverConfig.enableSecurity){
+  if(this->serverConfig.enableSecurity) {
     UA_ByteString certificate = UA_BYTESTRING_NULL;
     UA_ByteString privateKey = UA_BYTESTRING_NULL;
     size_t trustListSize = 0;
-    UA_ByteString *trustList = NULL;
+    UA_ByteString* trustList = NULL;
     size_t issuerListSize = 0;
-    UA_ByteString *issuerList = NULL;
+    UA_ByteString* issuerList = NULL;
     size_t blockListSize = 0;
-    UA_ByteString *blockList = NULL;
+    UA_ByteString* blockList = NULL;
 
     /* Load certificate and private key */
     certificate = loadFile(this->serverConfig.certPath.c_str());
     privateKey = loadFile(this->serverConfig.keyPath.c_str());
     if(UA_ByteString_equal(&certificate, &UA_BYTESTRING_NULL) ||
-        UA_ByteString_equal(&privateKey, &UA_BYTESTRING_NULL) ){
+        UA_ByteString_equal(&privateKey, &UA_BYTESTRING_NULL)) {
       cout << "Invalid security configuration. Can't load private key or certificate." << endl;
     }
 
     /* Load trust list */
-    struct dirent *entry = nullptr;
-    DIR *dp = nullptr;
+    struct dirent* entry = nullptr;
+    DIR* dp = nullptr;
     dp = opendir(this->serverConfig.allowListFolder.c_str());
-    if (dp != nullptr) {
+    if(dp != nullptr) {
       while((entry = readdir(dp))) {
-        if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
-          continue;
+        if(!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) continue;
         trustListSize++;
-        trustList = (UA_ByteString*) UA_realloc(trustList, sizeof(UA_ByteString) * trustListSize);
+        trustList = (UA_ByteString*)UA_realloc(trustList, sizeof(UA_ByteString) * trustListSize);
         char sbuf[1024];
-        sprintf (sbuf, "%s/%s", this->serverConfig.allowListFolder.c_str(), entry->d_name);
+        sprintf(sbuf, "%s/%s", this->serverConfig.allowListFolder.c_str(), entry->d_name);
         printf("Trust List entry:  %s\n", entry->d_name);
         trustList[trustListSize - 1] = loadFile(sbuf);
       }
@@ -170,14 +170,13 @@ void ua_uaadapter::constructServer() {
     /* Load Issuer list */
     dp = nullptr;
     dp = opendir(this->serverConfig.issuerListFolder.c_str());
-    if (dp != nullptr) {
+    if(dp != nullptr) {
       while((entry = readdir(dp))) {
-        if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
-          continue;
+        if(!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) continue;
         issuerListSize++;
-        issuerList = (UA_ByteString*) UA_realloc(issuerList, sizeof(UA_ByteString) * issuerListSize);
+        issuerList = (UA_ByteString*)UA_realloc(issuerList, sizeof(UA_ByteString) * issuerListSize);
         char sbuf[1024];
-        sprintf (sbuf, "%s/%s", this->serverConfig.allowListFolder.c_str(), entry->d_name);
+        sprintf(sbuf, "%s/%s", this->serverConfig.issuerListFolder.c_str(), entry->d_name);
         printf("Issuer List entry:  %s\n", entry->d_name);
         issuerList[issuerListSize - 1] = loadFile(sbuf);
       }
@@ -187,43 +186,38 @@ void ua_uaadapter::constructServer() {
     /* Load Block list */
     dp = nullptr;
     dp = opendir(this->serverConfig.blockListFolder.c_str());
-    if (dp != nullptr) {
+    if(dp != nullptr) {
       while((entry = readdir(dp))) {
-        if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
-          continue;
+        if(!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) continue;
         blockListSize++;
-        blockList = (UA_ByteString*) UA_realloc(blockList, sizeof(UA_ByteString) * blockListSize);
+        blockList = (UA_ByteString*)UA_realloc(blockList, sizeof(UA_ByteString) * blockListSize);
         char sbuf[1024];
-        sprintf (sbuf, "%s/%s", this->serverConfig.allowListFolder.c_str(), entry->d_name);
+        sprintf(sbuf, "%s/%s", this->serverConfig.blockListFolder.c_str(), entry->d_name);
         printf("Trust List entry:  %s\n", entry->d_name);
         blockList[blockListSize - 1] = loadFile(sbuf);
       }
     }
     closedir(dp);
 
-    //setup encrypted endpoints
-    UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(config, 16660,
-        &certificate, &privateKey,
-        trustList, trustListSize,
-        issuerList, issuerListSize,
-        blockList, blockListSize);
+    // setup encrypted endpoints
+    UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(config, 16660, &certificate, &privateKey,
+        trustList, trustListSize, issuerList, issuerListSize, blockList, blockListSize);
 
-    if(this->serverConfig.unsecure){
+    if(this->serverConfig.unsecure) {
       for(size_t i = 0; i < config->endpointsSize; i++) {
-        UA_EndpointDescription *ep = &config->endpoints[i];
-        if(ep->securityMode != UA_MESSAGESECURITYMODE_NONE)
-          continue;
+        UA_EndpointDescription* ep = &config->endpoints[i];
+        if(ep->securityMode != UA_MESSAGESECURITYMODE_NONE) continue;
 
         UA_EndpointDescription_clear(ep);
-         //Move the last to this position
+        // Move the last to this position
         if(i + 1 < config->endpointsSize) {
-          config->endpoints[i] = config->endpoints[config->endpointsSize-1];
+          config->endpoints[i] = config->endpoints[config->endpointsSize - 1];
           i--;
         }
         config->endpointsSize--;
       }
-       //Delete the entire array if the last Endpoint was removed
-      if(config->endpointsSize== 0) {
+      // Delete the entire array if the last Endpoint was removed
+      if(config->endpointsSize == 0) {
         UA_free(config->endpoints);
         config->endpoints = NULL;
       }
@@ -231,11 +225,10 @@ void ua_uaadapter::constructServer() {
 
     UA_ByteString_clear(&certificate);
     UA_ByteString_clear(&privateKey);
-    for(size_t i = 0; i < trustListSize; i++)
-      UA_ByteString_clear(&trustList[i]);
+    for(size_t i = 0; i < trustListSize; i++) UA_ByteString_clear(&trustList[i]);
   }
 
-  for(size_t i = 0; i < config->endpointsSize; ++i){
+  for(size_t i = 0; i < config->endpointsSize; ++i) {
     UA_ApplicationDescription_clear(&config->endpoints[i].server);
     UA_ApplicationDescription_copy(&config->applicationDescription, &config->endpoints[i].server);
   }
@@ -243,13 +236,13 @@ void ua_uaadapter::constructServer() {
   this->mappedServer = UA_Server_newWithConfig(config);
   this->server_config = UA_Server_getConfig(this->mappedServer);
 
-  //Username/Password handling
+  // Username/Password handling
   auto* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
   usernamePasswordLogins->password = UA_STRING_ALLOC((char*)this->serverConfig.password.c_str());
   usernamePasswordLogins->username = UA_STRING_ALLOC((char*)this->serverConfig.username.c_str());
-  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin, NULL,
-                           &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri,
-                           1, usernamePasswordLogins);
+  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
+      &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
+      usernamePasswordLogins);
 
   this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
   csa_namespaceinit_generated(this->mappedServer);
@@ -356,7 +349,7 @@ void ua_uaadapter::readConfig() {
       }
       cout << "No 'applicationName'-Attribute is set in config file. Use default application-name." << endl;
     }
-    //if no root folder name is set, use application name
+    // if no root folder name is set, use application name
     if(this->serverConfig.rootFolder.empty()) {
       this->serverConfig.rootFolder = this->serverConfig.applicationName;
     }
@@ -437,18 +430,17 @@ void ua_uaadapter::readConfig() {
     xmlXPathFreeObject(result);
   }
   else {
-    cout << "No <process_variable_hierarchy>-Tag in config file. Use default hierarchical mapping with '/'."
-         << endl;
+    cout << "No <process_variable_hierarchy>-Tag in config file. Use default hierarchical mapping with '/'." << endl;
     this->pvSeperator = "/";
   }
 }
 
 void ua_uaadapter::applyMapping(boost::shared_ptr<ControlSystemPVManager> csManager) {
-  //build folder structure
+  // build folder structure
   this->buildFolderStructure(csManager);
-  //start explicit mapping
+  // start explicit mapping
   this->explicitVarMapping(csManager);
-  //add configured additional variables
+  // add configured additional variables
   this->addAdditionalVariables();
 }
 
@@ -476,7 +468,7 @@ UA_NodeId ua_uaadapter::enrollFolderPathFromString(string path, string seperator
     vector<string> newPathVector = this->fileHandler->praseVariablePath(path, seperator);
     varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
   }
-  if(!varPathVector.empty()) { //last element is the variable name itself
+  if(!varPathVector.empty()) { // last element is the variable name itself
     varPathVector.pop_back();
     return this->createFolderPath(this->ownNodeId, varPathVector);
   }
@@ -488,24 +480,24 @@ void ua_uaadapter::implicitVarMapping(std::string varName, boost::shared_ptr<Con
   ua_processvariable* processvariable;
   if(!UA_NodeId_isNull(&folderPathNodeId)) {
     processvariable =
-        new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1),
-                               csManager, this->fileHandler->praseVariablePath(varName, this->pvSeperator).back());
+        new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1), csManager,
+            this->fileHandler->praseVariablePath(varName, this->pvSeperator).back());
   }
   else {
-    processvariable = new ua_processvariable(
-        this->mappedServer, this->ownNodeId, varName.substr(1, varName.size() - 1), csManager);
+    processvariable =
+        new ua_processvariable(this->mappedServer, this->ownNodeId, varName.substr(1, varName.size() - 1), csManager);
   }
   this->variables.push_back(processvariable);
   UA_NodeId tmpNodeId = processvariable->getOwnNodeId();
   UA_Server_writeDisplayName(this->mappedServer, tmpNodeId,
-                             UA_LOCALIZEDTEXT(
-                                 (char*)"en_US", (char*)this->fileHandler->praseVariablePath(varName, this->pvSeperator).back().c_str()));
+      UA_LOCALIZEDTEXT(
+          (char*)"en_US", (char*)this->fileHandler->praseVariablePath(varName, this->pvSeperator).back().c_str()));
   UA_NodeId_clear(&tmpNodeId);
 }
 
 void ua_uaadapter::deepCopyHierarchicalLayer(
     boost::shared_ptr<ControlSystemPVManager> csManager, UA_NodeId layer, UA_NodeId target) {
-  //copy pv's of current layer
+  // copy pv's of current layer
   UA_BrowseDescription bd;
   bd.includeSubtypes = false;
   bd.nodeId = layer;
@@ -516,7 +508,7 @@ void ua_uaadapter::deepCopyHierarchicalLayer(
   UA_BrowseResult br = UA_Server_browse(this->mappedServer, UA_UINT32_MAX, &bd);
   for(size_t j = 0; j < br.referencesSize; ++j) {
     UA_ReferenceDescription rd = br.references[j];
-    //get unit, desc, ..
+    // get unit, desc, ..
     UA_LocalizedText foundPVName;
     string foundPVNameCPP;
     UA_Server_readDisplayName(this->mappedServer, rd.nodeId.nodeId, &foundPVName);
@@ -536,7 +528,7 @@ void ua_uaadapter::deepCopyHierarchicalLayer(
     this->variables.push_back(processvariable);
   }
   UA_BrowseResult_clear(&br);
-  //copy folders of current layer
+  // copy folders of current layer
   bd.includeSubtypes = false;
   bd.nodeId = layer;
   bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
@@ -554,7 +546,7 @@ void ua_uaadapter::deepCopyHierarchicalLayer(
     UA_StatusCode result = UA_Server_readDisplayName(this->mappedServer, rd.nodeId.nodeId, &foundFolderName);
     UASTRING_TO_CPPSTRING(foundFolderName.text, foundFolderNameCPP);
     if(result != UA_STATUSCODE_GOOD) {
-      //error handling
+      // error handling
       continue;
     }
     UA_NodeId newRootFolder = createFolder(target, foundFolderNameCPP);
@@ -592,22 +584,22 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
       if(folder.empty()) {
         if(this->mappingExceptions) {
           throw std::runtime_error("Error! Folder creation failed. Name is missing. Mapping line number: " +
-                                   to_string(nodeset->nodeTab[i]->line));
+              to_string(nodeset->nodeTab[i]->line));
         }
         if(description.empty()) {
           UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping Folder. Folder creation failed. Name is missing. Mapping line number: %u",
-                         nodeset->nodeTab[i]->line);
+              "Warning! Skipping Folder. Folder creation failed. Name is missing. Mapping line number: %u",
+              nodeset->nodeTab[i]->line);
         }
         else {
           UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping Folder. Folder creation failed. Name is missing 'description: %s'. Mapping "
-                         "line number: %u",
-                         description.c_str(), nodeset->nodeTab[i]->line);
+              "Warning! Skipping Folder. Folder creation failed. Name is missing 'description: %s'. Mapping "
+              "line number: %u",
+              description.c_str(), nodeset->nodeTab[i]->line);
         }
         continue;
       }
-      //check if a pv with the requested node id exists
+      // check if a pv with the requested node id exists
       UA_NodeId tmpOutput = UA_NODEID_NULL;
       string pvNodeString;
       if(destination.empty()) {
@@ -620,7 +612,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
       UA_Server_readNodeId(this->mappedServer, pvNode, &tmpOutput);
       if(!UA_NodeId_isNull(&tmpOutput)) {
         UA_NodeId_clear(&tmpOutput);
-        //set folder description
+        // set folder description
         if(sourceName.empty() && !description.empty()) {
           UA_Server_writeDescription(
               this->mappedServer, pvNode, UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
@@ -629,44 +621,43 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
         if(this->mappingExceptions) {
           throw std::runtime_error("Error! Folder with source mapping failed. Target folder node id exists. "
                                    "Mapping line number: " +
-                                   to_string(nodeset->nodeTab[i]->line));
+              to_string(nodeset->nodeTab[i]->line));
         }
         UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                       "Warning! Skipping folder: %s. Folder with source mapping failed. Target folder node id exists. "
-                       "Mapping line number: %u",
-                       sourceName.c_str(), nodeset->nodeTab[i]->line);
+            "Warning! Skipping folder: %s. Folder with source mapping failed. Target folder node id exists. "
+            "Mapping line number: %u",
+            sourceName.c_str(), nodeset->nodeTab[i]->line);
         continue;
       }
       if(!copy.empty() && sourceName.empty()) {
         if(this->mappingExceptions) {
-          throw std::runtime_error(
-              "Error! Folder creation failed. Source folder missing. Mapping line number: " +
+          throw std::runtime_error("Error! Folder creation failed. Source folder missing. Mapping line number: " +
               to_string(nodeset->nodeTab[i]->line));
         }
         UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                       "Warning! Skipping Folder. Source 'name: %s' folder missing. Mapping line number: %u",
-                       folder.c_str(), nodeset->nodeTab[i]->line);
+            "Warning! Skipping Folder. Source 'name: %s' folder missing. Mapping line number: %u", folder.c_str(),
+            nodeset->nodeTab[i]->line);
         continue;
       }
       folderPathNodeId = enrollFolderPathFromString(destination + "/replacePart", "/");
       if(UA_NodeId_isNull(&folderPathNodeId)) {
         folderPathNodeId = UA_NODEID_STRING(1, (char*)(this->serverConfig.rootFolder + "Dir").c_str());
       }
-      //check if source name is set -> map complete hierarchical structure to the destination
+      // check if source name is set -> map complete hierarchical structure to the destination
       if(!sourceName.empty()) {
         if((destination.empty() && sourceName.compare(folder) == 0) ||
-           (!destination.empty() && sourceName.compare(destination + "/" + folder) == 0)) {
+            (!destination.empty() && sourceName.compare(destination + "/" + folder) == 0)) {
           if(this->mappingExceptions) {
             throw std::runtime_error(
                 "Error! Folder creation failed. Source and Destination equal. Mapping line number: " +
                 to_string(nodeset->nodeTab[i]->line));
           }
           UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping Folder. Source '%s' and Destination equal. Mapping line number: %u",
-                         sourceName.c_str(), nodeset->nodeTab[i]->line);
+              "Warning! Skipping Folder. Source '%s' and Destination equal. Mapping line number: %u",
+              sourceName.c_str(), nodeset->nodeTab[i]->line);
           continue;
         }
-        //check if the src is a folder
+        // check if the src is a folder
         string sourceFolder = this->serverConfig.rootFolder + "/" + sourceName + "Dir";
         bool isFolderType = false;
         UA_NodeId sourceFolderId = UA_NODEID_STRING(1, (char*)sourceFolder.c_str());
@@ -689,15 +680,15 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
         UA_BrowseResult_clear(&br);
         if(!isFolderType) {
           if(this->mappingExceptions) {
-            throw std::runtime_error("Error! Folder creation failed. No corresponding source folder: " +
-                                     sourceName + ". Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
+            throw std::runtime_error("Error! Folder creation failed. No corresponding source folder: " + sourceName +
+                ". Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
           }
           UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping Folder. No corresponding source '%s' folder. Mapping line number: %u",
-                         sourceName.c_str(), nodeset->nodeTab[i]->line);
+              "Warning! Skipping Folder. No corresponding source '%s' folder. Mapping line number: %u",
+              sourceName.c_str(), nodeset->nodeTab[i]->line);
           continue;
         }
-        //enroll path destination -> copy / link the complete tree to this place
+        // enroll path destination -> copy / link the complete tree to this place
         transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
         if(copy.compare("TRUE") == 0) {
           bool sourceAndDestinationEqual = false;
@@ -709,14 +700,13 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
           }
           if(sourceAndDestinationEqual) {
             if(this->mappingExceptions) {
-              throw std::runtime_error(
-                  "Error! Folder creation failed. Source and destination must be different for '" +
+              throw std::runtime_error("Error! Folder creation failed. Source and destination must be different for '" +
                   sourceName + "' folder. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
             }
             UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                           "Warning! Skipping Folder. Folder creation failed. Source and destination must be "
-                           "different for '%s' folder. Mapping line number: %u",
-                           sourceName.c_str(), nodeset->nodeTab[i]->line);
+                "Warning! Skipping Folder. Folder creation failed. Source and destination must be "
+                "different for '%s' folder. Mapping line number: %u",
+                sourceName.c_str(), nodeset->nodeTab[i]->line);
             continue;
           }
           // folder structure must be copied, pv nodes must be added
@@ -728,8 +718,8 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
               existingDestinationFolderString += this->serverConfig.rootFolder + "/" + folder + "Dir";
             }
             else {
-              existingDestinationFolderString =
-              this->serverConfig.rootFolder += "/" + destination + "/" + folder + "Dir";
+              existingDestinationFolderString = this->serverConfig.rootFolder +=
+                  "/" + destination + "/" + folder + "Dir";
             }
             copyRoot = UA_NODEID_STRING(1, (char*)existingDestinationFolderString.c_str());
           }
@@ -747,15 +737,14 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
               existingDestinationFolderString = this->serverConfig.rootFolder + "/" + folder;
             }
             else {
-              existingDestinationFolderString =
-                  this->serverConfig.rootFolder + "/" + destination + "/" + folder;
+              existingDestinationFolderString = this->serverConfig.rootFolder + "/" + destination + "/" + folder;
             }
             copyRoot = UA_NODEID_STRING(1, (char*)existingDestinationFolderString.c_str());
           }
           else {
             if(!description.empty()) {
-              UA_Server_writeDescription(this->mappedServer, copyRoot,
-                                         UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
+              UA_Server_writeDescription(
+                  this->mappedServer, copyRoot, UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
             }
           }
           UA_BrowseDescription bd;
@@ -793,12 +782,12 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
         }
         continue;
       }
-      //create the requested folder hierarchy
+      // create the requested folder hierarchy
       UA_NodeId retnode = createFolder(folderPathNodeId, folder);
-      //set folder description
+      // set folder description
       if(copy.empty() && sourceName.empty() && !description.empty()) {
-        UA_Server_writeDescription(this->mappedServer, retnode,
-                                   UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
+        UA_Server_writeDescription(
+            this->mappedServer, retnode, UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
       }
     }
 
@@ -843,21 +832,20 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
         }
         if(!name.empty()) {
           UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping PV mapping. SourceName 'name: %s' is missing.", name.c_str());
+              "Warning! Skipping PV mapping. SourceName 'name: %s' is missing.", name.c_str());
         }
         else {
           UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping PV mapping. SourceName is missing.");
+              "Warning! Skipping PV mapping. SourceName is missing.");
         }
         continue;
       }
-      //check if the pv still exists -> update requested
+      // check if the pv still exists -> update requested
       if((destination + "/" + name).compare(sourceName) == 0 && copy.compare("FALSE") == 0) {
-        //check if the source var exists
+        // check if the source var exists
         string parentSourceFolder = this->serverConfig.rootFolder + "/" +
-                                    (sourceName.substr(0,
-                                                       sourceName.length() - this->fileHandler->praseVariablePath(sourceName, "/").back().length() -
-                                                       1));
+            (sourceName.substr(
+                0, sourceName.length() - this->fileHandler->praseVariablePath(sourceName, "/").back().length() - 1));
         UA_NodeId parentSourceFolderId = UA_NODEID_STRING(1, (char*)parentSourceFolder.c_str());
         UA_NodeId pvNodeId = UA_NODEID_NULL;
         UA_BrowseDescription bd;
@@ -883,16 +871,16 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
           }
           if(!name.empty()) {
             UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                           "Warning! Skipping PV mapping. No corresponding source pv 'name: %s'.", name.c_str());
+                "Warning! Skipping PV mapping. No corresponding source pv 'name: %s'.", name.c_str());
           }
           else {
             UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                           "Warning! Skipping PV mapping. No corresponding source pv.");
+                "Warning! Skipping PV mapping. No corresponding source pv.");
           }
           return;
         }
         if(!unit.empty()) {
-          //update unit
+          // update unit
           for(size_t n = 0; n < this->variables.size(); n++) {
             UA_NodeId tmpNodeId = this->variables[n]->getOwnNodeId();
             if(UA_NodeId_equal(&tmpNodeId, &pvNodeId)) {
@@ -902,7 +890,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
           }
         }
         if(!description.empty()) {
-          //update description
+          // update description
           for(size_t n = 0; n < this->variables.size(); n++) {
             UA_NodeId tmpNodeId = this->variables[n]->getOwnNodeId();
             if(UA_NodeId_equal(&tmpNodeId, &pvNodeId)) {
@@ -917,7 +905,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
         }
         continue;
       }
-      //check if the source pv exists
+      // check if the source pv exists
       string parentSourceString = this->serverConfig.rootFolder + "/" + sourceName;
       UA_NodeId parentSourceId = UA_NODEID_STRING(1, (char*)parentSourceString.c_str());
       UA_NodeId tmpOutput = UA_NODEID_NULL;
@@ -926,23 +914,21 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
         if(this->mappingExceptions) {
           if(!name.empty()) {
             throw std::runtime_error("Error! PV mapping failed. Source PV not found 'name' : '" + name +
-                                     "'. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
+                "'. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
           }
           else {
-            throw std::runtime_error(
-                "Error! PV mapping failed. Source PV not found. Mapping line number: " +
+            throw std::runtime_error("Error! PV mapping failed. Source PV not found. Mapping line number: " +
                 to_string(nodeset->nodeTab[i]->line));
           }
         }
         if(!name.empty()) {
           UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping PV mapping. Source PV not found 'name: %s'. Mapping line number: %u",
-                         name.c_str(), nodeset->nodeTab[i]->line);
+              "Warning! Skipping PV mapping. Source PV not found 'name: %s'. Mapping line number: %u", name.c_str(),
+              nodeset->nodeTab[i]->line);
         }
         else {
           UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping PV mapping. Source PV not found. Mapping line number: %u",
-                         nodeset->nodeTab[i]->line);
+              "Warning! Skipping PV mapping. Source PV not found. Mapping line number: %u", nodeset->nodeTab[i]->line);
         }
         continue;
       }
@@ -950,7 +936,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
         UA_NodeId_clear(&tmpOutput);
         UA_NodeId_init(&tmpOutput);
       }
-      //check the pv copy attribute -> copy of pv requested; false -> reference to original pv requested
+      // check the pv copy attribute -> copy of pv requested; false -> reference to original pv requested
       UA_NodeId createdNodeId = UA_NODEID_NULL;
       if(copy.compare("TRUE") == 0) {
         if(sourceName.compare(destination + "/" + name) == 0) {
@@ -959,9 +945,9 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
                 "Error! PV mapping failed. Source and destination must be different if copy='true'.");
           }
           UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping PV mapping. Source and destination must be different if copy='true' 'name: "
-                         "%s'.",
-                         name.c_str());
+              "Warning! Skipping PV mapping. Source and destination must be different if copy='true' 'name: "
+              "%s'.",
+              name.c_str());
           continue;
         }
         UA_NodeId destinationFolderNodeId = UA_NODEID_NULL;
@@ -973,19 +959,18 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
             destinationFolderNodeId = enrollFolderPathFromString(destination + "/removedPart", "/");
           }
           else {
-            //legacy code to make old mapping possible
+            // legacy code to make old mapping possible
             if(destination.find("Variables" + unrollPath) == 0) {
               string requestedBrowseName = destination;
               requestedBrowseName.erase(0, ("Variables" + unrollPath).length());
-              //check if the requested path still exists in the Variables folder
-              string requestedPVBrowseName =
-                  this->serverConfig.rootFolder + "/Variables/" + requestedBrowseName;
+              // check if the requested path still exists in the Variables folder
+              string requestedPVBrowseName = this->serverConfig.rootFolder + "/Variables/" + requestedBrowseName;
               UA_NodeId requestedPVBrowseId = UA_NODEID_STRING(1, (char*)requestedPVBrowseName.c_str());
               UA_NodeId tmpOutput = UA_NODEID_NULL;
               UA_Server_readNodeId(this->mappedServer, requestedPVBrowseId, &tmpOutput);
               if(!UA_NodeId_isNull(&tmpOutput)) {
                 UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                               "Warning! Using legacy code. Mapped PV is used as PV mapping target");
+                    "Warning! Using legacy code. Mapped PV is used as PV mapping target");
                 UA_NodeId_copy(&requestedPVBrowseId, &destinationFolderNodeId);
               }
               else {
@@ -1004,18 +989,17 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
         }
         ua_processvariable* processvariable;
         if(!UA_NodeId_isNull(&destinationFolderNodeId)) {
-          processvariable = new ua_processvariable(
-              this->mappedServer, destinationFolderNodeId, sourceName, csManager, name);
+          processvariable =
+              new ua_processvariable(this->mappedServer, destinationFolderNodeId, sourceName, csManager, name);
           UA_NodeId tmpProcessVariableNodeId = processvariable->getOwnNodeId();
           if(UA_NodeId_isNull(&tmpProcessVariableNodeId)) {
             if(this->mappingExceptions) {
-              throw std::runtime_error(
-                  "PV creation failed. PV with same name mapped. Mapping line number: " +
+              throw std::runtime_error("PV creation failed. PV with same name mapped. Mapping line number: " +
                   to_string(nodeset->nodeTab[i]->line));
             }
             UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                           "Warning! Skipping PV %s. PV with same name mapped. Mapping line number: %u",
-                           sourceName.c_str(), nodeset->nodeTab[i]->line);
+                "Warning! Skipping PV %s. PV with same name mapped. Mapping line number: %u", sourceName.c_str(),
+                nodeset->nodeTab[i]->line);
             continue;
           }
           else {
@@ -1027,8 +1011,8 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
           if(this->mappingExceptions) {
             throw std::runtime_error("Folder creation failed.");
           }
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping PV. Folder creation failed.");
+          UA_LOG_WARNING(
+              &this->server_config->logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV. Folder creation failed.");
           continue;
         }
         UA_NodeId tmpPVNodeId = processvariable->getOwnNodeId();
@@ -1036,28 +1020,26 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
         UA_NodeId_clear(&tmpPVNodeId);
       }
       else {
-        //get node id of the source node
+        // get node id of the source node
         string sourceVarName = this->fileHandler->praseVariablePath(sourceName, "/").back();
         if(name.empty()) {
           name = sourceVarName;
         }
         if(sourceVarName.compare(name) != 0) {
           if(this->mappingExceptions) {
-            throw std::runtime_error(
-                "Error! PV mapping failed. The pv name can't changed if copy is false.");
+            throw std::runtime_error("Error! PV mapping failed. The pv name can't changed if copy is false.");
           }
           UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping PV mapping. The pv name can't changed if copy is false. 'name: %s'.",
-                         name.c_str());
+              "Warning! Skipping PV mapping. The pv name can't changed if copy is false. 'name: %s'.", name.c_str());
           continue;
         }
-        //create destination folder
+        // create destination folder
         UA_NodeId destinationFolder = enrollFolderPathFromString(destination + "/removedpart", "/");
         UA_ExpandedNodeId enid;
         enid.serverIndex = 1;
         enid.namespaceUri = UA_STRING_NULL;
         enid.nodeId = parentSourceId;
-        //add reference to the source node
+        // add reference to the source node
         UA_StatusCode addRef = UA_Server_addReference(
             this->mappedServer, destinationFolder, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, UA_TRUE);
         if(sourceVarName.compare(name) != 0) {
@@ -1065,7 +1047,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
             throw std::runtime_error("PV mapping failed. Can't create reference to original pv.");
           }
           UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                         "Warning! Skipping PV. Can't create reference to original pv.");
+              "Warning! Skipping PV. Can't create reference to original pv.");
           continue;
         }
         UA_NodeId_copy(&parentSourceId, &createdNodeId);
@@ -1123,20 +1105,20 @@ void ua_uaadapter::addAdditionalVariables() {
       if(!nodeValue.empty()) {
         value = this->fileHandler->getContentFromNode(nodeValue[0]);
       }
-      //check if name is empty
+      // check if name is empty
       if(name.empty()) {
         if(this->mappingExceptions) {
           throw std::runtime_error("Additional variable node creation failed. Additional variable name is "
                                    "mandatory. Mapping line number: " +
-                                   to_string(nodeset->nodeTab[i]->line));
+              to_string(nodeset->nodeTab[i]->line));
         }
         UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                       "Warning! Skipping additional variable. Additional variable name is mandatory. Mapping line "
-                       "number: %u",
-                       nodeset->nodeTab[i]->line);
+            "Warning! Skipping additional variable. Additional variable name is mandatory. Mapping line "
+            "number: %u",
+            nodeset->nodeTab[i]->line);
         continue;
       }
-      //check if the av node still exists
+      // check if the av node still exists
       UA_NodeId tmpOutput = UA_NODEID_NULL;
       string avNodeString;
       if(destination.empty()) {
@@ -1151,15 +1133,14 @@ void ua_uaadapter::addAdditionalVariables() {
         UA_NodeId_clear(&tmpOutput);
         UA_NodeId_init(&tmpOutput);
         if(this->mappingExceptions) {
-          throw std::runtime_error(
-              "Additional variable node creation failed. Additional variable already exists.");
+          throw std::runtime_error("Additional variable node creation failed. Additional variable already exists.");
         }
         UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                       "Warning! Skipping additional variable %s. Node already exists. Mapping line number: %u",
-                       name.c_str(), nodeset->nodeTab[i]->line);
+            "Warning! Skipping additional variable %s. Node already exists. Mapping line number: %u", name.c_str(),
+            nodeset->nodeTab[i]->line);
         continue;
       }
-      //check if pv with same name exists in the target folder
+      // check if pv with same name exists in the target folder
       UA_NodeId_clear(&tmpOutput);
       string pvNodeString;
       if(destination.empty()) {
@@ -1174,13 +1155,12 @@ void ua_uaadapter::addAdditionalVariables() {
         UA_NodeId_clear(&tmpOutput);
         UA_NodeId_init(&tmpOutput);
         if(this->mappingExceptions) {
-          throw std::runtime_error(
-              "Additional variable node creation failed. PV with same name already exists.");
+          throw std::runtime_error("Additional variable node creation failed. PV with same name already exists.");
         }
         UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                       "Warning! Skipping additional variable %s. PV with same name already exists. Mapping line number: "
-                       "%u",
-                       name.c_str(), nodeset->nodeTab[i]->line);
+            "Warning! Skipping additional variable %s. PV with same name already exists. Mapping line number: "
+            "%u",
+            name.c_str(), nodeset->nodeTab[i]->line);
         continue;
       }
 
@@ -1191,14 +1171,14 @@ void ua_uaadapter::addAdditionalVariables() {
       }
       else {
         additionalVarFolderPathNodeId += this->serverConfig.rootFolder + "Dir";
-        additionalVarFolderPath = UA_NODEID_STRING_ALLOC(1, (char*) additionalVarFolderPathNodeId.c_str());
+        additionalVarFolderPath = UA_NODEID_STRING_ALLOC(1, (char*)additionalVarFolderPathNodeId.c_str());
       }
       if(UA_NodeId_isNull(&additionalVarFolderPath)) {
         if(this->mappingExceptions) {
           throw std::runtime_error("Error! Creation of additional variable folder failed.");
         }
         UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-                       "Warning! Skipping additional variable. Creation of additional variable folder failed. Skipping.");
+            "Warning! Skipping additional variable. Creation of additional variable folder failed. Skipping.");
         continue;
       }
       ua_additionalvariable* additionalvariable =
@@ -1233,7 +1213,7 @@ UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderN
   string parentNodeIdString;
   if(basenodeid.identifierType == UA_NODEIDTYPE_STRING) {
     UASTRING_TO_CPPSTRING(basenodeid.identifier.string, parentNodeIdString);
-    if (!parentNodeIdString.empty()) {
+    if(!parentNodeIdString.empty()) {
       parentNodeIdString.resize(parentNodeIdString.size() - 3);
     }
     parentNodeIdString += '/' + folderName + "Dir";
@@ -1243,9 +1223,9 @@ UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderN
   }
 
   UA_Server_addObjectNode(this->mappedServer,
-                          UA_NODEID_STRING(1, (char*) parentNodeIdString.c_str()), //UA_NODEID_NUMERIC(1,0)
-                          basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), UA_QUALIFIEDNAME(1, (char*)folderName.c_str()),
-                          UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr, &this->ownedNodes, &createdNodeId);
+      UA_NODEID_STRING(1, (char*)parentNodeIdString.c_str()), // UA_NODEID_NUMERIC(1,0)
+      basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), UA_QUALIFIEDNAME(1, (char*)folderName.c_str()),
+      UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr, &this->ownedNodes, &createdNodeId);
 
   ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), &this->ownedNodes);
   return createdNodeId;
@@ -1266,16 +1246,18 @@ UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
   oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.rootFolder.c_str());
   oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.descriptionFolder.c_str());
 
-  UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, ((char*) (this->serverConfig.rootFolder+"Dir").c_str())),
-                          UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-                          UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()),
-                          UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &this->ownedNodes, &createdNodeId);
+  UA_Server_addObjectNode(this->mappedServer,
+      UA_NODEID_STRING(1, ((char*)(this->serverConfig.rootFolder + "Dir").c_str())),
+      UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
+      UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()),
+      UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &this->ownedNodes, &createdNodeId);
 
   this->ownNodeId = createdNodeId;
   ua_mapInstantiatedNodes(this->ownNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &this->ownedNodes);
 
   // Nodes "Variables" where created on object instantiation, we need these IDs to add new process variables to them...
-  //UA_NodeId_copy(nodePairList_getTargetIdBySourceId(this->ownedNodes, UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLES)), &this->variablesListId);
+  // UA_NodeId_copy(nodePairList_getTargetIdBySourceId(this->ownedNodes, UA_NODEID_NUMERIC(CSA_NSID,
+  // CSA_NSID_VARIABLES)), &this->variablesListId);
   return UA_STATUSCODE_GOOD;
 }
 
@@ -1298,7 +1280,7 @@ UA_NodeId ua_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
   UA_NodeId lastNodeId = UA_NODEID_NULL;
   for(uint32_t i = 0; i < this->folderVector.size(); i++) {
     if((this->folderVector.at(i).folderName.compare(folder) == 0) &&
-       (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &basenodeid))) {
+        (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &basenodeid))) {
       return this->folderVector.at(i).folderNodeId;
     }
   }
@@ -1321,8 +1303,8 @@ UA_NodeId ua_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<strin
       for(uint32_t i = 0; i < this->folderVector.size(); i++) {
         // get correct folder NodeId from first folderPath element
         if(!setted && (folderPath.at(m).compare(this->folderVector.at(i).folderName) == 0) &&
-           (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &nextNodeId)) &&
-           ((m + 1) < folderPath.size())) {
+            (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &nextNodeId)) &&
+            ((m + 1) < folderPath.size())) {
           // remember on witch position the folder still exist
           setted = true;
           starter4Folder = m + 1;
@@ -1373,7 +1355,7 @@ vector<string> ua_uaadapter::getAllNotMappableVariablesNames() {
   if(result) {
     xmlNodeSetPtr nodeset = result->nodesetval;
     for(int32_t i = 0; i < nodeset->nodeNr; i++) {
-      //for(auto var:this->variables) {
+      // for(auto var:this->variables) {
       bool mapped = false;
       string mappedVar = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
       for(auto var : this->getVariables()) {
