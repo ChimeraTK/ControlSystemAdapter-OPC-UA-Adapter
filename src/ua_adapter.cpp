@@ -200,8 +200,8 @@ void ua_uaadapter::constructServer() {
     closedir(dp);
 
     // setup encrypted endpoints
-    UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(config, 16660, &certificate, &privateKey,
-        trustList, trustListSize, issuerList, issuerListSize, blockList, blockListSize);
+    UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(config, this->serverConfig.opcuaPort,
+        &certificate, &privateKey, trustList, trustListSize, issuerList, issuerListSize, blockList, blockListSize);
 
     if(retval != UA_STATUSCODE_GOOD) {
       throw std::runtime_error("Failed setting up server endpoints.");
