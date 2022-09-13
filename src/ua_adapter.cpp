@@ -203,6 +203,10 @@ void ua_uaadapter::constructServer() {
     UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(config, 16660, &certificate, &privateKey,
         trustList, trustListSize, issuerList, issuerListSize, blockList, blockListSize);
 
+    if(retval != UA_STATUSCODE_GOOD) {
+      throw std::runtime_error("Failed setting up server endpoints.");
+    }
+
     if(this->serverConfig.unsecure) {
       for(size_t i = 0; i < config->endpointsSize; i++) {
         UA_EndpointDescription* ep = &config->endpoints[i];
