@@ -73,10 +73,6 @@ static string cleanUri(string s) {
   return s;
 }
 
-<<<<<<< Upstream, based on origin/master
-static UA_ByteString loadFile(const char* const path) {
-  UA_ByteString fileContents = UA_STRING_NULL;
-=======
 static void pubSubExampleConfiguration(UA_Server *server, UA_NodeId *pdsIdent){
   /* PubSub configuration Parameters */
   UA_UInt32 publisherId = 2234;
@@ -164,12 +160,9 @@ static void pubSubExampleField(UA_Server *server, UA_String fieldName, UA_NodeId
   UA_Server_addDataSetField(server, PDSIdent, &dataSetFieldConfig, NULL);
 }
 
-void ua_uaadapter::constructServer() {
-  auto config = (UA_ServerConfig*)UA_calloc(1, sizeof(UA_ServerConfig));
-  UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, NULL);
->>>>>>> 6c8af0b feat(adapter) add pubsub showcase
+static UA_ByteString loadFile(const char* const path) {
+  UA_ByteString fileContents = UA_STRING_NULL;
 
-<<<<<<< Upstream, based on origin/master
   /* Open the file */
   FILE* fp = fopen(path, "rb");
   if(!fp) {
@@ -195,10 +188,6 @@ void ua_uaadapter::constructServer() {
 }
 
 void ua_uaadapter::fillBuildInfo(UA_ServerConfig* config) {
-=======
-  UA_ServerConfig_addPubSubTransportLayer(config, UA_PubSubTransportLayerUDPMP());
-
->>>>>>> 6c8af0b feat(adapter) add pubsub showcase
   /*get hostname */
   char hostname[HOST_NAME_MAX];
   gethostname(hostname, HOST_NAME_MAX);
@@ -333,6 +322,7 @@ void ua_uaadapter::constructServer() {
     UA_ByteString_clear(&privateKey);
     for(size_t i = 0; i < trustListSize; i++) UA_ByteString_clear(&trustList[i]);
   }
+  UA_ServerConfig_addPubSubTransportLayer(config, UA_PubSubTransportLayerUDPMP());
   fillBuildInfo(config);
   for(size_t i = 0; i < config->endpointsSize; ++i) {
     UA_ApplicationDescription_clear(&config->endpoints[i].server);
@@ -342,9 +332,6 @@ void ua_uaadapter::constructServer() {
   this->mappedServer = UA_Server_newWithConfig(config);
   this->server_config = UA_Server_getConfig(this->mappedServer);
 
-<<<<<<< Upstream, based on origin/master
-  // Username/Password handling
-=======
   /* Add PubSub configuration */
   UA_NodeId pds;
   pubSubExampleConfiguration(this->mappedServer, &pds);
@@ -352,20 +339,13 @@ void ua_uaadapter::constructServer() {
    * Fields which are configured for PubSub in the XML */
   pubSubExampleField(this->mappedServer, UA_String_fromChars("Test Field 1"), UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER_SERVERSTATUS_CURRENTTIME), pds);
 
-  //Username/Password handling
->>>>>>> 6c8af0b feat(adapter) add pubsub showcase
+  // Username/Password handling
   auto* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
   usernamePasswordLogins->password = UA_STRING_ALLOC((char*)this->serverConfig.password.c_str());
   usernamePasswordLogins->username = UA_STRING_ALLOC((char*)this->serverConfig.username.c_str());
-<<<<<<< Upstream, based on origin/master
   UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
       &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
       usernamePasswordLogins);
-=======
-  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin, NULL,
-                           &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
-                           usernamePasswordLogins);
->>>>>>> 6c8af0b feat(adapter) add pubsub showcase
 
   this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
 
