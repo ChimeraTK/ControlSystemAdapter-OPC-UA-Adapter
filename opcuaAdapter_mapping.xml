@@ -2,6 +2,11 @@
 <uamapping>
 	<config rootFolder="llrfCtrl_hzdr" description="Test application for the digital LLRF system at ELBE / HZDR">
 		<server applicationName="LLRFServer" port="16660" />
+		<security unsecure="enable" certificate="../certs/server_cert.der"
+				  privatekey="../certs/server_key.der"
+				  trustlist="../certs/allow"
+				  blocklist="../certs/block"
+				  issuerlist="../certs/issuer"/>
 		<login username="test" password="test123" />
 		<process_variable_hierarchy>
 			<unroll pathSep="/">True</unroll>

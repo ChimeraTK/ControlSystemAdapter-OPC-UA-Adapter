@@ -20,14 +20,14 @@
 
 #include "xml_file_handler.h"
 
-#include <iostream>
-
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string.hpp>
-
+#include <libxml2/libxml/tree.h>
 #include <libxml2/libxml/xpath.h>
 #include <libxml2/libxml/xpathInternals.h>
-#include <libxml2/libxml/tree.h>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/tokenizer.hpp>
+
+#include <iostream>
 
 using namespace std;
 
@@ -58,18 +58,25 @@ xmlXPathObjectPtr xml_file_handler::getNodeSet(std::string xPathString) {
   }
   context = xmlXPathNewContext(this->doc);
   if(context == NULL) {
-    //std::cout("Error in xmlXPathNewContext\n");
+    // std::cout("Error in xmlXPathNewContext\n");
     return NULL;
   }
+  if(xmlXPathRegisterNs(
+         context, (xmlChar*)"csa", (xmlChar*)"https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter") != 0) {
+    std::cerr << "Failed to register xml namespace: https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
+              << std::endl;
+    return NULL;
+  }
+
   result = xmlXPathEvalExpression(xpath, context);
   xmlXPathFreeContext(context);
   if(result == NULL) {
-    //std::cout("Error in xmlXPathEvalExpression\n");
+    // std::cout("Error in xmlXPathEvalExpression\n");
     return NULL;
   }
   if(xmlXPathNodeSetIsEmpty(result->nodesetval)) {
     xmlXPathFreeObject(result);
-    //std::cout("No result\n");
+    // std::cout("No result\n");
     return NULL;
   }
   return result;
