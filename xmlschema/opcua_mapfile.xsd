@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             targetNamespace="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
-            xmlns="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
-            elementFormDefault="qualified"
+            xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
+            elementFormDefault="unqualified"
             attributeFormDefault="unqualified">
 
   <xsd:annotation>
@@ -11,18 +11,18 @@
     </xsd:documentation>
   </xsd:annotation>
 
-  <xsd:element name="uamapping" type="UAMappingType"/>
+  <xsd:element name="uamapping" type="csa:UAMappingType"/>
 
   <xsd:complexType name="UAMappingType">
     <xsd:sequence>
-      <xsd:element name="config" type="configType" minOccurs="0" maxOccurs="1">
+      <xsd:element name="config" type="csa:configType" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             General settings realted to the mapping and the OPC UA server.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="process_variable" type="pvType" minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="process_variable" type="csa:pvType" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Used to edit OPC UA nodes and to copy or link OPC UA nodes to new OPC UA nodes.
@@ -39,14 +39,14 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="additional_variable" type="additionalPVType" minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="additional_variable" type="csa:additionalPVType" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Used to add additional OPC UA nodes, that have a fixed value and are not linked to a ChimeraTK process variable.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="folder" type="folderType" minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="folder" type="csa:folderType" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Used to create, copy or link folders.
@@ -57,14 +57,14 @@
   </xsd:complexType>
   <xsd:complexType name="configType">
     <xsd:sequence>
-      <xsd:element name="server" type="serverType"  minOccurs="0" maxOccurs="1">
+      <xsd:element name="server" type="csa:serverType"  minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Change server properties, else defaults are used.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>   
-      <xsd:element name="security" type="securityType" minOccurs="0" maxOccurs="1">
+      <xsd:element name="security" type="csa:securityType" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Configure OPC UA server endpoints. If this element is not found in the 
@@ -72,7 +72,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="login" type="loginType"  minOccurs="0" maxOccurs="1">
+      <xsd:element name="login" type="csa:loginType"  minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             If clients should be requiered to login with username and password, use
@@ -80,7 +80,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="process_variable_hierarchy" type="hierarchyType" minOccurs="0" maxOccurs="1">
+      <xsd:element name="process_variable_hierarchy" type="csa:hierarchyType" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Change the behaviour of how process varibale names and the hierarchy included in the 
@@ -97,7 +97,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="mapping_exceptions" type="exceptionType" minOccurs="0" maxOccurs="1">
+      <xsd:element name="mapping_exceptions" type="csa:exceptionType" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Set the bahaviour in case error occur while parsing this mapping file.
@@ -107,7 +107,7 @@
         </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="rootFolder" type="nonEmptyString">
+    <xsd:attribute name="rootFolder" type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation>
           Set the name of the root node of the OPC UA server.
@@ -115,10 +115,10 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="description" type="nonEmptyString"/>
+    <xsd:attribute name="description" type="csa:nonEmptyString"/>
   </xsd:complexType>
   <xsd:complexType name="serverType">
-    <xsd:attribute name="applicationName" type="nonEmptyString">
+    <xsd:attribute name="applicationName" type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation>
           Set the name application name. 
@@ -145,7 +145,7 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="certificate" type="nonEmptyString">
+    <xsd:attribute name="certificate" type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           The server certificate given as *.der file. The certificate has
@@ -158,14 +158,14 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="privatekey" type="nonEmptyString">
+    <xsd:attribute name="privatekey" type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           The servers private key given as *.der file. 
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="trustlist" type="nonEmptyString">
+    <xsd:attribute name="trustlist" type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           Directory where to find trusted certificates, e.g. if no certification
@@ -173,14 +173,14 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="blocklist" type="nonEmptyString">
+    <xsd:attribute name="blocklist" type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           Directory where to find revocation lists of CAs.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="issuerlist" type="nonEmptyString">
+    <xsd:attribute name="issuerlist" type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           Directory where to issuer certificates given as *.der files.
@@ -189,12 +189,12 @@
     </xsd:attribute>
   </xsd:complexType>
   <xsd:complexType name="loginType">
-    <xsd:attribute name="username" type="nonEmptyString" use="required"/>
-    <xsd:attribute name="password" type="nonEmptyString" use="required"/>
+    <xsd:attribute name="username" type="csa:nonEmptyString" use="required"/>
+    <xsd:attribute name="password" type="csa:nonEmptyString" use="required"/>
   </xsd:complexType>
   <xsd:complexType name="hierarchyType">
     <xsd:sequence>
-      <xsd:element name="unroll" type="unrollType" minOccurs="1" maxOccurs="unbounded">
+      <xsd:element name="unroll" type="csa:unrollType" minOccurs="1" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Change the default path seperator.
@@ -213,7 +213,7 @@
   <xsd:complexType name="unrollType">
     <xsd:simpleContent>
       <xsd:extension base="xsd:boolean">
-        <xsd:attribute name="pathSep" type="nonEmptyString"/>
+        <xsd:attribute name="pathSep" type="csa:nonEmptyString"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
@@ -225,7 +225,7 @@
 
   <xsd:complexType name="pvType">
     <xsd:sequence minOccurs="0" maxOccurs="1">
-      <xsd:element name="destination" type="nonEmptyString">
+      <xsd:element name="destination" type="csa:nonEmptyString">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Give target browse path of the OPC UA node.
@@ -234,7 +234,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="name" type="nonEmptyString">
+      <xsd:element name="name" type="csa:nonEmptyString">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Give the name of the new OPC UA node. 
@@ -244,10 +244,10 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="unit" type="nonEmptyString"/>
-      <xsd:element name="description" type="nonEmptyString"/>
+      <xsd:element name="unit" type="csa:nonEmptyString"/>
+      <xsd:element name="description" type="csa:nonEmptyString"/>
     </xsd:sequence>
-    <xsd:attribute name="sourceName" type="nonEmptyString" use="required">
+    <xsd:attribute name="sourceName" type="csa:nonEmptyString" use="required">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           The node ID of the node to be used as reference.
@@ -266,15 +266,15 @@
   </xsd:complexType>
   <xsd:complexType name="additionalPVType">
    <xsd:sequence minOccurs="0" maxOccurs="1">
-      <xsd:element name="destination" type="nonEmptyString"/>
-      <xsd:element name="name" type="nonEmptyString"/>
+      <xsd:element name="destination" type="csa:nonEmptyString"/>
+      <xsd:element name="name" type="csa:nonEmptyString"/>
       <xsd:element name="value" type="xsd:string"/>
-      <xsd:element name="description" type="nonEmptyString"/>
+      <xsd:element name="description" type="csa:nonEmptyString"/>
     </xsd:sequence> 
   </xsd:complexType>   
   <xsd:complexType name="folderType">  
     <xsd:sequence>
-      <xsd:element name="name" type="nonEmptyString" minOccurs="1" maxOccurs="1">
+      <xsd:element name="name" type="csa:nonEmptyString" minOccurs="1" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Allows to change the folder name. 
@@ -283,7 +283,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="destination" type="nonEmptyString" minOccurs="0" maxOccurs="1">
+      <xsd:element name="destination" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Folder destination. The destination can include a hierachy, e.g. A/B. Folders in the target hierachy that do not exist are created on the fly.
@@ -292,7 +292,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="description" type="nonEmptyString" minOccurs="0" maxOccurs="1">
+      <xsd:element name="description" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Allows to change the folder description. 
@@ -302,7 +302,7 @@
         </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="sourceName" type="nonEmptyString">
+    <xsd:attribute name="sourceName" type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           If moving or linking exsisting folders give the path to the existing folder.

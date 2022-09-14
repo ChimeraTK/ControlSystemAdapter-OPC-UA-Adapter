@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<uamapping xmlns="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
+<csa:uamapping xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
   <config rootFolder="TopLevel" description="My test server configuration">
     <server applicationName="Test Server" port="16664"/>
     <!--security unsecure="false" certificate="certs/server_cert.der" privatekey="certs/server_key.der" trustlist="certs/trust" blocklist="certs/blocklists" issuerlist="certs/issuer"/-->   
     <!--login username="user" password="test"/-->
   </config>
-</uamapping>
+</csa:uamapping>
