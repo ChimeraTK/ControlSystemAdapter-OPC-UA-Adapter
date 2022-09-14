@@ -104,8 +104,9 @@ void ua_uaadapter::fillBuildInfo(UA_ServerConfig* config) {
   /*get hostname */
   char hostname[HOST_NAME_MAX];
   gethostname(hostname, HOST_NAME_MAX);
-  string hostname_uri = "opc.tcp://";
+  string hostname_uri = "urn:";
   hostname_uri.append(hostname);
+  hostname_uri.append(":ChimeraTK:" + this->serverConfig.applicationName);
 
   config->applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
   UA_String* hostName = UA_String_new();

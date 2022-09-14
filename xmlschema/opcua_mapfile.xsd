@@ -150,11 +150,15 @@
         <xsd:documentation xml:lang="en">
           The server certificate given as *.der file. The certificate has
           to have the v3 Subject Alternative Name field URI. It has to be set to
-          "opc.tcp://HOSTNAME", where HOST name is the name of the HOST where
-          the server is supposed to run. The certificate test is not excact, which
-          means the certificate URI has to include the above given string, but it
-          can include aditional information. E.g. "opc.tcp://HOSTNAME:PORT" will 
-          also be verified successfully.
+          "urn:HOSTNAME:ChimeraTK:APPNAME", where HOST name is the name of the HOST where
+          the server is supposed to run. The APPNAME is the application name set in the
+          mapping file (applicationName attribute of the server node). 
+          The certificate test is not excact, which means the certificate URI has to 
+          include the above given string, but it can include aditional information. 
+          E.g. "urn:HOSTNAME:ChimeraTK:APPNAME:PORT" will also be verified successfully.
+          Self-signed server certificates can be created using the python script
+          provided in the tools/certs directory. Use -u option to specify the 
+          URI as pointed out before.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
