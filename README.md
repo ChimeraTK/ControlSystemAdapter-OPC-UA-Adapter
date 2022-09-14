@@ -11,6 +11,6 @@ In principle all process variables are mapped in the OPC UA server. Node IDs and
 The mapping allows to extend the variable tree based on the tree created from mapping the ChimeraTK process variables.
 Details can be found in the documentation of the [xml scheme file](xmlschema/opcua_mapfile.xsd). An [example map file](examples/example_mapping.xml), illustrated how to set general properties of the OPC UA server.
 
-In principle it is possible to install open62541 via official packages, but it is recommended to install the (open62541 interface)[https://github.com/ChimeraTK/open62541-interface] included in ChiemraTK. It might include patches in the future and freezes the open62541 version. Thus, it is guaranteed that the control system adapter works - independent of upstream changes of the open62541 stack.
+In principle it is possible to install open62541 via official packages, but it is recommended to install the [open62541 interface](https://github.com/ChimeraTK/open62541-interface) included in ChiemraTK. It might include patches in the future and freezes the open62541 version. Thus, it is guaranteed that the control system adapter works - independent of upstream changes of the open62541 stack.
      
 A [list of autors](AUTHORS.md) is contained in this directory.
