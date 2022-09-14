@@ -100,11 +100,7 @@ static UA_ByteString loadFile(const char* const path) {
   return fileContents;
 }
 
-void ua_uaadapter::constructServer() {
-  auto config = (UA_ServerConfig*)UA_calloc(1, sizeof(UA_ServerConfig));
-  if(!this->serverConfig.enableSecurity) {
-    UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, NULL);
-  }
+void ua_uaadapter::fillBuildInfo(UA_ServerConfig* config) {
   /*get hostname */
   char hostname[HOST_NAME_MAX];
   gethostname(hostname, HOST_NAME_MAX);
@@ -116,8 +112,6 @@ void ua_uaadapter::constructServer() {
   *hostName = UA_STRING_ALLOC(hostname);
   config->applicationDescription.discoveryUrls = hostName;
   config->applicationDescription.discoveryUrlsSize = 1;
-  config->applicationDescription.applicationName =
-      UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
   config->applicationDescription.applicationUri = UA_STRING_ALLOC((char*)(cleanUri(hostname_uri)).c_str());
   config->buildInfo.manufacturerName = UA_STRING_ALLOC((char*)"ChimeraTK Team");
   std::string
@@ -131,6 +125,15 @@ void ua_uaadapter::constructServer() {
   config->buildInfo.productName = UA_STRING_ALLOC((char*)this->serverConfig.applicationName.c_str());
   string product_urn = "urn:ChimeraTK:" + this->serverConfig.applicationName;
   config->buildInfo.productUri = UA_STRING_ALLOC((char*)(cleanUri(product_urn)).c_str());
+  config->applicationDescription.applicationName =
+      UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
+}
+
+void ua_uaadapter::constructServer() {
+  auto config = (UA_ServerConfig*)UA_calloc(1, sizeof(UA_ServerConfig));
+  if(!this->serverConfig.enableSecurity) {
+    UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, NULL);
+  }
 
   if(this->serverConfig.enableSecurity) {
     UA_ByteString certificate = UA_BYTESTRING_NULL;
@@ -231,7 +234,7 @@ void ua_uaadapter::constructServer() {
     UA_ByteString_clear(&privateKey);
     for(size_t i = 0; i < trustListSize; i++) UA_ByteString_clear(&trustList[i]);
   }
-
+  fillBuildInfo(config);
   for(size_t i = 0; i < config->endpointsSize; ++i) {
     UA_ApplicationDescription_clear(&config->endpoints[i].server);
     UA_ApplicationDescription_copy(&config->applicationDescription, &config->endpoints[i].server);
