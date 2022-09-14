@@ -45,13 +45,13 @@
             Used to add additional OPC UA nodes, that have a fixed value and are not linked to a ChimeraTK process variable.
           </xsd:documentation>
         </xsd:annotation>
-      </xsd:element>        
+      </xsd:element>
       <xsd:element name="folder" type="folderType" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Used to create, copy or link folders.
           </xsd:documentation>
-        </xsd:annotation>        
+        </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
   </xsd:complexType>
@@ -63,7 +63,15 @@
             Change server properties, else defaults are used.
           </xsd:documentation>
         </xsd:annotation>
-      </xsd:element>      
+      </xsd:element>   
+      <xsd:element name="security" type="securityType" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Configure OPC UA server endpoints. If this element is not found in the 
+            maping file only one unencrypted end point is created.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
       <xsd:element name="login" type="loginType"  minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
@@ -128,6 +136,58 @@
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType> 
+  <xsd:complexType name="securityType">
+    <xsd:attribute name="unsecure" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          If true also an unencrypted end point is created. Else only encrypted
+          endpoints are created.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="certificate" type="nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The server certificate given as *.der file. The certificate has
+          to have the v3 Subject Alternative Name field URI. It has to be set to
+          "opc.tcp://HOSTNAME", where HOST name is the name of the HOST where
+          the server is supposed to run. The certificate test is not excact, which
+          means the certificate URI has to include the above given string, but it
+          can include aditional information. E.g. "opc.tcp://HOSTNAME:PORT" will 
+          also be verified successfully.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="privatekey" type="nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The servers private key given as *.der file. 
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="trustlist" type="nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Directory where to find trusted certificates, e.g. if no certification
+          authority (CA) is used.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="blocklist" type="nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Directory where to find revocation lists of CAs.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="issuerlist" type="nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Directory where to issuer certificates given as *.der files.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
   <xsd:complexType name="loginType">
     <xsd:attribute name="username" type="nonEmptyString" use="required"/>
     <xsd:attribute name="password" type="nonEmptyString" use="required"/>
@@ -165,7 +225,7 @@
 
   <xsd:complexType name="pvType">
     <xsd:sequence minOccurs="0" maxOccurs="1">
-      <xsd:element name="destination" type="nonEmptyString"/>
+      <xsd:element name="destination" type="nonEmptyString">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Give target browse path of the OPC UA node.
@@ -173,6 +233,7 @@
             The delimiter "/" should be used.
           </xsd:documentation>
         </xsd:annotation>
+      </xsd:element>
       <xsd:element name="name" type="nonEmptyString">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
@@ -221,7 +282,7 @@
             In case a folder is created the default description is empty.
           </xsd:documentation>
         </xsd:annotation>
-      </xsd:element>    
+      </xsd:element>
       <xsd:element name="destination" type="nonEmptyString" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
