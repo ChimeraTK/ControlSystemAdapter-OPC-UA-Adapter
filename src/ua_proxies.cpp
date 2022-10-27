@@ -91,7 +91,10 @@ UA_StatusCode ua_callProxy_mapDataSources(
       accessLevel = UA_ACCESSLEVELMASK_READ;
     }
 
-    UA_Server_writeAccessLevel(server, instantiatedId, accessLevel);
+    retval = UA_Server_writeAccessLevel(server, instantiatedId, accessLevel);
+    if(retval != UA_STATUSCODE_GOOD){
+      return retval;
+    }
     // There is currently no high- level function to do this. (02.12.2016)
     // -> Update to Stack 1.X https://open62541.org/doc/current/server.html?highlight=useraccesslevel
     // The following attributes cannot be written from the server, as they are specific to the different users and set by the access control callback://
@@ -100,9 +103,15 @@ UA_StatusCode ua_callProxy_mapDataSources(
     //    UserExecutable
     //__UA_Server_write(server, &instantiatedId, UA_ATTRIBUTEID_USERACCESSLEVEL, &UA_TYPES[UA_TYPES_BYTE], &accessLevel);
 
-    UA_Server_setVariableNode_dataSource(server, instantiatedId, ds);
+    retval = UA_Server_setVariableNode_dataSource(server, instantiatedId, ds);
+    if(retval != UA_STATUSCODE_GOOD){
+      return retval;
+    }
 
-    UA_Server_writeDescription(server, instantiatedId, ele->description);
+    retval = UA_Server_writeDescription(server, instantiatedId, ele->description);
+    if(retval != UA_STATUSCODE_GOOD){
+      return retval;
+    }
     delete ele; // inhibit memleak warning during static analysis
 
     /* Set the right Value Datatype and ValueRank
@@ -116,6 +125,9 @@ UA_StatusCode ua_callProxy_mapDataSources(
       UA_Variant variantVal;
       UA_Variant_init(&variantVal);
       retval = UA_Server_readValue(server, instantiatedId, &variantVal);
+      if(retval != UA_STATUSCODE_GOOD){
+        return retval;
+      }
       if(UA_NodeId_equal(&datatTypeNodeId, &basedatatype) && retval == UA_STATUSCODE_GOOD) {
         // See IEC 62541-3: OPC Unified Architecture - Part 3: Address space model -> Page 75
         UA_Int32 valueRank = -2;
@@ -135,7 +147,10 @@ UA_StatusCode ua_callProxy_mapDataSources(
             }
           }
         }
-        UA_Server_writeValueRank(server, instantiatedId, valueRank);
+        retval = UA_Server_writeValueRank(server, instantiatedId, valueRank);
+        if(retval != UA_STATUSCODE_GOOD){
+          return retval;
+        }
       }
       retval = UA_Server_writeDataType(server, instantiatedId, variantVal.type->typeId);
 
