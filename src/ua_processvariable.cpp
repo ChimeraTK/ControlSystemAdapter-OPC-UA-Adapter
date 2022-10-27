@@ -347,7 +347,7 @@ UA_StatusCode ua_processvariable::getValue_int8(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, (UA_SByte*)iarr.data(), iarr.size(), arrayRange);
       v->arrayDimensionsSize = 1;
@@ -378,7 +378,7 @@ UA_StatusCode ua_processvariable::getValue_uint8(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, (UA_Byte*)iarr.data(), iarr.size(), arrayRange);
       v->arrayDimensionsSize = 1;
@@ -409,7 +409,7 @@ UA_StatusCode ua_processvariable::getValue_int16(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, (UA_Int16*)iarr.data(), iarr.size(), arrayRange);
       v->arrayDimensionsSize = 1;
@@ -440,7 +440,7 @@ UA_StatusCode ua_processvariable::getValue_uint16(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, (UA_UInt16*)iarr.data(), iarr.size(), arrayRange);
       v->arrayDimensionsSize = 1;
@@ -471,7 +471,7 @@ UA_StatusCode ua_processvariable::getValue_int32(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, (UA_Int32*)iarr.data(), iarr.size(), arrayRange);
       v->arrayDimensionsSize = 1;
@@ -502,7 +502,7 @@ UA_StatusCode ua_processvariable::getValue_uint32(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, (UA_UInt32*)iarr.data(), iarr.size(), arrayRange);
       v->arrayDimensionsSize = 1;
@@ -533,7 +533,7 @@ UA_StatusCode ua_processvariable::getValue_int64(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, (UA_Int64*)iarr.data(), iarr.size(), arrayRange);
       v->arrayDimensionsSize = 1;
@@ -564,7 +564,7 @@ UA_StatusCode ua_processvariable::getValue_uint64(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, (UA_UInt64*)iarr.data(), iarr.size(), arrayRange);
       v->arrayDimensionsSize = 1;
@@ -595,7 +595,7 @@ UA_StatusCode ua_processvariable::getValue_float(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)darr.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)darr.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, (UA_Float*)darr.data(), darr.size(), arrayRange);
       v->arrayDimensionsSize = 1;
@@ -627,7 +627,7 @@ UA_StatusCode ua_processvariable::getValue_double(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)darr.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)darr.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, (UA_Double*)darr.data(), darr.size(), arrayRange);
       v->arrayDimensionsSize = 1;
@@ -665,7 +665,7 @@ UA_StatusCode ua_processvariable::getValue_string(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)sarr.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)sarr.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, sarrayval, sarr.size(), arrayRange);
       v->arrayDimensionsSize = 1;
@@ -705,7 +705,7 @@ UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
       UA_NumericRange arrayRange;
       arrayRange.dimensionsSize = 1;
       UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)bvector.size()};
+          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)bvector.size()-1};
       arrayRange.dimensions = &scalarThisDimension;
       rv = UA_Variant_setRangeCopy(v, (UA_Boolean*)barr, bvector.size(), arrayRange);
       v->arrayDimensionsSize = 1;
