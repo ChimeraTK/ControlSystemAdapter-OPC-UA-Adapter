@@ -1,26 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<uamapping>
+<csa:uamapping  xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
 	<config rootFolder="llrfCtrl_hzdr" description="Test application for the digital LLRF system at ELBE / HZDR">
 		<server applicationName="LLRFServer" port="16660" />
 		<login username="test" password="test123" />
 		<process_variable_hierarchy>
-			<unroll pathSep="/">True</unroll>
+			<unroll pathSep="/">true</unroll>
 		</process_variable_hierarchy>
-		<mapping_exceptions>False</mapping_exceptions>
+		<mapping_exceptions>false</mapping_exceptions>
 	</config>
-
-	<folder sourceName="1/FOLDER" copy="true">
-		<name>copyWithSourceTest</name>
-		<description>Folder description</description>
-	</folder>
-	<folder sourceName="1/FOLDER" copy="false">
-		<name>linkWithSourceTest</name>
-		<description>Folder description</description>
-	</folder>
-	<folder sourceName="1/FOLDER/defaultSep" copy="false">
-		<name>2/FOLDER</name>
-		<description>Folder description</description>
-	</folder>
 
 <!-- (1) Process variable options
   Information:
@@ -52,21 +39,20 @@
 	<process_variable sourceName="testDoubleArray_11000">
 		<destination>B</destination>
 		<name>testDoubleArray_11000</name>
+    <unit>U1.1</unit>
 		<description>Test Desc D1.1</description>
-		<unit>U1.1</unit>
 	</process_variable>
-    <!-- D2 [x]-->
-    <process_variable sourceName="testDoubleArray_12000" copy="false">
-        <destination>D</destination>
-        <name>testDoubleArray_12000</name>
-        <unit>U2</unit>
-    </process_variable>
-    <process_variable sourceName="testDoubleArray_13000" copy="false">
-        <destination>E</destination>
-        <name>testDoubleArray_13000</name>
-        <description></description>
-        <unit>U2.1</unit>
-    </process_variable>
+  <!-- D2 [x]-->
+  <process_variable sourceName="testDoubleArray_12000" copy="false">
+      <destination>D</destination>
+      <name>testDoubleArray_12000</name>
+      <unit>U2</unit>
+  </process_variable>
+  <process_variable sourceName="testDoubleArray_13000" copy="false">
+      <destination>E</destination>
+      <name>testDoubleArray_13000</name>
+      <unit>U2.1</unit>
+  </process_variable>
 	<!-- D3 [x]-->
 	<process_variable sourceName="testDoubleArray_14000" copy="false">
 		<destination>F</destination>
@@ -77,7 +63,6 @@
 		<destination>G</destination>
 		<name>testDoubleArray_15000</name>
 		<description>update description</description>
-		<unit></unit>
 	</process_variable>
 	<!-- D4 [x]-->
 	<process_variable sourceName="testDoubleArray_16000" copy="false">
@@ -98,7 +83,6 @@
 	</process_variable>
 	<process_variable sourceName="testDoubleArray_19000" copy="false">
 		<name>testDoubleArray_19000</name>
-		<destination></destination>
 		<description>update description</description>
 		<unit>new U</unit>
 	</process_variable>
@@ -109,7 +93,6 @@
 	</process_variable>
 	<process_variable sourceName="testDoubleArray_19000" copy="true">
 		<name>testDoubleArray_19000_</name>
-		<destination></destination>
 		<description>update description</description>
 		<unit>new U</unit>
 	</process_variable>
@@ -117,16 +100,8 @@
 	<process_variable sourceName="testDoubleArray_20000" copy="">
 	</process_variable>
 	<process_variable sourceName="testDoubleArray_21000" copy="">
-		<name></name>
-		<destination></destination>
-		<description></description>
-		<unit></unit>
 	</process_variable>
 	<process_variable sourceName="testDoubleArray_21000" copy="true">
-		<name></name>
-		<destination></destination>
-		<description></description>
-		<unit></unit>
 	</process_variable>
 
 	<!-- E1 [x]-->
@@ -193,22 +168,33 @@
 	</process_variable>
 
 	<!-- (2) Additional variable options
-        Information:
-        - the path seperator for the destination tag is "/"
-        - the destination can include a folder hierachy that is created on the fligth
-        - variable type is ctkAdditionalVariable (UAString)
-        - value should be assigned directly to the additional variable (no subnode named value)
+    Information:
+    - the path seperator for the destination tag is "/"
+    - the destination can include a folder hierachy that is created on the fligth
+    - variable type is ctkAdditionalVariable (UAString)
+    - value should be assigned directly to the additional variable (no subnode named value)
 
-        Error cases:
-            E1. PV with same name exists
-            E2. name is missing or is empty
+    Error cases:
+        E1. PV with same name exists
+        E2. name is missing or is empty
 
-        Default cases:
-            D1. Description -> description empty
-            D2. Destination -> variable is created in the root folder
-            D3. Value -> empty string
-        -->
-
+    Default cases:
+        D1. Description -> description empty
+        D2. Destination -> variable is created in the root folder
+        D3. Value -> empty string
+   -->
+  <folder sourceName="1/FOLDER" copy="true">
+    <name>copyWithSourceTest</name>
+    <description>Folder description</description>
+  </folder>
+  <folder sourceName="1/FOLDER" copy="false">
+    <name>linkWithSourceTest</name>
+    <description>Folder description</description>
+  </folder>
+  <folder sourceName="1/FOLDER/defaultSep" copy="false">
+    <name>2/FOLDER</name>
+    <description>Folder description</description>
+  </folder>
 	<!-- D1 [x]-->
 	<additional_variable>
 		<name>av_d1</name>
@@ -352,23 +338,23 @@
 	</folder>
 
 	<!-- (4) Folder with source
-         Information:
-          - the path seperator for the destination tag is "/"
-          - the destination can include a folder hierachy that is created on the flight
-          - allows to show folder content at another location
-          - folder content can be copied to the new location (copy="True") or simply linked to the new location
+   Information:
+    - the path seperator for the destination tag is "/"
+    - the destination can include a folder hierachy that is created on the flight
+    - allows to show folder content at another location
+    - folder content can be copied to the new location (copy="True") or simply linked to the new location
 
-         Error cases:
-          1. name is missing or is empty
-          2. new folder is equal to the source folder
-          3. sourceName with no corresponding folder
-          4. sourceName is empty or missing
+   Error cases:
+    1. name is missing or is empty
+    2. new folder is equal to the source folder
+    3. sourceName with no corresponding folder
+    4. sourceName is empty or missing
 
-         Default cases:
-          1. Description -> empty description
-          2. Destination -> folder is created in the root folder
-          3. Copy attribute -> copy="False"
-    -->
+   Default cases:
+    1. Description -> empty description
+    2. Destination -> folder is created in the root folder
+    3. Copy attribute -> copy="False"
+  -->
 	<!-- D1 [x]-->
 	<folder sourceName="folder/f1" copy="false">
 		<destination>A</destination>
@@ -451,77 +437,4 @@
 		<name>f10</name>
 		<description>Desc F10</description>
 	</folder>
-
-	<!--- START OF OLD CONFIGURATION PART -->
-	<!-- DEPRECATED
-	<additionalNodes folderName="AdditionalNodesFolder" description="DescriptionOfAdditionalNodes">
-		<variable name="BrowseName1" description="myDescription1" value="Wert1" />
-		<variable name="BrowseName2" description="myDescription2" value="Wert2" />
-		<variable name="BrowseName3" description="myDescription3" value="Wert3" />
-		<variable name="BrowseName4" description="myDescription4" value="Wert4" />
-		<variable name="BrowseName5" description="myDescription5" value="Wert5" />
-	</additionalNodes>
-	<additionalNodes folderName="ConfigFolder" description="DescriptionOfConfigFolder">
-		<variable name="BrowseNameA" description="myDescriptionA" value="WertA" />
-		<variable name="BrowseNameB" description="myDescriptionB" value="WertB" />
-	</additionalNodes>
-
-	<application name="WinAA">
-		<map sourceVariableName="/Mein/Name_ist#int8Array" rename="Array_s15_int8" engineeringUnit="Test" description="">
-			<unrollPath pathSep="_">True</unrollPath>
-			<unrollPath pathSep="/">True</unrollPath>
-			<unrollPath pathSep="#">True</unrollPath>
-		  <folder>NorthSide/LINAC/partA</folder>
-			<folder>NorthSide/LINAC/partX</folder>
-  	</map>
-			<map sourceVariableName="/Mein/Name_ist#int8Array_s15" rename="Array">
-			<unrollPath pathSep="_">True</unrollPath>
-			<unrollPath pathSep="/">True</unrollPath>
-			<unrollPath pathSep="#">True</unrollPath>
-		  <folder>NorthSide/LINAC/partA</folder>
-			<folder>NorthSide/LINAC/partX</folder>
-  	</map>
-	</application>
-	<application name="WinBB">
-		<map sourceVariableName="/Dein/Name//ist/uint8Array_s10" rename="">
-			<unrollPath pathSep="/">True</unrollPath>
-		  <folder>NorthSideLINAC/partA</folder>
-   	</map>
-		<map sourceVariableName="/int16Array_s15">
-			<unrollPath pathSep="_">False</unrollPath>
-		  <folder>SouthSide/LINAC/partA</folder>
-			<folder>SouthSide/LINAC/partB</folder>
-		</map>
-		<map sourceVariableName="/Ist/Name/dieser/int32Scalar">
-			<unrollPath pathSep="/">False</unrollPath>
-			<folder>EastSide/LINAC</folder>
-  	</map>
-	</application>
-	<application name="WinCC">
-		<map sourceVariableName="/Unser/Name/ist_uint8Array_s10">
-			<unrollPath pathSep="_">True</unrollPath>
-			<unrollPath pathSep="/">True</unrollPath>
-		  <folder>SouthSide/LINAC/partA</folder>
-    </map>
-		<map sourceVariableName="/int16Array_s15">
-			<unrollPath pathSep="_">False</unrollPath>
-		  <folder>NorthSideLINAC/partB</folder>
-    </map>
-		<map sourceVariableName="/floatArray_s10" rename="Gustav">
-			<unrollPath pathSep="_">False</unrollPath>
-   	</map>
-	</application>
-	<application name="EPICS">
-		<map sourceVariableName="/Ist/Name/dieser/uint32Scalar" rename="uint32S">
-    </map>
-		<map sourceVariableName="/Ist/Name/dieser/int32Scalar">
-			<unrollPath pathSep="/">False</unrollPath>
-		  <folder>EastSide/LINAC</folder>
-    </map>
-		<map sourceVariableName="/Ist/Name/dieser/doubleScalar" engineeringUnit="Test" description="updated test desc">
-			<unrollPath pathSep="/">True</unrollPath>
-		  <folder></folder>
-    </map>
-	</application>
-	-->
-</uamapping>
+</csa:uamapping>
