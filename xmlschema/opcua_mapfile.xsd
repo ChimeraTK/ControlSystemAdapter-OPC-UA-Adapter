@@ -228,8 +228,8 @@
   </xsd:complexType>
 
   <xsd:complexType name="pvType">
-    <xsd:sequence minOccurs="0" maxOccurs="1">
-      <xsd:element name="destination" type="csa:nonEmptyString">
+    <xsd:all>
+      <xsd:element name="destination" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Give target browse path of the OPC UA node.
@@ -238,7 +238,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="name" type="csa:nonEmptyString">
+      <xsd:element name="name" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Give the name of the new OPC UA node. 
@@ -248,9 +248,9 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="unit" type="csa:nonEmptyString"/>
-      <xsd:element name="description" type="csa:nonEmptyString"/>
-    </xsd:sequence>
+      <xsd:element name="unit" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="description" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1"/>
+    </xsd:all>
     <xsd:attribute name="sourceName" type="csa:nonEmptyString" use="required">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
@@ -269,15 +269,15 @@
     </xsd:attribute>
   </xsd:complexType>
   <xsd:complexType name="additionalPVType">
-   <xsd:sequence minOccurs="0" maxOccurs="1">
-      <xsd:element name="destination" type="csa:nonEmptyString"/>
-      <xsd:element name="name" type="csa:nonEmptyString"/>
-      <xsd:element name="value" type="xsd:string"/>
-      <xsd:element name="description" type="csa:nonEmptyString"/>
-    </xsd:sequence> 
+   <xsd:all>
+      <xsd:element name="destination" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="name" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="value" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="description" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1"/>
+    </xsd:all> 
   </xsd:complexType>   
   <xsd:complexType name="folderType">  
-    <xsd:sequence>
+    <xsd:all>
       <xsd:element name="name" type="csa:nonEmptyString" minOccurs="1" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
@@ -305,7 +305,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-    </xsd:sequence>
+    </xsd:all>
     <xsd:attribute name="sourceName" type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
