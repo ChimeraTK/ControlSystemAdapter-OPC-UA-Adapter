@@ -1,22 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <csa:uamapping xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
 	<config rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
-		<server applicationName="OPCUAServer" port="16665" />
+		<server applicationName="OPCUAServer" port="" />
 		<login username="test" password="test123" />
 		<process_variable_hierarchy>
 			<unroll pathSep="/">true</unroll>
 		</process_variable_hierarchy>
 		<mapping_exceptions>false</mapping_exceptions>
 	</config>
-	<config rootFolder="TestFolder_2" description="Ich bin die Beschreibung des TestFolders">
-		<server applicationName="OPCUAServer" port="16665" />
-		<login username="test" password="test123" />
-		<process_variable_hierarchy>
-			<unroll pathSep="/">true</unroll>
-		</process_variable_hierarchy>
-		<mapping_exceptions>false</mapping_exceptions>
-	</config>
-
 	<process_variable sourceName="Mein/Name/ist/uint32Scalar">
 		<destination>EPICS</destination>
 		<name>uint32S</name>

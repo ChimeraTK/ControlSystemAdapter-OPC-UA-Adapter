@@ -1,12 +1,11 @@
-#include <ua_adapter.h>
-#include <xml_file_handler.h>
-#include <test_sample_data.h>
-
-#include <boost/test/included/unit_test.hpp>
-
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/PVManager.h"
+#include <test_sample_data.h>
+#include <ua_adapter.h>
+#include <xml_file_handler.h>
+
+#include <boost/test/included/unit_test.hpp>
 
 using namespace boost::unit_test_framework;
 using namespace std;
@@ -32,7 +31,7 @@ void UAAdapterTest::testExampleSet() {
   ad1->~ua_uaadapter();
   ad1 = new ua_uaadapter("./uamapping_test_notwellformed.xml");
   ad1->~ua_uaadapter();
-  ad1 = new ua_uaadapter("./uamapping_test_portismissung.xml");
+  ad1 = new ua_uaadapter("./uamapping_test_portismissing.xml");
   ad1->~ua_uaadapter();
 
   // is Server running?
@@ -89,9 +88,7 @@ void UAAdapterTest::testExampleSet() {
 
 class UAAdapterTestSuite : public test_suite {
  public:
-  UAAdapterTestSuite() : test_suite("ua_uaadapter Test Suite") {
-    add(BOOST_TEST_CASE(&UAAdapterTest::testExampleSet));
-  }
+  UAAdapterTestSuite() : test_suite("ua_uaadapter Test Suite") { add(BOOST_TEST_CASE(&UAAdapterTest::testExampleSet)); }
 };
 
 test_suite* init_unit_test_suite(int argc, char* argv[]) {
