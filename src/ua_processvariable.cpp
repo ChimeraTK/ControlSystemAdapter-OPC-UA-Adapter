@@ -1201,6 +1201,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
 
+  // Allow negative sampling intervals -> used by Labview and handled by open62541-interface 1.3.3.-2
+  attr.minimumSamplingInterval = -1.;
   attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->nameNew.c_str());
   attr.description = description;
   attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
