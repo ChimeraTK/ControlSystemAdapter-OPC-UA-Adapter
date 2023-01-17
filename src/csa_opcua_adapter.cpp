@@ -1,19 +1,19 @@
-/* 
+/*
  * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
  *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can 
- * redistribute it and/or modify it under the terms of the Lesser GNU 
- * General Public License as published by the Free Software Foundation, 
+ * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
+ * redistribute it and/or modify it under the terms of the Lesser GNU
+ * General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope 
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the 
- * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+ * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
+ * that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the Lesser GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
- * 
+ *
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
  */
@@ -22,11 +22,11 @@ extern "C" {
 #include "unistd.h"
 }
 
-#include <iostream>
-
 #include "csa_opcua_adapter.h"
 #include "ua_adapter.h"
 #include "ua_processvariable.h"
+
+#include <iostream>
 
 csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
   this->csManager = csManager;
@@ -34,13 +34,16 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
   // Create new server adapter
   this->adapter = new ua_uaadapter(configFile);
 
+  // Prepare history settings
+  adapter->prepareHistory();
+
   // Initialize the process variables
   // This internally starts the managed threads in the mgr...
   vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
 
-  //start implicit var mapping
+  // start implicit var mapping
   for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
-    //adapter->addVariable(oneProcessVariable->getName(), this->csManager);
+    // adapter->addVariable(oneProcessVariable->getName(), this->csManager);
     adapter->implicitVarMapping(oneProcessVariable->getName(), this->csManager);
   }
 
@@ -69,7 +72,7 @@ ua_uaadapter* csa_opcua_adapter::getUAAdapter() {
 }
 
 void csa_opcua_adapter::start() {
-  if(!this->adapter_thread.joinable()){
+  if(!this->adapter_thread.joinable()) {
     this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter);
   }
 }

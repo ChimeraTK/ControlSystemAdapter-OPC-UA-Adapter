@@ -30,6 +30,7 @@
 #include <open62541/config.h>
 #include <open62541/plugin/accesscontrol.h>
 #include <open62541/plugin/accesscontrol_default.h>
+#include <open62541/plugin/historydata/history_data_gathering.h>
 #include <open62541/server_config_default.h>
 
 #include <vector>
@@ -110,6 +111,9 @@ class ua_uaadapter : ua_mapped_class {
   UA_Boolean mappingExceptions;
 
   ServerConfig serverConfig;
+  UA_HistoryDataGathering gathering;
+  UA_HistorizingNodeIdSettings setting;
+  bool historyEntryAdded{false};
 
   vector<ua_processvariable*> variables;
   vector<ua_additionalvariable*> additionalVariables;
@@ -305,6 +309,17 @@ class ua_uaadapter : ua_mapped_class {
    * @param config The server configuration to be modified.
    */
   void fillBuildInfo(UA_ServerConfig* config);
+
+  /**
+   * @brief Prepare history by creating a gathering.
+   */
+  void prepareHistory();
+  /**
+   * @brief This enables historizing for selected variables.
+   *
+   * @param nodeId The node id of the node which should include history.
+   */
+  UA_StatusCode enableHistory(UA_NodeId* nodeId);
 };
 
 #endif // MTCA_UAADAPTER_H

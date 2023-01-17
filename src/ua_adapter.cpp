@@ -34,6 +34,10 @@ extern "C" {
 #include "ua_processvariable.h"
 #include "ua_proxies.h"
 #include "xml_file_handler.h"
+#include <open62541/plugin/historydata/history_data_backend_memory.h>
+#include <open62541/plugin/historydata/history_data_gathering_default.h>
+#include <open62541/plugin/historydata/history_database_default.h>
+#include <open62541/plugin/historydatabase.h>
 
 #include <functional>
 #include <regex>
@@ -248,7 +252,7 @@ void ua_uaadapter::constructServer() {
   auto* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
   usernamePasswordLogins->password = UA_STRING_ALLOC((char*)this->serverConfig.password.c_str());
   usernamePasswordLogins->username = UA_STRING_ALLOC((char*)this->serverConfig.username.c_str());
-  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin, NULL, 
+  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin, NULL,
       &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
       usernamePasswordLogins);
 
@@ -500,6 +504,12 @@ void ua_uaadapter::implicitVarMapping(std::string varName, boost::shared_ptr<Con
   UA_Server_writeDisplayName(this->mappedServer, tmpNodeId,
       UA_LOCALIZEDTEXT(
           (char*)"en_US", (char*)this->fileHandler->praseVariablePath(varName, this->pvSeperator).back().c_str()));
+  if(varName.find("cpuTotal") != std::string::npos && varName.find("history") == std::string::npos) {
+    if(!enableHistory(&tmpNodeId)) {
+      UA_LOG_INFO(&this->server_config->logger, UA_LOGCATEGORY_USERLAND, "registered node for historizing: %s",
+          varName.c_str());
+    }
+  }
   UA_NodeId_clear(&tmpNodeId);
 }
 
@@ -1388,4 +1398,56 @@ UA_DateTime ua_uaadapter::getSourceTimeStamp() {
 
 UA_Server* ua_uaadapter::getMappedServer() {
   return this->mappedServer;
+}
+
+void ua_uaadapter::prepareHistory() {
+  gathering = UA_HistoryDataGathering_Default(1);
+
+  /* We set the responsible plugin in the configuration. UA_HistoryDatabase is
+   * the main plugin which handles the historical data service. */
+  server_config->historyDatabase = UA_HistoryDatabase_default(gathering);
+
+  /* There is a memory based database plugin. We will use that. We just
+   * reserve space for 3 nodes with 100 values each. This will also
+   * automaticaly grow if needed, but that is expensive, because all data must
+   * be copied. */
+  setting.historizingBackend = UA_HistoryDataBackend_Memory(3, 100);
+
+  /* We want the server to serve a maximum of 100 values per request. This
+   * value depend on the plattform you are running the server. A big server
+   * can serve more values, smaller ones less. */
+  setting.maxHistoryDataResponseSize = 100;
+
+  /* If we have a sensor which do not report updates
+   * and need to be polled we change the setting like that.
+   * The polling interval in ms.
+   *
+  setting.pollingInterval = 100;
+   *
+   * Set the update strategie to polling.
+   *
+  setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_POLL;
+   */
+  setting.pollingInterval = 100;
+  setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_POLL;
+  /* If you want to insert the values to the database yourself, we can set the user strategy here.
+   * This is useful if you for example want a value stored, if a defined delta is reached.
+   * Then you should use a local monitored item with a fuzziness and store the value in the callback.
+   *
+  setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_USER;
+   */
+}
+
+UA_StatusCode ua_uaadapter::enableHistory(UA_NodeId* nodeId) {
+  /* At the end we register the node for gathering data in the database. */
+  if(!historyEntryAdded) {
+    UA_StatusCode retval = gathering.registerNodeId(this->mappedServer, gathering.context, nodeId, setting);
+    UA_LOG_INFO(
+        &this->server_config->logger, UA_LOGCATEGORY_USERLAND, "registerNodeId: %s", UA_StatusCode_name(retval));
+    historyEntryAdded = true;
+    retval = gathering.startPoll(this->mappedServer, gathering.context, nodeId);
+    UA_LOG_INFO(&this->server_config->logger, UA_LOGCATEGORY_USERLAND, "startPoll %s", UA_StatusCode_name(retval));
+    return retval;
+  }
+  return UA_STATUSCODE_BAD;
 }
