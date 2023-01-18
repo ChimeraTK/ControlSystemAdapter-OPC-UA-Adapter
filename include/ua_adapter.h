@@ -113,7 +113,6 @@ class ua_uaadapter : ua_mapped_class {
   ServerConfig serverConfig;
   UA_HistoryDataGathering gathering;
   UA_HistorizingNodeIdSettings setting;
-  bool historyEntryAdded{false};
 
   vector<ua_processvariable*> variables;
   vector<ua_additionalvariable*> additionalVariables;

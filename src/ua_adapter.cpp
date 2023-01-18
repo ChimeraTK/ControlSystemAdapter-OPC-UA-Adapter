@@ -504,7 +504,12 @@ void ua_uaadapter::implicitVarMapping(std::string varName, boost::shared_ptr<Con
   UA_Server_writeDisplayName(this->mappedServer, tmpNodeId,
       UA_LOCALIZEDTEXT(
           (char*)"en_US", (char*)this->fileHandler->praseVariablePath(varName, this->pvSeperator).back().c_str()));
-  if(varName.find("cpuTotal") != std::string::npos && varName.find("history") == std::string::npos) {
+  if((varName.find("humidity") != std::string::npos ||
+      varName.find("temperature") != std::string::npos) &&
+      varName.find("history") == std::string::npos &&
+      varName.find("History") == std::string::npos &&
+      varName.find("26.") == std::string::npos &&
+      varName.find("28.") == std::string::npos) {
     if(!enableHistory(&tmpNodeId)) {
       UA_LOG_INFO(&this->server_config->logger, UA_LOGCATEGORY_USERLAND, "registered node for historizing: %s",
           varName.c_str());
@@ -1401,7 +1406,7 @@ UA_Server* ua_uaadapter::getMappedServer() {
 }
 
 void ua_uaadapter::prepareHistory() {
-  gathering = UA_HistoryDataGathering_Default(1);
+  gathering = UA_HistoryDataGathering_Default(20);
 
   /* We set the responsible plugin in the configuration. UA_HistoryDatabase is
    * the main plugin which handles the historical data service. */
@@ -1411,7 +1416,7 @@ void ua_uaadapter::prepareHistory() {
    * reserve space for 3 nodes with 100 values each. This will also
    * automaticaly grow if needed, but that is expensive, because all data must
    * be copied. */
-  setting.historizingBackend = UA_HistoryDataBackend_Memory(3, 100);
+  setting.historizingBackend = UA_HistoryDataBackend_Memory(20, 100);
 
   /* We want the server to serve a maximum of 100 values per request. This
    * value depend on the plattform you are running the server. A big server
@@ -1440,14 +1445,11 @@ void ua_uaadapter::prepareHistory() {
 
 UA_StatusCode ua_uaadapter::enableHistory(UA_NodeId* nodeId) {
   /* At the end we register the node for gathering data in the database. */
-  if(!historyEntryAdded) {
-    UA_StatusCode retval = gathering.registerNodeId(this->mappedServer, gathering.context, nodeId, setting);
-    UA_LOG_INFO(
-        &this->server_config->logger, UA_LOGCATEGORY_USERLAND, "registerNodeId: %s", UA_StatusCode_name(retval));
-    historyEntryAdded = true;
-    retval = gathering.startPoll(this->mappedServer, gathering.context, nodeId);
-    UA_LOG_INFO(&this->server_config->logger, UA_LOGCATEGORY_USERLAND, "startPoll %s", UA_StatusCode_name(retval));
-    return retval;
-  }
+  UA_StatusCode retval = gathering.registerNodeId(this->mappedServer, gathering.context, nodeId, setting);
+  UA_LOG_INFO(
+      &this->server_config->logger, UA_LOGCATEGORY_USERLAND, "registerNodeId: %s", UA_StatusCode_name(retval));
+  retval = gathering.startPoll(this->mappedServer, gathering.context, nodeId);
+  UA_LOG_INFO(&this->server_config->logger, UA_LOGCATEGORY_USERLAND, "startPoll %s", UA_StatusCode_name(retval));
+  return retval;
   return UA_STATUSCODE_BAD;
 }

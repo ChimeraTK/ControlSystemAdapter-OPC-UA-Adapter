@@ -93,7 +93,12 @@ UA_StatusCode ua_callProxy_mapDataSources(
       if(instantiatedId.identifierType == UA_NODEIDTYPE_STRING) {
         std::string tmp = "";
         UA_STRING_TO_CPPSTRING_COPY(&instantiatedId.identifier.string, &tmp);
-        if(tmp.find("cpuTotal") != std::string::npos && tmp.find("history") == std::string::npos) {
+        if((tmp.find("humidity") != std::string::npos ||
+            tmp.find("temperature") != std::string::npos) &&
+            tmp.find("history") == std::string::npos &&
+            tmp.find("History") == std::string::npos &&
+            tmp.find("26.") == std::string::npos &&
+            tmp.find("28.") == std::string::npos) {
           accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_HISTORYREAD;
         }
         else {

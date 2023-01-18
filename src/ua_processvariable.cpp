@@ -1198,7 +1198,12 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   attr.description = description;
   attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
 
-  if(nameNew.find("cpuTotal") != std::string::npos && nameNew.find("history") == std::string::npos) {
+  if((nameNew.find("humidity") != std::string::npos ||
+      nameNew.find("temperature") != std::string::npos) &&
+      nameNew.find("history") == std::string::npos &&
+      nameNew.find("History") == std::string::npos &&
+      nameNew.find("26.") == std::string::npos &&
+      nameNew.find("28.") == std::string::npos) {
     attr.historizing = true;
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE | UA_ACCESSLEVELMASK_HISTORYREAD;
   }
