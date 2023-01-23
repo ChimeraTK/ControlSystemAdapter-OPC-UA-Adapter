@@ -1406,7 +1406,58 @@ UA_Server* ua_uaadapter::getMappedServer() {
 }
 
 void ua_uaadapter::prepareHistory() {
-  gathering = UA_HistoryDataGathering_Default(20);
+  uint numberOfPvs = 20;   // number of PVs
+  uint length = 100;       // length of the history buffer
+  uint responseSize = 100; // maximum number of history values per request
+  uint interval = 1000;    // sampling interval
+  string xpath = "//config";
+  xmlXPathObjectPtr result = this->fileHandler->getNodeSet(xpath);
+  result = this->fileHandler->getNodeSet(xpath + "//history");
+  if(result) {
+    xmlNodeSetPtr nodeset = result->nodesetval;
+    if(nodeset->nodeNr > 1) {
+      throw std::runtime_error("To many <login>-Tags in config file");
+    }
+    string placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "size");
+    if(!placeHolder.empty()) {
+      numberOfPvs = std::stoi(placeHolder);
+    }
+    else {
+      UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          "Warning! <history>-Tag requires size. Will consider default size of 20.");
+    }
+    placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "length");
+    if(!placeHolder.empty()) {
+      length = std::stoi(placeHolder);
+    }
+    else {
+      UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          "Warning! <history>-Tag requires length. Will consider default size of 100.");
+    }
+
+    placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "response");
+    if(!placeHolder.empty()) {
+      responseSize = std::stoi(placeHolder);
+    }
+    else {
+      UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          "Warning! <history>-Tag requires repsonse. Will consider default size of 100.");
+    }
+    placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "interval");
+    if(!placeHolder.empty()) {
+      interval = std::stoi(placeHolder);
+    }
+    else {
+      UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          "Warning! <history>-Tag requires interval. Will consider default size of 1000.");
+    }
+  }
+  else {
+    UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+        "Warning! <history>-Tag mising. Will consider defaults.");
+  }
+
+  gathering = UA_HistoryDataGathering_Default(numberOfPvs);
 
   /* We set the responsible plugin in the configuration. UA_HistoryDatabase is
    * the main plugin which handles the historical data service. */
@@ -1416,12 +1467,12 @@ void ua_uaadapter::prepareHistory() {
    * reserve space for 3 nodes with 100 values each. This will also
    * automaticaly grow if needed, but that is expensive, because all data must
    * be copied. */
-  setting.historizingBackend = UA_HistoryDataBackend_Memory(20, 100);
+  setting.historizingBackend = UA_HistoryDataBackend_Memory(numberOfPvs, length);
 
   /* We want the server to serve a maximum of 100 values per request. This
    * value depend on the plattform you are running the server. A big server
    * can serve more values, smaller ones less. */
-  setting.maxHistoryDataResponseSize = 100;
+  setting.maxHistoryDataResponseSize = responseSize;
 
   /* If we have a sensor which do not report updates
    * and need to be polled we change the setting like that.
@@ -1433,7 +1484,7 @@ void ua_uaadapter::prepareHistory() {
    *
   setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_POLL;
    */
-  setting.pollingInterval = 100;
+  setting.pollingInterval = interval;
   setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_POLL;
   /* If you want to insert the values to the database yourself, we can set the user strategy here.
    * This is useful if you for example want a value stored, if a defined delta is reached.
