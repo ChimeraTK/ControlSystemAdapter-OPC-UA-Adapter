@@ -77,8 +77,8 @@ UA_StatusCode ua_callProxy_mapDataSources(
     if(ele == nullptr){
       continue;
     }
-    
-    retval = UA_Server_setVariableNode_dataSource(server, instantiatedId, ele->dataSource);
+
+    //retval = UA_Server_setVariableNode_dataSource(server, instantiatedId, ele->dataSource);
     if(retval != UA_STATUSCODE_GOOD){
       return retval;
     }

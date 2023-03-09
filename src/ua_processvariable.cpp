@@ -1187,10 +1187,11 @@ UA_StatusCode ua_processvariable::setValue_bool(const UA_Variant* data) {
 UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   UA_StatusCode retval = UA_STATUSCODE_GOOD;
   UA_NodeId createdNodeId = UA_NODEID_NULL;
-  if(!nodeStringIdOverwrite.empty()) this->nameNew = nodeStringIdOverwrite;
+  if(!nodeStringIdOverwrite.empty())
+    this->nameNew = nodeStringIdOverwrite;
 
-  if(UA_NodeId_equal(&this->baseNodeId, &createdNodeId) == UA_TRUE)
-    return 0; // Something went UA_WRONG (initializer should have set this!)
+  if(UA_NodeId_equal(&this->baseNodeId, &createdNodeId))
+    return UA_STATUSCODE_GOOD; // initializer should have set this!
 
   UA_LocalizedText description;
   description = UA_LOCALIZEDTEXT(
@@ -1237,6 +1238,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
                             &createdNodeId);
   UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
   ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, 1001), &this->ownedNodes);
+
 
   /* Use a datasource map to map any local getter/setter functions to OPC UA variables nodes */
   UA_DataSource_Map mapDs;
@@ -1599,13 +1601,14 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   }
 
   //add variable data source map element to the list
+  UA_NodeId_copy(&createdNodeId, &mapElem.concreteNodeId);
   mapDs.push_back(mapElem);
 
   UA_NodeId nodeIdVariableType = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
   NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, createdNodeId);
 
   for(auto i: mapDs){
-    UA_Server_setVariableNode_dataSource(this->mappedServer, i.concreteNodeId, i.dataSource);
+    UA_StatusCode result = UA_Server_setVariableNode_dataSource(this->mappedServer, i.concreteNodeId, i.dataSource);
   }
 
   //this->ua_mapDataSources((void*)this, &mapDs);
@@ -1642,7 +1645,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId nameVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
     NODE_PAIR_PUSH(this->ownedNodes, nameVariable, createdNodeId);
-    mapElemName.concreteNodeId = createdNodeId;
+    UA_NodeId_copy(&createdNodeId, &mapElemName.concreteNodeId);
     map.push_back(mapElemName);
   }
   else
@@ -1675,7 +1678,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId descVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
     NODE_PAIR_PUSH(this->ownedNodes, descVariable, createdNodeId);
-    mapElemName.concreteNodeId = createdNodeId;
+    UA_NodeId_copy(&createdNodeId, &mapElemDesc.concreteNodeId);
     map.push_back(mapElemDesc);
   }
   else
@@ -1704,7 +1707,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId engineeringunitVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
     NODE_PAIR_PUSH(this->ownedNodes, engineeringunitVariable, createdNodeId);
-    mapElemName.concreteNodeId = createdNodeId;
+    UA_NodeId_copy(&createdNodeId, &mapElemEU.concreteNodeId);
     map.push_back(mapElemEU);
   }
   else
@@ -1739,7 +1742,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId typeVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
     NODE_PAIR_PUSH(this->ownedNodes, typeVariable, createdNodeId);
-    mapElemName.concreteNodeId = createdNodeId;
+    UA_NodeId_copy(&createdNodeId, &mapElemType.concreteNodeId);
     map.push_back(mapElemType);
   }
   else
@@ -1768,7 +1771,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId vadilityVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
     NODE_PAIR_PUSH(this->ownedNodes, vadilityVariable, createdNodeId);
-    mapElemName.concreteNodeId = createdNodeId;
+    UA_NodeId_copy(&createdNodeId, &mapElemValidity.concreteNodeId);
     map.push_back(mapElemValidity);
   }
   else
