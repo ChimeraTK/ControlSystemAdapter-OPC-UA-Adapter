@@ -137,8 +137,8 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
   UA_DataSource_Map_Element mapElemValue;
   mapElemValue.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_ADDITIONAL_VARIABLE_VALUE);
   mapElemValue.description = vAttr2.description;
-  mapElemValue.read = ua_readproxy_ua_additionalvariable_getValue;
-  mapElemValue.write = NULL;
+  mapElemValue.dataSource.read = ua_readproxy_ua_additionalvariable_getValue;
+  mapElemValue.dataSource.write = NULL;
   mapDs.push_back(mapElemValue);
 
   this->ua_mapDataSources((void*)this, &mapDs);

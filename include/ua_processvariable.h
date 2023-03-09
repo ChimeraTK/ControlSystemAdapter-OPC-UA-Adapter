@@ -64,7 +64,7 @@ class ua_processvariable : ua_mapped_class {
   bool array;
 
   boost::shared_ptr<ControlSystemPVManager> csManager;
-  UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, string baseNodePath);
+  UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, string baseNodePath, UA_DataSource_Map & map);
 
   /** @brief  This methode mapped all own nodes into the opcua server
   *
