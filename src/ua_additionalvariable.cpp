@@ -100,6 +100,7 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
   vAttr.displayName = UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)this->name.c_str());
   vAttr.description = UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)this->description.c_str());
   vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
+  vAttr.valueRank = UA_VALUERANK_SCALAR;
   UA_Variant_setScalar(&vAttr.value, opcua_node_variable_t_ns_2_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
 
   UA_QualifiedName qualName = UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str());
@@ -120,6 +121,7 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
   vAttr2.displayName = UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)"Description");
   vAttr2.description = UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)this->description.c_str());
   vAttr2.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
+  vAttr.valueRank = UA_VALUERANK_SCALAR;
   UA_String addVarDescription = UA_STRING_ALLOC(description.c_str());
   UA_Variant_setScalarCopy(&vAttr2.value, &addVarDescription, &UA_TYPES[UA_TYPES_STRING]);
 
@@ -141,7 +143,7 @@ UA_StatusCode ua_additionalvariable::mapSelfToNamespace() {
   mapElemValue.dataSource.write = NULL;
   mapDs.push_back(mapElemValue);
 
-  this->ua_mapDataSources((void*)this, &mapDs);
+  UA_Server_setVariableNode_dataSource(this->mappedServer, createdNodeId, mapElemValue.dataSource);
 
   UA_String_clear(&addVarDescription);
   UA_VariableAttributes_clear(&vAttr2);

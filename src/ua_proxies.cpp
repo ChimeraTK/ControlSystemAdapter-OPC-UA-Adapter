@@ -16,7 +16,7 @@
  * 
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- * Copyright (c) 2019-2020 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
+ * Copyright (c) 2019-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
 
 #include "ua_proxies.h"
@@ -27,14 +27,15 @@
 using namespace std;
 
 UA_NodeId* nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId remoteId) {
-  UA_NodeId* local = nullptr;
+/*  UA_NodeId* local = nullptr;
   // cppcheck-suppress postfixOperator                  REASON: List iterator cannot be prefixed
   for(nodePairList::iterator j = pairList.begin(); j != pairList.end(); j++)
     if(UA_NodeId_equal(&((*j)->sourceNodeId), &remoteId) == UA_TRUE) {
       local = &((*j)->targetNodeId);
       break;
     }
-  return local;
+  return local;*/
+return NULL;
 }
 
 UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void* handle) {
@@ -50,7 +51,8 @@ UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId
 
 UA_StatusCode ua_callProxy_mapDataSources(
     UA_Server* server, nodePairList instantiatedNodesList, UA_DataSource_Map* map, void* srcClass) {
-  UA_StatusCode retval = UA_STATUSCODE_GOOD;
+
+/*  UA_StatusCode retval = UA_STATUSCODE_GOOD;
   if(map == nullptr || server == nullptr){
     return UA_STATUSCODE_BADINVALIDARGUMENT;
   }
@@ -76,24 +78,13 @@ UA_StatusCode ua_callProxy_mapDataSources(
     }
     if(ele == nullptr){
       continue;
-    }
-
-    //retval = UA_Server_setVariableNode_dataSource(server, instantiatedId, ele->dataSource);
-    if(retval != UA_STATUSCODE_GOOD){
-      return retval;
-    }
-
-    retval = UA_Server_writeDescription(server, instantiatedId, ele->description);
-    if(retval != UA_STATUSCODE_GOOD){
-      return retval;
-    }
-    delete ele;
+    }*/
 
     /* Set the right Value Datatype and ValueRank
         * -> This is a quickfix for subjective data handling by open62541
         * (02.12.2016)
         */
-    UA_NodeId dataTypeNodeId = UA_NODEID_NULL;
+/*    UA_NodeId dataTypeNodeId = UA_NODEID_NULL;
     retval = UA_Server_readDataType(server, instantiatedId, &dataTypeNodeId);
     if(retval == UA_STATUSCODE_GOOD) {
       const UA_NodeId basedatatype = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
@@ -131,7 +122,6 @@ UA_StatusCode ua_callProxy_mapDataSources(
 
       UA_Variant_clear(&variantVal);
     }
-  }
-
-  return retval;
+  }*/
+  return UA_STATUSCODE_GOOD;
 }

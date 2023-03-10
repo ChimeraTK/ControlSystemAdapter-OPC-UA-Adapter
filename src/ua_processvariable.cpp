@@ -1201,7 +1201,6 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   UA_VariableAttributes attr;
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
-
   // Allow negative sampling intervals -> used by Labview and handled by open62541-interface 1.3.3.-2
   attr.minimumSamplingInterval = -1.;
   attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->nameNew.c_str());
@@ -1252,333 +1251,120 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   UA_DataSource_Map_Element mapElem;
   mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
   mapElem.description = description;
+  //Read is possible for all elements
   mapElem.dataSource.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
-  //read pointer is always set
   UA_Byte accessLevel = UA_ACCESSLEVELMASK_READ;
+  UA_Variant uaArrayDimensions;
+  UA_UInt32 arrayDims[1];
 
   if(valueType == typeid(int8_t)) {
     type = UA_PV_INT8;
     if(this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-        accessLevel = accessLevel | UA_ACCESSLEVELMASK_WRITE;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
-      this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
   }
   else if(valueType == typeid(uint8_t)) {
     type = UA_PV_UINT8;
     if(this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
-      this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
   }
   else if(valueType == typeid(int16_t)) {
     type = UA_PV_INT16;
     if(this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
-      this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
   }
   else if(valueType == typeid(uint16_t)) {
     type = UA_PV_UINT16;
     if(this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
-      this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
   }
   else if(valueType == typeid(int32_t)) {
     type = UA_PV_INT32;
     if(this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
-      this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
   }
   else if(valueType == typeid(uint32_t)) {
     type = UA_PV_UINT32;
     if(this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
-      this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
   }
   else if(valueType == typeid(int64_t)) {
     type = UA_PV_INT64;
     if(this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
-      this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
   }
   else if(valueType == typeid(uint64_t)) {
     type = UA_PV_UINT64;
     if(this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
-      this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
   }
   else if(valueType == typeid(float)) {
     type = UA_PV_FLOAT;
     if(this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
-      this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_FLOAT].typeId);
   }
   else if(valueType == typeid(double)) {
     type = UA_PV_DOUBLE;
     if(this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
-      this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
   }
   else if(valueType == typeid(string)) {
     type = UA_PV_STRING;
     if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
-      this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
   }
   else if(valueType == typeid(Boolean)) {
     type = UA_PV_BOOL;
     if(this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.dataSource.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
   }
   else {
@@ -1593,6 +1379,19 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       std::cout << " (demangling failed) " << valueType.name();
     }
     std::cout << " for variable " << this->namePV << std::endl;
+  }
+
+  if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
+    mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
+  } else {
+    mapElem.dataSource.write = NULL;
+  }
+  if(this->array){
+    UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
+    UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+    UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
+  } else {
+    UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_SCALAR);
   }
 
   retval = UA_Server_writeAccessLevel(this->mappedServer, createdNodeId, accessLevel);
@@ -1614,7 +1413,6 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   //this->ua_mapDataSources((void*)this, &mapDs);
 
   UA_NodeId_clear(&createdNodeId);
-
   return UA_STATUSCODE_GOOD;
 }
 
@@ -1634,7 +1432,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr = UA_VariableAttributes_default;
   attr.displayName = UA_LOCALIZEDTEXT((char*)"", (char*)"Name");
   attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
-  attr.valueRank = UA_VALUERANK_ANY;
+  attr.valueRank = UA_VALUERANK_SCALAR;
   UA_String opcua_node_variable_t_ns_2_i_6004_variant_DataContents = UA_STRING_ALLOC((char*)"");
   UA_Variant_setScalar(
       &attr.value, &opcua_node_variable_t_ns_2_i_6004_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
@@ -1667,7 +1465,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
-  attr.valueRank = UA_VALUERANK_ANY;
+  attr.valueRank = UA_VALUERANK_SCALAR;
   UA_String opcua_node_variable_t_ns_2_i_6001_variant_DataContents = UA_STRING((char*)"");
   UA_Variant_setScalar(
       &attr.value, &opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
@@ -1699,7 +1497,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
-  attr.valueRank = UA_VALUERANK_ANY;
+  attr.valueRank = UA_VALUERANK_SCALAR;
   addResult = UA_Server_addVariableNode(this->mappedServer,
                                         UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/EngineeringUnit").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"EngineeringUnit"), UA_NODEID_NUMERIC(0, 63), attr, this,
@@ -1728,7 +1526,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
-  attr.valueRank = UA_VALUERANK_ANY;
+  attr.valueRank = UA_VALUERANK_SCALAR;
   UA_String opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING((char*)"");
   UA_Variant_setScalar(
       &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
@@ -1763,7 +1561,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
-  attr.valueRank = UA_VALUERANK_ANY;
+  attr.valueRank = UA_VALUERANK_SCALAR;
   addResult = UA_Server_addVariableNode(this->mappedServer,
                                         UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Validity").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"Validity"), UA_NODEID_NUMERIC(0, 63), attr, this,
