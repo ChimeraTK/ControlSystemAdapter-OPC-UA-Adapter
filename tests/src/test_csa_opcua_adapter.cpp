@@ -6,8 +6,8 @@
 #include <boost/test/included/unit_test.hpp>
 
 extern "C" {
+#include "csa_namespace.h" // Output des pyUANamespacecompilers
 #include "unistd.h"
-#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
 
 using namespace boost::unit_test_framework;

@@ -19,11 +19,11 @@
  * Copyright (c) 2019-2021 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
 
-#include "ua_additionalvariable.h"
+#include "csa_additionalvariable.h"
 #include "csa_config.h"
 
 extern "C" {
-#include "csa_namespaceinit_generated.h"
+#include "csa_namespace.h"
 }
 
 #include "ua_proxies.h"

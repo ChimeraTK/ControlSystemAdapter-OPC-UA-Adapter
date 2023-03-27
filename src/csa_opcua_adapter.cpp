@@ -22,11 +22,11 @@ extern "C" {
 #include "unistd.h"
 }
 
-#include <iostream>
-
 #include "csa_opcua_adapter.h"
+#include "csa_processvariable.h"
 #include "ua_adapter.h"
-#include "ua_processvariable.h"
+
+#include <iostream>
 
 csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
   this->csManager = csManager;
