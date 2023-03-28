@@ -1263,6 +1263,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = false;
     }
     else {
+      this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size();
     }
   }
@@ -1272,6 +1273,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = false;
     }
     else {
+      this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size();
     }
   }
@@ -1281,6 +1283,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = false;
     }
     else {
+      this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size();
     }
   }
@@ -1290,6 +1293,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = false;
     }
     else {
+      this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size();
     }
   }
@@ -1299,6 +1303,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = false;
     }
     else {
+      this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size();
     }
   }
@@ -1308,6 +1313,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = false;
     }
     else {
+      this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size();
     }
   }
@@ -1317,6 +1323,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = false;
     }
     else {
+      this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size();
     }
   }
@@ -1326,6 +1333,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = false;
     }
     else {
+      this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size();
     }
   }
@@ -1335,6 +1343,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = false;
     }
     else {
+      this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size();
     }
     UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_FLOAT].typeId);
@@ -1345,6 +1354,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = false;
     }
     else {
+      this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size();
     }
   }
@@ -1354,6 +1364,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = false;
     }
     else {
+      this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size();
     }
   }
