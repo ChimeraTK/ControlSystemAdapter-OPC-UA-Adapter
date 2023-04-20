@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.16)
 
 ##########################################################################################################
 ## Project specification
@@ -6,8 +6,8 @@ cmake_minimum_required(VERSION 3.1.0)
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 
 SET(${PROJECT_NAME}_MAJOR_VERSION 03)
-SET(${PROJECT_NAME}_MINOR_VERSION 01)
-SET(${PROJECT_NAME}_PATCH_VERSION 01)
+SET(${PROJECT_NAME}_MINOR_VERSION 02)
+SET(${PROJECT_NAME}_PATCH_VERSION 00)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
@@ -21,51 +21,7 @@ find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 find_package(open62541 1.3 REQUIRED)
 
-#Do not put any of the following packages as required. We will install it if it is not found.
-find_package(ChimeraTK-ControlSystemAdapter 02.03)
-find_package(ChimeraTK-DeviceAccess 02.06)
-
-#Install the DeviceAccess if it is not pre-installed
-if(NOT ChimeraTK-DeviceAccess_FOUND)
-    ExternalProject_Add(external-ChimeraTK-DeviceAccess
-            GIT_REPOSITORY "https://github.com/ChimeraTK/DeviceAccess.git"
-
-            GIT_TAG "master"
-            PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-DeviceAccess_src"
-            CMAKE_ARGS
-            "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess"
-            "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-            "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-            )
-
-    set(ChimeraTK-DeviceAccess_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/include)
-    set(ChimeraTK-DeviceAccess_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/lib)
-    set(ChimeraTK-DeviceAccess_LIBRARIES ChimeraTK-DeviceAccess)
-endif()
-
-#Install the ControlSystemAdapter if it is not pre-installed
-if(NOT ChimeraTK-ControlSystemAdapter_FOUND)
-    message("Installing ChimeraTK-ControlSystemAdapter as external dependency inside the build directory.")
-    message("You will not be able to make a proper installation of the OPCUA_Adapter. Only use this for testing and development.\n")
-    ExternalProject_Add(external-ChimeraTK-ControlSystemAdapter
-            GIT_REPOSITORY "https://github.com/ChimeraTK/ControlSystemAdapter.git"
-            GIT_TAG "master"
-            PREFIX "${CMAKE_BINARY_DIR}/ChimeraTK-ControlSystemAdapter_src"
-            DEPENDS external-ChimeraTK-DeviceAccess
-            CMAKE_ARGS
-            "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/ChimeraTK/DeviceAccess/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/"
-            "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter"
-            "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-            "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-            )
-    set(USE_ControlSystemAdapter TRUE)
-    set(ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/include)
-    set(ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/ChimeraTK/ControlSystemAdapter/lib)
-    set(ChimeraTK-ControlSystemAdapter_LIBRARIES ChimeraTK-ControlSystemAdapter)
-endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${ChimeraTK-ControlSystemAdapter_LINKER_FLAGS}")
+find_package(ChimeraTK-ControlSystemAdapter 02.06 REQUIRED)
 
 ##########################################################################################################
 ## Set the build type to Release if none is specified
@@ -115,14 +71,10 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/examples/)
-include_directories(SYSTEM ${ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS})
-include_directories(SYSTEM ${ChimeraTK-DeviceAccess_INCLUDE_DIRS})
 include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR})
 
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 link_directories(${LIBXML2_LIBRARIES})
-link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
-link_directories(${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
 
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
         ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
@@ -263,24 +215,20 @@ configure_file (
 
 ## Object Files
 add_library(mtca_objects OBJECT ${objectSources})
-target_link_libraries(mtca_objects open62541::open62541)
-if(USE_ControlSystemAdapter)
-    target_link_libraries(mtca_objects external-ChimeraTK-ControlSystemAdapter)
-    target_link_libraries(mtca_objects external-ChimeraTK-DeviceAccess)
-endif()
+target_link_libraries(mtca_objects PUBLIC open62541::open62541)
+target_link_libraries(mtca_objects PUBLIC ChimeraTK::ChimeraTK-ControlSystemAdapter)
 
 ## Early declaration due to the requirement to run the dependencies update prior to building
 ## Create shared lib
 add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects>)
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_FULL_LIBRARY_VERSION}
         SOVERSION ${${PROJECT_NAME}_SOVERSION})
-target_link_libraries(${PROJECT_NAME} ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${ChimeraTK-DeviceAccess_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} open62541::open62541)
-target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} pthread)
-target_link_libraries(${PROJECT_NAME} dl)
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PUBLIC ChimeraTK::ChimeraTK-ControlSystemAdapter)
+target_link_libraries(${PROJECT_NAME} PUBLIC open62541::open62541)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBXML2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
+target_link_libraries(${PROJECT_NAME} PRIVATE dl)
+target_link_libraries(${PROJECT_NAME} PRIVATE 
         ${Boost_FILESYSTEM_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
         ${Boost_THREAD_LIBRARY}
@@ -296,7 +244,11 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
 ## Install all Libraries
 ##########################################################################################################
 
-install( TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin LIBRARY DESTINATION lib )
+# this defines architecture-dependent ${CMAKE_INSTALL_LIBDIR}
+include(GNUInstallDirs)
+install( TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 ##########################################################################################################
 ## Custom Commands (z.b. model-compiler, autobuild-dependencies)
@@ -373,12 +325,10 @@ install(TARGETS ControlSystem-OPCUA_Sample_Adapter RUNTIME DESTINATION bin)
 ##########################################################################################################
 
 
-get_target_property(open62541_LIBRARIES open62541::open62541 LOCATION)
-set(${PROJECT_NAME}_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
-set(${PROJECT_NAME}_LIBRARIES "${ChimeraTK-ControlSystemAdapter_LIBRARIES} ${open62541_LIBRARIES}")
-set(${PROJECT_NAME}_LIBRARY_DIRS "${CMAKE_INSTALL_PREFIX}/lib ${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS}")
-set(${PROJECT_NAME}_CXX_FLAGS "${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
-set(${PROJECT_NAME}_LINKER_FLAGS "${ChimeraTK-ControlSystemAdapter_LINKER_FLAGS} -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib,--enable-new-dtags")
+# we support our cmake EXPORTS as imported targets
+set(PROVIDES_EXPORTED_TARGETS 1)
+# we need the public dependencies so create_cmake_config_files can find them as implicit dependencies
+list(APPEND ${PROJECT_NAME}_PUBLIC_DEPENDENCIES "open62541;ChimeraTK-ControlSystemAdapter")
 include(${CMAKE_SOURCE_DIR}/cmake/create_cmake_config_files.cmake)
 
 
