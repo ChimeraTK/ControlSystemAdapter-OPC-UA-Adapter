@@ -339,21 +339,9 @@ UA_StatusCode ua_processvariable::getValue_int8(UA_Variant* v) {
     if(this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint8_t ival = this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_SBYTE]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<int8_t> iarr = this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_SBYTE]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_SByte*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_SBYTE]);
     }
   }
 
@@ -370,21 +358,9 @@ UA_StatusCode ua_processvariable::getValue_uint8(UA_Variant* v) {
     if(this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint8_t ival = this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_BYTE]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<uint8_t> iarr = this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_BYTE]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Byte*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_BYTE]);
     }
   }
 
@@ -401,21 +377,9 @@ UA_StatusCode ua_processvariable::getValue_int16(UA_Variant* v) {
     if(this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint16_t ival = this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_INT16]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<int16_t> iarr = this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT16]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Int16*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT16]);
     }
   }
 
@@ -432,21 +396,9 @@ UA_StatusCode ua_processvariable::getValue_uint16(UA_Variant* v) {
     if(this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint16_t ival = this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_UINT16]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<uint16_t> iarr = this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT16]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_UInt16*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT16]);
     }
   }
 
@@ -463,21 +415,9 @@ UA_StatusCode ua_processvariable::getValue_int32(UA_Variant* v) {
     if(this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size() == 1) {
       int32_t ival = this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_INT32]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<int32_t> iarr = this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT32]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Int32*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT32]);
     }
   }
 
@@ -494,21 +434,9 @@ UA_StatusCode ua_processvariable::getValue_uint32(UA_Variant* v) {
     if(this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint32_t ival = this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_UINT32]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<uint32_t> iarr = this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT32]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_UInt32*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT32]);
     }
   }
 
@@ -525,21 +453,9 @@ UA_StatusCode ua_processvariable::getValue_int64(UA_Variant* v) {
     if(this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size() == 1) {
       int64_t ival = this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_INT64]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<int64_t> iarr = this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT64]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Int64*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT64]);
     }
   }
 
@@ -556,21 +472,9 @@ UA_StatusCode ua_processvariable::getValue_uint64(UA_Variant* v) {
     if(this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint64_t ival = this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_UINT64]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<uint64_t> iarr = this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT64]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_UInt64*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT64]);
     }
   }
 
@@ -582,7 +486,7 @@ UA_StatusCode ua_processvariable::getValue_float(UA_Variant* v) {
 
   if(this->type == UA_PV_FLOAT) {
     if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
-      this->csManager->getProcessArray<float>(this->namePV)->readLatest();
+      while(this->csManager->getProcessArray<float>(this->namePV)->readNonBlocking()) {      }
     }
     if(this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size() == 1) {
       float dval = this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).at(0);
@@ -591,17 +495,7 @@ UA_StatusCode ua_processvariable::getValue_float(UA_Variant* v) {
     else {
       // Array
       std::vector<float> darr = this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, darr.data(), darr.size(), &UA_TYPES[UA_TYPES_FLOAT]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)darr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Float*)darr.data(), darr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = darr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, darr.data(), darr.size(), &UA_TYPES[UA_TYPES_FLOAT]);
     }
   }
 
@@ -619,21 +513,9 @@ UA_StatusCode ua_processvariable::getValue_double(UA_Variant* v) {
     if(this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size() == 1) {
       double dval = this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &dval, &UA_TYPES[UA_TYPES_DOUBLE]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<double> darr = this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, darr.data(), darr.size(), &UA_TYPES[UA_TYPES_DOUBLE]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)darr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Double*)darr.data(), darr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = darr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, darr.data(), darr.size(), &UA_TYPES[UA_TYPES_DOUBLE]);
     }
   }
 
@@ -652,27 +534,13 @@ UA_StatusCode ua_processvariable::getValue_string(UA_Variant* v) {
       UA_String ua_val = CPPSTRING_TO_UASTRING(sval);
       rv = UA_Variant_setScalarCopy(v, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
       UA_String_clear(&ua_val);
-    }
-    else {
-      // Array
+    } else {
       std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
       UA_String* sarrayval = new UA_String[sarr.size()];
       for(size_t i = 0; i < sarr.size(); i++) {
         sarrayval[i] = CPPSTRING_TO_UASTRING(sarr[i]);
       }
-
-      UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)sarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, sarrayval, sarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = sarr.size();
-      v->arrayDimensions = arrayDims;
-
+      rv = UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
       delete[] sarrayval;
     }
   }
@@ -691,27 +559,13 @@ UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
     if(this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size() == 1) {
       Boolean bval = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &bval, &UA_TYPES[UA_TYPES_BOOLEAN]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<Boolean> bvector = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0);
       // Da vector<bool> kein Array liefert, müssen die Daten umkopiert werden
       Boolean* barr = new Boolean[bvector.size()];
       for(size_t i = 0; i < bvector.size(); i++) {
         barr[i] = bvector[i];
       }
-
-      UA_Variant_setArrayCopy(v, barr, bvector.size(), &UA_TYPES[UA_TYPES_BOOLEAN]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)bvector.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Boolean*)barr, bvector.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = bvector.size();
-      v->arrayDimensions = arrayDims;
       delete[] barr;
     }
   }
@@ -1266,6 +1120,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size();
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_BYTE].typeId);
   }
   else if(valueType == typeid(uint8_t)) {
     type = UA_PV_UINT8;
@@ -1276,6 +1131,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size();
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_SBYTE].typeId);
   }
   else if(valueType == typeid(int16_t)) {
     type = UA_PV_INT16;
@@ -1286,6 +1142,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size();
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_INT16].typeId);
   }
   else if(valueType == typeid(uint16_t)) {
     type = UA_PV_UINT16;
@@ -1296,6 +1153,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size();
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_UINT16].typeId);
   }
   else if(valueType == typeid(int32_t)) {
     type = UA_PV_INT32;
@@ -1306,6 +1164,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size();
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_INT32].typeId);
   }
   else if(valueType == typeid(uint32_t)) {
     type = UA_PV_UINT32;
@@ -1316,6 +1175,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size();
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_UINT32].typeId);
   }
   else if(valueType == typeid(int64_t)) {
     type = UA_PV_INT64;
@@ -1326,6 +1186,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size();
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_INT64].typeId);
   }
   else if(valueType == typeid(uint64_t)) {
     type = UA_PV_UINT64;
@@ -1336,6 +1197,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size();
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_UINT64].typeId);
   }
   else if(valueType == typeid(float)) {
     type = UA_PV_FLOAT;
@@ -1357,6 +1219,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size();
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_DOUBLE].typeId);
   }
   else if(valueType == typeid(string)) {
     type = UA_PV_STRING;
@@ -1367,6 +1230,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size();
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_STRING].typeId);
   }
   else if(valueType == typeid(Boolean)) {
     type = UA_PV_BOOL;
@@ -1377,6 +1241,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
       this->array = true;
       arrayDims[0] = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size();
     }
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_BOOLEAN].typeId);
   }
   else {
     int status;
