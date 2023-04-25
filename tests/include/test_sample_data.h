@@ -7,7 +7,7 @@
 #include "ChimeraTK/ControlSystemAdapter/ProcessArray.h"
 
 extern "C" {
-#include "csa_namespace.h" // Output des pyUANamespacecompilers
+#include "csa_namespace.h"
 #include "unistd.h"
 }
 

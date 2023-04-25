@@ -6,7 +6,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 extern "C" {
-#include "csa_namespace.h" // Output des pyUANamespacecompilers
+#include "csa_namespace.h"
 #include "unistd.h"
 }
 
