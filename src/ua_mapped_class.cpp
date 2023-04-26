@@ -16,7 +16,7 @@
  * 
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- * Copyright (c) 2021 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
+ * Copyright (c) 2021-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
 
 #include "ua_mapped_class.h"
@@ -64,8 +64,4 @@ UA_StatusCode ua_mapped_class::ua_unmapSelfFromNamespace() {
     delete p;
   }
   return UA_STATUSCODE_GOOD;
-}
-
-UA_StatusCode ua_mapped_class::ua_mapDataSources(void* srcClass, UA_DataSource_Map* map) {
-  return ua_callProxy_mapDataSources(this->mappedServer, this->ownedNodes, map, srcClass);
 }

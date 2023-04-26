@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- * Copyright (c) 2019-2021 Andreas Ebner  <Andreas.Ebner@iosb.fraunhofer.de>
+ * Copyright (c) 2019-2023 Andreas Ebner  <Andreas.Ebner@iosb.fraunhofer.de>
  */
 
 #ifndef HAVE_UA_PROXIES_H
@@ -49,17 +49,6 @@ typedef std::list<UA_DataSource_Map_Element> UA_DataSource_Map;
         UA_NodeId_copy(&_p_targetId, &tmp->targetNodeId);                                                              \
         _p_listname.push_back(tmp);                                                                                    \
     } while(0);
-
-/**
- * @brief Searching for NodeId's in <pairList> with the same NodeId from <remoteId>
- *
- * @param pairList
- * @param remoteId
- *
- * @return UA_NodeId from the found node
- *
- */
-UA_NodeId* nodePairList_getTargetIdBySourceId(nodePairList pairList, UA_NodeId remoteId);
 
 /**
  * @brief Node function and proxy mapping for new nodes
