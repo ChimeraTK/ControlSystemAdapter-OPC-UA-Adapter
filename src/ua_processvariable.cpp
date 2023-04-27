@@ -30,6 +30,7 @@ extern "C" {
 
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV,
                                        boost::shared_ptr<ControlSystemPVManager> csManager, string overwriteNodeString)
@@ -622,6 +623,7 @@ UA_StatusCode ua_processvariable::getValue_double(UA_Variant* v) {
     }
     else {
       // Array
+      std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
       std::vector<double> darr = this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0);
       UA_Variant_setArrayCopy(v, darr.data(), darr.size(), &UA_TYPES[UA_TYPES_DOUBLE]);
       UA_NumericRange arrayRange;
@@ -634,6 +636,8 @@ UA_StatusCode ua_processvariable::getValue_double(UA_Variant* v) {
       UA_UInt32* arrayDims = UA_UInt32_new();
       *arrayDims = darr.size();
       v->arrayDimensions = arrayDims;
+      std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+      std::cout << "Debug: Read Double Array Duration = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
     }
   }
 
@@ -695,7 +699,7 @@ UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
     else {
       // Array
       std::vector<Boolean> bvector = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0);
-      // Da vector<bool> kein Array liefert, müssen die Daten umkopiert werden
+      //Since vector<bool> is no array, we have to copy the data
       Boolean* barr = new Boolean[bvector.size()];
       for(size_t i = 0; i < bvector.size(); i++) {
         barr[i] = bvector[i];
