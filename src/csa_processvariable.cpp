@@ -1062,8 +1062,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
 
   if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-    attr.userWriteMask = UA_ACCESSLEVELMASK_WRITE;
-    attr.writeMask = UA_ACCESSLEVELMASK_WRITE;
+    attr.writeMask = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE;
+    attr.accessLevel = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE;
   }
 
   //Append the app and application folder names to the string nodeId, this is needed
@@ -1087,7 +1087,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   UA_Server_addVariableNode(this->mappedServer,
                             UA_NODEID_STRING(1, (char*)(baseNodeIdName + "/" + this->nameNew).c_str()),
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                            UA_QUALIFIEDNAME(1, (char*)this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, (void*)this,
+                            UA_QUALIFIEDNAME(1, (char*)this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, (void*) this,
                             &createdNodeId);
   UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
   ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, 1001), &this->ownedNodes);
@@ -1107,7 +1107,6 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   mapElem.description = description;
   //Read is possible for all elements
   mapElem.dataSource.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
-  UA_Byte accessLevel = UA_ACCESSLEVELMASK_READ;
   UA_Variant uaArrayDimensions;
   UA_UInt32 arrayDims[1];
 
@@ -1268,11 +1267,6 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
   } else {
     UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_SCALAR);
-  }
-
-  retval = UA_Server_writeAccessLevel(this->mappedServer, createdNodeId, accessLevel);
-  if(retval != UA_STATUSCODE_GOOD){
-    return retval;
   }
 
   //add variable data source map element to the list
