@@ -187,7 +187,7 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValidity(UA
     default:
       validity = -1;
   }
-  UA_Variant_setScalarCopy(&value->value, &validity, &UA_TYPES[UA_TYPES_UINT32]);
+  UA_Variant_setScalarCopy(&value->value, &validity, &UA_TYPES[UA_TYPES_INT32]);
   value->hasValue = true;
   if(includeSourceTimeStamp) {
     value->sourceTimestamp = thisObj->getSourceTimeStamp();
@@ -1303,6 +1303,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.displayName = UA_LOCALIZEDTEXT((char*)"", (char*)"Name");
   attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
   attr.valueRank = UA_VALUERANK_SCALAR;
+  attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
   UA_String opcua_node_variable_t_ns_2_i_6004_variant_DataContents = UA_STRING_ALLOC((char*)"");
   UA_Variant_setScalar(
       &attr.value, &opcua_node_variable_t_ns_2_i_6004_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
@@ -1336,6 +1337,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.valueRank = UA_VALUERANK_SCALAR;
+  attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
   UA_String opcua_node_variable_t_ns_2_i_6001_variant_DataContents = UA_STRING((char*)"");
   UA_Variant_setScalar(
       &attr.value, &opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
@@ -1368,6 +1370,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.valueRank = UA_VALUERANK_SCALAR;
+  attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
   addResult = UA_Server_addVariableNode(this->mappedServer,
                                         UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/EngineeringUnit").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"EngineeringUnit"), UA_NODEID_NUMERIC(0, 63), attr, this,
@@ -1397,6 +1400,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.valueRank = UA_VALUERANK_SCALAR;
+  attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
   UA_String opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING((char*)"");
   UA_Variant_setScalar(
       &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
@@ -1432,6 +1436,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.valueRank = UA_VALUERANK_SCALAR;
+  attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
   addResult = UA_Server_addVariableNode(this->mappedServer,
                                         UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Validity").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"Validity"), UA_NODEID_NUMERIC(0, 63), attr, this,
