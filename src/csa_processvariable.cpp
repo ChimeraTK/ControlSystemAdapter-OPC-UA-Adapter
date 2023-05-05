@@ -1294,14 +1294,14 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   // Adding the 'name' node to the PV
   UA_DataSource_Map_Element mapElemName;
   mapElemName.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
-  mapElemName.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+  mapElemName.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   mapElemName.dataSource.read = ua_readproxy_ua_processvariable_getName;
   mapElemName.dataSource.write = NULL;
 
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
-  attr.displayName = UA_LOCALIZEDTEXT((char*)"", (char*)"Name");
-  attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+  attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Name");
+  attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   attr.valueRank = UA_VALUERANK_SCALAR;
   attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
   UA_String opcua_node_variable_t_ns_2_i_6004_variant_DataContents = UA_STRING_ALLOC((char*)"");
@@ -1326,14 +1326,14 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   //Adding the 'Description' node to the PV
   UA_DataSource_Map_Element mapElemDesc;
   mapElemDesc.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
-  mapElemDesc.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+  mapElemDesc.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   mapElemDesc.dataSource.read = ua_readproxy_ua_processvariable_getDescription;
   mapElemDesc.dataSource.write = NULL;
 
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
-  attr.displayName = UA_LOCALIZEDTEXT((char*)"", (char*)"Description");
-  attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+  attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Description");
+  attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.valueRank = UA_VALUERANK_SCALAR;
@@ -1360,13 +1360,13 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   //Adding the 'EngineeringUnit' node to the PV
   UA_DataSource_Map_Element mapElemEU;
   mapElemEU.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
-  mapElemEU.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+  mapElemEU.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   mapElemEU.dataSource.read = ua_readproxy_ua_processvariable_getEngineeringUnit;
   mapElemEU.dataSource.write = NULL;
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
   attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"EngineeringUnit");
-  attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+  attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.valueRank = UA_VALUERANK_SCALAR;
@@ -1390,13 +1390,13 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   //Adding the 'Type' node to the PV
   UA_DataSource_Map_Element mapElemType;
   mapElemType.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
-  mapElemType.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+  mapElemType.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   mapElemType.dataSource.read = ua_readproxy_ua_processvariable_getType;
   mapElemType.dataSource.write = NULL;
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
-  attr.displayName = UA_LOCALIZEDTEXT((char*)"", (char*)"Type");
-  attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+  attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Type");
+  attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.valueRank = UA_VALUERANK_SCALAR;
@@ -1426,13 +1426,13 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   //Adding the Validity node to the PV
   UA_DataSource_Map_Element mapElemValidity;
   mapElemValidity.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
-  mapElemValidity.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+  mapElemValidity.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   mapElemValidity.dataSource.read = ua_readproxy_ua_processvariable_getValidity;
   mapElemValidity.dataSource.write = NULL;
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
   attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Validity");
-  attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
+  attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.valueRank = UA_VALUERANK_SCALAR;
