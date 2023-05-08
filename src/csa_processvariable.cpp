@@ -1371,6 +1371,8 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
   attr.valueRank = UA_VALUERANK_SCALAR;
   attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
+  UA_String defaultEngineeringUnit = UA_STRING((char*)"");
+  UA_Variant_setScalar(&attr.value, &defaultEngineeringUnit, &UA_TYPES[UA_TYPES_STRING]);
   addResult = UA_Server_addVariableNode(this->mappedServer,
                                         UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/EngineeringUnit").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"EngineeringUnit"), UA_NODEID_NUMERIC(0, 63), attr, this,
