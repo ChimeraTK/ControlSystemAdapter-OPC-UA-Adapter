@@ -1440,7 +1440,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   attr.valueRank = UA_VALUERANK_SCALAR;
   attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
   UA_Int32 defaultValidity = -1;
-  UA_Variant_setScalarCopy(&attr.value, &defaultValidity, &UA_TYPES[UA_TYPES_INT32]);
+  UA_Variant_setScalar(&attr.value, &defaultValidity, &UA_TYPES[UA_TYPES_INT32]);
   addResult = UA_Server_addVariableNode(this->mappedServer,
                                         UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Validity").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"Validity"), UA_NODEID_NUMERIC(0, 63), attr, this,
