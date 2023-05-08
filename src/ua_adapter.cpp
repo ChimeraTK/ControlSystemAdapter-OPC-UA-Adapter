@@ -20,7 +20,7 @@
  */
 
 extern "C" {
-#include "csa_namespaceinit_generated.h"
+#include "csa_namespace.h"
 #include "unistd.h"
 
 #include <dirent.h>
@@ -28,10 +28,10 @@ extern "C" {
 #include <stdlib.h>
 }
 
+#include "csa_additionalvariable.h"
 #include "csa_config.h"
+#include "csa_processvariable.h"
 #include "ua_adapter.h"
-#include "ua_additionalvariable.h"
-#include "ua_processvariable.h"
 #include "ua_proxies.h"
 #include "xml_file_handler.h"
 
@@ -253,7 +253,7 @@ void ua_uaadapter::constructServer() {
       usernamePasswordLogins);
 
   this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-  csa_namespaceinit_generated(this->mappedServer);
+  csa_namespace_init(this->mappedServer);
 
   UA_free(config);
   UA_String_clear(&usernamePasswordLogins->password);

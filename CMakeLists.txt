@@ -80,14 +80,11 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
         ${CMAKE_SOURCE_DIR}/src/ua_proxies.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_opcua_adapter.cpp
         ${CMAKE_SOURCE_DIR}/src/xml_file_handler.cpp
-        ${CMAKE_SOURCE_DIR}/src/ua_processvariable.cpp
-        ${CMAKE_SOURCE_DIR}/src/ua_additionalvariable.cpp
+        ${CMAKE_SOURCE_DIR}/src/csa_processvariable.cpp
+        ${CMAKE_SOURCE_DIR}/src/csa_additionalvariable.cpp
         ${CMAKE_SOURCE_DIR}/src/ua_adapter.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_opcua_application.cpp
-
-        #${CMAKE_SOURCE_DIR}/src/open62541.c
-        # Example HelperClass
-        #${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp
+        ${CMAKE_SOURCE_DIR}/src/csa_namespace.c
         )
 
 # Create the target directory for model initializers, open62541 and ControlSystemAdapter libraries/headers
@@ -95,11 +92,9 @@ file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/src_generated")
 include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 
 ##########################################################################################################
-## Optionen
+## Options
 ##########################################################################################################
 
-## Project specific options
-option(ENABLE_CREATEMODEL      "Create model from XML description"      OFF)
 ## Code quality control options
 option(ENABLE_COVERAGE        "Enable coverage stats and tests for adapter build" OFF)
 option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static code analysis using clangs analyzer." OFF)
@@ -107,15 +102,6 @@ option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prio
 option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
 option(ENABLE_RUNTIME_ANALYSIS "Build Runtime analyses" OFF)
-
-if(ENABLE_CREATEMODEL)
-    set(MODEL_XML_FILE "adapterim.xml" CACHE STRING "Namespace definition XML file for MTCA Model")
-
-    list(APPEND objectSources ${PROJECT_BINARY_DIR}/src_generated/csa_namespaceinit_generated.c)
-else()
-    include_directories(${CMAKE_SOURCE_DIR}/include/model_prebuilt/)
-    list(APPEND objectSources ${CMAKE_SOURCE_DIR}/include/model_prebuilt/csa_namespaceinit_generated.c)
-endif()
 
 if(ENABLE_COVERAGE)
     set(CMAKE_BUILD_TYPE DEBUG)
@@ -249,31 +235,6 @@ include(GNUInstallDirs)
 install( TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-##########################################################################################################
-## Custom Commands (z.b. model-compiler, autobuild-dependencies)
-##########################################################################################################
-
-add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/src_generated/csa_namespaceinit_generated.c
-        ${PROJECT_BINARY_DIR}/src_generated/csa_namespaceinit_generated.h
-        PRE_BUILD
-        COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
-        -i ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist_FullNS0.txt
-        -b ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist.txt
-        ${PROJECT_SOURCE_DIR}/model/Opc.Ua.NodeSet2.xml
-        ${PROJECT_SOURCE_DIR}/model/${MODEL_XML_FILE}
-        ${PROJECT_BINARY_DIR}/src_generated/csa_namespaceinit_generated
-        DEPENDS ${PROJECT_SOURCE_DIR}/model/Opc.Ua.NodeSet2.xml
-        ${PROJECT_SOURCE_DIR}/model/${MODEL_XML_FILE}
-        ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist_FullNS0.txt
-        ${PROJECT_SOURCE_DIR}/model/NodeID_Blacklist.txt
-        ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/generate_open62541CCode.py
-        ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/open62541_MacroHelper.py
-        ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_builtin_types.py
-        ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_constants.py
-        ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_namespace.py
-        ${PROJECT_SOURCE_DIR}/tools/pyUANamespace/ua_node_types.py)
-
 
 ##########################################################################################################
 ##  Tests and executables

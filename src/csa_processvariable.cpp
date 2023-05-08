@@ -19,11 +19,11 @@
  * Copyright (c) 2018-2021 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
 
-#include "ua_processvariable.h"
 #include "csa_config.h"
+#include "csa_processvariable.h"
 
 extern "C" {
-#include "csa_namespaceinit_generated.h"
+#include "csa_namespace.h"
 }
 
 #include "ua_proxies.h"
@@ -187,7 +187,7 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValidity(UA
     default:
       validity = -1;
   }
-  UA_Variant_setScalarCopy(&value->value, &validity, &UA_TYPES[UA_TYPES_UINT32]);
+  UA_Variant_setScalarCopy(&value->value, &validity, &UA_TYPES[UA_TYPES_INT32]);
   value->hasValue = true;
   if(includeSourceTimeStamp) {
     value->sourceTimestamp = thisObj->getSourceTimeStamp();
@@ -339,21 +339,9 @@ UA_StatusCode ua_processvariable::getValue_int8(UA_Variant* v) {
     if(this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint8_t ival = this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_SBYTE]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<int8_t> iarr = this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_SBYTE]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_SByte*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_SBYTE]);
     }
   }
 
@@ -370,21 +358,9 @@ UA_StatusCode ua_processvariable::getValue_uint8(UA_Variant* v) {
     if(this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint8_t ival = this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_BYTE]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<uint8_t> iarr = this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_BYTE]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Byte*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_BYTE]);
     }
   }
 
@@ -401,21 +377,9 @@ UA_StatusCode ua_processvariable::getValue_int16(UA_Variant* v) {
     if(this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint16_t ival = this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_INT16]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<int16_t> iarr = this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT16]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Int16*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT16]);
     }
   }
 
@@ -432,21 +396,9 @@ UA_StatusCode ua_processvariable::getValue_uint16(UA_Variant* v) {
     if(this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint16_t ival = this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_UINT16]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<uint16_t> iarr = this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT16]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_UInt16*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT16]);
     }
   }
 
@@ -463,21 +415,9 @@ UA_StatusCode ua_processvariable::getValue_int32(UA_Variant* v) {
     if(this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size() == 1) {
       int32_t ival = this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_INT32]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<int32_t> iarr = this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT32]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Int32*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT32]);
     }
   }
 
@@ -494,21 +434,9 @@ UA_StatusCode ua_processvariable::getValue_uint32(UA_Variant* v) {
     if(this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint32_t ival = this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_UINT32]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<uint32_t> iarr = this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT32]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_UInt32*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT32]);
     }
   }
 
@@ -525,21 +453,9 @@ UA_StatusCode ua_processvariable::getValue_int64(UA_Variant* v) {
     if(this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size() == 1) {
       int64_t ival = this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_INT64]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<int64_t> iarr = this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT64]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Int64*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_INT64]);
     }
   }
 
@@ -556,21 +472,9 @@ UA_StatusCode ua_processvariable::getValue_uint64(UA_Variant* v) {
     if(this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size() == 1) {
       uint64_t ival = this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_UINT64]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<uint64_t> iarr = this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT64]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)iarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_UInt64*)iarr.data(), iarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = iarr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[UA_TYPES_UINT64]);
     }
   }
 
@@ -582,7 +486,7 @@ UA_StatusCode ua_processvariable::getValue_float(UA_Variant* v) {
 
   if(this->type == UA_PV_FLOAT) {
     if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
-      this->csManager->getProcessArray<float>(this->namePV)->readLatest();
+      while(this->csManager->getProcessArray<float>(this->namePV)->readNonBlocking()) {      }
     }
     if(this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size() == 1) {
       float dval = this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).at(0);
@@ -591,17 +495,7 @@ UA_StatusCode ua_processvariable::getValue_float(UA_Variant* v) {
     else {
       // Array
       std::vector<float> darr = this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, darr.data(), darr.size(), &UA_TYPES[UA_TYPES_FLOAT]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)darr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Float*)darr.data(), darr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = darr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, darr.data(), darr.size(), &UA_TYPES[UA_TYPES_FLOAT]);
     }
   }
 
@@ -619,21 +513,9 @@ UA_StatusCode ua_processvariable::getValue_double(UA_Variant* v) {
     if(this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size() == 1) {
       double dval = this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &dval, &UA_TYPES[UA_TYPES_DOUBLE]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<double> darr = this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0);
-      UA_Variant_setArrayCopy(v, darr.data(), darr.size(), &UA_TYPES[UA_TYPES_DOUBLE]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)darr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Double*)darr.data(), darr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = darr.size();
-      v->arrayDimensions = arrayDims;
+      rv = UA_Variant_setArrayCopy(v, darr.data(), darr.size(), &UA_TYPES[UA_TYPES_DOUBLE]);
     }
   }
 
@@ -652,27 +534,13 @@ UA_StatusCode ua_processvariable::getValue_string(UA_Variant* v) {
       UA_String ua_val = CPPSTRING_TO_UASTRING(sval);
       rv = UA_Variant_setScalarCopy(v, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
       UA_String_clear(&ua_val);
-    }
-    else {
-      // Array
+    } else {
       std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
       UA_String* sarrayval = new UA_String[sarr.size()];
       for(size_t i = 0; i < sarr.size(); i++) {
         sarrayval[i] = CPPSTRING_TO_UASTRING(sarr[i]);
       }
-
-      UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)sarr.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, sarrayval, sarr.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = sarr.size();
-      v->arrayDimensions = arrayDims;
-
+      rv = UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
       delete[] sarrayval;
     }
   }
@@ -691,27 +559,13 @@ UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
     if(this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size() == 1) {
       Boolean bval = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).at(0);
       rv = UA_Variant_setScalarCopy(v, &bval, &UA_TYPES[UA_TYPES_BOOLEAN]);
-    }
-    else {
-      // Array
+    } else {
       std::vector<Boolean> bvector = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0);
       // Da vector<bool> kein Array liefert, müssen die Daten umkopiert werden
       Boolean* barr = new Boolean[bvector.size()];
       for(size_t i = 0; i < bvector.size(); i++) {
         barr[i] = bvector[i];
       }
-
-      UA_Variant_setArrayCopy(v, barr, bvector.size(), &UA_TYPES[UA_TYPES_BOOLEAN]);
-      UA_NumericRange arrayRange;
-      arrayRange.dimensionsSize = 1;
-      UA_NumericRangeDimension scalarThisDimension =
-          (UA_NumericRangeDimension){.min = 0, .max = (unsigned)bvector.size()-1};
-      arrayRange.dimensions = &scalarThisDimension;
-      rv = UA_Variant_setRangeCopy(v, (UA_Boolean*)barr, bvector.size(), arrayRange);
-      v->arrayDimensionsSize = 1;
-      UA_UInt32* arrayDims = UA_UInt32_new();
-      *arrayDims = bvector.size();
-      v->arrayDimensions = arrayDims;
       delete[] barr;
     }
   }
@@ -1187,10 +1041,11 @@ UA_StatusCode ua_processvariable::setValue_bool(const UA_Variant* data) {
 UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   UA_StatusCode retval = UA_STATUSCODE_GOOD;
   UA_NodeId createdNodeId = UA_NODEID_NULL;
-  if(!nodeStringIdOverwrite.empty()) this->nameNew = nodeStringIdOverwrite;
+  if(!nodeStringIdOverwrite.empty())
+    this->nameNew = nodeStringIdOverwrite;
 
-  if(UA_NodeId_equal(&this->baseNodeId, &createdNodeId) == UA_TRUE)
-    return 0; // Something went UA_WRONG (initializer should have set this!)
+  if(UA_NodeId_equal(&this->baseNodeId, &createdNodeId))
+    return UA_STATUSCODE_GOOD; // initializer should have set this!
 
   UA_LocalizedText description;
   description = UA_LOCALIZEDTEXT(
@@ -1200,7 +1055,6 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   UA_VariableAttributes attr;
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
-
   // Allow negative sampling intervals -> used by Labview and handled by open62541-interface 1.3.3.-2
   attr.minimumSamplingInterval = -1.;
   attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->nameNew.c_str());
@@ -1208,8 +1062,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
 
   if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-    attr.userWriteMask = UA_ACCESSLEVELMASK_WRITE;
-    attr.writeMask = UA_ACCESSLEVELMASK_WRITE;
+    attr.writeMask = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE;
+    attr.accessLevel = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE;
   }
 
   //Append the app and application folder names to the string nodeId, this is needed
@@ -1233,401 +1087,160 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   UA_Server_addVariableNode(this->mappedServer,
                             UA_NODEID_STRING(1, (char*)(baseNodeIdName + "/" + this->nameNew).c_str()),
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                            UA_QUALIFIEDNAME(1, (char*)this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, (void*)this,
+                            UA_QUALIFIEDNAME(1, (char*)this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, (void*) this,
                             &createdNodeId);
   UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
   ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, 1001), &this->ownedNodes);
 
-  this->addPVChildNodes(createdNodeId, baseNodeIdName);
+
+  /* Use a datasource map to map any local getter/setter functions to OPC UA variables nodes */
+  UA_DataSource_Map mapDs;
+  this->addPVChildNodes(createdNodeId, baseNodeIdName, mapDs);
 
   UA_Variant arrayDimensions;
   UA_Variant_init(&arrayDimensions);
-  /* Use a datasource map to map any local getter/setter functions to opcua variables nodes */
-  UA_DataSource_Map mapDs;
+
   std::type_info const& valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
+
+  UA_DataSource_Map_Element mapElem;
+  mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
+  mapElem.description = description;
+  //Read is possible for all elements
+  mapElem.dataSource.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
+  UA_Variant uaArrayDimensions;
+  UA_UInt32 arrayDims[1];
+
   if(valueType == typeid(int8_t)) {
     type = UA_PV_INT8;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<int8_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_BYTE].typeId);
   }
   else if(valueType == typeid(uint8_t)) {
     type = UA_PV_UINT8;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<uint8_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_SBYTE].typeId);
   }
   else if(valueType == typeid(int16_t)) {
     type = UA_PV_INT16;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<int16_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_INT16].typeId);
   }
   else if(valueType == typeid(uint16_t)) {
     type = UA_PV_UINT16;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<uint16_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_UINT16].typeId);
   }
   else if(valueType == typeid(int32_t)) {
     type = UA_PV_INT32;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<int32_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_INT32].typeId);
   }
   else if(valueType == typeid(uint32_t)) {
     type = UA_PV_UINT32;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<uint32_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_UINT32].typeId);
   }
   else if(valueType == typeid(int64_t)) {
     type = UA_PV_INT64;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<int64_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_INT64].typeId);
   }
   else if(valueType == typeid(uint64_t)) {
     type = UA_PV_UINT64;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<uint64_t>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_UINT64].typeId);
   }
   else if(valueType == typeid(float)) {
     type = UA_PV_FLOAT;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<float>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_FLOAT].typeId);
   }
   else if(valueType == typeid(double)) {
     type = UA_PV_DOUBLE;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<double>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_DOUBLE].typeId);
   }
   else if(valueType == typeid(string)) {
     type = UA_PV_STRING;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_STRING].typeId);
   }
   else if(valueType == typeid(Boolean)) {
     type = UA_PV_BOOL;
-    UA_DataSource_Map_Element mapElem;
-    mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-    mapElem.description = description;
-    mapElem.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue;
     if(this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size() == 1) {
       this->array = false;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
     }
     else {
       this->array = true;
-      if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-        mapElem.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
-      }
-      else {
-        mapElem.write = NULL;
-      }
-      UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
-      UA_Variant uaArrayDimensions;
-      UA_UInt32 arrayDims[1];
       arrayDims[0] = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0).size();
-      UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
-      UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
     }
-    mapDs.push_back(mapElem);
+    UA_Server_writeDataType(this->mappedServer, createdNodeId, UA_TYPES[UA_TYPES_BOOLEAN].typeId);
   }
   else {
     int status;
@@ -1643,69 +1256,54 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     std::cout << " for variable " << this->namePV << std::endl;
   }
 
+  if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
+    mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
+  } else {
+    mapElem.dataSource.write = NULL;
+  }
+  if(this->array){
+    UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
+    UA_Variant_setArray(&uaArrayDimensions, arrayDims, 1, &UA_TYPES[UA_TYPES_UINT32]);
+    UA_Server_writeArrayDimensions(this->mappedServer, createdNodeId, uaArrayDimensions);
+  } else {
+    UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_SCALAR);
+  }
+
+  //add variable data source map element to the list
+  UA_NodeId_copy(&createdNodeId, &mapElem.concreteNodeId);
+  mapDs.push_back(mapElem);
+
   UA_NodeId nodeIdVariableType = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
   NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, createdNodeId);
 
-  // Name
-  UA_DataSource_Map_Element mapElemName;
-  mapElemName.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
-  mapElemName.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
-  mapElemName.read = ua_readproxy_ua_processvariable_getName;
-  mapElemName.write = NULL;
-  mapDs.push_back(mapElemName);
+  for(auto i: mapDs){
+    UA_StatusCode result = UA_Server_setVariableNode_dataSource(this->mappedServer, i.concreteNodeId, i.dataSource);
+  }
 
-  // Description
-  UA_DataSource_Map_Element mapElemDesc;
-  mapElemDesc.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
-  mapElemDesc.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
-  mapElemDesc.read = ua_readproxy_ua_processvariable_getDescription;
-  mapElemDesc.write = NULL;
-  mapDs.push_back(mapElemDesc);
-
-  // EngineeringUnit
-  UA_DataSource_Map_Element mapElemEU;
-  mapElemEU.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
-  mapElemEU.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
-  mapElemEU.read = ua_readproxy_ua_processvariable_getEngineeringUnit;
-  mapElemEU.write = NULL;
-  mapDs.push_back(mapElemEU);
-
-  // Type
-  UA_DataSource_Map_Element mapElemType;
-  mapElemType.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
-  mapElemType.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
-  mapElemType.read = ua_readproxy_ua_processvariable_getType;
-  mapElemType.write = NULL;
-  mapDs.push_back(mapElemType);
-
-  // Validity
-  UA_DataSource_Map_Element mapElemValidity;
-  mapElemValidity.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
-  mapElemValidity.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
-  mapElemValidity.read = ua_readproxy_ua_processvariable_getValidity;
-  mapElemValidity.write = NULL;
-  mapDs.push_back(mapElemValidity);
-
-  this->ua_mapDataSources((void*)this, &mapDs);
+  //this->ua_mapDataSources((void*)this, &mapDs);
 
   UA_NodeId_clear(&createdNodeId);
-
   return UA_STATUSCODE_GOOD;
 }
 
-UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string baseNodePath) {
+UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string baseNodePath, UA_DataSource_Map &map) {
   UA_NodeId createdNodeId = UA_NODEID_NULL;
   UA_VariableAttributes attr;
   UA_StatusCode addResult;
 
-  //Adding the Name node to the PV
+  // Adding the 'name' node to the PV
+  UA_DataSource_Map_Element mapElemName;
+  mapElemName.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
+  mapElemName.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+  mapElemName.dataSource.read = ua_readproxy_ua_processvariable_getName;
+  mapElemName.dataSource.write = NULL;
+
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
-  attr.displayName = UA_LOCALIZEDTEXT((char*)"", (char*)"Name");
-  attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
-  attr.accessLevel = 3;
-  attr.userAccessLevel = 3;
-  attr.valueRank = -1;
+  attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Name");
+  attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+  attr.valueRank = UA_VALUERANK_SCALAR;
+  attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
   UA_String opcua_node_variable_t_ns_2_i_6004_variant_DataContents = UA_STRING_ALLOC((char*)"");
   UA_Variant_setScalar(
       &attr.value, &opcua_node_variable_t_ns_2_i_6004_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
@@ -1716,6 +1314,8 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId nameVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
     NODE_PAIR_PUSH(this->ownedNodes, nameVariable, createdNodeId);
+    UA_NodeId_copy(&createdNodeId, &mapElemName.concreteNodeId);
+    map.push_back(mapElemName);
   }
   else
     return addResult;
@@ -1723,14 +1323,21 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   UA_NodeId_clear(&createdNodeId);
   createdNodeId = UA_NODEID_NULL;
 
-  //Adding the Description node to the PV
+  //Adding the 'Description' node to the PV
+  UA_DataSource_Map_Element mapElemDesc;
+  mapElemDesc.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
+  mapElemDesc.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+  mapElemDesc.dataSource.read = ua_readproxy_ua_processvariable_getDescription;
+  mapElemDesc.dataSource.write = NULL;
+
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
-  attr.displayName = UA_LOCALIZEDTEXT((char*)"", (char*)"Description");
-  attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
-  attr.accessLevel = 3;
-  attr.userAccessLevel = 3;
-  attr.valueRank = -1;
+  attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Description");
+  attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+  attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
+  attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
+  attr.valueRank = UA_VALUERANK_SCALAR;
+  attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
   UA_String opcua_node_variable_t_ns_2_i_6001_variant_DataContents = UA_STRING((char*)"");
   UA_Variant_setScalar(
       &attr.value, &opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
@@ -1741,6 +1348,8 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId descVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
     NODE_PAIR_PUSH(this->ownedNodes, descVariable, createdNodeId);
+    UA_NodeId_copy(&createdNodeId, &mapElemDesc.concreteNodeId);
+    map.push_back(mapElemDesc);
   }
   else
     return addResult;
@@ -1748,14 +1357,22 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   UA_NodeId_clear(&createdNodeId);
   createdNodeId = UA_NODEID_NULL;
 
-  //Adding the EngineeringUnit node to the PV
+  //Adding the 'EngineeringUnit' node to the PV
+  UA_DataSource_Map_Element mapElemEU;
+  mapElemEU.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
+  mapElemEU.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+  mapElemEU.dataSource.read = ua_readproxy_ua_processvariable_getEngineeringUnit;
+  mapElemEU.dataSource.write = NULL;
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
   attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"EngineeringUnit");
-  attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
-  attr.accessLevel = 3;
-  attr.userAccessLevel = 3;
-  attr.valueRank = -1;
+  attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+  attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
+  attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
+  attr.valueRank = UA_VALUERANK_SCALAR;
+  attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
+  UA_String defaultEngineeringUnit = UA_STRING((char*)"");
+  UA_Variant_setScalar(&attr.value, &defaultEngineeringUnit, &UA_TYPES[UA_TYPES_STRING]);
   addResult = UA_Server_addVariableNode(this->mappedServer,
                                         UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/EngineeringUnit").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"EngineeringUnit"), UA_NODEID_NUMERIC(0, 63), attr, this,
@@ -1763,6 +1380,8 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId engineeringunitVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
     NODE_PAIR_PUSH(this->ownedNodes, engineeringunitVariable, createdNodeId);
+    UA_NodeId_copy(&createdNodeId, &mapElemEU.concreteNodeId);
+    map.push_back(mapElemEU);
   }
   else
     return addResult;
@@ -1770,14 +1389,20 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   UA_NodeId_clear(&createdNodeId);
   createdNodeId = UA_NODEID_NULL;
 
-  //Adding the Type node to the PV
+  //Adding the 'Type' node to the PV
+  UA_DataSource_Map_Element mapElemType;
+  mapElemType.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
+  mapElemType.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+  mapElemType.dataSource.read = ua_readproxy_ua_processvariable_getType;
+  mapElemType.dataSource.write = NULL;
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
-  attr.displayName = UA_LOCALIZEDTEXT((char*)"", (char*)"Type");
-  attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
-  attr.accessLevel = 3;
-  attr.userAccessLevel = 3;
-  attr.valueRank = -1;
+  attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Type");
+  attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+  attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
+  attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
+  attr.valueRank = UA_VALUERANK_SCALAR;
+  attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
   UA_String opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING((char*)"");
   UA_Variant_setScalar(
       &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
@@ -1791,6 +1416,8 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId typeVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
     NODE_PAIR_PUSH(this->ownedNodes, typeVariable, createdNodeId);
+    UA_NodeId_copy(&createdNodeId, &mapElemType.concreteNodeId);
+    map.push_back(mapElemType);
   }
   else
     return addResult;
@@ -1799,13 +1426,21 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   createdNodeId = UA_NODEID_NULL;
 
   //Adding the Validity node to the PV
+  UA_DataSource_Map_Element mapElemValidity;
+  mapElemValidity.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
+  mapElemValidity.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+  mapElemValidity.dataSource.read = ua_readproxy_ua_processvariable_getValidity;
+  mapElemValidity.dataSource.write = NULL;
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
   attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Validity");
-  attr.description = UA_LOCALIZEDTEXT((char*)"", (char*)"");
-  attr.accessLevel = 3;
-  attr.userAccessLevel = 3;
-  attr.valueRank = -1;
+  attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+  attr.accessLevel = UA_ACCESSLEVELMASK_READ ;
+  attr.userAccessLevel = UA_ACCESSLEVELMASK_READ ;
+  attr.valueRank = UA_VALUERANK_SCALAR;
+  attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
+  UA_Int32 defaultValidity = -1;
+  UA_Variant_setScalar(&attr.value, &defaultValidity, &UA_TYPES[UA_TYPES_INT32]);
   addResult = UA_Server_addVariableNode(this->mappedServer,
                                         UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Validity").c_str()), pvNodeId,
                                         UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"Validity"), UA_NODEID_NUMERIC(0, 63), attr, this,
@@ -1813,6 +1448,8 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId vadilityVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
     NODE_PAIR_PUSH(this->ownedNodes, vadilityVariable, createdNodeId);
+    UA_NodeId_copy(&createdNodeId, &mapElemValidity.concreteNodeId);
+    map.push_back(mapElemValidity);
   }
   else
     return addResult;

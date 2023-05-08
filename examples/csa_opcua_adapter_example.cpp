@@ -20,9 +20,10 @@
  */
 
 extern "C" {
-#include <unistd.h>
+#include "csa_namespace.h"
+
 #include <signal.h>
-#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
+#include <unistd.h>
 }
 
 #include <iostream>

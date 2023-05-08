@@ -21,14 +21,13 @@
 #ifndef CSA_OPCUA_ADAPTER_H
 #define CSA_OPCUA_ADAPTER_H
 
-#include <vector>
-#include <thread>
-
-#include "ua_adapter.h"
-#include "ua_processvariable.h"
-
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
+#include "csa_processvariable.h"
+#include "ua_adapter.h"
+
+#include <thread>
+#include <vector>
 
 /** @class csa_opcua_adapter
  *	@brief This class provide the two parts of the OPCUA Adapter. 

@@ -7,8 +7,8 @@
 #include "ChimeraTK/ControlSystemAdapter/ProcessArray.h"
 
 extern "C" {
+#include "csa_namespace.h"
 #include "unistd.h"
-#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
 
 #include <open62541/server_config_default.h>
@@ -107,7 +107,7 @@ struct TestFixtureServerSet {
     runUAServer = UA_TRUE;
     baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
 
-    csa_namespaceinit_generated(mappedServer);
+    csa_namespace_init(mappedServer);
   }
 };
 
