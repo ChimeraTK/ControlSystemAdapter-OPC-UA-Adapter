@@ -22,18 +22,16 @@
 # into the project-template repository immediately.
 #
 #######################################################################################################################
-CMAKE_SOURCE_DIR=$1
-PROJECT_BINARY_DIR=$2
 
-if [ -d $PROJECT_BINARY_DIR/runtime_analysis ]; then
-  rm -R $PROJECT_BINARY_DIR/runtime_analysis
+if [ -d @PROJECT_BINARY_DIR@/runtime_analysis ]; then
+  rm -R @PROJECT_BINARY_DIR@/runtime_analysis
 fi
 
-mkdir $PROJECT_BINARY_DIR/runtime_analysis
+mkdir @PROJECT_BINARY_DIR@/runtime_analysis
 
 cd ./tests/
 
-for file in $PROJECT_BINARY_DIR/tests/test_* ; do 
+for file in @PROJECT_BINARY_DIR@/tests/test_* ; do 
 	echo "Starte valgrind for: $file"
-	valgrind -v --track-origins=yes --leak-resolution=high --log-file=$PROJECT_BINARY_DIR/runtime_analysis/valgrind_$(basename $file).log $file
+	valgrind -v --track-origins=yes --leak-resolution=high --log-file=@PROJECT_BINARY_DIR@/runtime_analysis/valgrind_$(basename $file).log $file
 done
