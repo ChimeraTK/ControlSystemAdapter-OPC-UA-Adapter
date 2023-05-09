@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 3.16)
 ## Project specification
 ##########################################################################################################
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
-
 SET(${PROJECT_NAME}_MAJOR_VERSION 03)
 SET(${PROJECT_NAME}_MINOR_VERSION 02)
 SET(${PROJECT_NAME}_PATCH_VERSION 00)
@@ -28,26 +27,7 @@ find_package(ChimeraTK-ControlSystemAdapter 02.06 REQUIRED)
 ## Force it into Release if "None" is specified (needed to overrule dkpg_buildpackage)
 ##########################################################################################################
 
-if(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "None")
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-            "Choose the type of build, options are: Debug Release RelWithDebInfo tsan asan"
-            FORCE
-            )
-endif(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "None")
-
-##########################################################################################################
-## Copy mapping.xml into build folder
-##########################################################################################################
-if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
-    message("Copy mapping files into build folder.")
-    file(GLOB mappingFiles "${CMAKE_SOURCE_DIR}/*_mapping.xml")
-    foreach(mappingFile ${mappingFiles})
-        file(COPY ${mappingFile} DESTINATION ${CMAKE_BINARY_DIR}/)
-        message("Copy ${mappingFile}")
-    endforeach(mappingFile)
-
-    file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
-endif()
+include(cmake/set_default_build_to_release.cmake)
 
 ##########################################################################################################
 ## Compiler specific stuff
@@ -67,8 +47,6 @@ endif()
 ## Includes, Link dirs und Quellcode
 ##########################################################################################################
 
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/examples/)
 include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR})
@@ -84,7 +62,7 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_additionalvariable.cpp
         ${CMAKE_SOURCE_DIR}/src/ua_adapter.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_opcua_application.cpp
-        ${CMAKE_SOURCE_DIR}/src/csa_namespace.c
+        #${CMAKE_SOURCE_DIR}/src/csa_namespace.c -> see comment in the Object building section
         )
 
 # Create the target directory for model initializers, open62541 and ControlSystemAdapter libraries/headers
@@ -96,36 +74,17 @@ include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 ##########################################################################################################
 
 ## Code quality control options
-option(ENABLE_COVERAGE        "Enable coverage stats and tests for adapter build" OFF)
 option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static code analysis using clangs analyzer." OFF)
 option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prior to compilation." OFF)
 option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
 option(ENABLE_RUNTIME_ANALYSIS "Build Runtime analyses" OFF)
+option(INSTALL_SAMPLE_ADAPTER "Install an example application called ControlSystem-OPCUA_Sample_Adapter" OFF)
+# TODO: As soon if the test passes enable it per default. 
+#       If removing the option add info in csa_opcua_application.cpp doxygen docu.
+option(CHECK_CTK_STYLE        "Check ChimeraTK code style and license information." OFF)
 
-if(ENABLE_COVERAGE)
-    set(CMAKE_BUILD_TYPE DEBUG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
-
-    file(COPY ${PROJECT_SOURCE_DIR}/cmake/make_coverage.sh.in DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    add_custom_target(coverage
-            ${CMAKE_CURRENT_BINARY_DIR}/make_coverage.sh.in ${CMAKE_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            # Bad soulution to provide all depencys
-            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_adapter
-            #DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_application
-            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
-            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
-            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
-            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_uaadapter
-            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_xml_handler
-            COMMENT "Generating test coverage documentation" VERBATIM
-            )
-
-endif()
+include(cmake/enable_code_coverage_report.cmake)
 
 ##########################################################################################################
 ## Definition for compiler for static analysis
@@ -141,8 +100,8 @@ endif()
 ##########################################################################################################
 # We need spearate configuration types becasue flags from other types are conflicting
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;asan;tsan")
-set(CMAKE_CXX_FLAGS_TSAN "${CMAKE_CXX_FLAGS} -g -O1 -fsanitize=thread")
-set(CMAKE_C_FLAGS_TSAN "${CMAKE_C_FLAGS} -g -O1 -fsanitize=thread")
+set(CMAKE_CXX_FLAGS_TSAN "${CMAKE_CXX_FLAGS} -g -O1 -fsanitize=thread  -fno-inline")
+set(CMAKE_C_FLAGS_TSAN "${CMAKE_C_FLAGS} -g -O1 -fsanitize=thread  -fno-inline")
 
 set(CMAKE_CXX_FLAGS_ASAN "${CMAKE_CXX_FLAGS} -g -O0 -fsanitize=address -fsanitize=undefined -fsanitize=leak")
 set(CMAKE_C_FLAGS_ASAN "${CMAKE_C_FLAGS} -g -O0 -fsanitize=address -fsanitize=undefined -fsanitize=leak")
@@ -159,14 +118,12 @@ if(ENABLE_UNIT_TESTS)
 endif()
 
 if(ENABLE_RUNTIME_ANALYSIS)
-    file(COPY ${PROJECT_SOURCE_DIR}/cmake/make_valgrind.sh.in DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    add_custom_target(valgrind ALL
-            ${CMAKE_CURRENT_BINARY_DIR}/make_valgrind.sh.in ${CMAKE_SOURCE_DIR} ${PROJECT_BINARY_DIR}
+    configure_file(cmake/make_valgrind.sh.in ${CMAKE_CURRENT_BINARY_DIR}/make_valgrind.sh @ONLY)
+    add_custom_target(valgrind
+            ./make_valgrind.sh 
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            # Bad soulution to provide all depencys
+            # Bad solution to provide all dependencies
             DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_adapter
-            #DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_csa_opcua_application
-            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_ipc
             DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_processvariable
             DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_additionalvariable
             DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/test_opcua_uaadapter
@@ -175,19 +132,7 @@ if(ENABLE_RUNTIME_ANALYSIS)
             )
 endif()
 
-if(ENABLE_DOCUMENTATION)
-    find_package(Doxygen)
-    if(DOXYGEN_FOUND)
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-        add_custom_target(doc ALL
-                ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc/
-                COMMENT "Generating API documentation with Doxygen" VERBATIM
-                )
-    else(DOXYGEN_FOUND)
-        message("Doxygen not found, documentation will not be build.")
-    endif(DOXYGEN_FOUND)
-endif()
+include(cmake/enable_doxygen_documentation.cmake)
 
 ##########################################################################################################
 ## Object and shared library compilation required by tests and examples
@@ -204,9 +149,14 @@ add_library(mtca_objects OBJECT ${objectSources})
 target_link_libraries(mtca_objects PUBLIC open62541::open62541)
 target_link_libraries(mtca_objects PUBLIC ChimeraTK::ChimeraTK-ControlSystemAdapter)
 
+# ChimeraTK::ChimeraTK-ControlSystemAdapter exports the flag c++-17 with INTERFACE_COMPILE_OPTIONS. 
+# This causes a problem with clang c compilation.
+add_library(mtca_c_objetcs OBJECT ${CMAKE_SOURCE_DIR}/src/csa_namespace.c)
+target_link_libraries(mtca_c_objetcs PUBLIC open62541::open62541)
+
 ## Early declaration due to the requirement to run the dependencies update prior to building
 ## Create shared lib
-add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects>)
+add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects> $<TARGET_OBJECTS:mtca_c_objetcs>)
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_FULL_LIBRARY_VERSION}
         SOVERSION ${${PROJECT_NAME}_SOVERSION})
 target_link_libraries(${PROJECT_NAME} PUBLIC ChimeraTK::ChimeraTK-ControlSystemAdapter)
@@ -221,11 +171,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         ${Boost_CHRONO_LIBRARY}
         )
 
-#set_source_files_properties(${CMAKE_SOURCE_DIR}/src/open62541.c PROPERTIES COMPILE_FLAGS -w)
-
 # do not remove runtime path of the library when installing
 set_property(TARGET ${PROJECT_NAME} PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
-
 ##########################################################################################################
 ## Install all Libraries
 ##########################################################################################################
@@ -235,12 +182,14 @@ include(GNUInstallDirs)
 install( TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")    
 
 ##########################################################################################################
 ##  Tests and executables
 ##########################################################################################################
 
 link_directories(${CMAKE_BINARY_DIR})
+file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
 
 add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
 target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
@@ -264,8 +213,6 @@ target_link_libraries(ControlSystem-OPCUA_Sample_Application
         ${Boost_CHRONO_LIBRARY}
         )
 
-file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
-
 if(ENABLE_LINTING)
     file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/static_analysis")
     add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
@@ -274,10 +221,15 @@ if(ENABLE_LINTING)
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMENT "Running CppCheck on all CPP Sources" VERBATIM)
 endif()
-## Ends binary ControlSystem-OPCUA_Sample_Adapter
 
-install(TARGETS ControlSystem-OPCUA_Sample_Adapter RUNTIME DESTINATION bin)
+if(CHECK_CTK_STYLE)
+  include(cmake/enable_code_style_check.cmake)
+endif(CHECK_CTK_STYLE)
 
+if(INSTALL_SAMPLE_ADAPTER)
+  install(TARGETS ControlSystem-OPCUA_Sample_Adapter RUNTIME DESTINATION bin)
+  file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)  
+endif(INSTALL_SAMPLE_ADAPTER)
 ##########################################################################################################
 ## Create the config files by filling the correct variables into the template (*.cmake.in).
 ## All variables @VARIABLE@ are replaced with the current values, but they have to be set first....
