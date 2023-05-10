@@ -44,7 +44,7 @@ class ua_additionalvariable : ua_mapped_class {
   *
   * @return <UA_NodeId> of this processvariable
   */
-  UA_NodeId ownNodeId;
+  UA_NodeId ownNodeId{};
 
   /** @brief  This methode mapped all own nodes into the opcua server
   *
