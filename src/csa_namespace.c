@@ -38,8 +38,7 @@ static UA_StatusCode csa_namespace_add_additional_variable(UA_Server *server){
 //ToDo move node add logic to seperated functions, use macros for node-id's
 
 UA_INLINE UA_StatusCode csa_namespace_init(UA_Server *server) {
-UA_StatusCode retval = UA_STATUSCODE_GOOD; 
-if(retval == UA_STATUSCODE_GOOD){retval = UA_STATUSCODE_GOOD;} //ensure that retval is used
+UA_StatusCode retval = UA_STATUSCODE_GOOD;
 if (UA_Server_addNamespace(server, "http://adapterIM/") != 2)
     return UA_STATUSCODE_BADUNEXPECTEDERROR;
 
@@ -203,6 +202,6 @@ UA_Server_deleteReference(server, nodeId, UA_NODEID_NUMERIC(0, 40), true, UA_EXP
 UA_Server_addReference(server, UA_NODEID_NUMERIC(2, 6012), UA_NODEID_NUMERIC(0, 40), UA_EXPANDEDNODEID_NUMERIC(0, 63), true);
 } while(0);
 
-return UA_STATUSCODE_GOOD;
+return retval;
 }
 

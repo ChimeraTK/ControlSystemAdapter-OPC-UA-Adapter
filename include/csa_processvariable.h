@@ -64,7 +64,7 @@ class ua_processvariable : ua_mapped_class {
   bool array;
 
   boost::shared_ptr<ControlSystemPVManager> csManager;
-  UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, string baseNodePath, UA_DataSource_Map & map);
+  UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, const string& baseNodePath, UA_DataSource_Map & map);
 
   /** @brief  This methode mapped all own nodes into the opcua server
   *
@@ -80,7 +80,7 @@ class ua_processvariable : ua_mapped_class {
   * @param namePV Name of the process variable from control-system-adapter, is needed to fetch the rigth process varibale from PV-Manager
   * @param csManager Provide the hole PVManager from control-system-adapter to map all processvariable to the OPC UA-Model
   */
-  ua_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV,
+  ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
                      boost::shared_ptr<ControlSystemPVManager> csManager, std::string overwriteNodeString = "");
 
   /** @brief Destructor for ua_processvariable

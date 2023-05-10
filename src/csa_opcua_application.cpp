@@ -81,7 +81,7 @@ int main() {
   sigset_t intmask;
   sigemptyset(&intmask);
   sigaddset(&intmask, SIGINT);
-  sigprocmask(SIG_BLOCK, &intmask, NULL);
+  sigprocmask(SIG_BLOCK, &intmask, nullptr);
 
   cout << "Create the Managers" << endl;
   std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager>> pvManagers =
@@ -108,7 +108,7 @@ int main() {
   csaOPCUA->start();
 
   /* Unblock SIGINT */
-  sigprocmask(SIG_UNBLOCK, &intmask, NULL);
+  sigprocmask(SIG_UNBLOCK, &intmask, nullptr);
 
   while(!terminateMain) sleep(3600); // sleep will be interrupted when signal is received
   csManager.reset();

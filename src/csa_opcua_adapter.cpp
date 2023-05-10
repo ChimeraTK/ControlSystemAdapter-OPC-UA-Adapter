@@ -27,19 +27,20 @@ extern "C" {
 #include "ua_adapter.h"
 
 #include <iostream>
+#include <utility>
 
 csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
-  this->csManager = csManager;
+  this->csManager = std::move(csManager);
 
   // Create new server adapter
-  this->adapter = new ua_uaadapter(configFile);
+  this->adapter = new ua_uaadapter(std::move(configFile));
 
   // Initialize the process variables
   // This internally starts the managed threads in the mgr...
   vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
 
   //start implicit var mapping
-  for(ProcessVariable::SharedPtr oneProcessVariable : allProcessVariables) {
+  for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables) {
     //adapter->addVariable(oneProcessVariable->getName(), this->csManager);
     adapter->implicitVarMapping(oneProcessVariable->getName(), this->csManager);
   }
@@ -49,7 +50,7 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
   vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
   if(!allNotMappedVariables.empty()) {
     cout << "The following VariableNodes cant be mapped, because they are not member in PV-Manager:" << endl;
-    for(string var : allNotMappedVariables) {
+    for(const string& var : allNotMappedVariables) {
       cout << var << endl;
     }
   }

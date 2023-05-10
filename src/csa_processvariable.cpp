@@ -29,16 +29,17 @@ extern "C" {
 #include "ua_proxies.h"
 
 #include <iostream>
+#include <utility>
 #include <vector>
 
-ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, string namePV,
+ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
                                        boost::shared_ptr<ControlSystemPVManager> csManager, string overwriteNodeString)
     : ua_mapped_class(server, basenodeid) {
   // FIXME Check if name member of a csManager Parameter
   this->namePV = namePV;
   this->nameNew = namePV;
-  this->csManager = csManager;
-  this->nodeStringIdOverwrite = overwriteNodeString;
+  this->csManager = std::move(csManager);
+  this->nodeStringIdOverwrite = std::move(overwriteNodeString);
   this->type = UA_PV_UNKNOWN;
   this->array = false;
 
@@ -53,7 +54,7 @@ ua_processvariable::~ua_processvariable() {
 UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getName(UA_Server* server, const UA_NodeId* sessionId,
                                                                           void* sessionContext, const UA_NodeId* nodeId, void* nodeContext, UA_Boolean includeSourceTimeStamp,
                                                                           const UA_NumericRange* range, UA_DataValue* value) {
-  ua_processvariable* thisObj = static_cast<ua_processvariable*>(nodeContext);
+  auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
   UA_String ua_val;
   char* s = (char*)malloc(thisObj->getName().length() + 1);
   strncpy(s, (char*)thisObj->getName().c_str(), thisObj->getName().length());
@@ -79,7 +80,7 @@ string ua_processvariable::getName() {
 UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setEngineeringUnit(UA_Server* server,
                                                                                       const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
                                                                                       const UA_NumericRange* range, const UA_DataValue* value) {
-  ua_processvariable* theClass = static_cast<ua_processvariable*>(nodeContext);
+  auto* theClass = static_cast<ua_processvariable*>(nodeContext);
   std::string cpps;
   char* s;
   s = (char*)malloc(((UA_String) * ((UA_String*)value->value.data)).length + 1);
@@ -93,13 +94,13 @@ UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setEngineerin
 }
 
 void ua_processvariable::setEngineeringUnit(string engineeringUnit) {
-  this->engineeringUnit = engineeringUnit;
+  this->engineeringUnit = std::move(engineeringUnit);
 }
 
 UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getEngineeringUnit(UA_Server* server,
                                                                                      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
                                                                                      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
-  ua_processvariable* thisObj = static_cast<ua_processvariable*>(nodeContext);
+  auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
   UA_String ua_val;
   char* s = (char*)malloc(thisObj->getEngineeringUnit().length() + 1);
   strncpy(s, (char*)thisObj->getEngineeringUnit().c_str(), thisObj->getEngineeringUnit().length());
@@ -126,14 +127,13 @@ string ua_processvariable::getEngineeringUnit() {
     this->engineeringUnit = this->csManager->getProcessVariable(this->namePV)->getUnit();
     return this->engineeringUnit;
   }
-  return this->csManager->getProcessVariable(this->namePV)->getUnit();
 }
 
 // Description
 UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setDescription(UA_Server* server,
                                                                                   const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
                                                                                   const UA_NumericRange* range, const UA_DataValue* value) {
-  ua_processvariable* theClass = static_cast<ua_processvariable*>(nodeContext);
+  auto* theClass = static_cast<ua_processvariable*>(nodeContext);
   std::string cpps;
   char* s;
   s = (char*)malloc(((UA_String) * ((UA_String*)value->value.data)).length + 1);
@@ -147,13 +147,13 @@ UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setDescriptio
 }
 
 void ua_processvariable::setDescription(string description) {
-  this->description = description;
+  this->description = std::move(description);
 }
 
 UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getDescription(UA_Server* server,
                                                                                  const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
                                                                                  UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
-  ua_processvariable* thisObj = static_cast<ua_processvariable*>(nodeContext);
+  auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
   UA_String ua_val;
   char* s = (char*)malloc(thisObj->getDescription().length() + 1);
   strncpy(s, (char*)thisObj->getDescription().c_str(), thisObj->getDescription().length());
@@ -174,7 +174,7 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getDescription
 UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValidity(UA_Server* server,
                                                                               const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
                                                                               UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
-  ua_processvariable* thisObj = static_cast<ua_processvariable*>(nodeContext);
+  auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
   DataValidity dv = thisObj->csManager->getProcessVariable(thisObj->namePV)->dataValidity();
   UA_Int32 validity;
   switch(dv) {
@@ -204,14 +204,13 @@ string ua_processvariable::getDescription() {
     this->description = this->csManager->getProcessVariable(this->namePV)->getDescription();
     return this->description;
   }
-  return this->csManager->getProcessVariable(this->namePV)->getDescription();
 }
 
 // Type
 UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getType(UA_Server* server, const UA_NodeId* sessionId,
                                                                           void* sessionContext, const UA_NodeId* nodeId, void* nodeContext, UA_Boolean includeSourceTimeStamp,
                                                                           const UA_NumericRange* range, UA_DataValue* value) {
-  ua_processvariable* thisObj = static_cast<ua_processvariable*>(nodeContext);
+  auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
   UA_String ua_val;
   char* s = (char*)malloc(thisObj->getType().length() + 1);
   strncpy(s, (char*)thisObj->getType().c_str(), thisObj->getType().length());
@@ -263,8 +262,8 @@ string ua_processvariable::getType() {
 UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(UA_Server* server,
                                                                            const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
                                                                            UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
-  ua_processvariable* thisObj = static_cast<ua_processvariable*>(nodeContext);
-  UA_StatusCode rv;
+  auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
+  UA_StatusCode rv = UA_STATUSCODE_GOOD;
   switch(thisObj->type) {
     case UA_PV_INT8:
       rv = thisObj->getValue_int8(&value->value);
@@ -536,7 +535,7 @@ UA_StatusCode ua_processvariable::getValue_string(UA_Variant* v) {
       UA_String_clear(&ua_val);
     } else {
       std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
-      UA_String* sarrayval = new UA_String[sarr.size()];
+      auto* sarrayval = new UA_String[sarr.size()];
       for(size_t i = 0; i < sarr.size(); i++) {
         sarrayval[i] = CPPSTRING_TO_UASTRING(sarr[i]);
       }
@@ -561,8 +560,7 @@ UA_StatusCode ua_processvariable::getValue_bool(UA_Variant* v) {
       rv = UA_Variant_setScalarCopy(v, &bval, &UA_TYPES[UA_TYPES_BOOLEAN]);
     } else {
       std::vector<Boolean> bvector = this->csManager->getProcessArray<Boolean>(this->namePV)->accessChannel(0);
-      // Da vector<bool> kein Array liefert, müssen die Daten umkopiert werden
-      Boolean* barr = new Boolean[bvector.size()];
+      auto* barr = new Boolean[bvector.size()];
       for(size_t i = 0; i < bvector.size(); i++) {
         barr[i] = bvector[i];
       }
@@ -577,7 +575,7 @@ UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setValue(UA_S
                                                                             const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
                                                                             const UA_NumericRange* range, const UA_DataValue* value) {
   UA_StatusCode retval = UA_STATUSCODE_BADINTERNALERROR;
-  ua_processvariable* theClass = static_cast<ua_processvariable*>(nodeContext);
+  auto* theClass = static_cast<ua_processvariable*>(nodeContext);
   switch(theClass->type) {
     case UA_PV_INT8:
       retval = theClass->setValue_int8(&value->value);
@@ -646,7 +644,7 @@ UA_StatusCode ua_processvariable::setValue_int8(const UA_Variant* data) {
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        int8_t* v = (int8_t*)data->data;
+        auto* v = (int8_t*)data->data;
         valueArray.resize(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
           valueArray.at(i) = v[i];
@@ -679,7 +677,7 @@ UA_StatusCode ua_processvariable::setValue_uint8(const UA_Variant* data) {
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        uint8_t* v = (uint8_t*)data->data;
+        auto* v = (uint8_t*)data->data;
         valueArray.resize(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
           valueArray.at(i) = v[i];
@@ -712,7 +710,7 @@ UA_StatusCode ua_processvariable::setValue_int16(const UA_Variant* data) {
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        int16_t* v = (int16_t*)data->data;
+        auto* v = (int16_t*)data->data;
         valueArray.resize(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
           valueArray.at(i) = v[i];
@@ -745,7 +743,7 @@ UA_StatusCode ua_processvariable::setValue_uint16(const UA_Variant* data) {
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        uint16_t* v = (uint16_t*)data->data;
+        auto* v = (uint16_t*)data->data;
         valueArray.resize(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
           valueArray.at(i) = v[i];
@@ -778,7 +776,7 @@ UA_StatusCode ua_processvariable::setValue_int32(const UA_Variant* data) {
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        int32_t* v = (int32_t*)data->data;
+        auto* v = (int32_t*)data->data;
         valueArray.resize(data->arrayLength);
         //std::vector<int32_t> vectorizedValue(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
@@ -812,7 +810,7 @@ UA_StatusCode ua_processvariable::setValue_uint32(const UA_Variant* data) {
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        uint32_t* v = (uint32_t*)data->data;
+        auto* v = (uint32_t*)data->data;
         valueArray.resize(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
           valueArray.at(i) = v[i];
@@ -845,7 +843,7 @@ UA_StatusCode ua_processvariable::setValue_int64(const UA_Variant* data) {
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        int64_t* v = (int64_t*)data->data;
+        auto* v = (int64_t*)data->data;
         valueArray.resize(data->arrayLength);
         //std::vector<int64_t> vectorizedValue(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
@@ -879,7 +877,7 @@ UA_StatusCode ua_processvariable::setValue_uint64(const UA_Variant* data) {
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        uint64_t* v = (uint64_t*)data->data;
+        auto* v = (uint64_t*)data->data;
         valueArray.resize(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
           valueArray.at(i) = v[i];
@@ -912,7 +910,7 @@ UA_StatusCode ua_processvariable::setValue_float(const UA_Variant* data) {
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        float* v = (float*)data->data;
+        auto* v = (float*)data->data;
         valueArray.resize(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
           valueArray.at(i) = v[i];
@@ -945,7 +943,7 @@ UA_StatusCode ua_processvariable::setValue_double(const UA_Variant* data) {
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        double* v = (double*)data->data;
+        auto* v = (double*)data->data;
         valueArray.resize(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
           valueArray.at(i) = v[i];
@@ -976,17 +974,17 @@ UA_StatusCode ua_processvariable::setValue_string(const UA_Variant* data) {
       vector<string> valueArray;
       if(UA_Variant_isScalar(data) && (!array)) {
         string cpps;
-        UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)data->data)), cpps);
+        UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)data->data)), cpps)
         //string value = *((string *)data->data);
         valueArray.push_back(cpps);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
         // Array
-        UA_String* vdata = (UA_String*)data->data;
+        auto* vdata = (UA_String*)data->data;
         valueArray.resize(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
           string cpps;
-          UASTRING_TO_CPPSTRING(vdata[i], cpps);
+          UASTRING_TO_CPPSTRING(vdata[i], cpps)
           valueArray.at(i) = cpps;
         }
         if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() !=
@@ -1017,7 +1015,7 @@ UA_StatusCode ua_processvariable::setValue_bool(const UA_Variant* data) {
         valueArray.push_back(value);
       }
       else if((!UA_Variant_isScalar(data)) && array) {
-        Boolean* v = (Boolean*)data->data;
+        auto* v = (Boolean*)data->data;
         valueArray.resize(data->arrayLength);
         for(uint32_t i = 0; i < valueArray.size(); i++) {
           valueArray.at(i) = v[i];
@@ -1068,9 +1066,9 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
 
   //Append the app and application folder names to the string nodeId, this is needed
   //because the mapping allows one pv linked in more folder -> only pv path is not unique
-  string baseNodeIdName = "";
+  string baseNodeIdName;
   if(this->baseNodeId.identifierType == UA_NODEIDTYPE_STRING) {
-    UA_STRING_TO_CPPSTRING_COPY(&this->baseNodeId.identifier.string, &baseNodeIdName);
+    UA_STRING_TO_CPPSTRING_COPY(&this->baseNodeId.identifier.string, &baseNodeIdName)
   }
   if (!baseNodeIdName.empty()) {
     baseNodeIdName.resize(baseNodeIdName.size() - 3);
@@ -1084,7 +1082,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     return UA_STATUSCODE_BADNODEIDEXISTS;
   }
 
-  UA_Server_addVariableNode(this->mappedServer,
+  retval = UA_Server_addVariableNode(this->mappedServer,
                             UA_NODEID_STRING(1, (char*)(baseNodeIdName + "/" + this->nameNew).c_str()),
                             this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
                             UA_QUALIFIEDNAME(1, (char*)this->nameNew.c_str()), UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, (void*) this,
@@ -1259,7 +1257,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
     mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue;
   } else {
-    mapElem.dataSource.write = NULL;
+    mapElem.dataSource.write = nullptr;
   }
   if(this->array){
     UA_Server_writeValueRank(this->mappedServer, createdNodeId, UA_VALUERANK_ONE_DIMENSION);
@@ -1274,19 +1272,16 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   mapDs.push_back(mapElem);
 
   UA_NodeId nodeIdVariableType = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
-  NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, createdNodeId);
+  NODE_PAIR_PUSH(this->ownedNodes, nodeIdVariableType, createdNodeId)
 
   for(auto i: mapDs){
-    UA_StatusCode result = UA_Server_setVariableNode_dataSource(this->mappedServer, i.concreteNodeId, i.dataSource);
+    retval |= UA_Server_setVariableNode_dataSource(this->mappedServer, i.concreteNodeId, i.dataSource);
   }
-
-  //this->ua_mapDataSources((void*)this, &mapDs);
-
   UA_NodeId_clear(&createdNodeId);
-  return UA_STATUSCODE_GOOD;
+  return retval;
 }
 
-UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string baseNodePath, UA_DataSource_Map &map) {
+UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, const string& baseNodePath, UA_DataSource_Map &map) {
   UA_NodeId createdNodeId = UA_NODEID_NULL;
   UA_VariableAttributes attr;
   UA_StatusCode addResult;
@@ -1296,7 +1291,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   mapElemName.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
   mapElemName.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   mapElemName.dataSource.read = ua_readproxy_ua_processvariable_getName;
-  mapElemName.dataSource.write = NULL;
+  mapElemName.dataSource.write = nullptr;
 
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
@@ -1313,7 +1308,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
                                         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, this, &createdNodeId);
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId nameVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
-    NODE_PAIR_PUSH(this->ownedNodes, nameVariable, createdNodeId);
+    NODE_PAIR_PUSH(this->ownedNodes, nameVariable, createdNodeId)
     UA_NodeId_copy(&createdNodeId, &mapElemName.concreteNodeId);
     map.push_back(mapElemName);
   }
@@ -1328,7 +1323,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   mapElemDesc.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
   mapElemDesc.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   mapElemDesc.dataSource.read = ua_readproxy_ua_processvariable_getDescription;
-  mapElemDesc.dataSource.write = NULL;
+  mapElemDesc.dataSource.write = nullptr;
 
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
@@ -1347,7 +1342,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
                                         &createdNodeId);
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId descVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
-    NODE_PAIR_PUSH(this->ownedNodes, descVariable, createdNodeId);
+    NODE_PAIR_PUSH(this->ownedNodes, descVariable, createdNodeId)
     UA_NodeId_copy(&createdNodeId, &mapElemDesc.concreteNodeId);
     map.push_back(mapElemDesc);
   }
@@ -1362,7 +1357,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   mapElemEU.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
   mapElemEU.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   mapElemEU.dataSource.read = ua_readproxy_ua_processvariable_getEngineeringUnit;
-  mapElemEU.dataSource.write = NULL;
+  mapElemEU.dataSource.write = nullptr;
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
   attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"EngineeringUnit");
@@ -1379,7 +1374,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
                                         &createdNodeId);
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId engineeringunitVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
-    NODE_PAIR_PUSH(this->ownedNodes, engineeringunitVariable, createdNodeId);
+    NODE_PAIR_PUSH(this->ownedNodes, engineeringunitVariable, createdNodeId)
     UA_NodeId_copy(&createdNodeId, &mapElemEU.concreteNodeId);
     map.push_back(mapElemEU);
   }
@@ -1394,7 +1389,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   mapElemType.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
   mapElemType.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   mapElemType.dataSource.read = ua_readproxy_ua_processvariable_getType;
-  mapElemType.dataSource.write = NULL;
+  mapElemType.dataSource.write = nullptr;
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
   attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Type");
@@ -1415,7 +1410,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
                                         &createdNodeId);
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId typeVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
-    NODE_PAIR_PUSH(this->ownedNodes, typeVariable, createdNodeId);
+    NODE_PAIR_PUSH(this->ownedNodes, typeVariable, createdNodeId)
     UA_NodeId_copy(&createdNodeId, &mapElemType.concreteNodeId);
     map.push_back(mapElemType);
   }
@@ -1430,7 +1425,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
   mapElemValidity.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
   mapElemValidity.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
   mapElemValidity.dataSource.read = ua_readproxy_ua_processvariable_getValidity;
-  mapElemValidity.dataSource.write = NULL;
+  mapElemValidity.dataSource.write = nullptr;
   UA_VariableAttributes_init(&attr);
   attr = UA_VariableAttributes_default;
   attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Validity");
@@ -1447,7 +1442,7 @@ UA_StatusCode ua_processvariable::addPVChildNodes(UA_NodeId pvNodeId, string bas
                                         &createdNodeId);
   if(addResult == UA_STATUSCODE_GOOD) {
     UA_NodeId vadilityVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
-    NODE_PAIR_PUSH(this->ownedNodes, vadilityVariable, createdNodeId);
+    NODE_PAIR_PUSH(this->ownedNodes, vadilityVariable, createdNodeId)
     UA_NodeId_copy(&createdNodeId, &mapElemValidity.concreteNodeId);
     map.push_back(mapElemValidity);
   }
