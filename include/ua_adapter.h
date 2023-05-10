@@ -135,7 +135,7 @@ class ua_uaadapter : ua_mapped_class {
    *
    * @return UA_NodeId is the node id of the new created folder
    */
-  UA_NodeId createUAFolder(UA_NodeId basenodeId, string folderName, string description = "");
+  UA_NodeId createUAFolder(UA_NodeId basenodeId, const string& folderName, const string& description = "");
 
  public:
   bool running = false; // set to false to stop the worker thread
@@ -182,21 +182,21 @@ class ua_uaadapter : ua_mapped_class {
    * @param folderName Name of the new folder
    * @param description A short description of the folder
    */
-  UA_NodeId createFolder(UA_NodeId basenodeid, string folderName, string description = "");
+  UA_NodeId createFolder(UA_NodeId basenodeid, const string& folderName, const string& description = "");
 
   /** @brief Check if a folder path exist in opcua server
    *
    * @param basenodeId Node id of the parent node
    * @param folderPathVector Every single string is a folder name, the path ist checked in the given order
    */
-  UA_NodeId existFolderPath(UA_NodeId basenodeid, vector<string> folderPath);
+  UA_NodeId existFolderPath(UA_NodeId basenodeid, const vector<string>& folderPath);
 
   /** @brief Check if a folder exist in opcua server
    *
    * @param basenodeId Node id of the parent node
    * @param folderName The name of folder, that be checked
    */
-  UA_NodeId existFolder(UA_NodeId basenodeid, string folderName);
+  UA_NodeId existFolder(UA_NodeId basenodeid, const string& folderName);
 
   /** @brief Search PV by name in PV-List
    *
@@ -242,7 +242,7 @@ class ua_uaadapter : ua_mapped_class {
    *
    * @param csManager control system manager
    */
-  void explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> csManager);
+  void explicitVarMapping(const boost::shared_ptr<ControlSystemPVManager>& csManager);
 
   /**
    * @brief Read mapping file and add contained additional variables to the server.
@@ -304,7 +304,7 @@ class ua_uaadapter : ua_mapped_class {
    *
    * @param config The server configuration to be modified.
    */
-  void fillBuildInfo(UA_ServerConfig* config);
+  void fillBuildInfo(UA_ServerConfig* config) const;
 };
 
 #endif // MTCA_UAADAPTER_H
