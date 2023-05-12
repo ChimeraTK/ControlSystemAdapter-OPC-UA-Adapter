@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.16)
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 SET(${PROJECT_NAME}_MAJOR_VERSION 03)
 SET(${PROJECT_NAME}_MINOR_VERSION 02)
-SET(${PROJECT_NAME}_PATCH_VERSION 00)
+SET(${PROJECT_NAME}_PATCH_VERSION 01)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
@@ -146,13 +146,13 @@ configure_file (
 
 ## Object Files
 add_library(mtca_objects OBJECT ${objectSources})
-target_link_libraries(mtca_objects PUBLIC open62541::open62541)
+target_link_libraries(mtca_objects PRIVATE open62541::open62541)
 target_link_libraries(mtca_objects PUBLIC ChimeraTK::ChimeraTK-ControlSystemAdapter)
 
 # ChimeraTK::ChimeraTK-ControlSystemAdapter exports the flag c++-17 with INTERFACE_COMPILE_OPTIONS. 
 # This causes a problem with clang c compilation.
 add_library(mtca_c_objetcs OBJECT ${CMAKE_SOURCE_DIR}/src/csa_namespace.c)
-target_link_libraries(mtca_c_objetcs PUBLIC open62541::open62541)
+target_link_libraries(mtca_c_objetcs PRIVATE open62541::open62541)
 
 ## Early declaration due to the requirement to run the dependencies update prior to building
 ## Create shared lib
@@ -160,7 +160,7 @@ add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects> $<TARGET_OBJEC
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_FULL_LIBRARY_VERSION}
         SOVERSION ${${PROJECT_NAME}_SOVERSION})
 target_link_libraries(${PROJECT_NAME} PUBLIC ChimeraTK::ChimeraTK-ControlSystemAdapter)
-target_link_libraries(${PROJECT_NAME} PUBLIC open62541::open62541)
+target_link_libraries(${PROJECT_NAME} PRIVATE open62541::open62541)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBXML2_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
 target_link_libraries(${PROJECT_NAME} PRIVATE dl)
@@ -241,7 +241,7 @@ endif(INSTALL_SAMPLE_ADAPTER)
 # we support our cmake EXPORTS as imported targets
 set(PROVIDES_EXPORTED_TARGETS 1)
 # we need the public dependencies so create_cmake_config_files can find them as implicit dependencies
-list(APPEND ${PROJECT_NAME}_PUBLIC_DEPENDENCIES "open62541;ChimeraTK-ControlSystemAdapter")
+list(APPEND ${PROJECT_NAME}_PUBLIC_DEPENDENCIES "ChimeraTK-ControlSystemAdapter")
 include(${CMAKE_SOURCE_DIR}/cmake/create_cmake_config_files.cmake)
 
 
