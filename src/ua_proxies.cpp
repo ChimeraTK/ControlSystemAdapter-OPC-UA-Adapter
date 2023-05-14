@@ -20,16 +20,16 @@
  */
 
 #include "ua_proxies.h"
-#include "csa_config.h"
 
 #include <iostream>
 
 using namespace std;
 
+//ToDo move function to remove proxies file
 UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void* handle) {
-  nodePairList* lst = static_cast<nodePairList*>(handle);
+  auto* lst = static_cast<nodePairList*>(handle);
 
-  UA_NodeId_pair* thisNode = new UA_NodeId_pair;
+  auto* thisNode = new UA_NodeId_pair;
   UA_NodeId_copy(&definitionId, &thisNode->sourceNodeId);
   UA_NodeId_copy(&objectId, &thisNode->targetNodeId);
   lst->push_back(thisNode);
