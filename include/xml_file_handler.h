@@ -47,7 +47,7 @@ class xml_file_handler {
        *
        * @param filePath  Path to a xml file which you want to read
       */
-  xml_file_handler(std::string filePath);
+  xml_file_handler(const std::string& filePath);
 
   /** @brief This methode set a document pointer to the file it ist given by the file path
       *
@@ -55,7 +55,7 @@ class xml_file_handler {
       *
       * @return Returns true if a document is setted, if not it returns false
       */
-  bool createDoc(std::string filePath);
+  bool createDoc(const std::string& filePath);
 
   /** @brief This Methode check if a document is currently setted
       *
@@ -69,7 +69,7 @@ class xml_file_handler {
       *
       * @return Returns a element pointer if some was found, in other cases it will return NULL
       */
-  xmlXPathObjectPtr getNodeSet(std::string xPathString);
+  xmlXPathObjectPtr getNodeSet(const std::string& xPathString);
 
   /** @brief This methode return a list of all nodes with the given name nodeName starting by the given startNode
       *
@@ -78,7 +78,7 @@ class xml_file_handler {
       *
       * @return Returns a list of all pointer from founded child nodes with nodeName
       */
-  std::vector<xmlNodePtr> getNodesByName(xmlNodePtr startNode, std::string nodeName);
+  static std::vector<xmlNodePtr> getNodesByName(xmlNodePtr startNode, const std::string& nodeName);
   /** @brief This methode splitt a given string bey the given seperators. You can use the seperator as string of seperators like "_/&" all characters will be used as single seperator
       *
       * @param variablePath String which you want to seperate by the seperator
@@ -86,7 +86,7 @@ class xml_file_handler {
       *
       * @return Returns a vector of every single splitet word
       */
-  std::vector<std::string> praseVariablePath(std::string variablePath, std::string seperator = "/");
+  static std::vector<std::string> parseVariablePath(const std::string& variablePath, const std::string& seperator = "/");
 
   /** @brief This methode returns a value of the given attribute from the given node you want to know
       *
@@ -95,7 +95,7 @@ class xml_file_handler {
       *
       * @return Returns a string of the attribute
       */
-  std::string getAttributeValueFromNode(xmlNode* node, std::string attributeName);
+  static std::string getAttributeValueFromNode(xmlNode* node, const std::string& attributeName);
 
   /** @brief This methode returns the value between a xml tag. For example \<tagelement>content\</tagelement> the returned value ist "content".
       *
@@ -103,7 +103,7 @@ class xml_file_handler {
       *
       * @return Returns a string of the inner content
       */
-  std::string getContentFromNode(xmlNode* node);
+  static std::string getContentFromNode(xmlNode* node);
 
   /** @brief Destructor of the class, frees the document and clean the parser.
       *
@@ -111,8 +111,8 @@ class xml_file_handler {
   ~xml_file_handler();
 
  private:
-  xmlDocPtr doc;
-  xmlNodePtr cur;
+  xmlDocPtr doc{};
+  xmlNodePtr cur{};
 };
 
 #endif // XMLFILEHANDLER_H
