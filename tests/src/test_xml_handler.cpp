@@ -68,8 +68,8 @@ void XMLFileHandlerTest::getContent() {
     string emptyContent = xmlHandler->getContentFromNode(NULL);
     BOOST_CHECK(emptyContent == "");
 
-    vector<string> path = xmlHandler->praseVariablePath(
-        sourceVariableName, xmlHandler->getAttributeValueFromNode(nodeList[0], "name"));
+    vector<string> path =
+        xmlHandler->parseVariablePath(sourceVariableName, xmlHandler->getAttributeValueFromNode(nodeList[0], "name"));
     BOOST_CHECK(path.size() == 1);
   }
   else {

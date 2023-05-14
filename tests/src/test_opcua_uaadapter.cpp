@@ -39,7 +39,7 @@ void UAAdapterTest::testExampleSet() {
   BOOST_CHECK(!UA_NodeId_isNull(&ownNodeId));
 
   // Check folder functions
-  vector<string> pathVector = xmlHandler->praseVariablePath("/test/test/");
+  vector<string> pathVector = xmlHandler->parseVariablePath("/test/test/");
   // Check if path exist
   UA_NodeId folderNodeId = adapter->existFolderPath(ownNodeId, pathVector);
   BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
@@ -52,7 +52,7 @@ void UAAdapterTest::testExampleSet() {
   BOOST_CHECK(!UA_NodeId_isNull(&folderNodeId));
 
   // Check if path partly exist and create it
-  pathVector = xmlHandler->praseVariablePath("/test/test1/");
+  pathVector = xmlHandler->parseVariablePath("/test/test1/");
   folderNodeId = adapter->createFolderPath(UA_NODEID_NULL, pathVector);
   BOOST_CHECK(UA_NodeId_isNull(&folderNodeId));
 

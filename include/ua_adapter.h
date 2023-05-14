@@ -148,7 +148,7 @@ class ua_uaadapter : ua_mapped_class {
    *
    * @param configFile This file provide the configuration and the mapping of the server
    */
-  ua_uaadapter(string configPath);
+  ua_uaadapter(const string& configPath);
 
   /** @brief Destrructor of the class.
    *
@@ -213,7 +213,7 @@ class ua_uaadapter : ua_mapped_class {
    *
    * @return nodeId of the last created folder (last part of path)
    */
-  UA_NodeId enrollFolderPathFromString(string path, string seperator);
+  UA_NodeId enrollFolderPathFromString(const string& path, const string& seperator);
 
   /** @brief Check if a folder ath exist in opcua server
    *
@@ -227,7 +227,7 @@ class ua_uaadapter : ua_mapped_class {
    * @param basenodeId Node id of the parent node
    * @param folderPathVector Every single string is a folder name, the path ist checked in the given order
    */
-  void implicitVarMapping(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager);
+  void implicitVarMapping(const std::string& varName, const boost::shared_ptr<ControlSystemPVManager>& csManager);
 
   /**
    * @brief Read mapping file and apply the contained folders, additional variables and pv mappings.
@@ -235,7 +235,7 @@ class ua_uaadapter : ua_mapped_class {
    *
    * @param csManager control system manager
    */
-  void applyMapping(boost::shared_ptr<ControlSystemPVManager> csManager);
+  void applyMapping(const boost::shared_ptr<ControlSystemPVManager>& csManager);
 
   /**
    * @brief Read mapping file and apply contained PV mappings.
@@ -254,7 +254,7 @@ class ua_uaadapter : ua_mapped_class {
    *
    * @param csManager control system manager
    */
-  void buildFolderStructure(boost::shared_ptr<ControlSystemPVManager> csManager);
+  void buildFolderStructure(const boost::shared_ptr<ControlSystemPVManager>& csManager);
 
   /**
    * @brief Copy (recursively) the content of a folder to a new location
@@ -264,7 +264,7 @@ class ua_uaadapter : ua_mapped_class {
    * @param target destination folder
    */
   void deepCopyHierarchicalLayer(
-      boost::shared_ptr<ControlSystemPVManager> csManager, UA_NodeId layer, UA_NodeId target);
+      const boost::shared_ptr<ControlSystemPVManager>& csManager, UA_NodeId layer, UA_NodeId target);
 
   /** @brief Methode that returns the node id of the instanced class
    *
