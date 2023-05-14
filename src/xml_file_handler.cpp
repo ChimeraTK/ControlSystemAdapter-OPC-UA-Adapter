@@ -16,6 +16,7 @@
  *
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
+ * Copyright (c) 2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
 
 #include "xml_file_handler.h"
@@ -31,14 +32,14 @@
 
 using namespace std;
 
-xml_file_handler::xml_file_handler(std::string filePath) {
+xml_file_handler::xml_file_handler(const std::string& filePath) {
   // FIXME: Add some check routine if file realy exist
   this->createDoc(filePath);
 }
 
-std::vector<xmlNodePtr> xml_file_handler::getNodesByName(xmlNodePtr startNode, std::string nodeName) {
+std::vector<xmlNodePtr> xml_file_handler::getNodesByName(xmlNodePtr startNode, const std::string& nodeName) {
   std::vector<xmlNodePtr> nodeVector;
-  while(startNode != NULL) {
+  while(startNode != nullptr) {
     if((!xmlStrcmp(startNode->name, (const xmlChar*)nodeName.c_str()))) {
       nodeVector.push_back(startNode);
     }
@@ -48,56 +49,56 @@ std::vector<xmlNodePtr> xml_file_handler::getNodesByName(xmlNodePtr startNode, s
   return nodeVector;
 }
 
-xmlXPathObjectPtr xml_file_handler::getNodeSet(std::string xPathString) {
-  xmlChar* xpath = (xmlChar*)xPathString.c_str();
+xmlXPathObjectPtr xml_file_handler::getNodeSet(const std::string& xPathString) {
+  auto* xpath = (xmlChar*)xPathString.c_str();
   xmlXPathContextPtr context;
   xmlXPathObjectPtr result;
 
   if(!isDocSetted()) {
-    return NULL;
+    return nullptr;
   }
   context = xmlXPathNewContext(this->doc);
-  if(context == NULL) {
+  if(context == nullptr) {
     // std::cout("Error in xmlXPathNewContext\n");
-    return NULL;
+    return nullptr;
   }
   if(xmlXPathRegisterNs(
          context, (xmlChar*)"csa", (xmlChar*)"https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter") != 0) {
     std::cerr << "Failed to register xml namespace: https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
               << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   result = xmlXPathEvalExpression(xpath, context);
   xmlXPathFreeContext(context);
-  if(result == NULL) {
+  if(result == nullptr) {
     // std::cout("Error in xmlXPathEvalExpression\n");
-    return NULL;
+    return nullptr;
   }
   if(xmlXPathNodeSetIsEmpty(result->nodesetval)) {
     xmlXPathFreeObject(result);
     // std::cout("No result\n");
-    return NULL;
+    return nullptr;
   }
   return result;
 }
 
 bool xml_file_handler::isDocSetted() {
-  if(this->doc != NULL) {
+  if(this->doc != nullptr) {
     return true;
   }
   return false;
 }
 
-bool xml_file_handler::createDoc(std::string filePath) {
+bool xml_file_handler::createDoc(const std::string& filePath) {
   if(filePath.empty()) {
-    this->doc = NULL;
+    this->doc = nullptr;
     return false;
   }
 
   this->doc = xmlParseFile(filePath.c_str());
 
-  if(this->doc == NULL) {
+  if(this->doc == nullptr) {
     std::cout << "Document not parsed successfully." << std::endl;
     return false;
   }
@@ -105,7 +106,8 @@ bool xml_file_handler::createDoc(std::string filePath) {
   return true;
 }
 
-std::vector<std::string> xml_file_handler::praseVariablePath(std::string variablePath, std::string seperator) {
+std::vector<std::string> xml_file_handler::parseVariablePath(
+    const std::string& variablePath, const std::string& seperator) {
   std::vector<std::string> pathList;
   boost::char_separator<char> sep(seperator.c_str());
   boost::tokenizer<boost::char_separator<char>> tokens(variablePath, sep);
@@ -116,9 +118,9 @@ std::vector<std::string> xml_file_handler::praseVariablePath(std::string variabl
   return pathList;
 }
 
-std::string xml_file_handler::getAttributeValueFromNode(xmlNode* node, std::string attributeName) {
+std::string xml_file_handler::getAttributeValueFromNode(xmlNode* node, const std::string& attributeName) {
   xmlAttrPtr attr = xmlHasProp(node, (xmlChar*)attributeName.c_str());
-  if(!(attr == NULL)) {
+  if(attr != nullptr) {
     std::string merker = (std::string)((char*)attr->children->content);
     return merker;
   }
@@ -126,13 +128,13 @@ std::string xml_file_handler::getAttributeValueFromNode(xmlNode* node, std::stri
 }
 
 std::string xml_file_handler::getContentFromNode(xmlNode* node) {
-  if(node != NULL) {
+  if(node != nullptr) {
     xmlChar* content = xmlNodeGetContent(node->xmlChildrenNode);
-    if(content != NULL) {
-      std::string merker = (std::string)((char*)content);
+    if(content != nullptr) {
+      std::string maker = (std::string)((char*)content);
       xmlFree(content);
-      boost::trim(merker);
-      return merker;
+      boost::trim(maker);
+      return maker;
     }
   }
   return "";
