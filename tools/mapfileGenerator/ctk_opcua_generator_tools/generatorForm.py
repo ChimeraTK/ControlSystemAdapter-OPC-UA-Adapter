@@ -3,9 +3,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QColor
 import lxml.etree as ET
 import os
-from generator_tools.generatorUI import Ui_MainWindow
-from generator_tools.encryptionUI import Ui_EncryptionDialog
-from generator_tools.generatorClass import MapGenerator, XMLDirectory, XMLVar, EncryptionSettings
+from ctk_opcua_generator_tools.generatorUI import Ui_MainWindow
+from ctk_opcua_generator_tools.encryptionUI import Ui_EncryptionDialog
+from ctk_opcua_generator_tools.generatorClass import MapGenerator, XMLDirectory, XMLVar, EncryptionSettings
 import logging
 from typing import Optional
 

@@ -4,7 +4,7 @@ import argparse
 import logging
 import sys
 from PyQt5.QtWidgets import QApplication
-from generator_tools.generatorForm import MapGeneratorForm
+from ctk_opcua_generator_tools.generatorForm import MapGeneratorForm
 
 
 

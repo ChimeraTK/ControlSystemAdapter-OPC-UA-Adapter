@@ -232,6 +232,30 @@ if(INSTALL_SAMPLE_ADAPTER)
   install(TARGETS ControlSystem-OPCUA_Sample_Adapter RUNTIME DESTINATION bin)
   file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)  
 endif(INSTALL_SAMPLE_ADAPTER)
+
+##########################################################################################################
+##  Install map file generator
+##########################################################################################################
+
+
+include(pythonBindingHelperMacros)
+
+#
+# We build for python3 by default
+set(PYTHON3 TRUE CACHE BOOL "Builds modules for python3 if true and python2 if false")
+initialize()
+
+find_package(PythonLibs 3 REQUIRED)
+get_python_module_install_path(PYTHONLIBS_VERSION_STRING python_module_path)
+
+install(DIRECTORY tools/mapfileGenerator/ctk_opcua_generator_tools
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/${python_module_path})
+install(FILES tools/mapfileGenerator/chimeratk-opc-ua-mapfile-generator
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                     GROUP_READ GROUP_EXECUTE
+                     WORLD_READ WORLD_EXECUTE)
+
 ##########################################################################################################
 ## Create the config files by filling the correct variables into the template (*.cmake.in).
 ## All variables @VARIABLE@ are replaced with the current values, but they have to be set first....
