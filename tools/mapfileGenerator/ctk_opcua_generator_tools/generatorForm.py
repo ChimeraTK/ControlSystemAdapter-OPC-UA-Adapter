@@ -103,7 +103,12 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.treeWidget.blockSignals(True)
     self._createDirectoryNode(self.treeWidget, self.MapGenerator.dir, True)
     self.treeWidget.blockSignals(False)
+    # Attention the following fields are set in the GUI but not set in the mapping file as long as they 
+    # are not changed by the user!
+    # Simply show what will be used, because root folder and application name default to the
+    # application name if not set in the mapping file!
     self.applicationName.setText(self.MapGenerator.applicationName)
+    self.rootFolder.setText(self.MapGenerator.applicationName)
     
   def _getCheckBox(self, item:XMLDirectory | XMLVar, text:str, node:QTreeWidgetItem, index:int):
     '''
