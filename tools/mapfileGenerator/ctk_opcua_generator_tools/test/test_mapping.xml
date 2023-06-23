@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uamapping xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
+  <config rootFolder="Test" description="">
+    <server applicationName="Test" port="16664"/>
+    <security unsecure="True" certificate="certs/server_cert.der" privatekey="certs/server_key.der" trustlist="certs/trust" blocklist="certs/blocklists" issuerlist="certs/issuer"/>   
+    <login username="user" password="test"/>   
+  </config>
+</uamapping>
