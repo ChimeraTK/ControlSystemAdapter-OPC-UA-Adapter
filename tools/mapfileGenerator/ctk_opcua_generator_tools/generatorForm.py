@@ -165,7 +165,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     elif index == 4:
       # Description
       data.newDescription = item.text(index)
-      item.setText(index, item.text(index) + " (Added descr.)")
+      item.setText(index, item.text(index) + " (Orig.: " + str(data.description or '') + ")")
       item.setForeground(index,QBrush(QColor("#FF0000")))
     self.treeWidget.blockSignals(False)
     
@@ -204,7 +204,16 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     Reads description and unit. 
     Add CheckBox to enable/disable mapping of that variable.
     '''
-    node = QTreeWidgetItem(parent, [v.name]+[""]*2 + [v.unit] + [v.description]+[""])
+    name = v.name
+    if v.newName != None:
+      name = "{} (Orig.: {})".format(v.newName, v.name)
+    description = v.description
+    if v.newDescription != None:
+      description = "{} (Orig.: {})".format(v.newDescription, v.description)
+    unit = v.unit
+    if v.newUnit != None:
+      unit = "{} (Orig.: {})".format(v.newUnit, v.unit)
+    node = QTreeWidgetItem(parent, [name]+[""]*2 + [unit] + [description]+[""])
     self._setupRow(node, v)
     return node
   
@@ -212,8 +221,14 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     '''
     Create a directory entry in the Tree.
     This will recursively add sub directories and variables in the directories.
-    ''' 
-    mainNode = QTreeWidgetItem(parent, [dir.name] + [""]*5)
+    '''
+    name = dir.name
+    if dir.newName != None:
+      name = "{} (Orig.: {})".format(dir.newName, dir.name)
+    description = ''
+    if dir.newDescription != None:
+      description = "{} (Added descr.)".format(dir.newDescription)
+    mainNode = QTreeWidgetItem(parent, [name] + [""]*3 + [description] + [dir.newDestination or ''])
     self._setupRow(mainNode, dir)
     if isRootNode == True:
       mainNode.setExpanded(True)

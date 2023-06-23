@@ -5,4 +5,15 @@
     <security unsecure="True" certificate="certs/server_cert.der" privatekey="certs/server_key.der" trustlist="certs/trust" blocklist="certs/blocklists" issuerlist="certs/issuer"/>   
     <login username="user" password="test"/>   
   </config>
+  <folder sourceName="/Configuration" copy="False">
+    <description>newDirDescription</description>
+    <destination>/Test</destination>
+  </folder>
+  <process_variable sourceName="/Configuration/test" copy="False">
+    <description>newPVDescription</description>
+    <unit>newUnit</unit>
+    <name>newName</name>
+    <destination>/Test</destination>
+  </process_variable>
+  
 </uamapping>
