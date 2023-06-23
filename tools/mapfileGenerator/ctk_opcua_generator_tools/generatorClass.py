@@ -147,7 +147,7 @@ class XMLVar(MapOption):
   '''
   Class used to store all relevant information of process variables.
   '''
-  def __init__(self, var:ET.Element):
+  def __init__(self, var:ET.Element, path:str):
     super().__init__()
     self.element = var
     self.name = var.attrib['name']
@@ -161,10 +161,14 @@ class XMLVar(MapOption):
     self.description = var.find('description', namespaces=var.nsmap).text
     self.newDescription = None
     self.newDestination = None
+    self.fullName = path + "/" + self.name
 
-  def __str__(self):
+  def __str__(self) -> str:
     return "Variable ({}, {}): {}".format(self.valueType, self.numberOfElements,self.name)
-
+  
+  def __eq__(self, test:str) -> bool:
+    return test == self.fullName
+  
   def generateMapEntry(self, root:ET.Element, path:str):
     if self.newName or self.newDescription or self.newUnit or self.newDestination:
       logging.debug("Adding xml entry for process_variable for {}/{}".format(path.removeprefix('/root'),self.name))
@@ -205,7 +209,31 @@ class XMLDirectory(MapOption):
     self.newDestination = None
     self.hierarchyLevel = level
     self.parseDir(data)
+    
+  def __eq__(self, dir: str) -> str:
+    return dir == self.path
       
+  def findDir(self, dir: str):
+    if self == dir:
+      return self
+    for d in self.dirs:
+      if d == dir:
+        return d
+      ret = d.findDir(dir)
+      if ret != None:
+        return ret
+    return None
+  
+  def findVar(self, var: str):
+    for v in self.vars:
+      if v == var:
+        return v
+    for d in self.dirs:
+      ret = d.findVar(var)
+      if ret != None:
+        return ret
+    return None
+
   def parseDir(self, data:ET.Element):
     '''
     Read directory information from XML directory entry.
@@ -214,7 +242,7 @@ class XMLDirectory(MapOption):
     for dir in data.findall('directory',namespaces=data.nsmap):
       self.dirs.append(XMLDirectory(name = dir.attrib['name'], data=dir, level=self.hierarchyLevel+1, path = self.path))
     for var in data.findall('variable',namespaces=data.nsmap):
-      self.vars.append(XMLVar(var))
+      self.vars.append(XMLVar(var, self.path))
       
   def __str__(self):
     space = ""

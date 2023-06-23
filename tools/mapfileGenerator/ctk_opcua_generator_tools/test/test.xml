@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application xmlns="https://github.com/ChimeraTK/ApplicationCore" name="LLRFServer">
   <directory name="Configuration">
-    <variable name="enableAutomation">
+    <variable name="test">
       <value_type>int32</value_type>
       <direction>application_to_control_system</direction>
       <unit>unknown</unit>
-      <description>Configuration read from file 'LLRFBaseConfig.xml' - Configuration variable</description>
+      <description>description</description>
       <numberOfElements>1</numberOfElements>
     </variable>
   </directory>
