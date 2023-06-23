@@ -12,6 +12,7 @@ class MapOption():
 
 class EncryptionSettings():
   def __init__(self):
+    super(EncryptionSettings, self).__init__()
     self.encryptionEnabled = False
     self.addUnsecureEndpoint = False
     self.certificate = None
@@ -35,6 +36,7 @@ class EncryptionSettings():
 
 class Config():
   def __init__(self):
+    super(Config, self).__init__()
     self.username = None
     self.password = None
     self.applicationName = None
