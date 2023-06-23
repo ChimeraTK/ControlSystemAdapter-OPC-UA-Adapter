@@ -272,6 +272,7 @@
     <addaction name="actionOpen_File"/>
     <addaction name="actionSave_as"/>
     <addaction name="actionSave"/>
+    <addaction name="actionLoad_mapping_file"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -301,6 +302,11 @@
    </property>
    <property name="text">
     <string>Save</string>
+   </property>
+  </action>
+  <action name="actionLoad_mapping_file">
+   <property name="text">
+    <string>Load mapping file...</string>
    </property>
   </action>
  </widget>

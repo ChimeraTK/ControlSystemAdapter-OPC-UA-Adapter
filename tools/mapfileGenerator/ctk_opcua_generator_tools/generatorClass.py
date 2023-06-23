@@ -12,7 +12,6 @@ class MapOption():
 
 class EncryptionSettings():
   def __init__(self):
-    super(EncryptionSettings, self).__init__()
     self.encryptionEnabled = False
     self.addUnsecureEndpoint = False
     self.certificate = None
@@ -33,10 +32,38 @@ class EncryptionSettings():
       raise RuntimeError("Server certificate not set.")
     if self.trustList == None or (self.issuerList == None or self.blockList == None):
       raise RuntimeError("No trust list or CA related configuration set.")
+  
+  def createEncryption(self, security: ET.Element):
+    if self.addUnsecureEndpoint:
+      security.set("unsecure", "True")
+    else:
+      security.set("unsecure", "False")
+    security.set("privatekey", self.key)
+    security.set("certificate", self.certificate)
+    if self.trustList:
+      security.set("trustlist", self.trustList)
+    if self.issuerList:
+      security.set("issuerlist", self.issuerList)
+    if self.blockList:
+      security.set("blocklist", self.blockList)  
 
-class Config():
+  def readEncryption(self, data: ET.Element):
+    if 'unsecure' in data.attrib and data.attrib['unsecure'] == 'True':
+      self.addUnsecureEndpoint = True
+    if 'privatekey' in data.attrib:
+      self.key = data.attrib['privatekey']
+    if 'certificate' in data.attrib:
+      self.certificate = data.attrib['certificate']
+    if 'trustlist' in data.attrib:
+      self.trustList = data.attrib['trustlist']
+    if 'issuerlist' in data.attrib:
+      self.issuerList = data.attrib['issuerlist']
+    if 'blocklist' in data.attrib:
+      self.blockList = data.attrib['blocklist']
+    
+class Config(EncryptionSettings):
   def __init__(self):
-    super(Config, self).__init__()
+    super().__init__()
     self.username = None
     self.password = None
     self.applicationName = None
@@ -44,6 +71,77 @@ class Config():
     self.applicationDescription = ""
     self.enableLogin = False
     self.port = None
+    
+  def createConfig(self, root:ET.Element):
+    '''
+    Create server config XML section of the map file.
+    
+    @raise RuntimeError: If configuration is not complete.
+    '''
+    config = ET.SubElement(root,"config")
+    if self.rootFolder:
+      config.set("rootFolder", self.rootFolder)
+    config.set("description", self.applicationDescription)
+    server = ET.SubElement(config, "server")
+    if self.applicationName:
+      server.set("applicationName", self.applicationName)
+    else:
+      logging.info("Default application name will be used. It is the ChimeraTK application name.")
+    if self.port:
+      server.set("port", str(self.port))
+    else:
+      logging.info("Default port of 16664 will be used.")
+    
+    if self.enableLogin == True:
+      login = ET.SubElement(config, "login")
+      if self.username:
+        login.set("username", self.username)
+      else:
+        raise RuntimeError("No username set!")
+      if self.password:
+        login.set("password", self.password)
+      else:
+        raise RuntimeError("No password set!")
+      
+    if self.encryptionEnabled:
+      # raises in case of problems
+      self.checkEncryptionSettings()
+      self.createEncryption(ET.SubElement(config, "security"))
+    
+  def readConfig(self, data: ET.Element):
+    config = data.find('config',namespaces=data.nsmap)
+    if config != None:
+      if 'rootFolder' in config.attrib:
+        self.rootFolder = config.attrib['rootFolder']
+      if 'rootFolder' in config.attrib:
+        self.applicationDescription = config.attrib["description"]
+      # server settings
+      server = config.find('server')
+      if server != None:
+        if 'applicationName' in server.attrib:
+          self.applicationName = server.attrib["applicationName"]
+        if 'port' in server.attrib:
+          self.port = int(server.attrib['port'])
+        # security
+      login = config.find('login')
+      if login != None:
+        self.enableLogin = True
+        if 'username' in  login.attrib:
+          self.username = login.attrib['username']
+        if 'password' in  login.attrib:
+          self.password = login.attrib['password']
+          logging.info("Read password: {}".format(self.password))
+      else:
+        self.enableLogin = False  
+        self.username = None
+        self.password = None
+      security = config.find("security")
+      if security != None:
+        self.encryptionEnabled = True
+        self.readEncryption(security)
+      else: 
+        super().__init__()
+      
 
 class XMLVar(MapOption):
   '''
@@ -153,7 +251,7 @@ class XMLDirectory(MapOption):
 
       
   
-class MapGenerator(Config, EncryptionSettings):
+class MapGenerator(Config):
   def __init__(self, inputFile : str):
     super().__init__()
     self.inputFile = inputFile
@@ -161,78 +259,52 @@ class MapGenerator(Config, EncryptionSettings):
     self.isChimeraTKXML = False
     self.applicationName = None
     self.nsmap = None
+    self.nsmapMapfile = None
     self.dir = None
-    self._openFile()
+    self.parseChimeraTK()
     
-  def parseChimeraTK(self, data:ET.Element):
+  def parseChimeraTK(self):
     '''
     Parse a ChiemraTK generated XML file using the XML generator of the application.
+    @raise RuntimeError: If the given input file is not a ChiemraTK XML file. 
+                         The ChimeraTK map file is identified by the root node called 'application'.
     '''
     logging.debug("ChimeraTK XML file.")
+    data = self._openFile(self.inputFile)
+    if data.tag == 'application' or data.tag.split('}')[1] == 'application':
+      if 'name' in data.keys():
+        self.applicationName = data.attrib['name']
+        logging.info("Application name is: {}".format(self.applicationName))
+      self.nsmap = data.nsmap
+    else:
+      raise RuntimeError("Failed to find application tag. Not an XML file created by ChimeraTK's XML generator.")
     self.dir = XMLDirectory(name='root', data=data, level=0)
     if logging.root.level == logging.DEBUG:
       print(self.dir) 
     
-  def parseMapFile(self, data:ET.Element):
+  def parseMapFile(self, inputFile:str):
     '''
     Parse an existing map file.
+    @raise RuntimeError: If the given input file is not a mapping XML file. 
+                         A mapping file is identified by the root node called 'uamapping'.
+
     '''
     logging.debug("Parsing map file.")
-  
-  def _createConfig(self, root:ET.Element):
-    '''
-    Create server config XML section of the map file.
-    
-    @raise RuntimeError: If configuration is not complete.
-    '''
-    config = ET.SubElement(root,"config")
-    if self.rootFolder:
-      config.set("rootFolder", self.rootFolder)
-    config.set("description", self.applicationDescription)
-    server = ET.SubElement(config, "server")
-    if self.applicationName:
-      server.set("applicationName", self.applicationName)
+    data = self._openFile(inputFile)
+    if data.tag == 'uamapping':
+      nsmap = {'csa': 'https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter'}
+      if nsmap != data.nsmap:
+        RuntimeError("Wrong name space ({}) used in mapping file.".format(data.nsmap))
+      self.readConfig(data)
     else:
-      logging.info("Default application name will be used. It is the ChimeraTK application name.")
-    if self.port:
-      server.set("port", str(self.port))
-    else:
-      logging.info("Default port of 16664 will be used.")
-    
-    if self.enableLogin == True:
-      login = ET.SubElement(config, "login")
-      if self.username:
-        login.set("username", self.username)
-      else:
-        raise RuntimeError("No username set!")
-      if self.password:
-        login.set("password", self.password)
-      else:
-        raise RuntimeError("No password set!")
-      
-    if self.encryptionEnabled:
-      # raises in case of problems
-      self.checkEncryptionSettings()
-      security = ET.SubElement(config, "security")
-      if self.addUnsecureEndpoint:
-        security.set("unsecure", "True")
-      else:
-        security.set("unsecure", "False")
-      security.set("privatekey", self.key)
-      security.set("certificate", self.certificate)
-      if self.trustList:
-        security.set("trustlist", self.trustList)
-      if self.issuerList:
-        security.set("issuerlist", self.issuerList)
-      if self.blockList:
-        security.set("blocklist", self.blockList)
-      
+      raise RuntimeError("Failed to find uamapping tag. Not an ControlSystem-OPC-UA XML mapping file.")
+
   def save(self):
     '''Write the map file.
     '''
     logging.info("Writing map file: {}".format(self.outputFile))
     root = ET.Element("uamapping", nsmap = {'csa': 'https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter'})
-    self._createConfig(root)
+    self.createConfig(root)
     self.dir.generateMapEntries(root)
     tree = ET.ElementTree()
     tree._setroot(root)
@@ -242,24 +314,13 @@ class MapGenerator(Config, EncryptionSettings):
     with open(self.outputFile, "w") as text_file:
       text_file.write(prettyXml)
     
-  def _openFile(self):
+  def _openFile(self, inputFile: str) -> ET.Element:
     '''
-    Check if the given input file is a ChiemraTK XML file or an already 
-    created map file.
-    The ChimeraTK map file is identified by the root node called 'application'.
-    Else assume it is a map file.
+    Open an xml file.
     '''
-    logging.debug("analysing file {}".format(self.inputFile))
-    data = ET.parse(self.inputFile).getroot()
-    if data.tag == 'application' or data.tag.split('}')[1] == 'application':
-      if 'name' in data.keys():
-        self.applicationName = data.attrib['name']
-        logging.info("Application name is: {}".format(self.applicationName))
-      self.nsmap = data.nsmap
-      self.parseChimeraTK(data)
-    else:
-      self.parseMapFile(data)
-    
+    logging.debug("analysing file {}".format(inputFile))
+    data = ET.parse(inputFile).getroot()
+    return data
     
   def isChimeraTKXML(self) -> bool:
     '''
