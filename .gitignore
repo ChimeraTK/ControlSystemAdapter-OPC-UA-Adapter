@@ -33,3 +33,4 @@ ControlSystemAdapter-OPC-UA-Adapter.kdev4
 cov_htmp/
 app.info
 doc/html/
+__pycache__
