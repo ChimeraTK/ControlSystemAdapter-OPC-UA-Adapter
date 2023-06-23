@@ -3,9 +3,12 @@
 import argparse
 import logging
 import sys
+if sys.version_info < (3,10):
+  logging.error("Python 3.10 is required!")
+  sys.exit(1)
+
 from PyQt5.QtWidgets import QApplication
 from ctk_opcua_generator_tools.generatorForm import MapGeneratorForm
-
 
 
 def main(args):
