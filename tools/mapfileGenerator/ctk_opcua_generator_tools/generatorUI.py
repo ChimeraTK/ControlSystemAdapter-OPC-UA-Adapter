@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'generator/generatorUI.ui'
+# Form implementation generated from reading ui file 'generatorUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -128,9 +128,12 @@ class Ui_MainWindow(object):
         self.actionSave = QtWidgets.QAction(MainWindow)
         self.actionSave.setEnabled(False)
         self.actionSave.setObjectName("actionSave")
+        self.actionLoad_mapping_file = QtWidgets.QAction(MainWindow)
+        self.actionLoad_mapping_file.setObjectName("actionLoad_mapping_file")
         self.menuFile.addAction(self.actionOpen_File)
         self.menuFile.addAction(self.actionSave_as)
         self.menuFile.addAction(self.actionSave)
+        self.menuFile.addAction(self.actionLoad_mapping_file)
         self.menuFile.addAction(self.actionQuit)
         self.menubar.addAction(self.menuFile.menuAction())
 
@@ -160,3 +163,4 @@ class Ui_MainWindow(object):
         self.actionQuit.setText(_translate("MainWindow", "Quit"))
         self.actionSave_as.setText(_translate("MainWindow", "Save as..."))
         self.actionSave.setText(_translate("MainWindow", "Save"))
+        self.actionLoad_mapping_file.setText(_translate("MainWindow", "Load mapping file..."))
