@@ -130,7 +130,6 @@ class Config(EncryptionSettings):
           self.username = login.attrib['username']
         if 'password' in  login.attrib:
           self.password = login.attrib['password']
-          logging.info("Read password: {}".format(self.password))
       else:
         self.enableLogin = False  
         self.username = None
@@ -190,6 +189,15 @@ class XMLVar(MapOption):
         pv.set("copy", "True")
       else:
         pv.set("copy", "False")
+        
+  def reset(self):
+    '''
+    Resets all information related to updated directory and varaiable information, e.g.  set newName, newDescription ect. to None.
+    '''
+    self.newName = None    
+    self.newUnit = None
+    self.newDescription = None
+    self.newDestination = None
 
 class XMLDirectory(MapOption):
   '''
@@ -276,8 +284,17 @@ class XMLDirectory(MapOption):
         dest = ET.SubElement(folder, "destination")
         dest.text = self.newDestination.removeprefix('/root')
 
-
-      
+  def reset(self):
+    '''
+    Resets all information related to updated directory and varaiable information, e.g.  set newName, newDescription ect. to None.
+    '''
+    self.newName = None
+    self.newDescription = None
+    self.newDestination = None
+    for dir in self.dirs:
+      dir.reset()
+    for var in self.vars:
+      var.reset()      
   
 class MapGenerator(Config):
   def __init__(self, inputFile : str):
@@ -310,20 +327,58 @@ class MapGenerator(Config):
     if logging.root.level == logging.DEBUG:
       print(self.dir) 
     
-  def parseMapFile(self, inputFile:str):
+  def parseMapFile(self, inputFile:str) -> list[int]:
     '''
     Parse an existing map file.
+    @param inputFile: The map file name.
+    @return: list that includes the number of not found directories (index 0) and pvs (index 1). 
+             In the map file the sourceName is given and it can happen that the source
+             given in the map file does not correspond to a PV or directory from the original
+             variable tree.
     @raise RuntimeError: If the given input file is not a mapping XML file. 
                          A mapping file is identified by the root node called 'uamapping'.
-
     '''
     logging.debug("Parsing map file.")
+    self.dir.reset()
     data = self._openFile(inputFile)
     if data.tag == 'uamapping':
       nsmap = {'csa': 'https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter'}
       if nsmap != data.nsmap:
         RuntimeError("Wrong name space ({}) used in mapping file.".format(data.nsmap))
       self.readConfig(data)
+      # read folder information
+      nSkipped = [0,0]
+      for folder in data.findall('folder', namespaces=data.nsmap):
+        if "sourceName" in  folder.attrib:
+          dir = self.dir.findDir("/root" + folder.attrib["sourceName"])
+          if dir != None:
+            if folder.find('description', namespaces=folder.nsmap) != None:
+              dir.newDescription = folder.find('description', namespaces=folder.nsmap).text 
+            if folder.find('name', namespaces=folder.nsmap) != None:
+              dir.newName = folder.find('name', namespaces=folder.nsmap).text  
+            if folder.find('destination', namespaces=folder.nsmap) != None:
+              dir.newDestination = folder.find('destination', namespaces=folder.nsmap).text
+          else:
+            logging.warning("Failed to find source {} in the application variable tree!".format("/root" + folder.attrib["sourceName"]))
+            nSkipped[0] =  nSkipped[0] + 1
+
+      # read process_variable information
+      for pv in data.findall('process_variable', namespaces=data.nsmap):
+        if "sourceName" in  pv.attrib:
+          var = self.dir.findVar("/root" + pv.attrib["sourceName"])
+          if var != None:
+            if pv.find('description', namespaces=pv.nsmap) != None:
+              var.newDescription = pv.find('description', namespaces=pv.nsmap).text 
+            if pv.find('unit', namespaces=pv.nsmap) != None:
+              var.newUnit = pv.find('unit', namespaces=pv.nsmap).text
+            if pv.find('name', namespaces=pv.nsmap) != None:
+              var.newName = pv.find('name', namespaces=pv.nsmap).text  
+            if pv.find('destination', namespaces=pv.nsmap) != None:
+              var.newDestination = pv.find('destination', namespaces=pv.nsmap).text 
+          else:
+            logging.warning("Failed to find source {} in the application variable tree!".format("/root" + pv.attrib["sourceName"]))
+            nSkipped[1] =  nSkipped[1] + 1
+      return nSkipped
     else:
       raise RuntimeError("Failed to find uamapping tag. Not an ControlSystem-OPC-UA XML mapping file.")
 

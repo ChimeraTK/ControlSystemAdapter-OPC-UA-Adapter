@@ -44,10 +44,11 @@ class Test(unittest.TestCase):
     self.assertEqual(generator.enableLogin, True, "Wrong login state detected.")
     self.assertEqual(generator.encryptionEnabled, True, "Encryption state detected is wrong.")
     self.assertEqual(generator.dir.dirs[0].newDestination, "Test", "Read wrong destination")
-    self.assertEqual(generator.dir.dirs[0].newDescription, "newDescription" "Read wrong description")
+    self.assertEqual(generator.dir.dirs[0].newDescription, "newDirDescription", "Read wrong description")
+    self.assertEqual(generator.dir.dirs[0].newName, "newName", "Read wrong name")
     self.assertEqual(generator.dir.dirs[0].vars[0].newName, "newName", "Read wrong pv name")
     self.assertEqual(generator.dir.dirs[0].vars[0].newDestination, "Test", "Read wrong pv destination")
-    self.assertEqual(generator.dir.dirs[0].vars[0].newDescription, "newDescription", "Read wrong pv description")
+    self.assertEqual(generator.dir.dirs[0].vars[0].newDescription, "newPVDescription", "Read wrong pv description")
     self.assertEqual(generator.dir.dirs[0].vars[0].newUnit, "newUnit", "Read wrong pv unit")
 
 
@@ -67,6 +68,7 @@ class Test(unittest.TestCase):
     self.assertEqual(generator.encryptionEnabled, False, "Encryption state detected is wrong.")
     self.assertEqual(generator.dir.dirs[0].newDestination, None, "Read wrong destination")
     self.assertEqual(generator.dir.dirs[0].newDescription, None, "Read wrong description")
+    self.assertEqual(generator.dir.dirs[0].newName, None, "Read wrong name")
     self.assertEqual(generator.dir.dirs[0].vars[0].newName, None, "Read wrong pv name")
     self.assertEqual(generator.dir.dirs[0].vars[0].newDestination, None, "Read wrong pv destination")
     self.assertEqual(generator.dir.dirs[0].vars[0].newDescription, None, "Read wrong pv description")
