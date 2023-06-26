@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QFileDialog, QDialog, QMainWindow, QTreeWidget, QTreeWidgetItem, QCheckBox, QMessageBox
+from __future__ import annotations
+from PyQt5.QtWidgets import QFileDialog, QDialog, QMainWindow, QTreeWidgetItem, QCheckBox, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QColor
 import lxml.etree as ET
@@ -8,6 +9,7 @@ from ctk_opcua_generator_tools.encryptionUI import Ui_EncryptionDialog
 from ctk_opcua_generator_tools.generatorClass import MapGenerator, XMLDirectory, XMLVar, EncryptionSettings
 import logging
 from typing import Optional
+
 
 
 class EncryptionDialog(QDialog, Ui_EncryptionDialog):
@@ -45,22 +47,22 @@ class EncryptionDialog(QDialog, Ui_EncryptionDialog):
       return None
     
   def openTrustList(self):
-    dir = self._openDirectory()
-    if dir:
-      self.settings.trustList = dir
-      self.trustList.setText(dir)
+    directory = self._openDirectory()
+    if directory:
+      self.settings.trustList = directory
+      self.trustList.setText(directory)
       
   def openBlockList(self):
-    dir = self._openDirectory()
-    if dir:
-      self.settings.blockList = dir
-      self.blockList.setText(dir)
+    directory = self._openDirectory()
+    if directory:
+      self.settings.blockList = directory
+      self.blockList.setText(directory)
 
   def openIssuerList(self):
-    dir = self._openDirectory()
-    if dir:
-      self.settings.issuerList = dir
-      self.issuerList.setText(dir)
+    directory = self._openDirectory()
+    if directory:
+      self.settings.issuerList = directory
+      self.issuerList.setText(directory)
     
   
   def __init__(self, data:EncryptionSettings, parent=None):
@@ -88,7 +90,7 @@ class EncryptionDialog(QDialog, Ui_EncryptionDialog):
 class MapGeneratorForm(QMainWindow, Ui_MainWindow):
   def _createMapGenerator(self, fileName: str):
     try:    
-      self.MapGenerator = MapGenerator(fileName)
+      self.MapGenerator: MapGenerator|None = MapGenerator(fileName)
       self.statusbar.showMessage(fileName)
       self.fillTree()
     except RuntimeError as error:
@@ -169,7 +171,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
       item.setForeground(index,QBrush(QColor("#FF0000")))
     self.treeWidget.blockSignals(False)
     
-  def _setupRow(self, item:QTreeWidgetItem, data:XMLDirectory | XMLVar):
+  def _setupRow(self, item:QTreeWidgetItem, data: XMLDirectory|XMLVar):
     item.setData(0, Qt.UserRole, data)
     self.treeWidget.setItemWidget(item, 1, self._getCheckBox(data, "exclude", item, 1))
     self.treeWidget.setItemWidget(item, 2, self._getCheckBox(data, "enable", item, 2))
@@ -178,7 +180,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     else:
       item.setFlags(Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled | Qt.ItemIsSelectable)
   
-  def _setState(self, state:int, index:int, item:XMLDirectory | XMLVar):
+  def _setState(self, state:int, index:int, item: XMLDirectory|XMLVar):
     '''
     Set data in XMLDirectory or XMLVar.
     This could be to enable mapping or enable history.
@@ -225,32 +227,32 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self._setupRow(node, v)
     return node
   
-  def _createDirectoryNode(self, parent:QTreeWidgetItem, dir:XMLDirectory, isRootNode:bool = False) -> QTreeWidgetItem:
+  def _createDirectoryNode(self, parent:QTreeWidgetItem, directory:XMLDirectory, isRootNode:bool = False) -> QTreeWidgetItem:
     '''
     Create a directory entry in the Tree.
     This will recursively add sub directories and variables in the directories.
     '''
-    name = dir.name
-    if dir.newName != None:
-      name = "{} (Orig.: {})".format(dir.newName, dir.name)
+    name = directory.name
+    if directory.newName != None:
+      name = "{} (Orig.: {})".format(directory.newName, directory.name)
     description = ''
-    if dir.newDescription != None:
-      description = "{} (Added descr.)".format(dir.newDescription)
-    mainNode = QTreeWidgetItem(parent, [name] + [""]*3 + [description] + [dir.newDestination or ''])
-    if dir.newName != None:
+    if directory.newDescription != None:
+      description = "{} (Added descr.)".format(directory.newDescription)
+    mainNode = QTreeWidgetItem(parent, [name] + [""]*3 + [description] + [directory.newDestination or ''])
+    if directory.newName != None:
       mainNode.setForeground(0,QBrush(QColor("#FF0000")))
-    if dir.newDescription != None:
+    if directory.newDescription != None:
       mainNode.setForeground(4,QBrush(QColor("#FF0000")))
-    if dir.newDestination != None:
+    if directory.newDestination != None:
       mainNode.setForeground(5,QBrush(QColor("#FF0000")))
 
-    self._setupRow(mainNode, dir)
+    self._setupRow(mainNode, directory)
     if isRootNode == True:
       mainNode.setExpanded(True)
-    for d in dir.dirs:
-      lastNode = self._createDirectoryNode(mainNode, d)
-    for v in dir.vars:
-      node = self._createVariableNode(mainNode, v)
+    for d in directory.dirs:
+      self._createDirectoryNode(mainNode, d)
+    for v in directory.vars:
+      self._createVariableNode(mainNode, v)
     return mainNode
   
   def _mapItem(self, state:int, var:XMLVar, node:QTreeWidgetItem, index:int):
@@ -261,7 +263,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self._setState(state, index, var)
     logging.debug("Childs: {}".format(node.childCount()))
     
-  def _mapDirectory(self, state:int, dir:XMLDirectory, node:QTreeWidgetItem, index:int):
+  def _mapDirectory(self, state:int, directory:XMLDirectory, node:QTreeWidgetItem, index:int):
     '''
     Called when a directory is to be mapped. 
     The corresponding check box is edited.
@@ -271,7 +273,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     for chId in range(node.childCount()):
       ch = node.child(chId)
       self.treeWidget.itemWidget(ch, index).setCheckState(state)
-      self._setState(state, index, ch.data(0,Qt.UserRole))
+      self._setState(state, index, directory)
       
   def closeEvent(self, event):
     msg = "Are you sure you want to close the editor?"
