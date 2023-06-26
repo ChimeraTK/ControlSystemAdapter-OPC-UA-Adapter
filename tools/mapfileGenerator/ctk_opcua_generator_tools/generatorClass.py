@@ -1,7 +1,10 @@
+from __future__ import annotations
 import lxml.etree as ET
 #import xml.etree.ElementTree as ET
 import logging
 import re
+from typing import List
+
 
 class MapOption():
   def __init__(self):
@@ -64,13 +67,13 @@ class EncryptionSettings():
 class Config(EncryptionSettings):
   def __init__(self):
     super().__init__()
-    self.username = None
-    self.password = None
-    self.applicationName = None
-    self.rootFolder = None
+    self.username: str|None = None
+    self.password: str|None = None
+    self.applicationName: str|None = None
+    self.rootFolder: str|None = None
     self.applicationDescription = ""
     self.enableLogin = False
-    self.port = None
+    self.port: int|None = None
     
   def createConfig(self, root:ET.Element):
     '''
@@ -151,22 +154,27 @@ class XMLVar(MapOption):
     self.element = var
     self.name = var.attrib['name']
     # This name is set if the directory should be renamed
-    self.newName = None    
+    self.newName: str|None = None    
     self.valueType = var.find('value_type', namespaces=var.nsmap).text
     self.numberOfElements = int(var.find('numberOfElements', namespaces=var.nsmap).text)
     self.unit = var.find('unit', namespaces=var.nsmap).text
-    self.newUnit = None
+    self.newUnit: str|None = None
     self.direction = var.find('direction', namespaces=var.nsmap).text
     self.description = var.find('description', namespaces=var.nsmap).text
-    self.newDescription = None
-    self.newDestination = None
+    self.newDescription: str|None = None
+    self.newDestination: str|None = None
     self.fullName = path + "/" + self.name
 
   def __str__(self) -> str:
     return "Variable ({}, {}): {}".format(self.valueType, self.numberOfElements,self.name)
   
-  def __eq__(self, test:str) -> bool:
-    return test == self.fullName
+  def __eq__(self, other: object) -> bool:
+    if isinstance(other, str):
+      return other == self.fullName
+    elif isinstance(other, XMLVar):
+      return other.fullName == self.fullName 
+    else:
+      return NotImplemented
   
   def generateMapEntry(self, root:ET.Element, path:str):
     if self.newName or self.newDescription or self.newUnit or self.newDestination:
@@ -206,28 +214,33 @@ class XMLDirectory(MapOption):
   '''
   def __init__(self, name: str,  data:ET.Element, level: int, path:str = ''):
     super().__init__()
-    self.dirs = []
-    self.vars = []
+    self.dirs: List[XMLDirectory] = []
+    self.vars: List[XMLVar] = []
     self.element = data
     self.name = name
     self.path = path + "/" + name
     # This name is set if the directory should be renamed
-    self.newName = None
-    self.newDescription = None
-    self.newDestination = None
+    self.newName: str|None = None
+    self.newDescription: str|None = None
+    self.newDestination: str|None = None
     self.hierarchyLevel = level
     self.parseDir(data)
     
-  def __eq__(self, dir: str) -> str:
-    return dir == self.path
+  def __eq__(self, other: object) -> bool:
+    if isinstance(other, str):
+      return other == self.path
+    elif isinstance(dir, XMLDirectory):
+      return other.path == self.path
+    else:
+      return NotImplemented
       
-  def findDir(self, dir: str):
-    if self == dir:
+  def findDir(self, directory: str):
+    if self == directory:
       return self
     for d in self.dirs:
-      if d == dir:
+      if d == directory:
         return d
-      ret = d.findDir(dir)
+      ret = d.findDir(directory)
       if ret != None:
         return ret
     return None
@@ -247,18 +260,16 @@ class XMLDirectory(MapOption):
     Read directory information from XML directory entry.
     Includes reading variables and sub directories.
     '''
-    for dir in data.findall('directory',namespaces=data.nsmap):
-      self.dirs.append(XMLDirectory(name = dir.attrib['name'], data=dir, level=self.hierarchyLevel+1, path = self.path))
+    for directory in data.findall('directory',namespaces=data.nsmap):
+      self.dirs.append(XMLDirectory(name = directory.attrib['name'], data=directory, level=self.hierarchyLevel+1, path = self.path))
     for var in data.findall('variable',namespaces=data.nsmap):
       self.vars.append(XMLVar(var, self.path))
       
   def __str__(self):
-    space = ""
-    for i in range(self.hierarchyLevel):
-      space = space + "\t"
+    space = self.hierarchyLevel*"\t"
     out = space + "Directory (level: {}): {} \n".format(self.hierarchyLevel,self.path)
-    for dir in self.dirs:
-      out = out + str(dir)
+    for directory in self.dirs:
+      out = out + str(directory)
     for var in self.vars:
       out = out + space +  "\t" + str(var) + "\n"
 
@@ -291,8 +302,8 @@ class XMLDirectory(MapOption):
     self.newName = None
     self.newDescription = None
     self.newDestination = None
-    for dir in self.dirs:
-      dir.reset()
+    for directory in self.dirs:
+      directory.reset()
     for var in self.vars:
       var.reset()      
   
@@ -301,11 +312,9 @@ class MapGenerator(Config):
     super().__init__()
     self.inputFile = inputFile
     self.outputFile = None
-    self.isChimeraTKXML = False
     self.applicationName = None
     self.nsmap = None
     self.nsmapMapfile = None
-    self.dir = None
     self.parseChimeraTK()
     
   def parseChimeraTK(self):
@@ -327,7 +336,7 @@ class MapGenerator(Config):
     if logging.root.level == logging.DEBUG:
       print(self.dir) 
     
-  def parseMapFile(self, inputFile:str) -> list[int]:
+  def parseMapFile(self, inputFile:str) -> List[int]:
     '''
     Parse an existing map file.
     @param inputFile: The map file name.
@@ -350,14 +359,14 @@ class MapGenerator(Config):
       nSkipped = [0,0]
       for folder in data.findall('folder', namespaces=data.nsmap):
         if "sourceName" in  folder.attrib:
-          dir = self.dir.findDir("/root" + folder.attrib["sourceName"])
-          if dir != None:
+          directory = self.dir.findDir("/root" + folder.attrib["sourceName"])
+          if directory != None:
             if folder.find('description', namespaces=folder.nsmap) != None:
-              dir.newDescription = folder.find('description', namespaces=folder.nsmap).text 
+              directory.newDescription = folder.find('description', namespaces=folder.nsmap).text 
             if folder.find('name', namespaces=folder.nsmap) != None:
-              dir.newName = folder.find('name', namespaces=folder.nsmap).text  
+              directory.newName = folder.find('name', namespaces=folder.nsmap).text  
             if folder.find('destination', namespaces=folder.nsmap) != None:
-              dir.newDestination = folder.find('destination', namespaces=folder.nsmap).text
+              directory.newDestination = folder.find('destination', namespaces=folder.nsmap).text
           else:
             logging.warning("Failed to find source {} in the application variable tree!".format("/root" + folder.attrib["sourceName"]))
             nSkipped[0] =  nSkipped[0] + 1
@@ -404,12 +413,3 @@ class MapGenerator(Config):
     logging.debug("analysing file {}".format(inputFile))
     data = ET.parse(inputFile).getroot()
     return data
-    
-  def isChimeraTKXML(self) -> bool:
-    '''
-    The given input file could be an XML generated by the ChimeraTK
-    XML generator of the application or an already created map file.
-    
-    @return (boolean): True if it is a ChimeraTK XML file.
-    '''
-    return self.isChimeraTKXML
