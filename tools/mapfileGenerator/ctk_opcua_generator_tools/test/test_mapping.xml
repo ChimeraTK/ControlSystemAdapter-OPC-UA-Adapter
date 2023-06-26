@@ -7,13 +7,14 @@
   </config>
   <folder sourceName="/Configuration" copy="False">
     <description>newDirDescription</description>
-    <destination>/Test</destination>
+    <destination>Test</destination>
+    <name>newName</name>
   </folder>
   <process_variable sourceName="/Configuration/test" copy="False">
     <description>newPVDescription</description>
     <unit>newUnit</unit>
     <name>newName</name>
-    <destination>/Test</destination>
+    <destination>Test</destination>
   </process_variable>
   
 </uamapping>

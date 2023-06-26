@@ -165,7 +165,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     elif index == 4:
       # Description
       data.newDescription = item.text(index)
-      item.setText(index, item.text(index) + " (Orig.: " + str(data.description or '') + ")")
+      item.setText(index, item.text(index) +  " (Added descr.)")
       item.setForeground(index,QBrush(QColor("#FF0000")))
     self.treeWidget.blockSignals(False)
     
@@ -214,6 +214,14 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     if v.newUnit != None:
       unit = "{} (Orig.: {})".format(v.newUnit, v.unit)
     node = QTreeWidgetItem(parent, [name]+[""]*2 + [unit] + [description]+[""])
+    if v.newName != None:
+      node.setForeground(0,QBrush(QColor("#FF0000")))
+    if v.newUnit != None:
+      node.setForeground(3,QBrush(QColor("#FF0000")))
+    if v.newDescription != None:
+      node.setForeground(4,QBrush(QColor("#FF0000")))
+    if v.newDestination != None:
+      node.setForeground(5,QBrush(QColor("#FF0000")))
     self._setupRow(node, v)
     return node
   
@@ -229,6 +237,13 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     if dir.newDescription != None:
       description = "{} (Added descr.)".format(dir.newDescription)
     mainNode = QTreeWidgetItem(parent, [name] + [""]*3 + [description] + [dir.newDestination or ''])
+    if dir.newName != None:
+      mainNode.setForeground(0,QBrush(QColor("#FF0000")))
+    if dir.newDescription != None:
+      mainNode.setForeground(4,QBrush(QColor("#FF0000")))
+    if dir.newDestination != None:
+      mainNode.setForeground(5,QBrush(QColor("#FF0000")))
+
     self._setupRow(mainNode, dir)
     if isRootNode == True:
       mainNode.setExpanded(True)
@@ -384,7 +399,11 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
       name = QFileDialog.getOpenFileName(self, caption='Load existing mapping file', filter="XML files (*.xml)", options=QFileDialog.DontResolveSymlinks)
       if name[0]:
         try:    
-          self.MapGenerator.parseMapFile(name[0])
+          missed = self.MapGenerator.parseMapFile(name[0])
+          if missed[0] != 0 or missed[1] != 0:
+            QMessageBox.warning(self, "Map file generator", 
+                           "{} directories and {} PV could not be found by their source name in the original variable tree.\n Probably"
+                           " the mapping file does not correspong to the application XML file or the application was changed in the mean time.".format(missed[0], missed[1]))
           self._blockAndSetCheckbox(self.MapGenerator.addUnsecureEndpoint, self.addUnsecureEndpoint)
           self._blockAndSetCheckbox(self.MapGenerator.encryptionEnabled, self.enableEncryptionButton)
           self._blockAndSetCheckbox(self.MapGenerator.enableLogin, self.enableLoginSwitch)
@@ -394,6 +413,8 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
           self.password.setEnabled(self.MapGenerator.enableLogin)
           self._blockAndSetTextBox(self.MapGenerator.username, self.userName)
           self._blockAndSetTextBox(self.MapGenerator.password, self.password)
+          # update the tree
+          self.fillTree()
         except RuntimeError as error:
           QMessageBox.critical(self, "Map file generator", 
                                "Failed to load map file: {}\n Error: {}".format(name[0], error) )
