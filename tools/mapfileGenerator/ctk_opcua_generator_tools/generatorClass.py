@@ -1,4 +1,3 @@
-from __future__ import annotations
 import lxml.etree as ET
 #import xml.etree.ElementTree as ET
 import logging

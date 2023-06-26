@@ -1,8 +1,6 @@
-from __future__ import annotations
 from PyQt5.QtWidgets import QFileDialog, QDialog, QMainWindow, QTreeWidgetItem, QCheckBox, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QColor
-import lxml.etree as ET
 import os
 from ctk_opcua_generator_tools.generatorUI import Ui_MainWindow
 from ctk_opcua_generator_tools.encryptionUI import Ui_EncryptionDialog
