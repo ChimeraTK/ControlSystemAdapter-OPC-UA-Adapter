@@ -35,7 +35,7 @@ class EncryptionSettings():
     if self.trustList == None or (self.issuerList == None or self.blockList == None):
       raise RuntimeError("No trust list or CA related configuration set.")
   
-  def createEncryption(self, security: ET.Element):
+  def createEncryption(self, security: ET._Element):
     if self.addUnsecureEndpoint:
       security.set("unsecure", "True")
     else:
@@ -49,7 +49,7 @@ class EncryptionSettings():
     if self.blockList:
       security.set("blocklist", self.blockList)  
 
-  def readEncryption(self, data: ET.Element):
+  def readEncryption(self, data: ET._Element):
     if 'unsecure' in data.attrib and data.attrib['unsecure'] == 'True':
       self.addUnsecureEndpoint = True
     if 'privatekey' in data.attrib:
@@ -74,7 +74,7 @@ class Config(EncryptionSettings):
     self.enableLogin = False
     self.port: int|None = None
     
-  def createConfig(self, root:ET.Element):
+  def createConfig(self, root:ET._Element):
     '''
     Create server config XML section of the map file.
     
@@ -110,7 +110,7 @@ class Config(EncryptionSettings):
       self.checkEncryptionSettings()
       self.createEncryption(ET.SubElement(config, "security"))
     
-  def readConfig(self, data: ET.Element):
+  def readConfig(self, data: ET._Element):
     config = data.find('config',namespaces=data.nsmap)
     if config != None:
       if 'rootFolder' in config.attrib:
@@ -148,7 +148,7 @@ class XMLVar(MapOption):
   '''
   Class used to store all relevant information of process variables.
   '''
-  def __init__(self, var:ET.Element, path:str):
+  def __init__(self, var:ET._Element, path:str):
     super().__init__()
     self.element = var
     self.name = var.attrib['name']
@@ -175,7 +175,7 @@ class XMLVar(MapOption):
     else:
       return NotImplemented
   
-  def generateMapEntry(self, root:ET.Element, path:str):
+  def generateMapEntry(self, root:ET._Element, path:str):
     if self.newName or self.newDescription or self.newUnit or self.newDestination:
       logging.debug("Adding xml entry for process_variable for {}/{}".format(path.removeprefix('/root'),self.name))
       pv = ET.SubElement(root, "process_variable")
@@ -211,7 +211,7 @@ class XMLDirectory(MapOption):
   Class used to store all relevant information of CS directories.
   It includes sub directories and process variables.
   '''
-  def __init__(self, name: str,  data:ET.Element, level: int, path:str = ''):
+  def __init__(self, name: str,  data:ET._Element, level: int, path:str = ''):
     super().__init__()
     self.dirs: List[XMLDirectory] = []
     self.vars: List[XMLVar] = []
@@ -254,7 +254,7 @@ class XMLDirectory(MapOption):
         return ret
     return None
 
-  def parseDir(self, data:ET.Element):
+  def parseDir(self, data:ET._Element):
     '''
     Read directory information from XML directory entry.
     Includes reading variables and sub directories.
@@ -274,7 +274,7 @@ class XMLDirectory(MapOption):
 
     return out
   
-  def generateMapEntries(self, root:ET.Element):
+  def generateMapEntries(self, root:ET._Element):
     for d in self.dirs:
       d.generateMapEntries(root)
     for var in self.vars:
@@ -405,7 +405,7 @@ class MapGenerator(Config):
     with open(self.outputFile, "w") as text_file:
       text_file.write(prettyXml)
     
-  def _openFile(self, inputFile: str) -> ET.Element:
+  def _openFile(self, inputFile: str) -> ET._Element:
     '''
     Open an xml file.
     '''
