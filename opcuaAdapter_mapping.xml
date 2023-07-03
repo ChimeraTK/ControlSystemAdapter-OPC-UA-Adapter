@@ -8,11 +8,39 @@
 				  blocklist="../certs/block"
 				  issuerlist="../certs/issuer"/>-->
 		<login username="test" password="test123" />
+		<implcit_mapping>False</implcit_mapping>
 		<process_variable_hierarchy>
 			<unroll pathSep="/">True</unroll>
 		</process_variable_hierarchy>
 		<mapping_exceptions>False</mapping_exceptions>
+		<historizing max_nodes="100" max_length="10" interval="500" />
 	</config>
+
+<!-- Exclude Options
+		Now all variables used in the Application are connected to the control system. This could
+		blow uo the address space. Since many variables that are not needed to interact with the application
+		and overwhelm the user are often present, the user can exclude paths.
+-->
+
+<!--
+	- exact match
+	- only the PV matched
+-->
+	<exclude sourceName="dir/test" />
+	<exclude sourceName="testDoubleArray_31000" />
+
+	<!--
+        - PV name includes string dir/test
+        - Directory and PV would be matched
+        - If multiple PVs exist (e.g. dir/test1, /dir/test2) all are matched
+        - To exclude only the PVs one would have to add dir/test1 and /dir/test2 explicitly → will be done be the GUI anyways
+    -->
+	<exclude sourceName="dir/test*" />
+<!--
+	- PV name does not match dir/test/
+	- Directory and all PV in that directory including subdirectories with their PVs would match
+-->
+	<exclude sourceName="dir/test/*" />
 
 <!-- (1) Process variable options
   Information:
@@ -35,7 +63,7 @@
    5. Destination -> pv is created in root directory
 -->
 	<!-- D1 [x]-->
-	<process_variable sourceName="testDoubleArray_10000">
+	<process_variable sourceName="testDoubleArray_10000" history="1">
 		<destination>A</destination>
 		<name>testDoubleArray_10000</name>
 		<description>Test Desc D1</description>

@@ -34,10 +34,8 @@ class ua_mapped_class {
  protected:
   nodePairList ownedNodes;
   UA_NodeId baseNodeId{};
-  UA_DateTime sourceTimeStamp{};
 
  public:
-  UA_Client* mappedClient{};
   UA_Server* mappedServer;
 
   /** @brief Constructor of the class with parameter

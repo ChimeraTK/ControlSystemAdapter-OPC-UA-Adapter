@@ -67,20 +67,20 @@ struct FolderInfo {
  *
  */
 struct ServerConfig {
-  string rootFolder = "";
-  string descriptionFolder = "";
+  string rootFolder;
+  string descriptionFolder;
   UA_Boolean UsernamePasswordLogin = UA_FALSE;
-  string password = "";
-  string username = "";
+  string password;
+  string username;
   string applicationName = "OPCUA-Adapter";
   uint16_t opcuaPort = 16664;
   bool enableSecurity = false;
   bool unsecure = false;
-  string certPath = "";
-  string keyPath = "";
-  string allowListFolder = "";
-  string blockListFolder = "";
-  string issuerListFolder = "";
+  string certPath;
+  string keyPath;
+  string allowListFolder;
+  string blockListFolder;
+  string issuerListFolder;
 };
 
 /** @class ua_uaadapter
@@ -99,7 +99,6 @@ struct ServerConfig {
 class ua_uaadapter : ua_mapped_class {
  private:
   UA_ServerConfig* server_config;
-  UA_ServerNetworkLayer server_nl;
 
   UA_NodeId variablesListId;
   UA_NodeId constantsListId;
@@ -108,6 +107,7 @@ class ua_uaadapter : ua_mapped_class {
   UA_NodeId ownNodeId;
   string pvSeperator;
   UA_Boolean mappingExceptions;
+  UA_Boolean implicitMapping;
 
   ServerConfig serverConfig;
 
@@ -139,6 +139,8 @@ class ua_uaadapter : ua_mapped_class {
 
  public:
   bool running = false; // set to false to stop the worker thread
+  //TODO move this field to private and add getter and setter
+  vector<string> exclude;
 
   /** @brief Constructor of the class.
    *

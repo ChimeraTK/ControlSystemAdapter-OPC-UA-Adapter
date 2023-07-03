@@ -42,7 +42,6 @@ ua_mapped_class::ua_mapped_class(UA_Server* server, UA_NodeId baseNodeId) {
 ua_mapped_class::~ua_mapped_class() {
   this->ua_unmapSelfFromNamespace();
   this->mappedServer = nullptr;
-  this->mappedClient = nullptr;
   UA_NodeId_clear(&this->baseNodeId);
 }
 

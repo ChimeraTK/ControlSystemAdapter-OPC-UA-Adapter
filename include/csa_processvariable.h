@@ -97,11 +97,6 @@ class ua_processvariable : ua_mapped_class {
                                                                void* sessionContext, const UA_NodeId* nodeId, void* nodeContext, UA_Boolean includeSourceTimeStamp,
                                                                const UA_NumericRange* range, UA_DataValue* value);
 
-  /** @brief Set name of processvariable
-  *
-  * @param name Name of the processvariable
-  */
-  void setName(string name);
   /** @brief  Get name of processvariable
   *
   * @return <String> of the name of processvariable
@@ -112,11 +107,6 @@ class ua_processvariable : ua_mapped_class {
                                                                void* sessionContext, const UA_NodeId* nodeId, void* nodeContext, UA_Boolean includeSourceTimeStamp,
                                                                const UA_NumericRange* range, UA_DataValue* value);
 
-  /** @brief  Set type of processvariable
-  *
-  * @param type Define the type of the processvariable
-  */
-  void setType(string type);
   /** @brief  Get type of processvariable
   *
   * @return <String> of the type

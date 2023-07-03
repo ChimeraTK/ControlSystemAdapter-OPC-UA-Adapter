@@ -41,9 +41,35 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
   vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
 
   // start implicit var mapping
+  bool skip_var = false;
   for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables) {
-    // adapter->addVariable(oneProcessVariable->getName(), this->csManager);
-    adapter->implicitVarMapping(oneProcessVariable->getName(), this->csManager);
+    for(auto e : this->adapter->exclude){
+      string suffix_1 = "/*", suffix_2 ="*";
+      if(e.rfind(suffix_1) == e.size() - suffix_1.size()){
+        //ToDo adjust behavior - currently next case does the same
+        if(oneProcessVariable->getName().rfind(e.substr(0, e.size()-2)) == 0){
+          cout << "Info: exclude var (*) from mapping " << oneProcessVariable->getName() << endl;
+          skip_var = true;
+        }
+      } else if(e.rfind(suffix_2) == e.size() - suffix_2.size()){
+        if(oneProcessVariable->getName().rfind(e.substr(0, e.size()-1)) == 0){
+          cout << "Info: exclude var (*) from mapping " << oneProcessVariable->getName() << endl;
+          skip_var = true;
+        }
+      } else {
+         //case exact match
+         if(oneProcessVariable->getName().compare(e) == 0){
+           cout << "Info: exclude var (direct match) from mapping " << oneProcessVariable->getName() << endl;
+           skip_var = true;
+         }
+      }
+    }
+    if(!skip_var){
+        adapter->implicitVarMapping(oneProcessVariable->getName(), this->csManager);
+    } else {
+        cout << "Info: exclude var from mapping " << oneProcessVariable->getName() << endl;
+        skip_var = false;
+    }
   }
 
   adapter->applyMapping(this->csManager);
