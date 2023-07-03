@@ -295,7 +295,21 @@ void ua_uaadapter::readConfig() {
         this->mappingExceptions = UA_FALSE;
       }
     }
-
+    vector<xmlNodePtr> implicitMappingVector =
+        xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "implcit_mapping");
+    if(implicitMappingVector.empty()) {
+      this->implicitMapping = UA_FALSE;
+    }
+    else {
+      placeHolder = xml_file_handler::getContentFromNode(mappingExceptionsVector[0]);
+      transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
+      if(placeHolder == "TRUE") {
+        this->implicitMapping = UA_TRUE;
+      }
+      else {
+        this->implicitMapping = UA_FALSE;
+      }
+    }
     xmlXPathFreeObject(result);
   }
   result = this->fileHandler->getNodeSet(xpath + "//login");
@@ -441,6 +455,19 @@ void ua_uaadapter::readConfig() {
     cout << "No <process_variable_hierarchy>-Tag in config file. Use default hierarchical mapping with '/'." << endl;
     this->pvSeperator = "/";
   }
+
+  xmlXPathObjectPtr result_exclude = this->fileHandler->getNodeSet("//exclude");
+  xmlNodeSetPtr nodeset;
+  if(result_exclude) {
+    nodeset = result_exclude->nodesetval;
+    for(int32_t i = 0; i < nodeset->nodeNr; i++) {
+      string exclude_string = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
+      if(!exclude_string.empty()) {
+        this->exclude.insert(this->exclude.begin(), exclude_string);
+      }
+    }
+  }
+  xmlXPathFreeObject(result_exclude);
 }
 
 void ua_uaadapter::applyMapping(const boost::shared_ptr<ControlSystemPVManager>& csManager) {
@@ -1265,9 +1292,6 @@ UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
   this->ownNodeId = createdNodeId;
   ua_mapInstantiatedNodes(this->ownNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &this->ownedNodes);
 
-  // Nodes "Variables" where created on object instantiation, we need these IDs to add new process variables to them...
-  // UA_NodeId_copy(nodePairList_getTargetIdBySourceId(this->ownedNodes, UA_NODEID_NUMERIC(CSA_NSID,
-  // CSA_NSID_VARIABLES)), &this->variablesListId);
   return UA_STATUSCODE_GOOD;
 }
 

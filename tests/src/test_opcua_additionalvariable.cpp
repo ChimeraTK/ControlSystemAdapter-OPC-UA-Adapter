@@ -183,7 +183,7 @@ void AdditionalVariableTest::testClientSide() {
             string valName = "";
 
             // Check Description -> for all the same
-            UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)valueToCheck.data)), valName);
+            UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)valueToCheck.data)), valName)
             //cout << "Description: " << valName << endl;
             BOOST_CHECK(valName == "Value");
 
