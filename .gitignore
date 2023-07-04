@@ -34,3 +34,4 @@ cov_htmp/
 app.info
 doc/html/
 __pycache__
+/.mypy_cache/

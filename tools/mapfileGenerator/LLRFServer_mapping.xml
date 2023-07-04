@@ -1,6 +1,0 @@
-<uamapping xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
-  <config description="">
-    <server applicationName="LLRFServer"/>
-    <security unsecure="True" privatekey="/home/zenker/ElbeCA/grafana_cert.der" certificate="/home/zenker/ElbeCA/grafana_key.der" trustlist="/home/zenker/sw/chimeraTK" issuerlist="/home/zenker/sw/ogre/Docs" blocklist="/home/zenker/sw/ogre"/>
-  </config>
-</uamapping>
