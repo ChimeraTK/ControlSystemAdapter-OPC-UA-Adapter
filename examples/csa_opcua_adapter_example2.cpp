@@ -32,8 +32,8 @@ extern "C" {
 #include <errno.h>
 #include <stdlib.h>
 
-#include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
-#include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
+#include <ChimeraTK/ControlSystemAdapter/DevicePVManager.h>
+#include <ChimeraTK/ControlSystemAdapter/ApplicationBase.h>
 
 using namespace std;
 using namespace ChimeraTK;
@@ -45,9 +45,7 @@ struct MyApp : public ApplicationBase {
   void run() { cout << "Application run..." << endl; }
 
   void shutdown() {
-    std::lock_guard<std::mutex> lock(instance_mutex);
-    instance = nullptr;
-    hasBeenShutdown = true;
+    ApplicationBase::shutdown();
     cout << "Application shutdown..." << endl;
   }
 
