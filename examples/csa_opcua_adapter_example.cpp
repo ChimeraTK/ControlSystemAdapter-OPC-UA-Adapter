@@ -144,7 +144,7 @@ int main() {
     string nameDouble = "testDoubleArray_" + to_string(i);
     string nameInt = "testIntArray_" + to_string(i);
     ProcessArray<double>::SharedPtr testDoubleArray =
-        devManager->createProcessArray<double>(SynchronizationDirection::deviceToControlSystem, nameDouble, i);
+        devManager->createProcessArray<double>(SynchronizationDirection::bidirectional, nameDouble, i);
     ProcessArray<int32_t>::SharedPtr testIntArray =
         devManager->createProcessArray<int32_t>(SynchronizationDirection::deviceToControlSystem, nameInt, i);
     for(int32_t k = 0; k < i; k++) {
