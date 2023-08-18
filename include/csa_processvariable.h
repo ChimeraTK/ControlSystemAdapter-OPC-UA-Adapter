@@ -61,8 +61,15 @@ class ua_processvariable : ua_mapped_class {
   string description;
   UA_NodeId ownNodeId = UA_NODEID_NULL;
   UA_Processvariable_Type type;
-  bool array;
+  string node_historizing = "Default";
 
+ public:
+  const string& getNodeHistorizing() const;
+  void setNodeHistorizing(const string& nodeHistorizing);
+
+
+ private:
+  bool array;
   boost::shared_ptr<ControlSystemPVManager> csManager;
   UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, const string& baseNodePath, UA_DataSource_Map & map);
 

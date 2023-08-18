@@ -1050,6 +1050,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   description = UA_LOCALIZEDTEXT(
       (char*)"en_US", (char*)this->csManager->getProcessVariable(this->namePV)->getDescription().c_str());
 
+
   // Create our toplevel instance
   UA_VariableAttributes attr;
   UA_VariableAttributes_init(&attr);
@@ -1081,7 +1082,6 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
          UA_NODEID_STRING(1, (char*)(baseNodeIdName + "/" + this->nameNew).c_str()), &result) == UA_STATUSCODE_GOOD) {
     return UA_STATUSCODE_BADNODEIDEXISTS;
   }
-
   retval = UA_Server_addVariableNode(this->mappedServer,
       UA_NODEID_STRING(1, (char*)(baseNodeIdName + "/" + this->nameNew).c_str()), this->baseNodeId,
       UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*)this->nameNew.c_str()),
@@ -1468,4 +1468,10 @@ UA_NodeId ua_processvariable::getOwnNodeId() {
   UA_NodeId outputNode;
   UA_NodeId_copy(&this->ownNodeId, &outputNode);
   return outputNode;
+}
+const string& ua_processvariable::getNodeHistorizing() const {
+  return node_historizing;
+}
+void ua_processvariable::setNodeHistorizing(const string& nodeHistorizing) {
+  node_historizing = nodeHistorizing;
 }

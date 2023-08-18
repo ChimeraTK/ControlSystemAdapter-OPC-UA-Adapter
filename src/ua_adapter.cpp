@@ -18,6 +18,13 @@
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
  * Copyright (c) 2018-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
+#include <open62541/plugin/historydata/history_data_backend_memory.h>
+#include <open62541/plugin/historydata/history_data_gathering_default.h>
+#include <open62541/plugin/historydata/history_database_default.h>
+#include <open62541/plugin/historydatabase.h>
+#include <open62541/plugin/log_stdout.h>
+#include <open62541/server.h>
+
 
 extern "C" {
 #include "csa_namespace.h"
@@ -271,6 +278,56 @@ void ua_uaadapter::readConfig() {
       throw std::runtime_error("To many <config>-Tags in config file");
     }
 
+
+    /*
+     * result = this->fileHandler->getNodeSet(xpath + "//process_variable_hierarchy");
+if(result) {
+  xmlNodeSetPtr nodeset = result->nodesetval;
+  vector<xmlNodePtr> nodeVectorUnrollPathPV =
+      xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "unroll");
+  for(auto nodeUnrollPath : nodeVectorUnrollPathPV) {
+    string unrollSepEnabled = xml_file_handler::getContentFromNode(nodeUnrollPath);
+    transform(unrollSepEnabled.begin(), unrollSepEnabled.end(), unrollSepEnabled.begin(), ::toupper);
+    if(unrollSepEnabled == "TRUE") {
+      this->pvSeperator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
+    }
+  }
+     */
+
+    //check if historizing is configured
+    vector<xmlNodePtr> historizing = xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "historizing");
+    if(!historizing.empty()){
+      xmlXPathObjectPtr sub_sub_result = this->fileHandler->getNodeSet("//historizing");
+      if(sub_sub_result) {
+        xmlNodeSetPtr node_set = sub_sub_result->nodesetval;
+        for(int32_t i = 0; i < node_set->nodeNr; i++) {
+          vector<xmlNodePtr> nodeVectorhistorizingSetUp =
+              xml_file_handler::getNodesByName(node_set->nodeTab[i]->children, "setup");
+          string val;
+          for(auto& nodeHistorizingPath : nodeVectorhistorizingSetUp) {
+            val = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "name");
+            AdapterHistorySetup temp;
+            if(!val.empty()) {
+              temp.name = val;
+            }
+            val = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "max_nodes");
+            if(!val.empty()) {
+              temp.max_nodes = val;
+            }
+            val = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "entries_per_response");
+            if(!val.empty()) {
+              temp.entries_per_response = val;
+            }
+            val = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "interval");
+            if(!val.empty()) {
+              temp.interval = val;
+            }
+            this->serverConfig.history.insert(this->serverConfig.history.end(), temp);
+          }
+        }
+      }
+    }
+
     placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "rootFolder");
     if(!placeHolder.empty()) {
       this->serverConfig.rootFolder = placeHolder;
@@ -479,15 +536,186 @@ void ua_uaadapter::applyMapping(const boost::shared_ptr<ControlSystemPVManager>&
   this->addAdditionalVariables();
 }
 
+typedef struct{
+  UA_String *browse;
+  size_t found_folder;
+  size_t browse_path_size;
+  UA_Server *server;
+  UA_NodeId target_folder_nodeId;
+}folder_handler;
+
+UA_StatusCode browse_folder_structure(UA_NodeId childId, UA_Boolean isInverse, UA_NodeId referenceTypeId, void *handle){
+  if(isInverse)
+    return UA_STATUSCODE_GOOD;
+  auto *handler = (folder_handler*) handle;
+  UA_QualifiedName qn;
+  UA_Server_readBrowseName(handler->server, childId, &qn);
+
+  UA_NodeId temp = UA_NODEID_NULL;
+  if(handler->browse_path_size == handler->found_folder && UA_String_equal(&qn.name, &handler->browse[handler->found_folder]) && UA_NodeId_equal(&temp, &handler->target_folder_nodeId)){
+    printf("completed the browsepath with size %zu \n", handler->found_folder);
+    UA_NodeId_copy(&childId, &handler->target_folder_nodeId);
+    return UA_STATUSCODE_GOOD;
+  }
+  else if(UA_String_equal(&qn.name, &handler->browse[handler->found_folder])){
+    handler->found_folder++;
+    UA_Server_forEachChildNodeCall(handler->server, childId, browse_folder_structure, handler);
+  }
+  return UA_STATUSCODE_GOOD;
+}
+typedef struct{
+  UA_Server *server;
+  string history;
+  vector<UA_NodeId> *historizing_nodes;
+  vector<string> *historizing_setup;
+}handle_folder_variables;
+
+UA_StatusCode get_child_variables(UA_NodeId childId, UA_Boolean isInverse, UA_NodeId referenceTypeId, void *handle){
+  if(isInverse)
+    return UA_STATUSCODE_GOOD;
+  auto *handler = (handle_folder_variables*) handle;
+  UA_NodeClass outNodeClass;
+  UA_NodeClass_init(&outNodeClass);
+  UA_Server_readNodeClass(handler->server, childId, &outNodeClass);
+  if(outNodeClass == UA_NODECLASS_VARIABLE){
+    UA_NodeId *temp = UA_NodeId_new();
+    UA_NodeId_copy(&childId, temp);
+    handler->historizing_nodes->insert(handler->historizing_nodes->end(), *temp);
+    handler->historizing_setup->insert(handler->historizing_setup->end(), handler->history);
+  }
+  return UA_STATUSCODE_GOOD;
+}
+
+void ua_uaadapter::add_folder_historizing(vector<UA_NodeId> *historizing_nodes, vector<string> *historizing_setup){
+  for(size_t i=0;  i< this->serverConfig.historyfolders.size(); i++){
+    char *temp = const_cast<char*>(this->serverConfig.historyfolders[i].folder_name.c_str());
+    char ** res  = NULL;
+    char *  p    = strtok (temp, "/");
+    int n_spaces = 0, g;
+    /* split string and append tokens to 'res' */
+    while (p) {
+      res = (char **) realloc(res, sizeof (char*) * (unsigned long)++n_spaces);
+      if (res == NULL)
+        printf("error not enough memory");
+      res[n_spaces-1] = p;
+      p = strtok (NULL, "/");
+    }
+    /* print the result */
+    for (g = 0; g < (n_spaces); ++g)
+      printf ("res[%d] = %s\n", g, res[g]);
+
+    size_t old_size = historizing_nodes->size();
+    folder_handler handler;
+    handler.found_folder = 0;
+    handler.browse_path_size = n_spaces;
+    handler.server = this->mappedServer;
+    handler.browse = (UA_String*) UA_Array_new(1+n_spaces, &UA_TYPES[UA_TYPES_STRING]);
+    handler.browse[0] = UA_String_fromChars(this->serverConfig.rootFolder.c_str());
+    handler.target_folder_nodeId = UA_NODEID_NULL;
+    for (g = 0; g < (n_spaces); ++g){
+      handler.browse[1+g] = UA_String_fromChars(res[g]);
+    }
+    //browse the folder in the server
+    UA_Server_forEachChildNodeCall(this->mappedServer, UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), browse_folder_structure, &handler);
+    //todo map case when the target nodeid is not the first that is found
+    handle_folder_variables handle;
+    memset(&handle, 0, sizeof(handle_folder_variables));
+    handle.server = this->mappedServer;
+    handle.history = this->serverConfig.historyfolders[i].folder_historizing;
+    handle.historizing_nodes = historizing_nodes;
+    handle.historizing_setup = historizing_setup;
+    UA_Server_forEachChildNodeCall(this->mappedServer, handler.target_folder_nodeId, get_child_variables, &handle);
+  }
+}
+
+void ua_uaadapter::add_variable_historizing(vector<UA_NodeId> *historizing_nodes, vector<string> *historizing_setup){
+  for (auto& variable: this->variables){
+    string hist = variable->getNodeHistorizing();
+    if(hist != "Default"){
+      UA_NodeId id = variable->getOwnNodeId();
+      historizing_nodes->insert(historizing_nodes->end(), id);
+      historizing_setup->insert(historizing_setup->end(), hist);
+    }
+  }
+}
+
+void ua_uaadapter::set_variable_access_level_historizing(UA_NodeId id){
+  UA_Byte temp;
+  UA_Byte_init(&temp);
+  UA_Server_readAccessLevel(this->mappedServer, id, &temp);
+  UA_Byte case_read = UA_ACCESSLEVELMASK_READ;
+  UA_Byte case_read_write = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE;
+  if(temp == case_read){
+    UA_Byte access_level = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE ^ UA_ACCESSLEVELMASK_HISTORYREAD ^ UA_ACCESSLEVELMASK_HISTORYWRITE;
+    UA_Server_writeAccessLevel(this->mappedServer, id, access_level);
+  }
+  else if(temp == case_read_write){
+    UA_Byte access_level = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE ^ UA_ACCESSLEVELMASK_HISTORYREAD ^ UA_ACCESSLEVELMASK_HISTORYWRITE;
+    UA_Server_writeAccessLevel(this->mappedServer, id, access_level);
+  }
+  else{
+    printf("historizing already enabled\n");
+  }
+  UA_Server_writeHistorizing(this->mappedServer, id, true);
+}
+
+void ua_uaadapter::add_historizing_nodes(){
+  vector<UA_NodeId> historizing_nodes;
+  vector<string> historizing_setup;
+  //todo add historizing here and implement behavior if a variable has two historizing set ups
+  this->add_variable_historizing(&historizing_nodes, &historizing_setup);
+  this->add_folder_historizing(&historizing_nodes, &historizing_setup);
+  UA_HistoryDataGathering gathering = UA_HistoryDataGathering_Default(historizing_nodes.size());
+  this->server_config->historyDatabase = UA_HistoryDatabase_default(gathering);
+  UA_HistorizingNodeIdSettings setting;
+  setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_POLL;
+  for(size_t i=0; i< historizing_nodes.size(); i++){
+    AdapterHistorySetup hist;
+    bool found = false;
+    for(auto & j : this->serverConfig.history){
+      if(historizing_setup[i] == j.name) {
+        found = true;
+        hist = j;
+      }
+    }
+    if(!found){
+      cout <<"undefined history setup referenced \n";
+      break;
+    }
+    UA_String out = UA_STRING_NULL;
+    UA_print(&historizing_nodes[i], &UA_TYPES[UA_TYPES_NODEID], &out);
+    printf("%.*s\n", (int)out.length, out.data);
+    UA_String_clear(&out);
+    this->set_variable_access_level_historizing(historizing_nodes[i]);
+    char *temp;
+    setting.historizingBackend = UA_HistoryDataBackend_Memory(historizing_nodes.size(), (size_t) strtol(hist.max_nodes.c_str(), &temp, (int) strlen(hist.max_nodes.c_str())));
+    setting.maxHistoryDataResponseSize = (size_t) strtol(hist.entries_per_response.c_str(), &temp, (int) strlen(hist.entries_per_response.c_str()));
+    setting.pollingInterval = (size_t) strtol(hist.interval.c_str(), &temp, (int) strlen(hist.interval.c_str()));
+    UA_StatusCode retval = gathering.registerNodeId(this->mappedServer, gathering.context, &historizing_nodes[i], setting);
+    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
+        "registerNodeId %s", UA_StatusCode_name(retval));
+    retval = gathering.startPoll(this->mappedServer, gathering.context, &historizing_nodes[i]);
+  }
+  for(size_t i=0; i<historizing_nodes.size(); i++){
+    UA_String out = UA_STRING_NULL;
+    UA_print(&historizing_nodes[i], &UA_TYPES[UA_TYPES_NODEID], &out);
+    printf("add historizing %s for node %.*s\n", historizing_setup[i].c_str(), (int)out.length, out.data);
+    UA_String_clear(&out);
+  }
+  //clear the lists
+  historizing_nodes.clear();
+  historizing_setup.clear();
+}
+
 void ua_uaadapter::workerThread() {
   if(this->mappedServer == nullptr) {
     cout << "No server mapped" << endl;
     return;
   }
-
+  cout << "Enable historizing" << endl;
+  add_historizing_nodes();
   cout << "Starting the server worker thread" << endl;
   UA_Server_run_startup(this->mappedServer);
-
   this->running = true;
   while(this->running) {
     UA_Server_run_iterate(this->mappedServer, true);
@@ -607,6 +835,17 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
       vector<xmlNodePtr> nodeDescription =
           xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "description");
       string sourceName = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
+
+
+      string history = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "history");
+      if(!history.empty() && !sourceName.empty()){
+        printf("found folder historizing set up %s \n ", history.c_str());
+        AdapterFolderHistorySetup temp;
+        temp.folder_historizing = history;
+        temp.folder_name = sourceName;
+        this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
+      }
+
       string copy = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "copy");
       if(!nodeFolderPath.empty()) {
         destination = xml_file_handler::getContentFromNode(nodeFolderPath[0]);
@@ -837,7 +1076,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
   if(result) {
     nodeset = result->nodesetval;
     for(int32_t i = 0; i < nodeset->nodeNr; i++) {
-      string sourceName, copy, destination, name, unit, description, unrollPath;
+      string sourceName, copy, destination, name, unit, description, unrollPath, history;
       vector<xmlNodePtr> nodeDestination =
           xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "destination");
       vector<xmlNodePtr> nodeName = xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "name");
@@ -845,6 +1084,19 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
       vector<xmlNodePtr> nodeDescription =
           xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "description");
       sourceName = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
+      history = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "history");
+      if(!history.empty()){
+        if(!nodeName.empty()){
+          name = xml_file_handler::getContentFromNode(nodeName[0]);
+          for(auto& variable : this->variables) {
+            string temp = variable->getName();
+            if(temp == name) {
+              printf("add historizing for node %s with setup %s \n", name.c_str(), history.c_str());
+              variable->setNodeHistorizing(history);
+            }
+          }
+        }
+      }
       copy = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "copy");
       transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
 

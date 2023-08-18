@@ -20,7 +20,7 @@ find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 find_package(open62541 1.3 REQUIRED)
 
-find_package(ChimeraTK-ControlSystemAdapter 02.06 REQUIRED)
+find_package(ChimeraTK-ControlSystemAdapter 02.05 REQUIRED)
 
 ##########################################################################################################
 ## Set the build type to Release if none is specified
