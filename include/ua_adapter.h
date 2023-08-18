@@ -66,6 +66,18 @@ struct FolderInfo {
  *  @date 03.12.2016
  *
  */
+typedef struct{
+  string folder_historizing;
+  string folder_name;
+}AdapterFolderHistorySetup;
+
+typedef struct{
+  string name;
+  string max_nodes;
+  string entries_per_response;
+  string interval;
+} AdapterHistorySetup;
+
 struct ServerConfig {
   string rootFolder;
   string descriptionFolder;
@@ -81,6 +93,8 @@ struct ServerConfig {
   string allowListFolder;
   string blockListFolder;
   string issuerListFolder;
+  vector<AdapterHistorySetup> history{};
+  vector<AdapterFolderHistorySetup> historyfolders{};
 };
 
 /** @class ua_uaadapter
@@ -280,9 +294,30 @@ class ua_uaadapter : ua_mapped_class {
    */
   vector<ua_processvariable*> getVariables();
 
+
+  /** @brief adds AccessLeve HistoryRead and HistoryWrite for configured variables
+   *
+   */
+  void set_variable_access_level_historizing(UA_NodeId id);
+
+  /** @brief enables historizing for configured variables in the server
+   *
+   */
+
+  void add_folder_historizing(vector<UA_NodeId> *historizing_nodes, vector<string> *historizing_setup);
+
   /** @brief Create and start a thread for the opcua server instance
    *
    */
+
+  void add_variable_historizing(vector<UA_NodeId> *historizing_nodes, vector<string> *historizing_setup);
+
+  /** @brief Create and start a thread for the opcua server instance
+   *
+   */
+
+  void add_historizing_nodes();
+
   void workerThread();
 
   /** @brief This Methode reads the config-tag form the given <variableMap.xml>.
