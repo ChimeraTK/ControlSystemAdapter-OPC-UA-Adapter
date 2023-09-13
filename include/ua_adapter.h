@@ -30,6 +30,7 @@
 #include <open62541/config.h>
 #include <open62541/plugin/accesscontrol.h>
 #include <open62541/plugin/accesscontrol_default.h>
+#include <open62541/plugin/historydata/history_data_gathering.h>
 #include <open62541/server_config_default.h>
 
 #include <vector>
@@ -68,14 +69,14 @@ struct FolderInfo {
  */
 typedef struct{
   string folder_historizing;
-  string folder_name;
+  UA_NodeId folder_id;
 }AdapterFolderHistorySetup;
 
 typedef struct{
   string name;
-  string max_nodes;
-  string entries_per_response;
-  string interval;
+  size_t max_length;
+  size_t entries_per_response;
+  size_t interval;
 } AdapterHistorySetup;
 
 struct ServerConfig {
@@ -316,7 +317,7 @@ class ua_uaadapter : ua_mapped_class {
    *
    */
 
-  void add_historizing_nodes();
+  void add_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup, UA_HistoryDataGathering gathering);
 
   void workerThread();
 
