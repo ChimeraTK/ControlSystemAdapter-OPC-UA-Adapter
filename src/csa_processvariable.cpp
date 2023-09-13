@@ -1475,3 +1475,23 @@ const string& ua_processvariable::getNodeHistorizing() const {
 void ua_processvariable::setNodeHistorizing(const string& nodeHistorizing) {
   node_historizing = nodeHistorizing;
 }
+void ua_processvariable::setHistorizingNodeId(const UA_NodeId id) {
+  UA_NodeId_copy(&id, &historizing_node);
+}
+
+UA_NodeId ua_processvariable::getHistorizingNodeId() {
+  UA_NodeId outputNode;
+  UA_NodeId_copy(&this->historizing_node, &outputNode);
+  return outputNode;
+}
+
+void ua_processvariable::setTargetHistorizingNodeId(const UA_NodeId id) {
+  UA_NodeId_copy(&id, &historizing_node);
+}
+
+UA_NodeId ua_processvariable::getTargetHistorizingNodeId() {
+  UA_NodeId outputNode;
+  UA_NodeId_copy(&this->historizing_node, &outputNode);
+  return outputNode;
+}
+
