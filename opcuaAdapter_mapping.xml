@@ -14,8 +14,8 @@
 		</process_variable_hierarchy>
 		<mapping_exceptions>False</mapping_exceptions>
 		<historizing>
-			<setup name="fsdf" max_nodes="100" entries_per_response="10" interval="500"/>
-			<setup name="fdf" max_nodes="100" entries_per_response="10" interval="500"/>
+			<setup name="fsdf" max_length="100" entries_per_response="10" interval="500"/>
+			<setup name="fdf" max_length="100" entries_per_response="10" interval="500"/>
 		</historizing>
 	</config>
 
@@ -372,7 +372,7 @@
 		<description>Folder Description of A/B</description>
 	</folder>
 	<!-- update folder description of created folder 'A' -->
-	<folder>
+	<folder history="fdf">
 		<name>A</name>
 		<description>Description of A</description>
 	</folder>

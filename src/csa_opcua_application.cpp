@@ -101,6 +101,7 @@ int main() {
   cout << "Create the adapter" << endl;
   csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
 
+  printf("test build\n");
   cout << "Run the application instance" << endl;
   ChimeraTK::ApplicationBase::getInstance().run();
 
