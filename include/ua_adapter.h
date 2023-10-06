@@ -22,21 +22,36 @@
 #ifndef MTCA_UAADAPTER_H
 #define MTCA_UAADAPTER_H
 
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
-#include "csa_additionalvariable.h"
-#include "csa_processvariable.h"
-#include "ua_mapped_class.h"
-#include "xml_file_handler.h"
+
 #include <open62541/config.h>
 #include <open62541/plugin/accesscontrol.h>
 #include <open62541/plugin/accesscontrol_default.h>
 #include <open62541/plugin/historydata/history_data_gathering.h>
 #include <open62541/server_config_default.h>
-
-#include <vector>
+#include "node_historizing.h"
 
 using namespace ChimeraTK;
 using namespace std;
+
+struct ServerConfig {
+  string rootFolder;
+  string descriptionFolder;
+  UA_Boolean UsernamePasswordLogin = UA_FALSE;
+  string password;
+  string username;
+  string applicationName = "OPCUA-Adapter";
+  uint16_t opcuaPort = 16664;
+  bool enableSecurity = false;
+  bool unsecure = false;
+  string certPath;
+  string keyPath;
+  string allowListFolder;
+  string blockListFolder;
+  string issuerListFolder;
+  vector<AdapterHistorySetup> history{};
+  vector<AdapterFolderHistorySetup> historyfolders{};
+  vector<AdapterPVHistorySetup> historyvariables{};
+};
 
 /** @struct FolderInfo
  *	@brief This struct represents a folder in OPCUA with its own node id and with his parent and child node id. For
@@ -67,36 +82,7 @@ struct FolderInfo {
  *  @date 03.12.2016
  *
  */
-typedef struct{
-  string folder_historizing;
-  UA_NodeId folder_id;
-}AdapterFolderHistorySetup;
 
-typedef struct{
-  string name;
-  size_t max_length;
-  size_t entries_per_response;
-  size_t interval;
-} AdapterHistorySetup;
-
-struct ServerConfig {
-  string rootFolder;
-  string descriptionFolder;
-  UA_Boolean UsernamePasswordLogin = UA_FALSE;
-  string password;
-  string username;
-  string applicationName = "OPCUA-Adapter";
-  uint16_t opcuaPort = 16664;
-  bool enableSecurity = false;
-  bool unsecure = false;
-  string certPath;
-  string keyPath;
-  string allowListFolder;
-  string blockListFolder;
-  string issuerListFolder;
-  vector<AdapterHistorySetup> history{};
-  vector<AdapterFolderHistorySetup> historyfolders{};
-};
 
 /** @class ua_uaadapter
  *	@brief This class provide the opcua server and manage the variable mapping.
@@ -295,29 +281,10 @@ class ua_uaadapter : ua_mapped_class {
    */
   vector<ua_processvariable*> getVariables();
 
-
-  /** @brief adds AccessLeve HistoryRead and HistoryWrite for configured variables
-   *
-   */
-  void set_variable_access_level_historizing(UA_NodeId id);
-
-  /** @brief enables historizing for configured variables in the server
-   *
-   */
-
-  void add_folder_historizing(vector<UA_NodeId> *historizing_nodes, vector<string> *historizing_setup);
-
   /** @brief Create and start a thread for the opcua server instance
    *
    */
 
-  void add_variable_historizing(vector<UA_NodeId> *historizing_nodes, vector<string> *historizing_setup);
-
-  /** @brief Create and start a thread for the opcua server instance
-   *
-   */
-
-  void add_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup, UA_HistoryDataGathering gathering);
 
   void workerThread();
 
