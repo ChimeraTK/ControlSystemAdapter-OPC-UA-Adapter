@@ -61,17 +61,6 @@ class ua_processvariable : ua_mapped_class {
   string description;
   UA_NodeId ownNodeId = UA_NODEID_NULL;
   UA_Processvariable_Type type;
-  string node_historizing = "Default";
-  UA_NodeId historizing_node = UA_NODEID_NULL;
-  UA_NodeId target_historizing_node = UA_NODEID_NULL;
-
- public:
-  const string& getNodeHistorizing() const;
-  void setNodeHistorizing(const string& nodeHistorizing);
-  void setHistorizingNodeId(const UA_NodeId);
-  UA_NodeId getHistorizingNodeId();
-  void setTargetHistorizingNodeId(const UA_NodeId);
-  UA_NodeId getTargetHistorizingNodeId();
 
 
  private:
