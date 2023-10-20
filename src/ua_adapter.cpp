@@ -325,10 +325,10 @@ if(result) {
             }
             if(history_name.empty() || history_max_length.empty() || history_entries_per_response.empty() || history_interval.empty()) {
               if(!history_name.empty()) {
-                throw std::logic_error("Inclomplete History Configuration for history " + history_name);
+                throw std::logic_error("Incomplete History Configuration for history " + history_name);
               }
               else {
-                throw std::logic_error("Inclomplete History Configuration. Missing history name");
+                throw std::logic_error("Incomplete History Configuration. Missing history name");
               }
             }
             else{
@@ -1229,8 +1229,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
         UA_NodeId tmpPVNodeId = processvariable->getOwnNodeId();
         UA_NodeId_copy(&tmpPVNodeId, &createdNodeId);
         UA_NodeId_clear(&tmpPVNodeId);
-      }
-      else {
+      } else {
         // get node id of the source node
         string sourceVarName = xml_file_handler::parseVariablePath(sourceName, "/").back();
         if(name.empty()) {

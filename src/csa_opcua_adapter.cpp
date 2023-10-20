@@ -36,9 +36,17 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
   // Create new server adapter
   this->adapter = new ua_uaadapter(std::move(configFile));
 
+  // Pre-Processing - get list of PV's to skip excluding
+  vector<string> mappedPvSources = adapter->getAllMappedPvSourceNames();
+  for(const auto& f : mappedPvSources) {
+    cout << f << endl;
+  }
+
   // Initialize the process variables
   // This internally starts the managed threads in the mgr...
   vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
+
+  vector<string> unusedVariables;
 
   // start implicit var mapping
   bool skip_var = false;
@@ -48,25 +56,38 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
       string suffix_1 = "/*", suffix_2 ="*";
       if(e.rfind(suffix_1) == e.size() - suffix_1.size()){
         if(oneProcessVariable->getName().rfind(e.substr(0, e.size()-1)) == 0){
-          cout << "Info: exclude var (/*) from mapping " << oneProcessVariable->getName() << endl;
-          skip_var = true;
+          if (std::find(mappedPvSources.begin(), mappedPvSources.end(), e.substr(1, e.size() - 1)) != mappedPvSources.end()){
+            cout << "Warning: Skip exclude node - Used in pv-mapping" << endl;
+          } else {
+            cout << "Info: exclude var (/*) from mapping " << oneProcessVariable->getName() << endl;
+            skip_var = true;
+          }
         }
       } else if(e.rfind(suffix_2) == e.size() - suffix_2.size()){
         if(oneProcessVariable->getName().rfind(e.substr(0, e.size()-1), 0) == 0){
-          cout << "Info: exclude var (/) from mapping " << oneProcessVariable->getName() << endl;
-          skip_var = true;
+          if (std::find(mappedPvSources.begin(), mappedPvSources.end(), e.substr(1, e.size() - 1)) != mappedPvSources.end()){
+            cout << "Warning: Skip exclude node - Used in pv-mapping" << endl;
+          } else {
+            cout << "Info: exclude var (/) from mapping " << oneProcessVariable->getName() << endl;
+            skip_var = true;
+          }
         }
-      } else {
-         //case exact match
-         if(oneProcessVariable->getName().compare(e) == 0){
-           cout << "Info: exclude var (direct match) from mapping " << oneProcessVariable->getName() << endl;
-           skip_var = true;
-         }
+      } else if(oneProcessVariable->getName() == e){
+           //check if this node is mapped later
+          if (std::find(mappedPvSources.begin(), mappedPvSources.end(), e.substr(1, e.size() - 1)) != mappedPvSources.end()){
+            cout << "Warning: Skip exclude node - Used in pv-mapping" << endl; //Print namen
+          } else {
+            cout << "Info: exclude var (direct match) from mapping " << oneProcessVariable->getName() << endl;
+            skip_var = true;
+          }
       }
+
     }
     if(!skip_var){
         adapter->implicitVarMapping(oneProcessVariable->getName(), this->csManager);
     } else {
+        //variable is skipped and therefore unused
+        this->unusedVariables.push_back(oneProcessVariable->getName());
         skip_var = false;
     }
   }

@@ -305,6 +305,10 @@ class ua_uaadapter : ua_mapped_class {
    */
   vector<string> getAllNotMappableVariablesNames();
 
+
+  //ToDo documentation
+  vector<string> getAllMappedPvSourceNames();
+
   /** @brief Fill server build information.
    *
    * @param config The server configuration to be modified.
