@@ -32,6 +32,20 @@
 	<exclude sourceName="dir/test" />
 	<exclude sourceName="/testDoubleArray_31000" />
 
+	<!-- re-add the node to the information model" -->
+	<process_variable sourceName="testDoubleArray_31000" copy="true">
+		<destination>A</destination>
+		<name>testReAddCPY</name>
+		<description>Test Desc D1</description>
+		<unit>U1</unit>
+	</process_variable>
+	<process_variable sourceName="testDoubleArray_31000" copy="false">
+		<destination>A</destination>
+		<name>testReAddLNK</name>
+		<description>Test Desc D1</description>
+		<unit>U1</unit>
+	</process_variable>
+
 <!--
 	- PV name includes string dir/test
 	- Directory and PV would be matched

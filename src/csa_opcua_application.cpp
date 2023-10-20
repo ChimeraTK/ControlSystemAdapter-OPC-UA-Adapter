@@ -101,6 +101,9 @@ int main() {
   cout << "Create the adapter" << endl;
   csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
 
+  //ToDo add optimized ApplicationBase call ticket: 5751 create list with full paths
+  //chimeraTK::ApplicationBase::getInstance().optimiseUnmappedVariables(this.);
+
   printf("test build\n");
   cout << "Run the application instance" << endl;
   ChimeraTK::ApplicationBase::getInstance().run();
