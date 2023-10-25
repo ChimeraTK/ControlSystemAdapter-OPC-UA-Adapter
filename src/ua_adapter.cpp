@@ -1554,6 +1554,19 @@ UA_NodeId ua_uaadapter::createFolder(UA_NodeId basenodeid, const string& folderN
   return newFolder.folderNodeId;
 }
 
+vector<string> ua_uaadapter::getAllMappedPvSourceNames() {
+  vector<string> mappedPvSources;
+  xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//process_variable");
+  if(result) {
+    xmlNodeSetPtr nodeset = result->nodesetval;
+    for(int32_t i = 0; i < nodeset->nodeNr; i++) {
+      mappedPvSources.insert(mappedPvSources.begin(), xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName"));
+    }
+  }
+  xmlXPathFreeObject(result);
+  return mappedPvSources;
+}
+
 vector<string> ua_uaadapter::getAllNotMappableVariablesNames() {
   vector<string> notMappableVariablesNames;
   xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//process_variable");
