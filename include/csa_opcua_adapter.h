@@ -46,7 +46,7 @@ class csa_opcua_adapter {
   std::thread adapter_thread;
   ua_uaadapter* adapter;
   boost::shared_ptr<ControlSystemPVManager> csManager;
-  vecor<string> unusedVariables;
+  vector<string> unusedVariables;
 
  public:
   /**
