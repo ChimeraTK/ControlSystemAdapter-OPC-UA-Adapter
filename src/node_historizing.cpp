@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
 *
-* Copyright (c) 2023 Florian Düwel <florian.duewel@iosb.fraunhofer.de>
+* Copyright (c) 2022-2023 Fraunhofer IOSB (Author: Florian Düwel)
 */
 
 #include "open62541/plugin/log_stdout.h"
@@ -100,7 +100,7 @@ void set_variable_access_level_historizing(UA_NodeId id, UA_Server *mappedServer
   UA_Byte_init(&temp);
   UA_Server_readAccessLevel(mappedServer, id, &temp);
   if(temp == UA_ACCESSLEVELMASK_READ){
-    UA_Byte access_level = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_HISTORYREAD ^ UA_ACCESSLEVELMASK_HISTORYWRITE;
+    UA_Byte access_level = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_HISTORYREAD /*^ UA_ACCESSLEVELMASK_HISTORYWRITE*/;
     UA_Server_writeAccessLevel(mappedServer, id, access_level);
   }
   else if(temp == (UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE)){
@@ -183,6 +183,10 @@ void add_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>&
       }
     }
     set_variable_access_level_historizing(historizing_nodes[i], mappedServer);
+    /* ToDo
+     * replace line 190 with
+     * setting.historizingBackend = UA_HistoryDataBackend_Memory_Circular(historizing_nodes.size(), hist.max_length);
+     * after circular history is enabled*/
     setting.historizingBackend = UA_HistoryDataBackend_Memory(historizing_nodes.size(), hist.max_length);
     setting.maxHistoryDataResponseSize = hist.entries_per_response;
     setting.pollingInterval = hist.interval;

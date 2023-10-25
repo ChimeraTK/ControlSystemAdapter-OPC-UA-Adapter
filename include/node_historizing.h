@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
 *
-* Copyright (c) 2023 Florian Düwel <florian.duewel@iosb.fraunhofer.de>
+* Copyright (c) 2022-2023 Fraunhofer IOSB (Author: Florian Düwel)
 */
 
 #ifndef CHIMERATK_CONTROLSYSTEMADAPTER_OPCUAADAPTER_NODE_HISTORIZING_H
