@@ -311,9 +311,9 @@ if(result) {
             if(!history_name.empty()) {
               temp.name = history_name;
             }
-            string history_max_length = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "max_length");
-            if(!history_max_length.empty()) {
-              sscanf(history_max_length.c_str(), "%zu", &temp.max_length);
+            string history_buffer_length = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "buffer_length");
+            if(!history_buffer_length.empty()) {
+              sscanf(history_buffer_length.c_str(), "%zu", &temp.buffer_length);
             }
             string history_entries_per_response = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "entries_per_response");
             if(!history_entries_per_response.empty()) {
@@ -323,7 +323,7 @@ if(result) {
             if(!history_interval.empty()) {
               sscanf(history_interval.c_str(), "%zu", &temp.interval);
             }
-            if(history_name.empty() || history_max_length.empty() || history_entries_per_response.empty() || history_interval.empty()) {
+            if(history_name.empty() || history_buffer_length.empty() || history_entries_per_response.empty() || history_interval.empty()) {
               if(!history_name.empty()) {
                 throw std::logic_error("Incomplete History Configuration for history " + history_name);
               }
