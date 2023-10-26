@@ -22,6 +22,15 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+      <xsd:element name="exclude" type="csa:exclude" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Used to exclude proces variables or folders from the mapping process. 
+            The is useful to hide parts of the ChimeraTK application from the control system adatper.
+            This safes resources!  
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>      
       <xsd:element name="process_variable" type="csa:pvType" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
@@ -85,7 +94,7 @@
           <xsd:documentation xml:lang="en">
             Change the behaviour of how process varibale names and the hierarchy included in the 
             process variable name are represented in OPC UA.
-            The default is that process variable names are unrooled at "/" characters.
+            The default is that process variable names are unrolled at "/" characters.
             Folders are created for all string before the last delimiter. The last string
             is used as OPC UA node browse name. However the OPC UA node ID is a string node ID
             that includes the complete register path corresponding to the CHimeraTK process variable.
@@ -103,6 +112,15 @@
             Set the bahaviour in case error occur while parsing this mapping file.
             If True Exceptions occuring in the mapping process are thrown. 
             Else error messages are send to std::cerr and the mapping block caused exception is ignored. 
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="historizing" type="csa:historizingType" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Define different historizing settings. 
+            Those can be assigned to directories and folders via the history attribute. The value
+            of the history attribute has to match the settings defined here. 
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -226,7 +244,50 @@
       <xsd:extension base="xsd:boolean"/>
     </xsd:simpleContent>
   </xsd:complexType>
-
+  
+  <xsd:complexType name="historizingType">
+    <xsd:sequence>
+      <xsd:element name="setup" type="csa:historizingSetupType" minOccurs="1" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+         
+  <xsd:complexType name="historizingSetupType">
+    <xsd:attribute name="name" type="csa:nonEmptyString" use="required">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The name of the historizing setting.
+          It is used as identifier when assigning a historiy to a pv or folder and
+          should match the name used in the history attribute of process_variable or folder.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="entries_per_response" type="xsd:positiveInteger" use="required">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          The number of histroy entries send per reponse. If a large number is used
+          one big message is send as a single HistoryReadResponse. Else the history 
+          data is send via multiple HostroyReadResponses and a continuation point is used
+          to link the different responses. 
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="buffer_length" type="xsd:positiveInteger" use="required">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+           Length of the circular buffer.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="interval" type="xsd:positiveInteger" use="required">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Polling interval [ms] used to read data by the servers internal client thread.
+          If no data change is seen no entry is added to the history buffer.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>        
+  </xsd:complexType>
+ 
   <xsd:complexType name="pvType">
     <xsd:all>
       <xsd:element name="destination" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1">
@@ -264,6 +325,14 @@
         <xsd:documentation xml:lang="en">
           If copy=flase a link is created to the source process variable.
           Else a new OPC UA node is created - it is still connected to the same ChimeraTK process variable.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="history" type="csa:nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          If used history is turned on for all PVs in the created folder.
+          The name given here has to match a history setup in the config section.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -319,6 +388,28 @@
           If using exsisting folders decide if the directory should be only linked to the source 
           folder or if it should be copied.
           By default copying is enabled.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="history" type="csa:nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          If used history is turned on for all PVs in the created folder.
+          The name given here has to match a history setup in the config section.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+  
+  <xsd:complexType name="exclude">
+    <xsd:attribute name="sourceName" type="csa:nonEmptyString"  use="required">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Source name used to identify folder/process variable to be excluded.
+          Use wild card to:
+          - match pvs in directory: "dir/test/*"
+          - match pv "dir/test" and the directory "dir/test": "dir/test*"
+          - match pv only: "dir/test"
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
