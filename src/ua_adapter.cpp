@@ -375,21 +375,6 @@ if(result) {
         this->mappingExceptions = UA_FALSE;
       }
     }
-    vector<xmlNodePtr> implicitMappingVector =
-        xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "implcit_mapping");
-    if(implicitMappingVector.empty()) {
-      this->implicitMapping = UA_FALSE;
-    }
-    else {
-      placeHolder = xml_file_handler::getContentFromNode(mappingExceptionsVector[0]);
-      transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
-      if(placeHolder == "TRUE") {
-        this->implicitMapping = UA_TRUE;
-      }
-      else {
-        this->implicitMapping = UA_FALSE;
-      }
-    }
     xmlXPathFreeObject(result);
   }
   result = this->fileHandler->getNodeSet(xpath + "//login");

@@ -108,7 +108,6 @@ class ua_uaadapter : ua_mapped_class {
   UA_NodeId ownNodeId;
   string pvSeperator;
   UA_Boolean mappingExceptions;
-  UA_Boolean implicitMapping;
 
   ServerConfig serverConfig;
 
