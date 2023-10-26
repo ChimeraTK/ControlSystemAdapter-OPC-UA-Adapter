@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<uamapping>
+<csa:uamapping xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
 	<config rootFolder="llrfCtrl_hzdr" description="Test application for the digital LLRF system at ELBE / HZDR">
 		<server applicationName="LLRFServer" port="16660" />
 <!--		<security unsecure="enable" certificate="../certs/server_cert.der"
@@ -8,7 +8,6 @@
 				  blocklist="../certs/block"
 				  issuerlist="../certs/issuer"/>-->
 		<login username="test" password="test123" />
-		<implcit_mapping>False</implcit_mapping>
 		<process_variable_hierarchy>
 			<unroll pathSep="/">True</unroll>
 		</process_variable_hierarchy>
@@ -477,4 +476,4 @@
 		<name>f10</name>
 		<description>Desc F10</description>
 	</folder>
-</uamapping>
+</csa:uamapping>
