@@ -43,7 +43,7 @@ typedef struct{
 
 typedef struct{
   string name;
-  size_t max_length;
+  size_t buffer_length;
   size_t entries_per_response;
   size_t interval;
 }AdapterHistorySetup;

@@ -183,7 +183,7 @@ void add_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>&
       }
     }
     set_variable_access_level_historizing(historizing_nodes[i], mappedServer);
-    setting.historizingBackend = UA_HistoryDataBackend_Memory(historizing_nodes.size(), hist.max_length);
+    setting.historizingBackend = UA_HistoryDataBackend_Memory(historizing_nodes.size(), hist.buffer_length);
     setting.maxHistoryDataResponseSize = hist.entries_per_response;
     setting.pollingInterval = hist.interval;
     /*UA_StatusCode retval =*/ gathering.registerNodeId(mappedServer, gathering.context, &historizing_nodes[i], setting);
