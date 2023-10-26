@@ -19,49 +19,6 @@
 		</historizing>
 	</config>
 
-<!-- Exclude Options
-		Now all variables used in the Application are connected to the control system. This could
-		blow uo the address space. Since many variables that are not needed to interact with the application
-		and overwhelm the user are often present, the user can exclude paths.
--->
-
-<!--
-	- exact match
-	- only the PV matched
--->
-	<exclude sourceName="dir/test" />
-	<exclude sourceName="/testDoubleArray_31000" />
-
-	<!-- re-add the node to the information model" -->
-	<process_variable sourceName="testDoubleArray_31000" copy="true">
-		<destination>A</destination>
-		<name>testReAddCPY</name>
-		<description>Test Desc D1</description>
-		<unit>U1</unit>
-	</process_variable>
-	<process_variable sourceName="testDoubleArray_31000" copy="false">
-		<destination>A</destination>
-		<name>testReAddLNK</name>
-		<description>Test Desc D1</description>
-		<unit>U1</unit>
-	</process_variable>
-
-<!--
-	- PV name includes string dir/test
-	- Directory and PV would be matched
-	- If multiple PVs exist (e.g. dir/test1, /dir/test2) all are matched
-	- To exclude only the PVs one would have to add dir/test1 and /dir/test2 explicitly → will be done be the GUI anyways
--->
-	<exclude sourceName="dir/test*" />
-	<exclude sourceName="/Mein/Name*" />
-
-<!--
-	- PV name does not match dir/test/
-	- Directory and all PV in that directory including subdirectories with their PVs would match
--->
-	<exclude sourceName="dir/test/*" />
-	<exclude sourceName="/Dein/Name/*" />
-
 <!-- (1) Process variable options
   Information:
 	- the path seperator for the destination tag is "/"
@@ -478,6 +435,49 @@
 		<name>E4</name>
 		<description>E4</description>
 	</folder>
+
+	<!-- (5) Exclude Nodes and Folders
+         Information:
+         - 	All variables used in the Application are connected to the control system. This could
+		blow uo the address space. Since many variables that are not needed to interact with the application
+		and overwhelm the user are often present, the user can exclude paths.
+          -
+
+         Default cases:
+          1. Greedy matching with "*" to check if the exclude string is contained in a folder or process variable
+          2. Directory matching with "/*" to exclude all children (folders, process variables) in the exclude path
+          3. Direct matching with one-to-one relation between exclude string and process variable
+
+         Error cases:
+          1. Try to exclude process variable which is used in the process variable mapping (direct match)
+    -->
+
+	<!-- D1 [x]
+		- PV name includes string dir/test
+		- If multiple PVs exist (e.g. dir/test1, /dir/test2) all are matched
+	-->
+	<exclude sourceName="dir/test*" />
+	<exclude sourceName="/Mein/Name*" />
+
+	<!-- D2 [x]
+        - Directory and all PV in that directory including subdirectories with their PVs would match
+	-->
+	<exclude sourceName="dir/test/*" />
+	<exclude sourceName="/Dein/Name/*" />
+
+	<!-- D3 [x]	-->
+	<exclude sourceName="dir/test" />
+	<exclude sourceName="/testDoubleArray_57000" />
+
+	<!-- E1 [x]	-->
+	<exclude sourceName="/testDoubleArray_19000" />
+
+	<!-- E2 [x]	-->
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="true">
+		<destination>A</destination>
+		<name>exclude_map_test</name>
+	</process_variable>
+	<exclude sourceName="/Unser*" />
 
 	<!-- general test folder with source test -->
 	<folder sourceName="folder/f9" copy="false">

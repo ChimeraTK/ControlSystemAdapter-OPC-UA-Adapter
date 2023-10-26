@@ -38,15 +38,12 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
 
   // Pre-Processing - get list of PV's to skip excluding
   vector<string> mappedPvSources = adapter->getAllMappedPvSourceNames();
+  cout << "List of mapped process variables: " << endl;
   for(const auto& f : mappedPvSources) {
-    cout << f << endl;
+    cout << "\t" << f << endl;
   }
 
-  // Initialize the process variables
-  // This internally starts the managed threads in the mgr...
   vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
-
-  vector<string> unusedVariables;
 
   // start implicit var mapping
   bool skip_var = false;
@@ -56,38 +53,49 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
       string suffix_1 = "/*", suffix_2 ="*";
       if(e.rfind(suffix_1) == e.size() - suffix_1.size()){
         if(oneProcessVariable->getName().rfind(e.substr(0, e.size()-1)) == 0){
-          if (std::find(mappedPvSources.begin(), mappedPvSources.end(), e.substr(1, e.size() - 1)) != mappedPvSources.end()){
-            cout << "Warning: Skip exclude node - Used in pv-mapping" << endl;
-          } else {
-            cout << "Info: exclude var (/*) from mapping " << oneProcessVariable->getName() << endl;
+          bool pv_used = false;
+          for(const auto& ele: mappedPvSources){
+            if(ele.rfind(e.substr(1, e.size() - 3)) == 0){
+              cout << "Warning: Skip exclude node - Used in pv-mapping (directory match) PV:" << oneProcessVariable->getName() << endl;
+              pv_used = true;
+              break;
+            }
+          }
+          if(!pv_used){
+            cout << "Info: directory var exclude (/*) from mapping " << oneProcessVariable->getName() << endl;
             skip_var = true;
           }
         }
       } else if(e.rfind(suffix_2) == e.size() - suffix_2.size()){
         if(oneProcessVariable->getName().rfind(e.substr(0, e.size()-1), 0) == 0){
-          if (std::find(mappedPvSources.begin(), mappedPvSources.end(), e.substr(1, e.size() - 1)) != mappedPvSources.end()){
-            cout << "Warning: Skip exclude node - Used in pv-mapping" << endl;
-          } else {
-            cout << "Info: exclude var (/) from mapping " << oneProcessVariable->getName() << endl;
+          bool pv_used = false;
+          for(const auto& ele: mappedPvSources){
+            if(ele.rfind(e.substr(1, e.size() - 2)) == 0){
+              cout << "Warning: Skip exclude node - Used in pv-mapping (greedy match) PV:" << oneProcessVariable->getName() << endl;
+              pv_used = true;
+              break;
+            }
+          }
+          if(!pv_used){
+            cout << "Info: greedy var exclude (*) from mapping " << oneProcessVariable->getName() << endl;
             skip_var = true;
           }
         }
       } else if(oneProcessVariable->getName() == e){
            //check if this node is mapped later
           if (std::find(mappedPvSources.begin(), mappedPvSources.end(), e.substr(1, e.size() - 1)) != mappedPvSources.end()){
-            cout << "Warning: Skip exclude node - Used in pv-mapping" << endl; //Print namen
+            cout << "Warning: Skip exclude node - Used in pv-mapping (direct match) PV:" << oneProcessVariable->getName() << endl; //Print namen
           } else {
-            cout << "Info: exclude var (direct match) from mapping " << oneProcessVariable->getName() << endl;
+            cout << "Info: direct exclude var (direct match) from mapping" << oneProcessVariable->getName() << endl;
             skip_var = true;
           }
       }
-
     }
     if(!skip_var){
         adapter->implicitVarMapping(oneProcessVariable->getName(), this->csManager);
     } else {
         //variable is skipped and therefore unused
-        this->unusedVariables.push_back(oneProcessVariable->getName());
+        this->unusedVariables.insert(oneProcessVariable->getName());
         skip_var = false;
     }
   }
@@ -131,4 +139,7 @@ void csa_opcua_adapter::stop() {
 
 bool csa_opcua_adapter::isRunning() {
   return this->adapter_thread.joinable();
+}
+const set<string>& csa_opcua_adapter::getUnusedVariables() const {
+  return unusedVariables;
 }

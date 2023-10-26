@@ -736,7 +736,7 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
               (int)out.length, out.data);
           UA_String_clear(&out);
         }
-        if(!sourceName.empty() && (copy.empty() | copy == "false")){
+        if(!sourceName.empty() && (copy.empty() || copy == "false")){
           AdapterFolderHistorySetup temp;
           temp.folder_historizing = history;
           string folderNodeId = this->serverConfig.rootFolder +"/" + sourceName +"Dir";
@@ -997,31 +997,30 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
         //get the name of the variable
         if(!nodeName.empty()){
           if(nodeDestination.empty()){
-            cout << "nodename: "<<  xml_file_handler::getContentFromNode(nodeName[0]) << endl;
+            //cout << "nodename: "<<  xml_file_handler::getContentFromNode(nodeName[0]) << endl;
             targetNodeId = this->serverConfig.rootFolder +"/" + xml_file_handler::getContentFromNode(nodeName[0]);
             UA_NodeId id = UA_NODEID_STRING(1, (char*) targetNodeId.c_str());
             UA_NodeId_copy(&id, &temp.variable_id);
             this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
           }
           else{
-            cout << "nodename: "<<  xml_file_handler::getContentFromNode(nodeName[0]) << endl;
-            cout << "node destination: "<<  xml_file_handler::getContentFromNode(nodeDestination[0]) << endl;
+            //cout << "nodename: "<<  xml_file_handler::getContentFromNode(nodeName[0]) << endl;
+            //cout << "node destination: "<<  xml_file_handler::getContentFromNode(nodeDestination[0]) << endl;
             targetNodeId = this->serverConfig.rootFolder +"/" + xml_file_handler::getContentFromNode(nodeDestination[0]) + "/" + xml_file_handler::getContentFromNode(nodeName[0]);
             UA_NodeId id = UA_NODEID_STRING(1, (char*) targetNodeId.c_str());
             UA_NodeId_copy(&id, &temp.variable_id);
             this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
           }
         }
-        if(!sourceName.empty() && (copy.empty() | copy == "FALSE")){
+        if(!sourceName.empty() && (copy.empty() || copy == "FALSE")){
           name = sourceName;
-          cout << "print the source name "<<  sourceName << endl;
+          //cout << "print the source name "<<  sourceName << endl;
           targetNodeId = this->serverConfig.rootFolder +"/"+ sourceName;
           UA_NodeId id = UA_NODEID_STRING(1, (char*) targetNodeId.c_str());
           UA_NodeId_copy(&id, &temp.variable_id);
           this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
         }
       }
-
 
       if(!nodeDestination.empty()) {
         destination = xml_file_handler::getContentFromNode(nodeDestination[0]);
@@ -1052,7 +1051,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
         continue;
       }
       // check if the pv still exists -> update requested
-      if((destination + "/" + name) == sourceName && copy == "FALSE") {
+      if(((destination + "/" + name) == sourceName) && copy == "FALSE") {
         // check if the source var exists
         string parentSourceFolder = this->serverConfig.rootFolder + "/" +
             (sourceName.substr(
@@ -1088,7 +1087,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
             UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
                 "Warning! Skipping PV mapping. No corresponding source pv.");
           }
-          return;
+          continue;
         }
         if(!unit.empty()) {
           // update unit
@@ -1150,7 +1149,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
       // check the pv copy attribute -> copy of pv requested; false -> reference to original pv requested
       UA_NodeId createdNodeId = UA_NODEID_NULL;
       if(copy == "TRUE") {
-        if(sourceName == destination + "/" + name) {
+        if(sourceName == (destination + "/" + name)) {
           if(this->mappingExceptions) {
             throw std::runtime_error(
                 "Error! PV mapping failed. Source and destination must be different if copy='true'.");
@@ -1246,12 +1245,12 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
         // create destination folder
         UA_NodeId destinationFolder = enrollFolderPathFromString(destination + "/removedpart", "/");
         UA_ExpandedNodeId enid;
-        enid.serverIndex = 1;
+        enid.serverIndex = 0;
         enid.namespaceUri = UA_STRING_NULL;
         enid.nodeId = parentSourceId;
         // add reference to the source node
         UA_StatusCode addRef = UA_Server_addReference(
-            this->mappedServer, destinationFolder, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, UA_TRUE);
+            this->mappedServer, destinationFolder, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, true);
         if(sourceVarName != name) {
           if(this->mappingExceptions) {
             throw std::runtime_error("PV mapping failed. Can't create reference to original pv.");

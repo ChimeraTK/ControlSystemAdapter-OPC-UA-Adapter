@@ -46,7 +46,7 @@ class csa_opcua_adapter {
   std::thread adapter_thread;
   ua_uaadapter* adapter;
   boost::shared_ptr<ControlSystemPVManager> csManager;
-  vector<string> unusedVariables;
+  set<string> unusedVariables;
 
  public:
   /**
@@ -75,6 +75,8 @@ class csa_opcua_adapter {
    * @return Return the ua_uaadapter
    */
   ua_uaadapter* getUAAdapter();
+
+  const set<string>& getUnusedVariables() const;
 
   /**
    * @brief Start all objects in single threads for this case only the opc ua server
