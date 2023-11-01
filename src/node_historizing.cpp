@@ -186,10 +186,10 @@ UA_HistoryDataGathering add_historizing_nodes(vector<UA_NodeId>& historizing_nod
     }
     set_variable_access_level_historizing(historizing_nodes[i], mappedServer);
     /* ToDo
-     * replace line 192 with
-     * setting.historizingBackend = UA_HistoryDataBackend_Memory_Circular(1, hist.buffer_length);
-     * after circular history is enabled */
-    setting.historizingBackend = UA_HistoryDataBackend_Memory(1, hist.buffer_length);
+     * replace line 190 with
+     * setting.historizingBackend = UA_HistoryDataBackend_Memory_Circular(historizing_nodes.size(), hist.max_length);
+     * after circular history is enabled*/
+    setting.historizingBackend = UA_HistoryDataBackend_Memory(historizing_nodes.size(), hist.buffer_length);
     setting.maxHistoryDataResponseSize = hist.entries_per_response;
     setting.pollingInterval = hist.interval;
     UA_StatusCode retval = gathering.registerNodeId(mappedServer, gathering.context, &historizing_nodes[i], setting);
