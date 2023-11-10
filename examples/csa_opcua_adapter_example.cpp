@@ -1,19 +1,19 @@
-/* 
+/*
  * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
  *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can 
- * redistribute it and/or modify it under the terms of the Lesser GNU 
- * General Public License as published by the Free Software Foundation, 
+ * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
+ * redistribute it and/or modify it under the terms of the Lesser GNU
+ * General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope 
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the 
- * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+ * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
+ * that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the Lesser GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
- * 
+ *
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
  * Copyright (c) 2018-2019 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
@@ -26,15 +26,15 @@ extern "C" {
 #include <unistd.h>
 }
 
-#include <iostream>
-#include <chrono>
-#include <time.h>
-#include <errno.h>
-#include <stdlib.h>
-
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "csa_opcua_adapter.h"
 #include "runtime_value_generator.h"
+
+#include <chrono>
+#include <errno.h>
+#include <iostream>
+#include <stdlib.h>
+#include <time.h>
 
 using namespace std;
 using namespace ChimeraTK;
@@ -83,23 +83,22 @@ int main() {
       devManager->createProcessArray<double>(SynchronizationDirection::controlSystemToDevice, "doubleScalar", 1);
   ProcessArray<string>::SharedPtr stringAddev =
       devManager->createProcessArray<string>(SynchronizationDirection::controlSystemToDevice, "stringScalar", 1);
-  ProcessArray<string>::SharedPtr stringAddev2 =
-      devManager->createProcessArray<string>(SynchronizationDirection::deviceToControlSystem,
-                                             "1/FOLDER/defaultSep/stringScalar", 1, "my description", "desc");
+  ProcessArray<string>::SharedPtr stringAddev2 = devManager->createProcessArray<string>(
+      SynchronizationDirection::deviceToControlSystem, "1/FOLDER/defaultSep/stringScalar", 1, "my description", "desc");
 
   ProcessArray<int8_t>::SharedPtr intB15A8dev =
       devManager->createProcessArray<int8_t>(SynchronizationDirection::controlSystemToDevice, "int8Array_s15", 15,
-                                             "mIatrou*Rahm", "Die Einheit ist essentiel und sollte SI Einheit sein...");
+          "mIatrou*Rahm", "Die Einheit ist essentiel und sollte SI Einheit sein...");
   ProcessArray<uint8_t>::SharedPtr intB10Au8dev = devManager->createProcessArray<uint8_t>(
       SynchronizationDirection::controlSystemToDevice, "uint8Array_s10", 10, "1/Rahm");
   ProcessArray<int16_t>::SharedPtr intB15A16dev = devManager->createProcessArray<int16_t>(
       SynchronizationDirection::controlSystemToDevice, "int16Array_s15", 15, "Iatrou", "Beschreibung eines Iatrous");
-  ProcessArray<uint16_t>::SharedPtr intB10Au16dev = devManager->createProcessArray<uint16_t>(
-      SynchronizationDirection::controlSystemToDevice, "uint16Array_s10", 10);
+  ProcessArray<uint16_t>::SharedPtr intB10Au16dev =
+      devManager->createProcessArray<uint16_t>(SynchronizationDirection::controlSystemToDevice, "uint16Array_s10", 10);
   ProcessArray<int32_t>::SharedPtr intB15A32dev =
       devManager->createProcessArray<int32_t>(SynchronizationDirection::controlSystemToDevice, "int32Array_s15", 15);
-  ProcessArray<uint32_t>::SharedPtr intB10Au32dev = devManager->createProcessArray<uint32_t>(
-      SynchronizationDirection::controlSystemToDevice, "uint32Array_s10", 10);
+  ProcessArray<uint32_t>::SharedPtr intB10Au32dev =
+      devManager->createProcessArray<uint32_t>(SynchronizationDirection::controlSystemToDevice, "uint32Array_s10", 10);
   ProcessArray<double>::SharedPtr intB15Afdev =
       devManager->createProcessArray<double>(SynchronizationDirection::controlSystemToDevice, "doubleArray_s15", 15);
   ProcessArray<float>::SharedPtr intB10Addev =
@@ -119,6 +118,10 @@ int main() {
       devManager->createProcessArray<double>(SynchronizationDirection::deviceToControlSystem, "double_sine", 1);
   ProcessArray<int32_t>::SharedPtr int_sineDev =
       devManager->createProcessArray<int32_t>(SynchronizationDirection::deviceToControlSystem, "int_sine", 1);
+  ProcessArray<ChimeraTK::Boolean>::SharedPtr boolDev =
+      devManager->createProcessArray<ChimeraTK::Boolean>(SynchronizationDirection::deviceToControlSystem, "bool", 1);
+  ProcessArray<ChimeraTK::Void>::SharedPtr voidDev =
+      devManager->createProcessArray<ChimeraTK::Void>(SynchronizationDirection::deviceToControlSystem, "void", 1);
 
   // example mapping variable
   ProcessArray<int8_t>::SharedPtr intB15A8devMap = devManager->createProcessArray<int8_t>(
@@ -127,7 +130,7 @@ int main() {
       SynchronizationDirection::controlSystemToDevice, "Mein/Name_ist#int8Array", 15, "Iatrou^2/Rahm");
   ProcessArray<uint8_t>::SharedPtr intB10Au8devMap1 =
       devManager->createProcessArray<uint8_t>(SynchronizationDirection::controlSystemToDevice,
-                                              "/Dein/Name//ist/uint8Array_s10", 10, "Iatrou^2/Rahm", "Beschreibung");
+          "/Dein/Name//ist/uint8Array_s10", 10, "Iatrou^2/Rahm", "Beschreibung");
   ProcessArray<uint8_t>::SharedPtr intB10Au8devMap2 = devManager->createProcessArray<uint8_t>(
       SynchronizationDirection::controlSystemToDevice, "Unser/Name/ist_uint8Array_s10", 10);
   ProcessArray<uint32_t>::SharedPtr intAu32devMap = devManager->createProcessArray<uint32_t>(
@@ -162,8 +165,8 @@ int main() {
   }
 
   /* Adding some folder with variables
-  *
-  */
+   *
+   */
   time(&t);
   srand((unsigned int)t);
   for(int32_t n = 1; n < 10; n++) {
