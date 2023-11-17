@@ -114,10 +114,10 @@ void set_variable_access_level_historizing(UA_NodeId id, UA_Server *mappedServer
 // avoid multiple setups for one node
 void check_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup){
   bool repeat = true;
-  size_t position = 0;
+  /*size_t position = 0;*/
   while(repeat){
     repeat = false;
-    for(size_t i=position; i< historizing_nodes.size(); i++){
+    for(size_t i=/*position*/0; i< historizing_nodes.size(); i++){
       for(size_t j=i+1; j< historizing_nodes.size(); j++){
         if(UA_NodeId_equal(reinterpret_cast<UA_NodeId*>(&historizing_nodes[i]), reinterpret_cast<UA_NodeId*>(&historizing_nodes[j]))){
           UA_String out = UA_STRING_NULL;
@@ -125,10 +125,11 @@ void check_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string
           UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
               "Warning! Node %.*s has multiple history settings.", (int)out.length, out.data);
           UA_String_clear(&out);
+          UA_NodeId_clear(reinterpret_cast<UA_NodeId*>(&historizing_nodes[j]));
           historizing_nodes.erase(historizing_nodes.begin()+j);
           historizing_setup.erase(historizing_setup.begin()+j);
           repeat = true;
-          position = i;
+          /*position = i;*/
           break;
         }
       }
@@ -155,6 +156,7 @@ static void remove_nodes_with_incomplete_historizing_setup(vector<UA_NodeId>& hi
         UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
             "Warning! Remove node %.*s from historizing because the setup %s  is missing.", (int)out.length, out.data, historizing_setup[i].c_str());
         UA_String_clear(&out);
+        //UA_NodeId_clear(&historizing_nodes[j]);
         historizing_nodes.erase(historizing_nodes.begin()+i);
         historizing_setup.erase(historizing_setup.begin()+i);
         repeat = true;
@@ -165,17 +167,17 @@ static void remove_nodes_with_incomplete_historizing_setup(vector<UA_NodeId>& hi
   }
 }
 
-void add_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup, UA_HistoryDataGathering gathering, UA_Server *mappedServer, UA_ServerConfig *server_config, vector<AdapterHistorySetup> history, vector<AdapterFolderHistorySetup> historyfolders, vector<AdapterPVHistorySetup> historyvariables){
+UA_HistoryDataGathering add_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup, UA_Server *mappedServer, UA_ServerConfig *server_config, vector<AdapterHistorySetup> history, vector<AdapterFolderHistorySetup> historyfolders, vector<AdapterPVHistorySetup> historyvariables){
   add_variable_historizing(&historizing_nodes, &historizing_setup, historyvariables, mappedServer, server_config);
   add_folder_historizing(&historizing_nodes, &historizing_setup, historyfolders, mappedServer, server_config);
   check_historizing_nodes(historizing_nodes, historizing_setup);
   //search nodes with incomplete history config
   remove_nodes_with_incomplete_historizing_setup(historizing_nodes, historizing_setup, history);
-  gathering = UA_HistoryDataGathering_Default(historizing_nodes.size());
+  UA_HistoryDataGathering gathering = UA_HistoryDataGathering_Default(historizing_nodes.size());
   server_config->historyDatabase = UA_HistoryDatabase_default(gathering);
-  UA_HistorizingNodeIdSettings setting;
-  setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_POLL;
   for(size_t i=0; i< historizing_nodes.size(); i++){
+    UA_HistorizingNodeIdSettings setting;
+    setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_POLL;
     AdapterHistorySetup hist;
     for(auto & j : history){
       if(historizing_setup[i] == j.name) {
@@ -184,15 +186,48 @@ void add_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>&
     }
     set_variable_access_level_historizing(historizing_nodes[i], mappedServer);
     /* ToDo
-     * replace line 190 with
-     * setting.historizingBackend = UA_HistoryDataBackend_Memory_Circular(historizing_nodes.size(), hist.max_length);
-     * after circular history is enabled*/
-    setting.historizingBackend = UA_HistoryDataBackend_Memory(historizing_nodes.size(), hist.max_length);
+     * replace line 192 with
+     * setting.historizingBackend = UA_HistoryDataBackend_Memory_Circular(1, hist.buffer_length);
+     * after circular history is enabled */
+    setting.historizingBackend = UA_HistoryDataBackend_Memory(1, hist.buffer_length);
     setting.maxHistoryDataResponseSize = hist.entries_per_response;
     setting.pollingInterval = hist.interval;
-    /*UA_StatusCode retval =*/ gathering.registerNodeId(mappedServer, gathering.context, &historizing_nodes[i], setting);
-    /*retval =*/ gathering.startPoll(mappedServer, gathering.context, &historizing_nodes[i]);
+    UA_StatusCode retval = gathering.registerNodeId(mappedServer, gathering.context, &historizing_nodes[i], setting);
+    if(retval != UA_STATUSCODE_GOOD){
+      UA_String out = UA_STRING_NULL;
+      UA_print(&historizing_nodes[i], &UA_TYPES[UA_TYPES_NODEID], &out);
+      UA_LOG_WARNING(&server_config->logger, UA_LOGCATEGORY_USERLAND,
+          "Failed to add historizing for Node %.*s with StatusCode %s",
+          (int)out.length, out.data, UA_StatusCode_name(retval));
+      UA_String_clear(&out);
+    }
+    retval = gathering.startPoll(mappedServer, gathering.context, &historizing_nodes[i]);
+    if(retval != UA_STATUSCODE_GOOD){
+      UA_String out = UA_STRING_NULL;
+      UA_print(&historizing_nodes[i], &UA_TYPES[UA_TYPES_NODEID], &out);
+      UA_LOG_WARNING(&server_config->logger, UA_LOGCATEGORY_USERLAND,
+          "Failed to start the poll for Node %.*s with StatusCode %s",
+          (int)out.length, out.data, UA_StatusCode_name(retval));
+      UA_String_clear(&out);
+    }
   }
+  return gathering;
+}
+
+void clear_history(UA_HistoryDataGathering gathering, vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup, UA_Server *mappedServer, vector<AdapterFolderHistorySetup> historyfolders, vector<AdapterPVHistorySetup> historyvariables){
+  //stop the poll for all historizing variables
+  for(auto & historizing_node : historizing_nodes){
+    UA_StatusCode retval = gathering.stopPoll(mappedServer, gathering.context, &historizing_node);
+    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "stopPoll %s", UA_StatusCode_name(retval));
+  }
+  //clear the list of valid historizing nodes
   historizing_nodes.clear();
   historizing_setup.clear();
+  //clear the nodeis lists (variables + server from the xml config)
+  for(auto & historyfolder : historyfolders){
+    UA_NodeId_clear(&historyfolder.folder_id);
+  }
+  for(auto & historyvariable : historyvariables){
+    UA_NodeId_clear(&historyvariable.variable_id);
+  }
 }
