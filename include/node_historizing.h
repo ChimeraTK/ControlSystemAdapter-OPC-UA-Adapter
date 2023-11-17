@@ -48,14 +48,19 @@ typedef struct{
   size_t interval;
 }AdapterHistorySetup;
 
-void add_historizing_nodes(vector<UA_NodeId>& historizing_nodes,
-                           vector<string>& historizing_setup,
-                           UA_HistoryDataGathering gathering,
-                           UA_Server *mappedServer,
-                           UA_ServerConfig *server_config,
-                           vector<AdapterHistorySetup> history,
-                           vector<AdapterFolderHistorySetup> historyfolders,
-                           vector<AdapterPVHistorySetup> historyvariables);
+UA_HistoryDataGathering add_historizing_nodes(vector<UA_NodeId>& historizing_nodes,
+                                              vector<string>& historizing_setup,
+                                              UA_Server *mappedServer,
+                                              UA_ServerConfig *server_config,
+                                              vector<AdapterHistorySetup> history,
+                                              vector<AdapterFolderHistorySetup> historyfolders,
+                                              vector<AdapterPVHistorySetup> historyvariables);
 
+void clear_history(UA_HistoryDataGathering gathering,
+                   vector<UA_NodeId>& historizing_nodes,
+                   vector<string>& historizing_setup,
+                   UA_Server *mappedServer,
+                   vector<AdapterFolderHistorySetup> historyfolders,
+                   vector<AdapterPVHistorySetup> historyvariables);
 
 #endif // CHIMERATK_CONTROLSYSTEMADAPTER_OPCUAADAPTER_NODE_HISTORIZING_H
