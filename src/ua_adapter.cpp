@@ -551,22 +551,16 @@ void ua_uaadapter::workerThread() {
   }
   vector<UA_NodeId> historizing_nodes;
   vector<string> historizing_setup;
-  UA_HistoryDataGathering gathering;
-  add_historizing_nodes(historizing_nodes, historizing_setup, gathering, this->mappedServer, this->server_config, this->serverConfig.history, this->serverConfig.historyfolders, this->serverConfig.historyvariables);
+  UA_HistoryDataGathering gathering = add_historizing_nodes(historizing_nodes, historizing_setup, this->mappedServer,
+      this->server_config, this->serverConfig.history, this->serverConfig.historyfolders, this->serverConfig.historyvariables);
   cout << "Starting the server worker thread" << endl;
   UA_Server_run_startup(this->mappedServer);
   this->running = true;
-
   while(this->running) {
     UA_Server_run_iterate(this->mappedServer, true);
   }
-  for(size_t i=0; i< historizing_nodes.size(); i++){
-    UA_StatusCode retval = gathering.stopPoll(this->mappedServer, gathering.context, &historizing_nodes[i]);
-    UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "stopPoll %s", UA_StatusCode_name(retval));
-  }
-  //clear the lists
-  historizing_nodes.clear();
-  historizing_setup.clear();
+  clear_history(gathering, historizing_nodes, historizing_setup, this->mappedServer,
+                this->serverConfig.historyfolders, this->serverConfig.historyvariables);
 
   UA_Server_run_shutdown(this->mappedServer);
   cout << "Stopped the server worker thread" << endl;
