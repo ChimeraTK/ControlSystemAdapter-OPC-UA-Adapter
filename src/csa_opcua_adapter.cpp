@@ -55,7 +55,7 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
         if(oneProcessVariable->getName().rfind(e.substr(0, e.size()-1)) == 0){
           bool pv_used = false;
           for(const auto& ele: mappedPvSources){
-            if(ele.rfind(e.substr(1, e.size() - 3)) == 0){
+            if(ele == oneProcessVariable->getName().substr(1, oneProcessVariable->getName().size()-1)){
               cout << "Warning: Skip exclude node - Used in pv-mapping (directory match) PV:" << oneProcessVariable->getName() << endl;
               pv_used = true;
               break;
@@ -70,7 +70,7 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
         if(oneProcessVariable->getName().rfind(e.substr(0, e.size()-1), 0) == 0){
           bool pv_used = false;
           for(const auto& ele: mappedPvSources){
-            if(ele.rfind(e.substr(1, e.size() - 2)) == 0){
+            if(ele == oneProcessVariable->getName().substr(1, oneProcessVariable->getName().size()-1)){
               cout << "Warning: Skip exclude node - Used in pv-mapping (greedy match) PV:" << oneProcessVariable->getName() << endl;
               pv_used = true;
               break;
