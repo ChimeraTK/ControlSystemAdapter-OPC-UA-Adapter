@@ -528,7 +528,7 @@ if(result) {
     for(int32_t i = 0; i < nodeset->nodeNr; i++) {
       string exclude_string = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
       if(!exclude_string.empty()) {
-        this->exclude.insert(this->exclude.begin(), exclude_string);
+        this->exclude.insert(this->exclude.begin(), "/" + exclude_string);
       }
     }
   }

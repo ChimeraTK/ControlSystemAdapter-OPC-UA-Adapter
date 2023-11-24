@@ -456,20 +456,20 @@
 		- If multiple PVs exist (e.g. dir/test1, /dir/test2) all are matched
 	-->
 	<exclude sourceName="dir/test*" />
-	<exclude sourceName="/Mein/Name*" />
+	<exclude sourceName="Mein/Name*" />
 
 	<!-- D2 [x]
         - Directory and all PV in that directory including subdirectories with their PVs would match
 	-->
 	<exclude sourceName="dir/test/*" />
-	<exclude sourceName="/Dein/Name/*" />
+	<exclude sourceName="Dein/Name/*" />
 
 	<!-- D3 [x]	-->
 	<exclude sourceName="dir/test" />
-	<exclude sourceName="/testDoubleArray_57000" />
+	<exclude sourceName="testDoubleArray_57000" />
 
 	<!-- E1 [x]	-->
-	<exclude sourceName="/testDoubleArray_19000" />
+	<exclude sourceName="testDoubleArray_19000" />
 
 	<!-- E2 [x]	-->
 	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="true">
