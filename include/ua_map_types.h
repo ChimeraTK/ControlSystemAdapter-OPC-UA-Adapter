@@ -1,17 +1,28 @@
-/** @class ua_proxies
- * 	@brief Helper class to interact with open62541 in a easy way.
- * 	This class is a kind of a proxy to interact with the open62541 stack. For this, the class mapped all variables
- * to the nodestore of the open62541.
+/*
+ * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
+ *
+ * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
+ * redistribute it and/or modify it under the terms of the Lesser GNU
+ * General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
+ * that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Lesser GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
  *
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
  * Copyright (c) 2019-2023 Andreas Ebner  <Andreas.Ebner@iosb.fraunhofer.de>
  */
 
-#ifndef HAVE_UA_PROXIES_H
-#define HAVE_UA_PROXIES_H
+#ifndef HAVE_UA_MAP_TYPES_H
+#define HAVE_UA_MAP_TYPES_H
 
-#include "ua_proxies_typeconversion.h"
+#include "ua_typeconversion.h"
 #include <open62541/server.h>
 
 #include <iostream>
