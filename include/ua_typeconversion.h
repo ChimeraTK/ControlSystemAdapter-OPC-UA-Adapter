@@ -18,8 +18,8 @@
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
  */
 
-#ifndef HAVE_UA_PROXIES_TYPECONVERSION_H
-#define HAVE_UA_PROXIES_TYPECONVERSION_H
+#ifndef HAVE_UA_TYPECONVERSION_H
+#define HAVE_UA_TYPECONVERSION_H
 
 #include <open62541/server.h>
 
@@ -101,4 +101,4 @@ static inline UA_String CPPSTRING_TO_UASTRING(std::string& s) {
     UASTRING_AS_STRING(_p_tmpName.text, _p_strbuffer);                                                                 \
   }
 
-#endif //#ifndef HAVE_UA_PROXIES_TYPECONVERSION_H
+#endif //#ifndef HAVE_UA_TYPECONVERSION_H
