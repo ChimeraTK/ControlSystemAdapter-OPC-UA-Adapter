@@ -27,7 +27,7 @@ extern "C" {
 #include "csa_namespace.h"
 }
 
-#include "ua_proxies.h"
+#include "ua_map_types.h"
 
 #include <iostream>
 #include <utility>

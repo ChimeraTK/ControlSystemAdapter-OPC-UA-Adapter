@@ -39,7 +39,7 @@ extern "C" {
 #include "csa_config.h"
 #include "csa_processvariable.h"
 #include "ua_adapter.h"
-#include "ua_proxies.h"
+#include "ua_map_types.h"
 #include "xml_file_handler.h"
 
 #include <functional>
