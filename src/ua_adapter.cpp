@@ -217,7 +217,7 @@ void ua_uaadapter::constructServer() {
       throw std::runtime_error("Failed setting up server endpoints.");
     }
 
-    if(this->serverConfig.unsecure) {
+    if(!this->serverConfig.unsecure) {
       for(size_t i = 0; i < config->endpointsSize; i++) {
         UA_EndpointDescription* ep = &config->endpoints[i];
         if(ep->securityMode != UA_MESSAGESECURITYMODE_NONE) continue;
@@ -456,7 +456,12 @@ if(result) {
     this->serverConfig.enableSecurity = true;
     string unsecure = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "unsecure");
     if(!unsecure.empty()) {
-      this->serverConfig.unsecure = true;
+      transform(unsecure.begin(), unsecure.end(), unsecure.begin(), ::toupper);
+      if(unsecure.compare("TRUE") == 0){
+        this->serverConfig.unsecure = true;
+      } else {
+        this->serverConfig.unsecure = false;
+      }
     }
     else {
       this->serverConfig.unsecure = false;
