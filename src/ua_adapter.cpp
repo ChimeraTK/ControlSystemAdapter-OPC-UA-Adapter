@@ -16,11 +16,17 @@
  *
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- * Copyright (c) 2018-2021 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
+ * Copyright (c) 2018-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
+#include <open62541/plugin/historydata/history_data_backend_memory.h>
+#include <open62541/plugin/historydata/history_data_gathering_default.h>
+#include <open62541/plugin/historydata/history_database_default.h>
+#include <open62541/plugin/historydatabase.h>
+#include <open62541/plugin/log_stdout.h>
+#include <open62541/server.h>
 
 extern "C" {
-#include "csa_namespaceinit_generated.h"
+#include "csa_namespace.h"
 #include "unistd.h"
 
 #include <dirent.h>
@@ -28,16 +34,12 @@ extern "C" {
 #include <stdlib.h>
 }
 
+#include "csa_additionalvariable.h"
 #include "csa_config.h"
+#include "csa_processvariable.h"
 #include "ua_adapter.h"
-#include "ua_additionalvariable.h"
-#include "ua_processvariable.h"
-#include "ua_proxies.h"
+#include "ua_map_types.h"
 #include "xml_file_handler.h"
-#include <open62541/plugin/historydata/history_data_backend_memory.h>
-#include <open62541/plugin/historydata/history_data_gathering_default.h>
-#include <open62541/plugin/historydata/history_database_default.h>
-#include <open62541/plugin/historydatabase.h>
 
 #include <functional>
 #include <regex>
@@ -50,7 +52,7 @@ extern "C" {
 using namespace ChimeraTK;
 using namespace std;
 
-ua_uaadapter::ua_uaadapter(string configFile) : ua_mapped_class() {
+ua_uaadapter::ua_uaadapter(const string& configFile) : ua_mapped_class() {
   this->mappingExceptions = UA_FALSE;
   this->fileHandler = new xml_file_handler(configFile);
   this->readConfig();
@@ -104,7 +106,7 @@ static UA_ByteString loadFile(const char* const path) {
   return fileContents;
 }
 
-void ua_uaadapter::fillBuildInfo(UA_ServerConfig* config) {
+void ua_uaadapter::fillBuildInfo(UA_ServerConfig* config) const {
   /*get hostname */
   char hostname[HOST_NAME_MAX];
   gethostname(hostname, HOST_NAME_MAX);
@@ -137,18 +139,18 @@ void ua_uaadapter::fillBuildInfo(UA_ServerConfig* config) {
 void ua_uaadapter::constructServer() {
   auto config = (UA_ServerConfig*)UA_calloc(1, sizeof(UA_ServerConfig));
   if(!this->serverConfig.enableSecurity) {
-    UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, NULL);
+    UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, nullptr);
   }
 
   if(this->serverConfig.enableSecurity) {
     UA_ByteString certificate = UA_BYTESTRING_NULL;
     UA_ByteString privateKey = UA_BYTESTRING_NULL;
     size_t trustListSize = 0;
-    UA_ByteString* trustList = NULL;
+    UA_ByteString* trustList = nullptr;
     size_t issuerListSize = 0;
-    UA_ByteString* issuerList = NULL;
+    UA_ByteString* issuerList = nullptr;
     size_t blockListSize = 0;
-    UA_ByteString* blockList = NULL;
+    UA_ByteString* blockList = nullptr;
 
     /* Load certificate and private key */
     certificate = loadFile(this->serverConfig.certPath.c_str());
@@ -201,7 +203,7 @@ void ua_uaadapter::constructServer() {
         blockList = (UA_ByteString*)UA_realloc(blockList, sizeof(UA_ByteString) * blockListSize);
         char sbuf[1024];
         sprintf(sbuf, "%s/%s", this->serverConfig.blockListFolder.c_str(), entry->d_name);
-        printf("Trust List entry:  %s\n", entry->d_name);
+        printf("Block List entry:  %s\n", entry->d_name);
         blockList[blockListSize - 1] = loadFile(sbuf);
       }
     }
@@ -215,7 +217,7 @@ void ua_uaadapter::constructServer() {
       throw std::runtime_error("Failed setting up server endpoints.");
     }
 
-    if(this->serverConfig.unsecure) {
+    if(!this->serverConfig.unsecure) {
       for(size_t i = 0; i < config->endpointsSize; i++) {
         UA_EndpointDescription* ep = &config->endpoints[i];
         if(ep->securityMode != UA_MESSAGESECURITYMODE_NONE) continue;
@@ -231,7 +233,7 @@ void ua_uaadapter::constructServer() {
       // Delete the entire array if the last Endpoint was removed
       if(config->endpointsSize == 0) {
         UA_free(config->endpoints);
-        config->endpoints = NULL;
+        config->endpoints = nullptr;
       }
     }
 
@@ -252,12 +254,12 @@ void ua_uaadapter::constructServer() {
   auto* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
   usernamePasswordLogins->password = UA_STRING_ALLOC((char*)this->serverConfig.password.c_str());
   usernamePasswordLogins->username = UA_STRING_ALLOC((char*)this->serverConfig.username.c_str());
-  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin, NULL,
+  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin, nullptr,
       &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
       usernamePasswordLogins);
 
   this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-  csa_namespaceinit_generated(this->mappedServer);
+  csa_namespace_init(this->mappedServer);
 
   UA_free(config);
   UA_String_clear(&usernamePasswordLogins->password);
@@ -275,31 +277,105 @@ void ua_uaadapter::readConfig() {
       throw std::runtime_error("To many <config>-Tags in config file");
     }
 
-    placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "rootFolder");
+    /*
+     * result = this->fileHandler->getNodeSet(xpath + "//process_variable_hierarchy");
+if(result) {
+  xmlNodeSetPtr nodeset = result->nodesetval;
+  vector<xmlNodePtr> nodeVectorUnrollPathPV =
+      xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "unroll");
+  for(auto nodeUnrollPath : nodeVectorUnrollPathPV) {
+    string unrollSepEnabled = xml_file_handler::getContentFromNode(nodeUnrollPath);
+    transform(unrollSepEnabled.begin(), unrollSepEnabled.end(), unrollSepEnabled.begin(), ::toupper);
+    if(unrollSepEnabled == "TRUE") {
+      this->pvSeperator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
+    }
+  }
+     */
+
+    // check if historizing is configured
+    vector<xmlNodePtr> historizing = xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "historizing");
+    if(!historizing.empty()) {
+      xmlXPathObjectPtr sub_sub_result = this->fileHandler->getNodeSet("//historizing");
+      if(sub_sub_result) {
+        xmlNodeSetPtr node_set = sub_sub_result->nodesetval;
+        for(int32_t i = 0; i < node_set->nodeNr; i++) {
+          vector<xmlNodePtr> nodeVectorhistorizingSetUp =
+              xml_file_handler::getNodesByName(node_set->nodeTab[i]->children, "setup");
+          string val;
+          for(auto& nodeHistorizingPath : nodeVectorhistorizingSetUp) {
+            string history_name = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "name");
+            AdapterHistorySetup temp;
+            char* c;
+            if(!history_name.empty()) {
+              temp.name = history_name;
+            }
+            string history_buffer_length =
+                xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "buffer_length");
+            if(!history_buffer_length.empty()) {
+              sscanf(history_buffer_length.c_str(), "%zu", &temp.buffer_length);
+            }
+            string history_entries_per_response =
+                xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "entries_per_response");
+            if(!history_entries_per_response.empty()) {
+              sscanf(history_entries_per_response.c_str(), "%zu", &temp.entries_per_response);
+            }
+            string history_interval = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "interval");
+            if(!history_interval.empty()) {
+              sscanf(history_interval.c_str(), "%zu", &temp.interval);
+            }
+            if(history_name.empty() || history_buffer_length.empty() || history_entries_per_response.empty() ||
+                history_interval.empty()) {
+              if(!history_name.empty()) {
+                throw std::logic_error("Incomplete History Configuration for history " + history_name);
+              }
+              else {
+                throw std::logic_error("Incomplete History Configuration. Missing history name");
+              }
+            }
+            else {
+              // check if a configuration is redefined
+              bool existing = false;
+              for(size_t j = 0; j < this->serverConfig.history.size(); j++) {
+                if(history_name == this->serverConfig.history[j].name) {
+                  existing = true;
+                }
+              }
+              if(!existing) {
+                this->serverConfig.history.insert(this->serverConfig.history.end(), temp);
+              }
+              else {
+                throw std::logic_error("redefinition of history configuration " + history_name);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "rootFolder");
     if(!placeHolder.empty()) {
       this->serverConfig.rootFolder = placeHolder;
     }
 
-    placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "description");
+    placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "description");
     if(!placeHolder.empty()) {
       this->serverConfig.descriptionFolder = placeHolder;
     }
     vector<xmlNodePtr> mappingExceptionsVector =
-        this->fileHandler->getNodesByName(nodeset->nodeTab[0]->children, "mapping_exceptions");
+        xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "mapping_exceptions");
     if(mappingExceptionsVector.empty()) {
       this->mappingExceptions = UA_FALSE;
     }
     else {
-      placeHolder = this->fileHandler->getContentFromNode(mappingExceptionsVector[0]);
+      placeHolder = xml_file_handler::getContentFromNode(mappingExceptionsVector[0]);
       transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
-      if(placeHolder.compare("TRUE") == 0) {
+      if(placeHolder == "TRUE") {
         this->mappingExceptions = UA_TRUE;
       }
       else {
         this->mappingExceptions = UA_FALSE;
       }
     }
-
     xmlXPathFreeObject(result);
   }
   result = this->fileHandler->getNodeSet(xpath + "//login");
@@ -309,7 +385,7 @@ void ua_uaadapter::readConfig() {
       throw std::runtime_error("To many <login>-Tags in config file");
     }
     this->serverConfig.UsernamePasswordLogin = UA_TRUE;
-    placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "password");
+    placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "password");
     if(!placeHolder.empty()) {
       this->serverConfig.password = placeHolder;
     }
@@ -317,7 +393,7 @@ void ua_uaadapter::readConfig() {
       throw std::runtime_error("<login>-Tag requires username");
     }
 
-    placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "username");
+    placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "username");
     if(!placeHolder.empty()) {
       this->serverConfig.username = placeHolder;
     }
@@ -336,7 +412,7 @@ void ua_uaadapter::readConfig() {
     if(nodeset->nodeNr > 1) {
       throw std::runtime_error("To many <server>-Tags in config file");
     }
-    string opcuaPort = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "port");
+    string opcuaPort = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "port");
     if(!opcuaPort.empty()) {
       this->serverConfig.opcuaPort = std::stoi(opcuaPort);
     }
@@ -344,7 +420,7 @@ void ua_uaadapter::readConfig() {
       cout << "No 'port'-Attribute in config file is set. Use default Port: 16664" << endl;
     }
 
-    placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
+    placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
     if(!placeHolder.empty()) {
       this->serverConfig.applicationName = placeHolder;
       if(this->serverConfig.rootFolder.empty()) {
@@ -355,7 +431,7 @@ void ua_uaadapter::readConfig() {
       string applicationName;
       try {
         string applicationName = ApplicationBase::getInstance().getName();
-        this->serverConfig.applicationName = applicationName.c_str();
+        this->serverConfig.applicationName = applicationName;
       }
       catch(ChimeraTK::logic_error) {
       }
@@ -378,43 +454,48 @@ void ua_uaadapter::readConfig() {
       throw std::runtime_error("To many <security>-Tags in config file");
     }
     this->serverConfig.enableSecurity = true;
-    string unsecure = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "unsecure");
+    string unsecure = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "unsecure");
     if(!unsecure.empty()) {
-      this->serverConfig.unsecure = true;
+      transform(unsecure.begin(), unsecure.end(), unsecure.begin(), ::toupper);
+      if(unsecure.compare("TRUE") == 0){
+        this->serverConfig.unsecure = true;
+      } else {
+        this->serverConfig.unsecure = false;
+      }
     }
     else {
       this->serverConfig.unsecure = false;
       cout << "No 'unsecure'-Attribute in config file is set. Disable unsecure endpoints" << endl;
     }
-    string certPath = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "certificate");
+    string certPath = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "certificate");
     if(!certPath.empty()) {
       this->serverConfig.certPath = certPath;
     }
     else {
       cout << "Invalid security configuration. No 'certificate'-Attribute in config file is set." << endl;
     }
-    string keyPath = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "privatekey");
+    string keyPath = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "privatekey");
     if(!keyPath.empty()) {
       this->serverConfig.keyPath = keyPath;
     }
     else {
       cout << "Invalid security configuration. No 'privatekey'-Attribute in config file is set." << endl;
     }
-    string allowListFolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "trustlist");
+    string allowListFolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "trustlist");
     if(!allowListFolder.empty()) {
       this->serverConfig.allowListFolder = allowListFolder;
     }
     else {
       cout << "Invalid security configuration. No 'trustlist'-Attribute in config file is set." << endl;
     }
-    string blockListFolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "blocklist");
+    string blockListFolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "blocklist");
     if(!blockListFolder.empty()) {
       this->serverConfig.blockListFolder = blockListFolder;
     }
     else {
       cout << "No 'blockListFolder'-Attribute in config file is set." << endl;
     }
-    string issuerListFolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "issuerlist");
+    string issuerListFolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "issuerlist");
     if(!issuerListFolder.empty()) {
       this->serverConfig.issuerListFolder = issuerListFolder;
     }
@@ -431,12 +512,12 @@ void ua_uaadapter::readConfig() {
   if(result) {
     xmlNodeSetPtr nodeset = result->nodesetval;
     vector<xmlNodePtr> nodeVectorUnrollPathPV =
-        this->fileHandler->getNodesByName(nodeset->nodeTab[0]->children, "unroll");
+        xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "unroll");
     for(auto nodeUnrollPath : nodeVectorUnrollPathPV) {
-      string unrollSepEnabled = this->fileHandler->getContentFromNode(nodeUnrollPath);
+      string unrollSepEnabled = xml_file_handler::getContentFromNode(nodeUnrollPath);
       transform(unrollSepEnabled.begin(), unrollSepEnabled.end(), unrollSepEnabled.begin(), ::toupper);
-      if(unrollSepEnabled.compare("TRUE") == 0) {
-        this->pvSeperator += this->fileHandler->getAttributeValueFromNode(nodeUnrollPath, "pathSep");
+      if(unrollSepEnabled == "TRUE") {
+        this->pvSeperator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
       }
     }
     xmlXPathFreeObject(result);
@@ -445,9 +526,22 @@ void ua_uaadapter::readConfig() {
     cout << "No <process_variable_hierarchy>-Tag in config file. Use default hierarchical mapping with '/'." << endl;
     this->pvSeperator = "/";
   }
+
+  xmlXPathObjectPtr result_exclude = this->fileHandler->getNodeSet("//exclude");
+  xmlNodeSetPtr nodeset;
+  if(result_exclude) {
+    nodeset = result_exclude->nodesetval;
+    for(int32_t i = 0; i < nodeset->nodeNr; i++) {
+      string exclude_string = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
+      if(!exclude_string.empty()) {
+        this->exclude.insert(this->exclude.begin(), "/" + exclude_string);
+      }
+    }
+  }
+  xmlXPathFreeObject(result_exclude);
 }
 
-void ua_uaadapter::applyMapping(boost::shared_ptr<ControlSystemPVManager> csManager) {
+void ua_uaadapter::applyMapping(const boost::shared_ptr<ControlSystemPVManager>& csManager) {
   // build folder structure
   this->buildFolderStructure(csManager);
   // start explicit mapping
@@ -461,23 +555,28 @@ void ua_uaadapter::workerThread() {
     cout << "No server mapped" << endl;
     return;
   }
-
+  vector<UA_NodeId> historizing_nodes;
+  vector<string> historizing_setup;
+  UA_HistoryDataGathering gathering =
+      add_historizing_nodes(historizing_nodes, historizing_setup, this->mappedServer, this->server_config,
+          this->serverConfig.history, this->serverConfig.historyfolders, this->serverConfig.historyvariables);
   cout << "Starting the server worker thread" << endl;
   UA_Server_run_startup(this->mappedServer);
-
   this->running = true;
   while(this->running) {
     UA_Server_run_iterate(this->mappedServer, true);
   }
+  clear_history(gathering, historizing_nodes, historizing_setup, this->mappedServer, this->serverConfig.historyfolders,
+      this->serverConfig.historyvariables);
 
   UA_Server_run_shutdown(this->mappedServer);
   cout << "Stopped the server worker thread" << endl;
 }
 
-UA_NodeId ua_uaadapter::enrollFolderPathFromString(string path, string seperator) {
+UA_NodeId ua_uaadapter::enrollFolderPathFromString(const string& path, const string& seperator) {
   vector<string> varPathVector;
   if(!seperator.empty()) {
-    vector<string> newPathVector = this->fileHandler->praseVariablePath(path, seperator);
+    vector<string> newPathVector = xml_file_handler::parseVariablePath(path, seperator);
     varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
   }
   if(!varPathVector.empty()) { // last element is the variable name itself
@@ -487,13 +586,14 @@ UA_NodeId ua_uaadapter::enrollFolderPathFromString(string path, string seperator
   return UA_NODEID_NULL;
 }
 
-void ua_uaadapter::implicitVarMapping(std::string varName, boost::shared_ptr<ControlSystemPVManager> csManager) {
+void ua_uaadapter::implicitVarMapping(
+    const std::string& varName, const boost::shared_ptr<ControlSystemPVManager>& csManager) {
   UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeperator);
   ua_processvariable* processvariable;
   if(!UA_NodeId_isNull(&folderPathNodeId)) {
     processvariable =
         new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1), csManager,
-            this->fileHandler->praseVariablePath(varName, this->pvSeperator).back());
+            xml_file_handler::parseVariablePath(varName, this->pvSeperator).back());
   }
   else {
     processvariable =
@@ -503,23 +603,12 @@ void ua_uaadapter::implicitVarMapping(std::string varName, boost::shared_ptr<Con
   UA_NodeId tmpNodeId = processvariable->getOwnNodeId();
   UA_Server_writeDisplayName(this->mappedServer, tmpNodeId,
       UA_LOCALIZEDTEXT(
-          (char*)"en_US", (char*)this->fileHandler->praseVariablePath(varName, this->pvSeperator).back().c_str()));
-  if((varName.find("humidity") != std::string::npos ||
-      varName.find("temperature") != std::string::npos) &&
-      varName.find("history") == std::string::npos &&
-      varName.find("History") == std::string::npos &&
-      varName.find("26.") == std::string::npos &&
-      varName.find("28.") == std::string::npos) {
-    if(!enableHistory(&tmpNodeId)) {
-      UA_LOG_INFO(&this->server_config->logger, UA_LOGCATEGORY_USERLAND, "registered node for historizing: %s",
-          varName.c_str());
-    }
-  }
+          (char*)"en_US", (char*)xml_file_handler::parseVariablePath(varName, this->pvSeperator).back().c_str()));
   UA_NodeId_clear(&tmpNodeId);
 }
 
 void ua_uaadapter::deepCopyHierarchicalLayer(
-    boost::shared_ptr<ControlSystemPVManager> csManager, UA_NodeId layer, UA_NodeId target) {
+    const boost::shared_ptr<ControlSystemPVManager>& csManager, UA_NodeId layer, UA_NodeId target) {
   // copy pv's of current layer
   UA_BrowseDescription bd;
   bd.includeSubtypes = false;
@@ -535,17 +624,17 @@ void ua_uaadapter::deepCopyHierarchicalLayer(
     UA_LocalizedText foundPVName;
     string foundPVNameCPP;
     UA_Server_readDisplayName(this->mappedServer, rd.nodeId.nodeId, &foundPVName);
-    UASTRING_TO_CPPSTRING(foundPVName.text, foundPVNameCPP);
+    UASTRING_TO_CPPSTRING(foundPVName.text, foundPVNameCPP)
 
     string pvSourceNameid;
     UA_String foundPVSourceName;
     string foundPVSourceNameCPP;
     UA_Variant value;
-    UA_STRING_TO_CPPSTRING_COPY(&rd.nodeId.nodeId.identifier.string, &pvSourceNameid);
+    UA_STRING_TO_CPPSTRING_COPY(&rd.nodeId.nodeId.identifier.string, &pvSourceNameid)
     UA_Server_readValue(this->mappedServer, UA_NODEID_STRING(1, (char*)(pvSourceNameid + "/Name").c_str()), &value);
     foundPVSourceName = *((UA_String*)value.data);
-    UASTRING_TO_CPPSTRING(foundPVSourceName, foundPVSourceNameCPP);
-    string varName = this->fileHandler->praseVariablePath(foundPVNameCPP, "/").back();
+    UASTRING_TO_CPPSTRING(foundPVSourceName, foundPVSourceNameCPP)
+    string varName = xml_file_handler::parseVariablePath(foundPVNameCPP, "/").back();
     auto* processvariable =
         new ua_processvariable(this->mappedServer, target, foundPVSourceNameCPP, csManager, foundPVNameCPP);
     this->variables.push_back(processvariable);
@@ -567,7 +656,7 @@ void ua_uaadapter::deepCopyHierarchicalLayer(
     string foundFolderNameCPP;
     UA_Server_readDescription(this->mappedServer, rd.nodeId.nodeId, &foundFolderDescription);
     UA_StatusCode result = UA_Server_readDisplayName(this->mappedServer, rd.nodeId.nodeId, &foundFolderName);
-    UASTRING_TO_CPPSTRING(foundFolderName.text, foundFolderNameCPP);
+    UASTRING_TO_CPPSTRING(foundFolderName.text, foundFolderNameCPP)
     if(result != UA_STATUSCODE_GOOD) {
       // error handling
       continue;
@@ -580,30 +669,73 @@ void ua_uaadapter::deepCopyHierarchicalLayer(
   UA_BrowseResult_clear(&br);
 }
 
-void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager> csManager) {
+void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVManager>& csManager) {
   xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//folder");
   xmlNodeSetPtr nodeset;
   if(result) {
     nodeset = result->nodesetval;
+
     for(int32_t i = 0; i < nodeset->nodeNr; i++) {
       UA_NodeId folderPathNodeId;
       string destination, description, folder;
       vector<xmlNodePtr> nodeFolderPath =
-          this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "destination");
-      vector<xmlNodePtr> nodeFolder = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "name");
+          xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "destination");
+      vector<xmlNodePtr> nodeFolder = xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "name");
       vector<xmlNodePtr> nodeDescription =
-          this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "description");
-      string sourceName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
-      string copy = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "copy");
+          xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "description");
+      string sourceName = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
+      string copy = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "copy");
       if(!nodeFolderPath.empty()) {
-        destination = this->fileHandler->getContentFromNode(nodeFolderPath[0]);
+        destination = xml_file_handler::getContentFromNode(nodeFolderPath[0]);
       }
       if(!nodeDescription.empty()) {
-        description = this->fileHandler->getContentFromNode(nodeDescription[0]);
+        description = xml_file_handler::getContentFromNode(nodeDescription[0]);
       }
       if(!nodeFolder.empty()) {
-        folder = this->fileHandler->getContentFromNode(nodeFolder[0]);
+        folder = xml_file_handler::getContentFromNode(nodeFolder[0]);
       }
+      string history = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "history");
+      if(!history.empty()) {
+        if(!nodeFolder.empty()) {
+          string folderNodeId;
+          if(!nodeFolderPath.empty()) {
+            if(strlen(destination.c_str()) == 0) {
+              // todo check whiy destionation is not empty and does not raise an exception
+              folderNodeId = this->serverConfig.rootFolder + "/" + folder + "Dir";
+            }
+            else {
+              folderNodeId = this->serverConfig.rootFolder + "/" + destination + "/" + folder + "Dir";
+            }
+          }
+          else {
+            folderNodeId = this->serverConfig.rootFolder + "/" + folder + "Dir";
+          }
+          AdapterFolderHistorySetup temp;
+          temp.folder_historizing = history;
+          UA_NodeId id = UA_NODEID_STRING(1, (char*)folderNodeId.c_str());
+          UA_NodeId_copy(&id, &temp.folder_id);
+          this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
+          UA_String out = UA_STRING_NULL;
+          UA_print(&temp.folder_id, &UA_TYPES[UA_TYPES_NODEID], &out);
+          UA_LOG_INFO(&server_config->logger, UA_LOGCATEGORY_USERLAND, "add folder from destionation and name %.*s ",
+              (int)out.length, out.data);
+          UA_String_clear(&out);
+        }
+        if(!sourceName.empty() && (copy.empty() || copy == "false")) {
+          AdapterFolderHistorySetup temp;
+          temp.folder_historizing = history;
+          string folderNodeId = this->serverConfig.rootFolder + "/" + sourceName + "Dir";
+          UA_NodeId id = UA_NODEID_STRING(1, (char*)folderNodeId.c_str());
+          UA_NodeId_copy(&id, &temp.folder_id);
+          this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
+          UA_String out = UA_STRING_NULL;
+          UA_print(&temp.folder_id, &UA_TYPES[UA_TYPES_NODEID], &out);
+          UA_LOG_INFO(&server_config->logger, UA_LOGCATEGORY_USERLAND, "add folder from source name %.*s ",
+              (int)out.length, out.data);
+          UA_String_clear(&out);
+        }
+      }
+
       if(folder.empty()) {
         if(this->mappingExceptions) {
           throw std::runtime_error("Error! Folder creation failed. Name is missing. Mapping line number: " +
@@ -668,8 +800,8 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
       }
       // check if source name is set -> map complete hierarchical structure to the destination
       if(!sourceName.empty()) {
-        if((destination.empty() && sourceName.compare(folder) == 0) ||
-            (!destination.empty() && sourceName.compare(destination + "/" + folder) == 0)) {
+        if((destination.empty() && sourceName == folder) ||
+            (!destination.empty() && sourceName == destination + "/" + folder)) {
           if(this->mappingExceptions) {
             throw std::runtime_error(
                 "Error! Folder creation failed. Source and Destination equal. Mapping line number: " +
@@ -713,13 +845,13 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
         }
         // enroll path destination -> copy / link the complete tree to this place
         transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
-        if(copy.compare("TRUE") == 0) {
+        if(copy == "TRUE") {
           bool sourceAndDestinationEqual = false;
           if(!destination.empty()) {
-            if(sourceName.compare(destination + "/" + folder) == 0) sourceAndDestinationEqual = true;
+            if(sourceName == destination + "/" + folder) sourceAndDestinationEqual = true;
           }
           else {
-            if(sourceName.compare(folder) == 0) sourceAndDestinationEqual = true;
+            if(sourceName == folder) sourceAndDestinationEqual = true;
           }
           if(sourceAndDestinationEqual) {
             if(this->mappingExceptions) {
@@ -805,7 +937,7 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
         }
         continue;
       }
-      // create the requested folder hierarchy
+
       UA_NodeId retnode = createFolder(folderPathNodeId, folder);
       // set folder description
       if(copy.empty() && sourceName.empty() && !description.empty()) {
@@ -818,35 +950,72 @@ void ua_uaadapter::buildFolderStructure(boost::shared_ptr<ControlSystemPVManager
   }
 }
 
-void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> csManager) {
+void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVManager>& csManager) {
   xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//process_variable");
   xmlNodeSetPtr nodeset;
   if(result) {
     nodeset = result->nodesetval;
     for(int32_t i = 0; i < nodeset->nodeNr; i++) {
-      string sourceName, copy, destination, name, unit, description, unrollPath;
+      string sourceName, copy, destination, name, unit, description, unrollPath, history;
       vector<xmlNodePtr> nodeDestination =
-          this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "destination");
-      vector<xmlNodePtr> nodeName = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "name");
-      vector<xmlNodePtr> nodeUnit = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "unit");
+          xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "destination");
+      vector<xmlNodePtr> nodeName = xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "name");
+
+      vector<xmlNodePtr> nodeUnit = xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "unit");
       vector<xmlNodePtr> nodeDescription =
-          this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "description");
-      sourceName = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
-      copy = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "copy");
+          xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "description");
+
+      copy = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "copy");
       transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
 
+      sourceName = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
+      history = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "history");
+      if(!history.empty()) {
+        AdapterPVHistorySetup temp;
+        temp.variable_historizing = history;
+        string targetNodeId;
+        // get the name of the variable
+        if(!nodeName.empty()) {
+          if(nodeDestination.empty()) {
+            // cout << "nodename: "<<  xml_file_handler::getContentFromNode(nodeName[0]) << endl;
+            targetNodeId = this->serverConfig.rootFolder + "/" + xml_file_handler::getContentFromNode(nodeName[0]);
+            UA_NodeId id = UA_NODEID_STRING(1, (char*)targetNodeId.c_str());
+            UA_NodeId_copy(&id, &temp.variable_id);
+            this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
+          }
+          else {
+            // cout << "nodename: "<<  xml_file_handler::getContentFromNode(nodeName[0]) << endl;
+            // cout << "node destination: "<<  xml_file_handler::getContentFromNode(nodeDestination[0]) << endl;
+            targetNodeId = this->serverConfig.rootFolder + "/" +
+                xml_file_handler::getContentFromNode(nodeDestination[0]) + "/" +
+                xml_file_handler::getContentFromNode(nodeName[0]);
+            UA_NodeId id = UA_NODEID_STRING(1, (char*)targetNodeId.c_str());
+            UA_NodeId_copy(&id, &temp.variable_id);
+            this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
+          }
+        }
+        if(!sourceName.empty() && (copy.empty() || copy == "FALSE")) {
+          name = sourceName;
+          // cout << "print the source name "<<  sourceName << endl;
+          targetNodeId = this->serverConfig.rootFolder + "/" + sourceName;
+          UA_NodeId id = UA_NODEID_STRING(1, (char*)targetNodeId.c_str());
+          UA_NodeId_copy(&id, &temp.variable_id);
+          this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
+        }
+      }
+
       if(!nodeDestination.empty()) {
-        destination = this->fileHandler->getContentFromNode(nodeDestination[0]);
-        unrollPath = this->fileHandler->getAttributeValueFromNode(nodeDestination[0], "unrollPath");
+        destination = xml_file_handler::getContentFromNode(nodeDestination[0]);
+        unrollPath = xml_file_handler::getAttributeValueFromNode(nodeDestination[0], "unrollPath");
       }
       if(!nodeName.empty()) {
-        name = this->fileHandler->getContentFromNode(nodeName[0]);
+        name = xml_file_handler::getContentFromNode(nodeName[0]);
       }
       if(!nodeUnit.empty()) {
-        unit = this->fileHandler->getContentFromNode(nodeUnit[0]);
+        unit = xml_file_handler::getContentFromNode(nodeUnit[0]);
       }
       if(!nodeDescription.empty()) {
-        description = this->fileHandler->getContentFromNode(nodeDescription[0]);
+        description = xml_file_handler::getContentFromNode(nodeDescription[0]);
       }
 
       if(sourceName.empty()) {
@@ -864,11 +1033,11 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
         continue;
       }
       // check if the pv still exists -> update requested
-      if((destination + "/" + name).compare(sourceName) == 0 && copy.compare("FALSE") == 0) {
+      if(((destination + "/" + name) == sourceName) && copy == "FALSE") {
         // check if the source var exists
         string parentSourceFolder = this->serverConfig.rootFolder + "/" +
             (sourceName.substr(
-                0, sourceName.length() - this->fileHandler->praseVariablePath(sourceName, "/").back().length() - 1));
+                0, sourceName.length() - xml_file_handler::parseVariablePath(sourceName, "/").back().length() - 1));
         UA_NodeId parentSourceFolderId = UA_NODEID_STRING(1, (char*)parentSourceFolder.c_str());
         UA_NodeId pvNodeId = UA_NODEID_NULL;
         UA_BrowseDescription bd;
@@ -883,7 +1052,7 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
           UA_ReferenceDescription rd = br.references[j];
           string name;
           UASTRING_TO_CPPSTRING(rd.displayName.text, name)
-          if(name.compare(this->fileHandler->praseVariablePath(sourceName, "/").back()) == 0) {
+          if(name == xml_file_handler::parseVariablePath(sourceName, "/").back()) {
             UA_NodeId_copy(&br.references[j].nodeId.nodeId, &pvNodeId);
           }
         }
@@ -900,24 +1069,24 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
             UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
                 "Warning! Skipping PV mapping. No corresponding source pv.");
           }
-          return;
+          continue;
         }
         if(!unit.empty()) {
           // update unit
-          for(size_t n = 0; n < this->variables.size(); n++) {
-            UA_NodeId tmpNodeId = this->variables[n]->getOwnNodeId();
+          for(auto& variable : this->variables) {
+            UA_NodeId tmpNodeId = variable->getOwnNodeId();
             if(UA_NodeId_equal(&tmpNodeId, &pvNodeId)) {
-              this->variables[n]->setEngineeringUnit(unit);
+              variable->setEngineeringUnit(unit);
             }
             UA_NodeId_clear(&tmpNodeId);
           }
         }
         if(!description.empty()) {
           // update description
-          for(size_t n = 0; n < this->variables.size(); n++) {
-            UA_NodeId tmpNodeId = this->variables[n]->getOwnNodeId();
+          for(auto& variable : this->variables) {
+            UA_NodeId tmpNodeId = variable->getOwnNodeId();
             if(UA_NodeId_equal(&tmpNodeId, &pvNodeId)) {
-              this->variables[n]->setDescription(description);
+              variable->setDescription(description);
             }
             UA_NodeId_clear(&tmpNodeId);
           }
@@ -961,8 +1130,8 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
       }
       // check the pv copy attribute -> copy of pv requested; false -> reference to original pv requested
       UA_NodeId createdNodeId = UA_NODEID_NULL;
-      if(copy.compare("TRUE") == 0) {
-        if(sourceName.compare(destination + "/" + name) == 0) {
+      if(copy == "TRUE") {
+        if(sourceName == (destination + "/" + name)) {
           if(this->mappingExceptions) {
             throw std::runtime_error(
                 "Error! PV mapping failed. Source and destination must be different if copy='true'.");
@@ -1044,11 +1213,11 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
       }
       else {
         // get node id of the source node
-        string sourceVarName = this->fileHandler->praseVariablePath(sourceName, "/").back();
+        string sourceVarName = xml_file_handler::parseVariablePath(sourceName, "/").back();
         if(name.empty()) {
           name = sourceVarName;
         }
-        if(sourceVarName.compare(name) != 0) {
+        if(sourceVarName != name) {
           if(this->mappingExceptions) {
             throw std::runtime_error("Error! PV mapping failed. The pv name can't changed if copy is false.");
           }
@@ -1059,13 +1228,13 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
         // create destination folder
         UA_NodeId destinationFolder = enrollFolderPathFromString(destination + "/removedpart", "/");
         UA_ExpandedNodeId enid;
-        enid.serverIndex = 1;
+        enid.serverIndex = 0;
         enid.namespaceUri = UA_STRING_NULL;
         enid.nodeId = parentSourceId;
         // add reference to the source node
         UA_StatusCode addRef = UA_Server_addReference(
-            this->mappedServer, destinationFolder, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, UA_TRUE);
-        if(sourceVarName.compare(name) != 0) {
+            this->mappedServer, destinationFolder, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, true);
+        if(sourceVarName != name) {
           if(this->mappingExceptions) {
             throw std::runtime_error("PV mapping failed. Can't create reference to original pv.");
           }
@@ -1076,19 +1245,19 @@ void ua_uaadapter::explicitVarMapping(boost::shared_ptr<ControlSystemPVManager> 
         UA_NodeId_copy(&parentSourceId, &createdNodeId);
       }
       if(!unit.empty()) {
-        for(size_t n = 0; n < this->variables.size(); n++) {
-          UA_NodeId tmpNodeId = this->variables[n]->getOwnNodeId();
+        for(auto& variable : this->variables) {
+          UA_NodeId tmpNodeId = variable->getOwnNodeId();
           if(UA_NodeId_equal(&tmpNodeId, &createdNodeId)) {
-            this->variables[n]->setEngineeringUnit(unit);
+            variable->setEngineeringUnit(unit);
           }
           UA_NodeId_clear(&tmpNodeId);
         }
       }
       if(!description.empty()) {
-        for(size_t n = 0; n < this->variables.size(); n++) {
-          UA_NodeId tmpNodeId = this->variables[n]->getOwnNodeId();
+        for(auto& variable : this->variables) {
+          UA_NodeId tmpNodeId = variable->getOwnNodeId();
           if(UA_NodeId_equal(&tmpNodeId, &createdNodeId)) {
-            this->variables[n]->setDescription(description);
+            variable->setDescription(description);
           }
           UA_NodeId_clear(&tmpNodeId);
         }
@@ -1110,23 +1279,23 @@ void ua_uaadapter::addAdditionalVariables() {
     for(int32_t i = 0; i < nodeset->nodeNr; i++) {
       string destination, name, description, value;
       vector<xmlNodePtr> nodeDestination =
-          this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "destination");
-      vector<xmlNodePtr> nodeName = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "name");
+          xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "destination");
+      vector<xmlNodePtr> nodeName = xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "name");
       vector<xmlNodePtr> nodeDescription =
-          this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "description");
-      vector<xmlNodePtr> nodeValue = this->fileHandler->getNodesByName(nodeset->nodeTab[i]->children, "value");
+          xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "description");
+      vector<xmlNodePtr> nodeValue = xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "value");
 
       if(!nodeDestination.empty()) {
-        destination = this->fileHandler->getContentFromNode(nodeDestination[0]);
+        destination = xml_file_handler::getContentFromNode(nodeDestination[0]);
       }
       if(!nodeName.empty()) {
-        name = this->fileHandler->getContentFromNode(nodeName[0]);
+        name = xml_file_handler::getContentFromNode(nodeName[0]);
       }
       if(!nodeDescription.empty()) {
-        description = this->fileHandler->getContentFromNode(nodeDescription[0]);
+        description = xml_file_handler::getContentFromNode(nodeDescription[0]);
       }
       if(!nodeValue.empty()) {
-        value = this->fileHandler->getContentFromNode(nodeValue[0]);
+        value = xml_file_handler::getContentFromNode(nodeValue[0]);
       }
       // check if name is empty
       if(name.empty()) {
@@ -1204,7 +1373,7 @@ void ua_uaadapter::addAdditionalVariables() {
             "Warning! Skipping additional variable. Creation of additional variable folder failed. Skipping.");
         continue;
       }
-      ua_additionalvariable* additionalvariable =
+      auto* additionalvariable =
           new ua_additionalvariable(this->mappedServer, additionalVarFolderPath, name, value, description);
       this->additionalVariables.push_back(additionalvariable);
     }
@@ -1217,7 +1386,8 @@ vector<ua_processvariable*> ua_uaadapter::getVariables() {
   return this->variables;
 }
 
-UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderName, std::string description) {
+UA_NodeId ua_uaadapter::createUAFolder(
+    UA_NodeId basenodeid, const std::string& folderName, const std::string& description) {
   // FIXME: Check if folder name a possible name or should it be escaped (?!"§%-:, etc)
   UA_StatusCode retval = UA_STATUSCODE_GOOD;
   UA_NodeId createdNodeId = UA_NODEID_NULL;
@@ -1235,7 +1405,7 @@ UA_NodeId ua_uaadapter::createUAFolder(UA_NodeId basenodeid, std::string folderN
 
   string parentNodeIdString;
   if(basenodeid.identifierType == UA_NODEIDTYPE_STRING) {
-    UASTRING_TO_CPPSTRING(basenodeid.identifier.string, parentNodeIdString);
+    UASTRING_TO_CPPSTRING(basenodeid.identifier.string, parentNodeIdString)
     if(!parentNodeIdString.empty()) {
       parentNodeIdString.resize(parentNodeIdString.size() - 3);
     }
@@ -1278,9 +1448,6 @@ UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
   this->ownNodeId = createdNodeId;
   ua_mapInstantiatedNodes(this->ownNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &this->ownedNodes);
 
-  // Nodes "Variables" where created on object instantiation, we need these IDs to add new process variables to them...
-  // UA_NodeId_copy(nodePairList_getTargetIdBySourceId(this->ownedNodes, UA_NODEID_NUMERIC(CSA_NSID,
-  // CSA_NSID_VARIABLES)), &this->variablesListId);
   return UA_STATUSCODE_GOOD;
 }
 
@@ -1288,9 +1455,9 @@ UA_NodeId ua_uaadapter::getOwnNodeId() {
   return this->ownNodeId;
 }
 
-UA_NodeId ua_uaadapter::existFolderPath(UA_NodeId basenodeid, std::vector<string> folderPath) {
+UA_NodeId ua_uaadapter::existFolderPath(UA_NodeId basenodeid, const std::vector<string>& folderPath) {
   UA_NodeId lastNodeId = basenodeid;
-  for(std::string t : folderPath) {
+  for(const std::string& t : folderPath) {
     lastNodeId = this->existFolder(lastNodeId, t);
     if(UA_NodeId_isNull(&lastNodeId)) {
       return UA_NODEID_NULL;
@@ -1299,12 +1466,11 @@ UA_NodeId ua_uaadapter::existFolderPath(UA_NodeId basenodeid, std::vector<string
   return lastNodeId;
 }
 
-UA_NodeId ua_uaadapter::existFolder(UA_NodeId basenodeid, string folder) {
+UA_NodeId ua_uaadapter::existFolder(UA_NodeId basenodeid, const string& folder) {
   UA_NodeId lastNodeId = UA_NODEID_NULL;
-  for(uint32_t i = 0; i < this->folderVector.size(); i++) {
-    if((this->folderVector.at(i).folderName.compare(folder) == 0) &&
-        (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &basenodeid))) {
-      return this->folderVector.at(i).folderNodeId;
+  for(auto& i : this->folderVector) {
+    if((i.folderName == folder) && (UA_NodeId_equal(&i.prevFolderNodeId, &basenodeid))) {
+      return i.folderNodeId;
     }
   }
   return UA_NODEID_NULL;
@@ -1323,15 +1489,14 @@ UA_NodeId ua_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<strin
     bool setted = false;
     // Check if path exist partly
     for(uint32_t m = 0; m < folderPath.size(); m++) {
-      for(uint32_t i = 0; i < this->folderVector.size(); i++) {
+      for(auto& i : this->folderVector) {
         // get correct folder NodeId from first folderPath element
-        if(!setted && (folderPath.at(m).compare(this->folderVector.at(i).folderName) == 0) &&
-            (UA_NodeId_equal(&this->folderVector.at(i).prevFolderNodeId, &nextNodeId)) &&
+        if(!setted && (folderPath.at(m) == i.folderName) && (UA_NodeId_equal(&i.prevFolderNodeId, &nextNodeId)) &&
             ((m + 1) < folderPath.size())) {
           // remember on witch position the folder still exist
           setted = true;
           starter4Folder = m + 1;
-          nextNodeId = this->folderVector.at(i).folderNodeId;
+          nextNodeId = i.folderNodeId;
         }
         if(setted) {
           break;
@@ -1355,7 +1520,7 @@ UA_NodeId ua_uaadapter::createFolderPath(UA_NodeId basenodeid, std::vector<strin
   return prevNodeId;
 }
 
-UA_NodeId ua_uaadapter::createFolder(UA_NodeId basenodeid, string folderName, string description) {
+UA_NodeId ua_uaadapter::createFolder(UA_NodeId basenodeid, const string& folderName, const string& description) {
   if(UA_NodeId_isNull(&basenodeid)) {
     return UA_NODEID_NULL;
   }
@@ -1371,6 +1536,20 @@ UA_NodeId ua_uaadapter::createFolder(UA_NodeId basenodeid, string folderName, st
   return newFolder.folderNodeId;
 }
 
+vector<string> ua_uaadapter::getAllMappedPvSourceNames() {
+  vector<string> mappedPvSources;
+  xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//process_variable");
+  if(result) {
+    xmlNodeSetPtr nodeset = result->nodesetval;
+    for(int32_t i = 0; i < nodeset->nodeNr; i++) {
+      mappedPvSources.insert(
+          mappedPvSources.begin(), xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName"));
+    }
+  }
+  xmlXPathFreeObject(result);
+  return mappedPvSources;
+}
+
 vector<string> ua_uaadapter::getAllNotMappableVariablesNames() {
   vector<string> notMappableVariablesNames;
   xmlXPathObjectPtr result = this->fileHandler->getNodeSet("//process_variable");
@@ -1380,9 +1559,9 @@ vector<string> ua_uaadapter::getAllNotMappableVariablesNames() {
     for(int32_t i = 0; i < nodeset->nodeNr; i++) {
       // for(auto var:this->variables) {
       bool mapped = false;
-      string mappedVar = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
+      string mappedVar = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
       for(auto var : this->getVariables()) {
-        if(var->getName().compare(mappedVar) == 0) {
+        if(var->getName() == mappedVar) {
           mapped = true;
         }
       }
@@ -1403,104 +1582,4 @@ UA_DateTime ua_uaadapter::getSourceTimeStamp() {
 
 UA_Server* ua_uaadapter::getMappedServer() {
   return this->mappedServer;
-}
-
-void ua_uaadapter::prepareHistory() {
-  uint numberOfPvs = 20;   // number of PVs
-  uint length = 100;       // length of the history buffer
-  uint responseSize = 100; // maximum number of history values per request
-  uint interval = 1000;    // sampling interval
-  string xpath = "//config";
-  xmlXPathObjectPtr result = this->fileHandler->getNodeSet(xpath);
-  result = this->fileHandler->getNodeSet(xpath + "//history");
-  if(result) {
-    xmlNodeSetPtr nodeset = result->nodesetval;
-    if(nodeset->nodeNr > 1) {
-      throw std::runtime_error("To many <login>-Tags in config file");
-    }
-    string placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "size");
-    if(!placeHolder.empty()) {
-      numberOfPvs = std::stoi(placeHolder);
-    }
-    else {
-      UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-          "Warning! <history>-Tag requires size. Will consider default size of 20.");
-    }
-    placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "length");
-    if(!placeHolder.empty()) {
-      length = std::stoi(placeHolder);
-    }
-    else {
-      UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-          "Warning! <history>-Tag requires length. Will consider default size of 100.");
-    }
-
-    placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "response");
-    if(!placeHolder.empty()) {
-      responseSize = std::stoi(placeHolder);
-    }
-    else {
-      UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-          "Warning! <history>-Tag requires repsonse. Will consider default size of 100.");
-    }
-    placeHolder = this->fileHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "interval");
-    if(!placeHolder.empty()) {
-      interval = std::stoi(placeHolder);
-    }
-    else {
-      UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-          "Warning! <history>-Tag requires interval. Will consider default size of 1000.");
-    }
-  }
-  else {
-    UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-        "Warning! <history>-Tag mising. Will consider defaults.");
-  }
-
-  gathering = UA_HistoryDataGathering_Default(numberOfPvs);
-
-  /* We set the responsible plugin in the configuration. UA_HistoryDatabase is
-   * the main plugin which handles the historical data service. */
-  server_config->historyDatabase = UA_HistoryDatabase_default(gathering);
-
-  /* There is a memory based database plugin. We will use that. We just
-   * reserve space for 3 nodes with 100 values each. This will also
-   * automaticaly grow if needed, but that is expensive, because all data must
-   * be copied. */
-  setting.historizingBackend = UA_HistoryDataBackend_Memory(numberOfPvs, length);
-
-  /* We want the server to serve a maximum of 100 values per request. This
-   * value depend on the plattform you are running the server. A big server
-   * can serve more values, smaller ones less. */
-  setting.maxHistoryDataResponseSize = responseSize;
-
-  /* If we have a sensor which do not report updates
-   * and need to be polled we change the setting like that.
-   * The polling interval in ms.
-   *
-  setting.pollingInterval = 100;
-   *
-   * Set the update strategie to polling.
-   *
-  setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_POLL;
-   */
-  setting.pollingInterval = interval;
-  setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_POLL;
-  /* If you want to insert the values to the database yourself, we can set the user strategy here.
-   * This is useful if you for example want a value stored, if a defined delta is reached.
-   * Then you should use a local monitored item with a fuzziness and store the value in the callback.
-   *
-  setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_USER;
-   */
-}
-
-UA_StatusCode ua_uaadapter::enableHistory(UA_NodeId* nodeId) {
-  /* At the end we register the node for gathering data in the database. */
-  UA_StatusCode retval = gathering.registerNodeId(this->mappedServer, gathering.context, nodeId, setting);
-  UA_LOG_INFO(
-      &this->server_config->logger, UA_LOGCATEGORY_USERLAND, "registerNodeId: %s", UA_StatusCode_name(retval));
-  retval = gathering.startPoll(this->mappedServer, gathering.context, nodeId);
-  UA_LOG_INFO(&this->server_config->logger, UA_LOGCATEGORY_USERLAND, "startPoll %s", UA_StatusCode_name(retval));
-  return retval;
-  return UA_STATUSCODE_BAD;
 }

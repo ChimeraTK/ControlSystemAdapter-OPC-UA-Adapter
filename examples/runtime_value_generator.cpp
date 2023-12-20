@@ -1,33 +1,33 @@
-/* 
+/*
  * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
  *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can 
- * redistribute it and/or modify it under the terms of the Lesser GNU 
- * General Public License as published by the Free Software Foundation, 
+ * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
+ * redistribute it and/or modify it under the terms of the Lesser GNU
+ * General Public License as published by the Free Software Foundation,
  * either version 3 of the License, or (at your option) any later version.
  *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope 
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the 
- * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+ * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
+ * that it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the Lesser GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
- * 
+ *
  * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
  */
 
 #include "runtime_value_generator.h"
 
-#include <iostream>
-#include <math.h>
+#include "csa_opcua_adapter.h"
 #include <sys/sysinfo.h>
-#include <unistd.h>
 
 #include <ChimeraTK/ReadAnyGroup.h>
 
-#include "csa_opcua_adapter.h"
+#include <iostream>
+#include <math.h>
+#include <unistd.h>
 
 using std::cout;
 using std::endl;
@@ -63,14 +63,18 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
 
   while(this->running) {
     double double_sine = devManager->getProcessArray<double>("amplitude")->accessChannel(0).at(0) *
-                         sin((2 * 3.141) / devManager->getProcessArray<double>("period")->accessChannel(0).at(0) *
-                             devManager->getProcessArray<int32_t>("t")->accessChannel(0).at(0));
+        sin((2 * 3.141) / devManager->getProcessArray<double>("period")->accessChannel(0).at(0) *
+            devManager->getProcessArray<int32_t>("t")->accessChannel(0).at(0));
     int32_t int_sine = round(double_sine);
 
     devManager->getProcessArray<double>("double_sine")->accessChannel(0) = vector<double>{double_sine};
     devManager->getProcessArray<double>("double_sine")->write();
     devManager->getProcessArray<int32_t>("int_sine")->accessChannel(0) = vector<int32_t>{int_sine};
     devManager->getProcessArray<int32_t>("int_sine")->write();
+    devManager->getProcessArray<ChimeraTK::Boolean>("bool")->accessChannel(0) =
+        vector<ChimeraTK::Boolean>{!devManager->getProcessArray<ChimeraTK::Boolean>("bool")->accessChannel(0).at(0)};
+    devManager->getProcessArray<ChimeraTK::Boolean>("bool")->write();
+    devManager->getProcessArray<ChimeraTK::Void>("void")->write();
     devManager->getProcessArray<int32_t>("t")->accessChannel(0) =
         vector<int32_t>{(int32_t)((end - start) / (CLOCKS_PER_SEC / 1000))};
     devManager->getProcessArray<int32_t>("t")->write();

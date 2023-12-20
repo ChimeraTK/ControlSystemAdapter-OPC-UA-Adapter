@@ -25,7 +25,7 @@ extern "C" {
 #include <open62541/server.h>
 }
 
-#include "ua_proxies.h"
+#include "ua_map_types.h"
 
 /** @class ua_mapped_class
  *	@brief This class mapped all inforamtion into the opca server
@@ -33,11 +33,9 @@ extern "C" {
 class ua_mapped_class {
  protected:
   nodePairList ownedNodes;
-  UA_NodeId baseNodeId;
-  UA_DateTime sourceTimeStamp;
+  UA_NodeId baseNodeId{};
 
  public:
-  UA_Client* mappedClient;
   UA_Server* mappedServer;
 
   /** @brief Constructor of the class with parameter

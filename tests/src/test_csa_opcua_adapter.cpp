@@ -1,13 +1,11 @@
 #include <iostream>
 
-#include <ua_adapter.h>
 #include <csa_opcua_adapter.h>
 #include <test_sample_data.h>
 #include <boost/test/included/unit_test.hpp>
 
 extern "C" {
 #include "unistd.h"
-#include "csa_namespaceinit_generated.h" // Output des pyUANamespacecompilers
 }
 
 using namespace boost::unit_test_framework;
@@ -28,7 +26,7 @@ void CSAOPCUATest::testWithoutPVSet() {
 
   // is Server running?
   csaOPCUA->start();
-  while(!csaOPCUA->getUAAdapter()->running) {};
+  while(!csaOPCUA->getUAAdapter()->running) {}
   BOOST_CHECK(csaOPCUA->isRunning());
   BOOST_CHECK(csaOPCUA->getUAAdapter()->running);
   // is csManager init
@@ -46,8 +44,7 @@ void CSAOPCUATest::testWithPVSet() {
   csa_opcua_adapter* csaOPCUA = new csa_opcua_adapter(tfExampleSet.csManager, "../tests/uamapping_test_2.xml");
   csaOPCUA->start();
   BOOST_CHECK(csaOPCUA->isRunning());
-  while(!csaOPCUA->getUAAdapter()->running) {
-  };
+  while(!csaOPCUA->getUAAdapter()->running) {}
   BOOST_CHECK(csaOPCUA->getUAAdapter()->running);
   // is csManager init
   BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 21);

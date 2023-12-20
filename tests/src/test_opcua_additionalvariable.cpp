@@ -1,9 +1,9 @@
-#include <string.h>
+#include <csa_additionalvariable.h>
 #include <test_sample_data.h>
-#include <ua_proxies_typeconversion.h>
-#include <ua_additionalvariable.h>
-
 #include <boost/test/included/unit_test.hpp>
+
+#include <string.h>
+#include "ua_typeconversion.h"
 
 using namespace boost::unit_test_framework;
 
@@ -182,7 +182,7 @@ void AdditionalVariableTest::testClientSide() {
             string valName = "";
 
             // Check Description -> for all the same
-            UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)valueToCheck.data)), valName);
+            UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)valueToCheck.data)), valName)
             //cout << "Description: " << valName << endl;
             BOOST_CHECK(valName == "Value");
 

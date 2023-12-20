@@ -21,14 +21,13 @@
 #ifndef CSA_OPCUA_ADAPTER_H
 #define CSA_OPCUA_ADAPTER_H
 
-#include <vector>
-#include <thread>
-
-#include "ua_adapter.h"
-#include "ua_processvariable.h"
-
-#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
+#include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
+#include "csa_processvariable.h"
+#include "ua_adapter.h"
+
+#include <thread>
+#include <vector>
 
 /** @class csa_opcua_adapter
  *	@brief This class provide the two parts of the OPCUA Adapter. 
@@ -47,6 +46,7 @@ class csa_opcua_adapter {
   std::thread adapter_thread;
   ua_uaadapter* adapter;
   boost::shared_ptr<ControlSystemPVManager> csManager;
+  set<string> unusedVariables;
 
  public:
   /**
@@ -75,6 +75,8 @@ class csa_opcua_adapter {
    * @return Return the ua_uaadapter
    */
   ua_uaadapter* getUAAdapter();
+
+  const set<string>& getUnusedVariables() const;
 
   /**
    * @brief Start all objects in single threads for this case only the opc ua server

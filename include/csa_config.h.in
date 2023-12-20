@@ -1,17 +1,15 @@
 #ifndef HAVE_CONFIG_H_
 #define HAVE_CONFIG_H_
 
-/* Example parameter expansion:
- * #define ENABLE_BUILDMODEL "${ENABLE_BUILDMODEL}"
- */
- 
 // Namespace ID for UA Information Model
 #define CSA_NSID 2
 
-// SubIDs in types ...
-// ... of Module
 #define CSA_NSID_CONSTANTS 5002
 #define CSA_NSID_VARIABLES 5001
+
+#define UA_NS2ID_CTKADDITIONALVARIABLE 1005
+#define UA_NS2ID_CTKMODULE 1002
+#define UA_NS2ID_CTKPROCESSVARIABLE 1001
 
 // ... of ProcessVariable
 #define CSA_NSID_VARIABLE       1001
@@ -21,7 +19,6 @@
 #define CSA_NSID_VARIABLE_VALUE  6010
 #define CSA_NSID_VARIABLE_TYPE  6012
 #define CSA_NSID_VARIABLE_VALIDITY  6013
-
 // .... of AdditionalVariable
 #define CSA_NSID_ADDITIONAL_VARIABLE_VALUE 6002
 

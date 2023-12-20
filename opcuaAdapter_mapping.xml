@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<uamapping>
+<csa:uamapping xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
 	<config rootFolder="llrfCtrl_hzdr" description="Test application for the digital LLRF system at ELBE / HZDR">
 		<server applicationName="LLRFServer" port="16660" />
-		<security unsecure="enable" certificate="../certs/server_cert.der"
+<!--		<security unsecure="enable" certificate="../certs/server_cert.der"
 				  privatekey="../certs/server_key.der"
 				  trustlist="../certs/allow"
 				  blocklist="../certs/block"
-				  issuerlist="../certs/issuer"/>
+				  issuerlist="../certs/issuer"/>-->
 		<login username="test" password="test123" />
 		<process_variable_hierarchy>
 			<unroll pathSep="/">True</unroll>
 		</process_variable_hierarchy>
 		<mapping_exceptions>False</mapping_exceptions>
+		<historizing>
+			<setup name="fsdf" buffer_length="100" entries_per_response="10" interval="500"/>
+			<setup name="fdf" buffer_length="100" entries_per_response="10" interval="500"/>
+		</historizing>
 	</config>
 
 <!-- (1) Process variable options
@@ -35,7 +39,7 @@
    5. Destination -> pv is created in root directory
 -->
 	<!-- D1 [x]-->
-	<process_variable sourceName="testDoubleArray_10000">
+	<process_variable sourceName="testDoubleArray_10000" history="fsdf">
 		<destination>A</destination>
 		<name>testDoubleArray_10000</name>
 		<description>Test Desc D1</description>
@@ -338,7 +342,7 @@
 		<description>Folder Description of A/B</description>
 	</folder>
 	<!-- update folder description of created folder 'A' -->
-	<folder>
+	<folder history="fdf">
 		<name>A</name>
 		<description>Description of A</description>
 	</folder>
@@ -362,7 +366,7 @@
           3. Copy attribute -> copy="False"
     -->
 	<!-- D1 [x]-->
-	<folder sourceName="folder/f1" copy="false">
+	<folder sourceName="folder/f1" copy="false" history="fdf">
 		<destination>A</destination>
 		<name>f1</name>
 	</folder>
@@ -431,6 +435,49 @@
 		<description>E4</description>
 	</folder>
 
+	<!-- (5) Exclude Nodes and Folders
+         Information:
+         - 	All variables used in the Application are connected to the control system. This could
+		blow uo the address space. Since many variables that are not needed to interact with the application
+		and overwhelm the user are often present, the user can exclude paths.
+          -
+
+         Default cases:
+          1. Greedy matching with "*" to check if the exclude string is contained in a folder or process variable
+          2. Directory matching with "/*" to exclude all children (folders, process variables) in the exclude path
+          3. Direct matching with one-to-one relation between exclude string and process variable
+
+         Error cases:
+          1. Try to exclude process variable which is used in the process variable mapping (direct match)
+    -->
+
+	<!-- D1 [x]
+		- PV name includes string dir/test
+		- If multiple PVs exist (e.g. dir/test1, /dir/test2) all are matched
+	-->
+	<exclude sourceName="dir/test*" />
+	<exclude sourceName="Mein/Name*" />
+
+	<!-- D2 [x]
+        - Directory and all PV in that directory including subdirectories with their PVs would match
+	-->
+	<exclude sourceName="dir/test/*" />
+	<exclude sourceName="Dein/Name/*" />
+
+	<!-- D3 [x]	-->
+	<exclude sourceName="dir/test" />
+	<exclude sourceName="testDoubleArray_57000" />
+
+	<!-- E1 [x]	-->
+	<exclude sourceName="testDoubleArray_19000" />
+
+	<!-- E2 [x]	-->
+	<process_variable sourceName="Unser/Name/ist_uint8Array_s10" copy="true">
+		<destination>A</destination>
+		<name>exclude_map_test</name>
+	</process_variable>
+	<exclude sourceName="/Unser*" />
+
 	<!-- general test folder with source test -->
 	<folder sourceName="folder/f9" copy="false">
 		<destination>A</destination>
@@ -443,4 +490,4 @@
 		<name>f10</name>
 		<description>Desc F10</description>
 	</folder>
-</uamapping>
+</csa:uamapping>
