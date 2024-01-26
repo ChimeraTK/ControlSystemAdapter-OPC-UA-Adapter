@@ -35,18 +35,19 @@ namespace fusion = boost::fusion;
 
 typedef enum {
   UA_PV_UNKNOWN = 0,
-  UA_PV_INT8 = UA_TYPES_SBYTE,
-  UA_PV_UINT8 = UA_TYPES_BYTE,
-  UA_PV_INT16 = UA_TYPES_INT16,
-  UA_PV_UINT16 = UA_TYPES_UINT16,
-  UA_PV_INT32 = UA_TYPES_INT32,
-  UA_PV_UINT32 = UA_TYPES_UINT32,
-  UA_PV_FLOAT = UA_TYPES_FLOAT,
-  UA_PV_DOUBLE = UA_TYPES_DOUBLE,
-  UA_PV_STRING = UA_TYPES_STRING,
-  UA_PV_INT64 = UA_TYPES_INT64,
-  UA_PV_UINT64 = UA_TYPES_UINT64,
-  UA_PV_BOOL = UA_TYPES_BOOLEAN
+  UA_PV_INT8 = 1,
+  UA_PV_UINT8 = 2,
+  UA_PV_INT16 = 3,
+  UA_PV_UINT16 = 4,
+  UA_PV_INT32 = 5,
+  UA_PV_UINT32 = 6,
+  UA_PV_FLOAT = 8,
+  UA_PV_DOUBLE = 9,
+  UA_PV_STRING = 10,
+  UA_PV_INT64 = 11,
+  UA_PV_UINT64 = 12,
+  UA_PV_BOOL = 13,
+  UA_PV_VOID = 14
 } UA_Processvariable_Type;
 
 typedef fusion::map<fusion::pair<int8_t, UA_Processvariable_Type>, fusion::pair<uint8_t, UA_Processvariable_Type>,
@@ -207,6 +208,9 @@ class ua_processvariable : ua_mapped_class {
 
   template<typename T>
   UA_UInt32 typeSpecificSetup(UA_DataSource_Map_Element& mapElem, const UA_NodeId nodeId);
+
+  UA_StatusCode getValue_void();
+  UA_StatusCode getValue_void(UA_Server* server, UA_ServerConfig* conf);
 };
 
 #endif // UA_PROCESSVARIABLE_H
