@@ -24,6 +24,7 @@
 #include <open62541/plugin/historydatabase.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
+#include "void_type.h"
 
 extern "C" {
 #include "csa_namespace.h"
@@ -40,7 +41,6 @@ extern "C" {
 #include "ua_adapter.h"
 #include "ua_map_types.h"
 #include "xml_file_handler.h"
-
 #include <functional>
 #include <regex>
 #include <string>
@@ -566,17 +566,24 @@ void ua_uaadapter::applyMapping(const boost::shared_ptr<ControlSystemPVManager>&
   this->addAdditionalVariables();
 }
 
+
 void ua_uaadapter::workerThread() {
   if(this->mappedServer == nullptr) {
     cout << "No server mapped" << endl;
     return;
   }
+
+  /*for(auto & variable : this->variables){
+    check_void_type(variable);
+  }*/
+
   vector<UA_NodeId> historizing_nodes;
   vector<string> historizing_setup;
   UA_HistoryDataGathering gathering =
       add_historizing_nodes(historizing_nodes, historizing_setup, this->mappedServer, this->server_config,
           this->serverConfig.history, this->serverConfig.historyfolders, this->serverConfig.historyvariables);
   cout << "Starting the server worker thread" << endl;
+  add_void_event_type(this->mappedServer);
   UA_Server_run_startup(this->mappedServer);
   this->running = true;
   while(this->running) {

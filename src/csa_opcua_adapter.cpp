@@ -29,6 +29,7 @@ extern "C" {
 
 #include <iostream>
 #include <utility>
+#include "void_type.h"
 
 csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
   this->csManager = std::move(csManager);
@@ -122,7 +123,6 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
   }
 
   adapter->applyMapping(this->csManager);
-
   vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
   if(!allNotMappedVariables.empty()) {
     cout << "The following VariableNodes cant be mapped, because they are not member in PV-Manager:" << endl;
@@ -148,6 +148,25 @@ ua_uaadapter* csa_opcua_adapter::getUAAdapter() {
 void csa_opcua_adapter::start() {
   if(!this->adapter_thread.joinable()) {
     this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter);
+  }
+  //start void observer loop
+  cout << "Start the void observer thread" << endl;
+  void_observer_data *data  =  (void_observer_data*) UA_calloc(1, sizeof(void_observer_data));
+  vector<ua_processvariable*> vars = adapter->getVariables();
+  for(auto & variable : vars){
+    auto type = variable->getType();
+    if(type == "Void"){
+      data->pvs.insert(data->pvs.end(), variable->getName());
+    }
+  }
+  if(!data->pvs.empty()){
+    data->mappedServer = adapter->getMappedServer();
+    data->csManager = csManager;
+    std::thread observer_thread(&startVoidObserverThread, data);
+    observer_thread.detach();
+  }
+  else{
+    free(data);
   }
 }
 

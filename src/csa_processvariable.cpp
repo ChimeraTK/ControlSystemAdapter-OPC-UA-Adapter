@@ -257,6 +257,8 @@ string ua_processvariable::getType() {
     return "string";
   else if(valueType == typeid(Boolean))
     return "Boolean";
+  else if(valueType == typeid(Void))
+    return "Void";
   else
     return "Unsupported type";
 }
@@ -507,6 +509,8 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
     arrayDims[0] = typeSpecificSetup<Boolean>(mapElem, createdNodeId);
   }
   else {
+    if(valueType == typeid(Void))
+      type = UA_PV_VOID;
     int status;
     auto* demangledName = abi::__cxa_demangle(valueType.name(), nullptr, nullptr, &status);
     std::cout << "Cannot proxy unknown type ";
