@@ -12,15 +12,47 @@ class MapOption():
     # True/False in case history is enabled
     self.history = None
 
+class HistorySetting():
+  def __init__(self, name:str):
+    self.name:str = name
+    self.entriesPerResponse:int|None = None
+    self.buffferLength:int|None = None
+    self.interval:int|None = None
+    
+  def checkSettings(self):
+    if self.entriesPerResponse == None:
+      raise RuntimeError("Number of entries per response not set.")
+    if self.interval == None:
+      raise RuntimeError("Sampling interval not set.")
+    if self.buffferLength == None:
+      raise RuntimeError("Buffer length not set.")
+  
+  def createHistory(self, history: ET._Element):
+    history.set("name", self.name)
+    history.set("entries_per_response", str(self.entriesPerResponse))
+    history.set("buffer_length", str(self.buffferLength))
+    history.set("interval", str(self.interval))
+    
+  def readHistory(self, data: ET._Element):
+    if 'name' in data.attrib:
+      self.name = str(data.attrib['name'])
+    if 'entries_per_response' in data.attrib:
+      self.entriesPerResponse = int(data.attrib['entries_per_response'])
+    if 'buffer_length' in data.attrib:
+      self.buffferLength = int(data.attrib['buffer_length'])
+    if 'interval' in data.attrib:
+      self.interval = int(data.attrib['interval'])
+    
+
 class EncryptionSettings():
   def __init__(self):
-    self.encryptionEnabled = False
-    self.addUnsecureEndpoint = False
-    self.certificate = None
-    self.key = None
-    self.blockList = None
-    self.trustList = None
-    self.issuerList = None
+    self.encryptionEnabled:bool = False
+    self.addUnsecureEndpoint:bool = False
+    self.certificate:str|None = None
+    self.key:str|None = None
+    self.blockList:str|None = None
+    self.trustList:str|None = None
+    self.issuerList:str|None = None
     
   def checkEncryptionSettings(self):
     '''
