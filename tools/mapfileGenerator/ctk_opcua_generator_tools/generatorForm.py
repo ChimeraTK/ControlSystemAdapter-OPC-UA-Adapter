@@ -170,21 +170,32 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.applicationName.setText(self.MapGenerator.applicationName)
     self.rootFolder.setText(self.MapGenerator.applicationName)
     
-  def _getCheckBox(self, item:XMLDirectory | XMLVar, text:str, node:QTreeWidgetItem, index:int):
+  def _getCheckBox(self, item:XMLDirectory | XMLVar, text:str, node:QTreeWidgetItem):
     '''
     Create a checkbox.
     
     @param item: The XML items that corresponds to the checkbox.
     @param text: The check box label.
     @param node: The widget item where the checkbox will be added. It is assumed it is a QTreeWidgetItem with multiple columns.
-    @param index: The column index of the checkbox.
     '''
     checkbox = QCheckBox(parent=self.treeWidget, text=text)
     if isinstance(item, XMLDirectory) == True:
-      checkbox.stateChanged.connect(lambda state: self._mapDirectory(state,item, node, index))
+      checkbox.stateChanged.connect(lambda state: self._mapDirectory(state,item, node))
     else:
-      checkbox.stateChanged.connect(lambda state: self._mapItem(state,item, node, index))
+      checkbox.stateChanged.connect(lambda state: self._mapItem(state,item, node))
     return checkbox
+  
+  def _getComboBox(self, item:XMLDirectory | XMLVar, node:QTreeWidgetItem):
+    '''
+    Create a combo box.
+    
+    @param item: The XML items that corresponds to the checkbox.
+    @param node: The widget item where the checkbox will be added. It is assumed it is a QTreeWidgetItem with multiple columns.
+    '''
+    combobox = QComboBox(parent=self.treeWidget)
+    combobox.addItem('No history', None)
+    combobox.currentIndexChanged.connect(lambda histIndex: self._setHistoryItem(histIndex, item, combobox, node))
+    return combobox
   
   def _updateItem(self, item:QTreeWidgetItem, index:int):
     self.treeWidget.blockSignals(True)
@@ -209,36 +220,33 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
       data.newDescription = item.text(index)
       item.setText(index, item.text(index) +  " (Added descr.)")
       item.setForeground(index,QBrush(QColor("#FF0000")))
+    elif index == 5:
+      # additional Location
+      data.newDestination = item.text(index)
+      item.setText(5,data.newDestination)
+      item.setForeground(5,QBrush(QColor("#FF0000")))
     self.treeWidget.blockSignals(False)
     
   def _setupRow(self, item:QTreeWidgetItem, data: XMLDirectory|XMLVar):
     item.setData(0, Qt.UserRole, data)
-    self.treeWidget.setItemWidget(item, 1, self._getCheckBox(data, "exclude", item, 1))
-    self.treeWidget.setItemWidget(item, 2, self._getCheckBox(data, "enable", item, 2))
+    self.treeWidget.setItemWidget(item, 1, self._getCheckBox(data, "exclude", item))
+    self.treeWidget.setItemWidget(item, 2, self._getComboBox(data, item))
     if isinstance(data, XMLDirectory):
       item.setFlags(Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled)
     else:
       item.setFlags(Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled | Qt.ItemIsSelectable)
   
-  def _setState(self, state:int, index:int, item: XMLDirectory|XMLVar):
+  def _setState(self, state:int, item: XMLDirectory|XMLVar):
     '''
     Set data in XMLDirectory or XMLVar.
-    This could be to enable mapping or enable history.
+    This is used to enable mapping.
     '''
-    if index == 1:
-      if state == Qt.Checked:
-        item.exclude = True
-        logging.debug("Excluding item {}.".format(item.name))
-      else:
-        item.exclude = False
-        logging.debug("Including item {}.".format(item.name))
-    elif index == 2:
-      if state == Qt.Checked:
-        item.history = True
-        logging.debug("Enabling history for item {}.".format(item.name))
-      else:
-        item.history = False
-        logging.debug("Disabling history for item {}.".format(item.name))
+    if state == Qt.Checked:
+      item.exclude = True
+      logging.debug("Excluding item {}.".format(item.name))
+    else:
+      item.exclude = False
+      logging.debug("Including item {}.".format(item.name))
 
   def _createVariableNode(self, parent:QTreeWidgetItem, v:XMLVar) -> QTreeWidgetItem:
     '''
@@ -295,15 +303,15 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
       self._createVariableNode(mainNode, v)
     return mainNode
   
-  def _mapItem(self, state:int, var:XMLVar, node:QTreeWidgetItem, index:int):
+  def _mapItem(self, state:int, var:XMLVar, node:QTreeWidgetItem):
     '''
     Called when a variable is to be mapped. 
     The corresponding check box is edited.
     '''
-    self._setState(state, index, var)
+    self._setState(state, var)
     logging.debug("Childs: {}".format(node.childCount()))
     
-  def _mapDirectory(self, state:int, directory:XMLDirectory, node:QTreeWidgetItem, index:int):
+  def _mapDirectory(self, state:int, directory:XMLDirectory, node:QTreeWidgetItem):
     '''
     Called when a directory is to be mapped. 
     The corresponding check box is edited.
@@ -312,8 +320,23 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     logging.debug("Mapping directory.")
     for chId in range(node.childCount()):
       ch = node.child(chId)
-      self.treeWidget.itemWidget(ch, index).setCheckState(state)
-      self._setState(state, index, directory)
+      self.treeWidget.itemWidget(ch, 1).setCheckState(state)
+      self._setState(state, directory)
+      
+  def _setHistoryItem(self, histIndex:int, var:XMLVar|XMLDirectory, combo:QComboBox, node:QTreeWidgetItem):
+    '''
+    Called when historizing setting is choosen.
+    @param histIndex: The index of the history setting.
+    '''
+    if combo.itemText(histIndex) != 'No history':
+      var.historizing = combo.itemText(histIndex)
+    else:
+      var.historizing = None
+      
+    if isinstance(var, XMLDirectory):
+      for chId in range(node.childCount()):
+        ch = node.child(chId)
+        self.treeWidget.itemWidget(ch, 2).setCurrentText(combo.itemText(histIndex))
       
   def closeEvent(self, event):
     msg = "Are you sure you want to close the editor?"
@@ -418,14 +441,23 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
         histName = 'historySetting_{}'.format(i)
         i = i+1
     setting = HistorySetting(name=histName)
+    # add item to the historizing combo box
     self.histories.addItem(setting.name, setting)
     self.histories.setCurrentText(setting.name)
     dlg = HistorySettingsDialog(parent=self, data=self.histories, histories=self.MapGenerator.historySettings, edit=False)
     dlg.exec()
     logging.info("Adding historizing setting with name: {}".format(setting.name))
+    # add HistorySetting to the settings of the MapGenerator
     self.MapGenerator.historySettings.append(setting)
+    # add history settings to the combo boxes in the TreeWidget (recursively)
+    self.addComboEntry(self.treeWidget.itemAt(0,0), setting)
     self.editHistorySettingButton.setEnabled(True)
 
+  def addComboEntry(self, item:QTreeWidgetItem, setting:HistorySetting):
+    self.treeWidget.itemWidget(item, 2).addItem(setting.name, setting)
+    for chId in range(item.childCount()):
+      self.addComboEntry(item.child(chId), setting)
+      
   def editHistorySetting(self):
     dlg = HistorySettingsDialog(parent=self, data=self.histories,histories=self.MapGenerator.historySettings, edit=True)
     dlg.exec()
@@ -479,10 +511,16 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
           self._blockAndSetTextBox(self.MapGenerator.password, self.password)
           # update the tree
           self.fillTree()
+          # update historizing settings
+          for setting in self.MapGenerator.historySettings:
+            if self.histories.findText(setting.name) == -1:
+              self.histories.addItem(setting.name,setting)
+            else:
+              logging.warning("Setting with name {} already exist. Not loading parameters from mapping file.".format(setting.name))
         except RuntimeError as error:
           QMessageBox.critical(self, "Map file generator", 
                                "Failed to load map file: {}\n Error: {}".format(name[0], error) )
-      
+          
   def __init__(self, args, parent=None):
     super(MapGeneratorForm, self).__init__(parent)
     self.setupUi(self)
