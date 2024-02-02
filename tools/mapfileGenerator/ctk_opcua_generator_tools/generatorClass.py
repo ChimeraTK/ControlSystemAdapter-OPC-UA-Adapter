@@ -162,21 +162,21 @@ class Config(EncryptionSettings):
     
   def readConfig(self, data: ET._Element):
     config = data.find('config',namespaces=data.nsmap)
-    if config:
+    if config is not None:
       if 'rootFolder' in config.attrib:
         self.rootFolder = str(config.attrib['rootFolder'])
       if 'rootFolder' in config.attrib:
         self.applicationDescription = config.attrib["description"]
       # server settings
       server = config.find('server')
-      if server:
+      if server is not None:
         if 'applicationName' in server.attrib:
           self.applicationName = str(server.attrib["applicationName"])
         if 'port' in server.attrib:
           self.port = int(server.attrib['port'])
         # security
       login = config.find('login')
-      if login:
+      if login is not None:
         self.enableLogin = True
         if 'username' in  login.attrib:
           self.username = str(login.attrib['username'])
@@ -187,13 +187,13 @@ class Config(EncryptionSettings):
         self.username = None
         self.password = None
       security = config.find("security")
-      if security:
+      if security is not None:
         self.encryptionEnabled = True
         self.readEncryption(security)
       else: 
         super().__init__()
       historizing = config.find('historizing')
-      if historizing:
+      if historizing is not None:
         for setup in historizing.findall('setup', namespaces=data.nsmap):
           h = HistorySetting('')
           h.readHistory(setup)
@@ -220,6 +220,7 @@ class XMLVar(MapOption):
     self.newDescription: str|None = None
     self.newDestination: str|None = None
     self.fullName = path + "/" + self.name
+    self.historizing:str|None = None
 
   def __str__(self) -> str:
     return "Variable ({}, {}): {}".format(self.valueType, self.numberOfElements,self.name)
@@ -279,6 +280,7 @@ class XMLDirectory(MapOption):
     self.newName: str|None = None
     self.newDescription: str|None = None
     self.newDestination: str|None = None
+    self.historizing:str|None = None
     self.hierarchyLevel = level
     self.parseDir(data)
     
