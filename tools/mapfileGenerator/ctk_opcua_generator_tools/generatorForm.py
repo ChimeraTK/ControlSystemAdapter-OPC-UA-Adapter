@@ -1,12 +1,13 @@
-from PyQt5.QtWidgets import QFileDialog, QDialog, QMainWindow, QTreeWidgetItem, QCheckBox, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QDialog, QMainWindow, QTreeWidgetItem, QCheckBox, QMessageBox, QDialogButtonBox, QComboBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QColor
 import os
 from ctk_opcua_generator_tools.generatorUI import Ui_MainWindow
 from ctk_opcua_generator_tools.encryptionUI import Ui_EncryptionDialog
-from ctk_opcua_generator_tools.generatorClass import MapGenerator, XMLDirectory, XMLVar, EncryptionSettings
+from ctk_opcua_generator_tools.historyUI import Ui_HistoryDialog
+from ctk_opcua_generator_tools.generatorClass import MapGenerator, XMLDirectory, XMLVar, EncryptionSettings, HistorySetting
 import logging
-from typing import Optional
+from typing import Optional, List
 
 
 
@@ -84,7 +85,48 @@ class EncryptionDialog(QDialog, Ui_EncryptionDialog):
     self.setBlockList.clicked.connect(self.openBlockList)
     self.setTrustList.clicked.connect(self.openTrustList)
     self.setIssuerList.clicked.connect(self.openIssuerList)
-
+    
+class HistorySettingsDialog(QDialog, Ui_HistoryDialog):
+  def __init__(self, data:QComboBox, histories: List[HistorySetting], edit:bool, parent=None):
+    '''
+    @param data: The setting to be added.
+    @param histories: The list of all settings. Is used to ensure that names are unique!
+    '''
+    super(HistorySettingsDialog,self).__init__(parent)
+    self.setupUi(self)
+    self.data = data.currentData()
+    self.historyName.setText(self.data.name)
+    self.entriesPerResponse.setValue(self.data.entriesPerResponse)
+    self.bufferLength.setValue(self.data.bufferLength)
+    self.samplingInterval.setValue(self.data.interval)
+    self.histories = histories
+    self.edit = edit
+    # Save current text -> if edit is true and the name is changed we need to check again if it already exists
+    self.combo = data
+    
+    self.historyName.editingFinished.connect(self.checkNameExists)
+    self.samplingInterval.valueChanged.connect(self.updateData)
+    self.entriesPerResponse.valueChanged.connect(self.updateData)
+    self.bufferLength.valueChanged.connect(self.updateData)
+    
+  def checkNameExists(self):
+    # check if is new or name was changed
+    if self.edit == False or self.combo.currentText() != self.historyName.text():
+      found = next((x for x in self.histories if x.name == self.historyName.text()),None)
+      if found != None:
+        self.buttonBox.button( QDialogButtonBox.Ok ).setEnabled( False );
+      else:
+        self.buttonBox.button( QDialogButtonBox.Ok ).setEnabled( True );
+        self.data.name = self.historyName.text()
+        self.combo.setItemText(self.combo.currentIndex(),self.historyName.text())
+        
+        
+      
+  def updateData(self):
+    self.data.entriesPerResponse = self.entriesPerResponse.value()
+    self.data.interval = self.samplingInterval.value()
+    self.data.bufferLength = self.bufferLength.value()
+      
 class MapGeneratorForm(QMainWindow, Ui_MainWindow):
   def _createMapGenerator(self, fileName: str):
     try:    
@@ -367,6 +409,27 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.MapGenerator.encryptionEnabled = states[0]
     self.MapGenerator.addUnsecureEndpoint = states[1]
   
+  def addHistorySetting(self):
+    histName = 'historySetting'
+    if self.histories.findText(histName) != -1:
+      i = 0
+      histName = 'historySetting_{}'.format(i)
+      while(self.histories.findText(histName) != -1):
+        histName = 'historySetting_{}'.format(i)
+        i = i+1
+    setting = HistorySetting(name=histName)
+    self.histories.addItem(setting.name, setting)
+    self.histories.setCurrentText(setting.name)
+    dlg = HistorySettingsDialog(parent=self, data=self.histories, histories=self.MapGenerator.historySettings, edit=False)
+    dlg.exec()
+    self.MapGenerator.historySettings.append(setting)
+    self.editHistorySettingButton.setEnabled(True)
+
+  def editHistorySetting(self):
+    dlg = HistorySettingsDialog(parent=self, data=self.histories,histories=self.MapGenerator.historySettings, edit=True)
+    dlg.exec()
+    
+  
   def _blockAndSetTextBox(self, value: str, control):
     '''
     Set a text box without updating the configuration,
@@ -447,6 +510,8 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.enableEncryptionButton.stateChanged.connect(self.updateEncryptionConfiguration)
     self.addUnsecureEndpoint.stateChanged.connect(self.updateEncryptionConfiguration)
     self.configureEncryptionButton.clicked.connect(self.configureEncryption)
+    self.editHistorySettingButton.clicked.connect(self.editHistorySetting)
+    self.addHistorySettingButton.clicked.connect(self.addHistorySetting)
 
     
     # Allow to move items 

@@ -15,22 +15,22 @@ class MapOption():
 class HistorySetting():
   def __init__(self, name:str):
     self.name:str = name
-    self.entriesPerResponse:int|None = None
-    self.buffferLength:int|None = None
-    self.interval:int|None = None
+    self.entriesPerResponse:int = 1000
+    self.bufferLength:int = 100
+    self.interval:int = 1000
     
   def checkSettings(self):
     if self.entriesPerResponse == None:
       raise RuntimeError("Number of entries per response not set.")
     if self.interval == None:
       raise RuntimeError("Sampling interval not set.")
-    if self.buffferLength == None:
+    if self.bufferLength == None:
       raise RuntimeError("Buffer length not set.")
   
   def createHistory(self, history: ET._Element):
     history.set("name", self.name)
     history.set("entries_per_response", str(self.entriesPerResponse))
-    history.set("buffer_length", str(self.buffferLength))
+    history.set("buffer_length", str(self.bufferLength))
     history.set("interval", str(self.interval))
     
   def readHistory(self, data: ET._Element):
@@ -39,11 +39,10 @@ class HistorySetting():
     if 'entries_per_response' in data.attrib:
       self.entriesPerResponse = int(data.attrib['entries_per_response'])
     if 'buffer_length' in data.attrib:
-      self.buffferLength = int(data.attrib['buffer_length'])
+      self.bufferLength = int(data.attrib['buffer_length'])
     if 'interval' in data.attrib:
       self.interval = int(data.attrib['interval'])
-    
-
+      
 class EncryptionSettings():
   def __init__(self):
     self.encryptionEnabled:bool = False
@@ -105,7 +104,8 @@ class Config(EncryptionSettings):
     self.applicationDescription = ""
     self.enableLogin = False
     self.port: int|None = None
-    
+    self.historySettings: List[HistorySetting] = []
+  
   def createConfig(self, root:ET._Element):
     '''
     Create server config XML section of the map file.
