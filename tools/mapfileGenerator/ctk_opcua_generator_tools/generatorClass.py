@@ -43,6 +43,13 @@ class HistorySetting():
     if 'interval' in data.attrib:
       self.interval = int(data.attrib['interval'])
       
+  def writeSetting(self, element:ET._Element):
+    element.set("name", self.name)
+    element.set("entries_per_response",str(self.entriesPerResponse))
+    element.set("buffer_length",str(self.bufferLength))
+    element.set("interval",str(self.interval))
+    
+      
 class EncryptionSettings():
   def __init__(self):
     self.encryptionEnabled:bool = False
@@ -71,8 +78,10 @@ class EncryptionSettings():
       security.set("unsecure", "True")
     else:
       security.set("unsecure", "False")
-    security.set("privatekey", self.key)
-    security.set("certificate", self.certificate)
+    if self.key:
+      security.set("privatekey", self.key)
+    if self.certificate:
+      security.set("certificate", self.certificate)
     if self.trustList:
       security.set("trustlist", self.trustList)
     if self.issuerList:
@@ -84,15 +93,15 @@ class EncryptionSettings():
     if 'unsecure' in data.attrib and data.attrib['unsecure'] == 'True':
       self.addUnsecureEndpoint = True
     if 'privatekey' in data.attrib:
-      self.key = data.attrib['privatekey']
+      self.key = str(data.attrib['privatekey'])
     if 'certificate' in data.attrib:
-      self.certificate = data.attrib['certificate']
+      self.certificate = str(data.attrib['certificate'])
     if 'trustlist' in data.attrib:
-      self.trustList = data.attrib['trustlist']
+      self.trustList = str(data.attrib['trustlist'])
     if 'issuerlist' in data.attrib:
-      self.issuerList = data.attrib['issuerlist']
+      self.issuerList = str(data.attrib['issuerlist'])
     if 'blocklist' in data.attrib:
-      self.blockList = data.attrib['blocklist']
+      self.blockList = str(data.attrib['blocklist'])
     
 class Config(EncryptionSettings):
   def __init__(self):
@@ -141,39 +150,55 @@ class Config(EncryptionSettings):
       # raises in case of problems
       self.checkEncryptionSettings()
       self.createEncryption(ET.SubElement(config, "security"))
+      
+    if len(self.historySettings) > 0:
+      logging.info("Writing {} history settings.".format(len(self.historySettings)))
+      historizing = ET.SubElement(config, "historizing")
+      for setting in self.historySettings:
+        settingElement = ET.SubElement(historizing,"setup")
+        setting.writeSetting(settingElement)
+    else:
+      logging.info("No history settings found.")
     
   def readConfig(self, data: ET._Element):
     config = data.find('config',namespaces=data.nsmap)
-    if config != None:
+    if config:
       if 'rootFolder' in config.attrib:
-        self.rootFolder = config.attrib['rootFolder']
+        self.rootFolder = str(config.attrib['rootFolder'])
       if 'rootFolder' in config.attrib:
         self.applicationDescription = config.attrib["description"]
       # server settings
       server = config.find('server')
-      if server != None:
+      if server:
         if 'applicationName' in server.attrib:
-          self.applicationName = server.attrib["applicationName"]
+          self.applicationName = str(server.attrib["applicationName"])
         if 'port' in server.attrib:
           self.port = int(server.attrib['port'])
         # security
       login = config.find('login')
-      if login != None:
+      if login:
         self.enableLogin = True
         if 'username' in  login.attrib:
-          self.username = login.attrib['username']
+          self.username = str(login.attrib['username'])
         if 'password' in  login.attrib:
-          self.password = login.attrib['password']
+          self.password = str(login.attrib['password'])
       else:
         self.enableLogin = False  
         self.username = None
         self.password = None
       security = config.find("security")
-      if security != None:
+      if security:
         self.encryptionEnabled = True
         self.readEncryption(security)
       else: 
         super().__init__()
+      historizing = config.find('historizing')
+      if historizing:
+        for setup in historizing.findall('setup', namespaces=data.nsmap):
+          h = HistorySetting('')
+          h.readHistory(setup)
+          self.historySettings.append(h)
+        
       
 
 class XMLVar(MapOption):
@@ -183,15 +208,15 @@ class XMLVar(MapOption):
   def __init__(self, var:ET._Element, path:str):
     super().__init__()
     self.element = var
-    self.name = var.attrib['name']
+    self.name:str = str(var.attrib['name'])
     # This name is set if the directory should be renamed
     self.newName: str|None = None    
-    self.valueType = var.find('value_type', namespaces=var.nsmap).text
-    self.numberOfElements = int(var.find('numberOfElements', namespaces=var.nsmap).text)
-    self.unit = var.find('unit', namespaces=var.nsmap).text
+    self.valueType:str = var.find('value_type', namespaces=var.nsmap).text
+    self.numberOfElements:int = int(var.find('numberOfElements', namespaces=var.nsmap).text)
+    self.unit:str = var.find('unit', namespaces=var.nsmap).text
     self.newUnit: str|None = None
-    self.direction = var.find('direction', namespaces=var.nsmap).text
-    self.description = var.find('description', namespaces=var.nsmap).text
+    self.direction:str = var.find('direction', namespaces=var.nsmap).text
+    self.description:str = var.find('description', namespaces=var.nsmap).text
     self.newDescription: str|None = None
     self.newDestination: str|None = None
     self.fullName = path + "/" + self.name
@@ -292,7 +317,7 @@ class XMLDirectory(MapOption):
     Includes reading variables and sub directories.
     '''
     for directory in data.findall('directory',namespaces=data.nsmap):
-      self.dirs.append(XMLDirectory(name = directory.attrib['name'], data=directory, level=self.hierarchyLevel+1, path = self.path))
+      self.dirs.append(XMLDirectory(name = str(directory.attrib['name']), data=directory, level=self.hierarchyLevel+1, path = self.path))
     for var in data.findall('variable',namespaces=data.nsmap):
       self.vars.append(XMLVar(var, self.path))
       
@@ -390,7 +415,7 @@ class MapGenerator(Config):
       nSkipped = [0,0]
       for folder in data.findall('folder', namespaces=data.nsmap):
         if "sourceName" in  folder.attrib:
-          directory = self.dir.findDir("/root" + folder.attrib["sourceName"])
+          directory = self.dir.findDir("/root" + str(folder.attrib["sourceName"]))
           if directory != None:
             if folder.find('description', namespaces=folder.nsmap) != None:
               directory.newDescription = folder.find('description', namespaces=folder.nsmap).text 
@@ -399,13 +424,13 @@ class MapGenerator(Config):
             if folder.find('destination', namespaces=folder.nsmap) != None:
               directory.newDestination = folder.find('destination', namespaces=folder.nsmap).text
           else:
-            logging.warning("Failed to find source {} in the application variable tree!".format("/root" + folder.attrib["sourceName"]))
+            logging.warning("Failed to find source {} in the application variable tree!".format("/root" + str(folder.attrib["sourceName"])))
             nSkipped[0] =  nSkipped[0] + 1
 
       # read process_variable information
       for pv in data.findall('process_variable', namespaces=data.nsmap):
         if "sourceName" in  pv.attrib:
-          var = self.dir.findVar("/root" + pv.attrib["sourceName"])
+          var = self.dir.findVar("/root" + str(pv.attrib["sourceName"]))
           if var != None:
             if pv.find('description', namespaces=pv.nsmap) != None:
               var.newDescription = pv.find('description', namespaces=pv.nsmap).text 
@@ -416,7 +441,7 @@ class MapGenerator(Config):
             if pv.find('destination', namespaces=pv.nsmap) != None:
               var.newDestination = pv.find('destination', namespaces=pv.nsmap).text 
           else:
-            logging.warning("Failed to find source {} in the application variable tree!".format("/root" + pv.attrib["sourceName"]))
+            logging.warning("Failed to find source {} in the application variable tree!".format("/root" + str(pv.attrib["sourceName"])))
             nSkipped[1] =  nSkipped[1] + 1
       return nSkipped
     else:

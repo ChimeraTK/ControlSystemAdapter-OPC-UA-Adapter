@@ -422,6 +422,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.histories.setCurrentText(setting.name)
     dlg = HistorySettingsDialog(parent=self, data=self.histories, histories=self.MapGenerator.historySettings, edit=False)
     dlg.exec()
+    logging.info("Adding historizing setting with name: {}".format(setting.name))
     self.MapGenerator.historySettings.append(setting)
     self.editHistorySettingButton.setEnabled(True)
 
@@ -444,7 +445,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     
   def _blockAndSetCheckbox(self, value: bool, control):
     '''
-    Set a check bos without updating the configuration,
+    Set a check box without updating the configuration,
     which would override parameters of the MapGenerator.
     '''
     control.blockSignals(True)
