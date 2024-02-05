@@ -466,6 +466,13 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     dlg = HistorySettingsDialog(parent=self, data=self.histories,histories=self.MapGenerator.historySettings, edit=True)
     dlg.exec()
     
+  def addHistoryForInputs(self, node:QTreeWidgetItem):
+    data = node.data(0, Qt.UserRole)
+    if isinstance(data, XMLVar) and data.direction == 'control_system_to_application':
+      self.treeWidget.itemWidget(node, 2).setCurrentText(self.histories.currentText())
+    else:
+      for chId in range(node.childCount()):
+        self.addHistoryForInputs(node.child(chId))
   
   def _blockAndSetTextBox(self, value: str, control):
     '''
@@ -555,6 +562,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.configureEncryptionButton.clicked.connect(self.configureEncryption)
     self.editHistorySettingButton.clicked.connect(self.editHistorySetting)
     self.addHistorySettingButton.clicked.connect(self.addHistorySetting)
+    self.setHistoryForInputsButton.clicked.connect(lambda: self.addHistoryForInputs(self.treeWidget.itemAt(0,0)))
 
     
     # Allow to move items 
