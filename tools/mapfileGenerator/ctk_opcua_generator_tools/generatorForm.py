@@ -337,6 +337,10 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
       for chId in range(node.childCount()):
         ch = node.child(chId)
         self.treeWidget.itemWidget(ch, 2).setCurrentText(combo.itemText(histIndex))
+        if var.historizing:
+          self.treeWidget.itemWidget(ch, 2).setEnabled(False)
+        else:
+          self.treeWidget.itemWidget(ch, 2).setEnabled(True)
       
   def closeEvent(self, event):
     msg = "Are you sure you want to close the editor?"

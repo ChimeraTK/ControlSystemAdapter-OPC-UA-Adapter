@@ -233,11 +233,16 @@ class XMLVar(MapOption):
     else:
       return NotImplemented
   
-  def generateMapEntry(self, root:ET._Element, path:str):
-    if self.newName or self.newDescription or self.newUnit or self.newDestination:
+  def generateMapEntry(self, root:ET._Element, path:str, historizingActive:bool = False, excludeActive:bool = False):
+    if(self.exclude and not excludeActive):
+      exclude = ET.SubElement(root, "exclude")
+      exclude.set("sourceName", self.fullName.removeprefix('/root'))
+    if self.newName or self.newDescription or self.newUnit or self.newDestination or (self.historizing and not historizingActive):
       logging.debug("Adding xml entry for process_variable for {}/{}".format(path.removeprefix('/root'),self.name))
       pv = ET.SubElement(root, "process_variable")
       pv.set("sourceName", path.removeprefix('/root') + '/' + self.name)
+      if self.historizing and not historizingActive:
+        pv.set("history", self.historizing)
       if self.newDescription:
         dest = ET.SubElement(pv, "description")
         dest.text = self.newDescription
@@ -333,16 +338,22 @@ class XMLDirectory(MapOption):
 
     return out
   
-  def generateMapEntries(self, root:ET._Element):
+  def generateMapEntries(self, root:ET._Element, historiszingActive:bool = False, excludeActive = False):
     for d in self.dirs:
-      d.generateMapEntries(root)
+      d.generateMapEntries(root, self.historizing is not None, self.exclude is not None)
     for var in self.vars:
-      var.generateMapEntry(root, self.path)
-    if self.newDescription or self.newName or self.newDestination:
+      var.generateMapEntry(root, self.path, self.historizing is not None, self.exclude is not None)
+    if self.exclude and not excludeActive:
+      exclude = ET.SubElement(root, "exclude")
+      exclude.set("sourceName", self.path.removeprefix('/root') + '*')
+    
+    if self.newDescription or self.newName or self.newDestination or (self.historizing and not historiszingActive):
       logging.debug("Adding xml entry for folder {}".format(self.path.removeprefix('/root')))
       folder = ET.SubElement(root, "folder")
       folder.set("sourceName", self.path.removeprefix('/root'))
       folder.set("copy", "False")
+      if self.historizing and not historiszingActive:
+        folder.set("history", self.historizing)
       if self.newDescription:
         dest = ET.SubElement(folder, "description")
         dest.text = self.newDescription
