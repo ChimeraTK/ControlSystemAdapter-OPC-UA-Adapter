@@ -345,7 +345,7 @@ class XMLDirectory(MapOption):
       var.generateMapEntry(root, self.path, self.historizing is not None, self.exclude is not None)
     if self.exclude and not excludeActive:
       exclude = ET.SubElement(root, "exclude")
-      exclude.set("sourceName", self.path.removeprefix('/root') + '*')
+      exclude.set("sourceName", self.path.removeprefix('/root') + '/*')
     
     if self.newDescription or self.newName or self.newDestination or (self.historizing and not historiszingActive):
       logging.debug("Adding xml entry for folder {}".format(self.path.removeprefix('/root')))
