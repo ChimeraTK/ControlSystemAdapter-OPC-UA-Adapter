@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1106</width>
+    <width>1147</width>
     <height>856</height>
    </rect>
   </property>
@@ -97,10 +97,17 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
+       <widget class="QPushButton" name="addHistorySettingButton">
+        <property name="text">
+         <string>Add history setting</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QComboBox" name="histories">
         <property name="minimumSize">
          <size>
-          <width>200</width>
+          <width>0</width>
           <height>0</height>
          </size>
         </property>
@@ -120,12 +127,15 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="setHistoryForInputsButton">
+       <widget class="QRadioButton" name="setHistoryForInputsButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use the selected history for all input process variables.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>Use for inputs</string>
+         <string>Use selected history for inputs</string>
         </property>
        </widget>
       </item>
@@ -203,10 +213,51 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QPushButton" name="addHistorySettingButton">
-        <property name="text">
-         <string>Add history setting</string>
+       <widget class="QFrame" name="horizontalFrame">
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
         </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <property name="leftMargin">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Color legend:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(254, 232, 200);</string>
+           </property>
+           <property name="text">
+            <string>Controlsystem to Application</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(229, 245, 224);</string>
+           </property>
+           <property name="text">
+            <string>Application to Controlsystem</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
       <item>
@@ -259,8 +310,14 @@
       <property name="dragEnabled">
        <bool>true</bool>
       </property>
+      <property name="indentation">
+       <number>20</number>
+      </property>
       <attribute name="headerVisible">
        <bool>true</bool>
+      </attribute>
+      <attribute name="headerDefaultSectionSize">
+       <number>100</number>
       </attribute>
       <column>
        <property name="text">
@@ -301,7 +358,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1106</width>
+     <width>1147</width>
      <height>22</height>
     </rect>
    </property>
