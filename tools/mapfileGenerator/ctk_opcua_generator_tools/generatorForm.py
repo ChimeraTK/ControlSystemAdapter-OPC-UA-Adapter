@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QFileDialog, QDialog, QMainWindow, QTreeWidgetItem, QCheckBox, QMessageBox, QDialogButtonBox, QComboBox
+from PyQt5.QtWidgets import QFileDialog, QDialog, QMainWindow, QTreeWidgetItem, QCheckBox, QMessageBox, QDialogButtonBox, QComboBox, QHeaderView
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QColor
 import os
@@ -170,6 +170,16 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.applicationName.setText(self.MapGenerator.applicationName)
     self.rootFolder.setText(self.MapGenerator.applicationName)
     
+    # resize columns
+    header = self.treeWidget.header()
+    #header.setSectionResizeMode(QHeaderView.ResizeToContents)
+    #header.setStretchLastSection(False)
+    header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+    header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
+    header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+    header.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+    header.setSectionResizeMode(4, QHeaderView.Interactive)
+    
   def _getCheckBox(self, item:XMLDirectory | XMLVar, text:str, node:QTreeWidgetItem):
     '''
     Create a checkbox.
@@ -195,6 +205,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     combobox = QComboBox(parent=self.treeWidget)
     combobox.addItem('No history', None)
     combobox.currentIndexChanged.connect(lambda histIndex: self._setHistoryItem(histIndex, item, combobox, node))
+    combobox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
     return combobox
   
   def _updateItem(self, item:QTreeWidgetItem, index:int):
@@ -264,6 +275,12 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     if v.newUnit != None:
       unit = "{} (Orig.: {})".format(v.newUnit, v.unit)
     node = QTreeWidgetItem(parent, [name]+[""]*2 + [unit] + [description]+[""])
+    
+    if v.direction == 'control_system_to_application':
+      node.setBackground(0,QBrush(QColor("#fee8c8")))
+    else:
+      node.setBackground(0,QBrush(QColor("#e5f5e0")))
+    
     if v.newName != None:
       node.setForeground(0,QBrush(QColor("#FF0000")))
     if v.newUnit != None:
@@ -455,7 +472,12 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.MapGenerator.historySettings.append(setting)
     # add history settings to the combo boxes in the TreeWidget (recursively)
     self.addComboEntry(self.treeWidget.itemAt(0,0), setting)
+    header = self.treeWidget.header()
+    # resize the history column accoding to the new historizing setting name, size of 200 is ignored size 
+    # the size is set to the combobox size using ResizeToContents-> see fillTree()
+    header.resizeSection(2,200)
     self.editHistorySettingButton.setEnabled(True)
+    self.setHistoryForInputsButton.setEnabled(True)
 
   def addComboEntry(self, item:QTreeWidgetItem, setting:HistorySetting):
     self.treeWidget.itemWidget(item, 2).addItem(setting.name, setting)
@@ -466,13 +488,17 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     dlg = HistorySettingsDialog(parent=self, data=self.histories,histories=self.MapGenerator.historySettings, edit=True)
     dlg.exec()
     
-  def addHistoryForInputs(self, node:QTreeWidgetItem):
+  def addHistoryForInputs(self, isChecked:bool, node:QTreeWidgetItem):
     data = node.data(0, Qt.UserRole)
     if isinstance(data, XMLVar) and data.direction == 'control_system_to_application':
-      self.treeWidget.itemWidget(node, 2).setCurrentText(self.histories.currentText())
+      if isChecked:
+        self.treeWidget.itemWidget(node, 2).setCurrentText(self.histories.currentText())
+      else:
+        self.treeWidget.itemWidget(node, 2).setCurrentText('No history')
+      
     else:
       for chId in range(node.childCount()):
-        self.addHistoryForInputs(node.child(chId))
+        self.addHistoryForInputs(isChecked,node.child(chId))
   
   def _blockAndSetTextBox(self, value: str, control):
     '''
@@ -542,7 +568,9 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
       self._createMapGenerator(args.input)
     else:
       self.openFile()
-  
+      
+    self.histories.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+   
     self.treeWidget.itemChanged.connect(self._updateItem)
     
     self.actionOpen_File.triggered.connect(self.openFile)
@@ -562,7 +590,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.configureEncryptionButton.clicked.connect(self.configureEncryption)
     self.editHistorySettingButton.clicked.connect(self.editHistorySetting)
     self.addHistorySettingButton.clicked.connect(self.addHistorySetting)
-    self.setHistoryForInputsButton.clicked.connect(lambda: self.addHistoryForInputs(self.treeWidget.itemAt(0,0)))
+    self.setHistoryForInputsButton.clicked.connect(lambda isChecked: self.addHistoryForInputs(isChecked, self.treeWidget.itemAt(0,0)))
 
     
     # Allow to move items 
