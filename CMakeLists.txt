@@ -58,6 +58,7 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
         ${CMAKE_SOURCE_DIR}/src/ua_map_types.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_opcua_adapter.cpp
         ${CMAKE_SOURCE_DIR}/src/node_historizing.cpp
+        ${CMAKE_SOURCE_DIR}/src/void_type.cpp
         ${CMAKE_SOURCE_DIR}/src/xml_file_handler.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_processvariable.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_additionalvariable.cpp
