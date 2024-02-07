@@ -314,6 +314,13 @@ class ua_uaadapter : ua_mapped_class {
    * @param config The server configuration to be modified.
    */
   void fillBuildInfo(UA_ServerConfig* config) const;
+
+  /** @brief get ServerConfig.
+   *
+   * @param returns the serveConfig.
+   */
+  ServerConfig get_server_config();
+
 };
 
 #endif // MTCA_UAADAPTER_H

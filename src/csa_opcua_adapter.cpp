@@ -153,12 +153,17 @@ void csa_opcua_adapter::start() {
   cout << "Start the void observer thread" << endl;
   void_observer_data *data  =  (void_observer_data*) UA_calloc(1, sizeof(void_observer_data));
   vector<ua_processvariable*> vars = adapter->getVariables();
+  auto conf = adapter->get_server_config();
+  data->rootFolder = conf.rootFolder;
+  data->adapter = this;
+  cout << "application_name: " << data->rootFolder << endl;
   for(auto & variable : vars){
     auto type = variable->getType();
     if(type == "Void"){
       data->pvs.insert(data->pvs.end(), variable->getName());
     }
   }
+  cout << "Nbr void: " << data->pvs.size() << endl;
   if(!data->pvs.empty()){
     data->mappedServer = adapter->getMappedServer();
     data->csManager = csManager;
@@ -166,7 +171,7 @@ void csa_opcua_adapter::start() {
     observer_thread.detach();
   }
   else{
-    free(data);
+    UA_free(data);
   }
 }
 
