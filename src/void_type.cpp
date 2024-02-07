@@ -7,89 +7,86 @@
 #include "open62541/plugin/log_stdout.h"
 
 
-static UA_StatusCode fire_void_event(UA_Server *server, string pv_name, boost::shared_ptr<ControlSystemPVManager> csManager){
+static UA_StatusCode fire_void_event(void_observer_data *data, const string& pv_name){
   UA_NodeId outId;
   UA_NodeId void_event_NodeId = UA_NODEID_STRING(1, "VoidEventType");
-  UA_StatusCode retval = UA_Server_createEvent(server, void_event_NodeId, &outId);
+  UA_StatusCode retval = UA_Server_createEvent(data->mappedServer, void_event_NodeId, &outId);
   if (retval != UA_STATUSCODE_GOOD) {
-    UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
-        "createEvent failed. StatusCode %s", UA_StatusCode_name(retval));
+    /*UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
+        "createEvent failed. StatusCode %s", UA_StatusCode_name(retval));*/
     return retval;
   }
-  //read the description, type, validity and nodeid from the server
-  auto pv = csManager->getProcessVariable(pv_name);
+
+  auto pv = data->csManager->getProcessVariable(pv_name);
   auto validity = static_cast<UA_Int32>(pv->dataValidity());
-  retval = UA_Server_writeObjectProperty_scalar(server, outId, UA_QUALIFIEDNAME(1, "Validity"),
+  /*retval =*/ UA_Server_writeObjectProperty_scalar(data->mappedServer, outId, UA_QUALIFIEDNAME(1, "Validity"),
       &validity, &UA_TYPES[UA_TYPES_INT32]);
-  if(retval != UA_STATUSCODE_GOOD){
+  /*if(retval != UA_STATUSCODE_GOOD){
     UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
         "Setting PV validity failed with StatusCode %s", UA_StatusCode_name(retval));
-  }
+  }*/
+
   UA_String pvname = UA_String_fromChars(pv_name.c_str());
-  retval = UA_Server_writeObjectProperty_scalar(server, outId, UA_QUALIFIEDNAME(1, "Name"),
+  /*retval =*/ UA_Server_writeObjectProperty_scalar(data->mappedServer, outId, UA_QUALIFIEDNAME(1, "Name"),
       &pvname, &UA_TYPES[UA_TYPES_STRING]);
-  if(retval != UA_STATUSCODE_GOOD){
+  /*if(retval != UA_STATUSCODE_GOOD){
     UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
         "Setting PV Name failed with StatusCode %s", UA_StatusCode_name(retval));
-  }
+  }*/
   UA_String_clear(&pvname);
 
-
-  string path = "llrfCtrl_hzdr/";
   UA_NodeId id;
   UA_NodeId_init(&id);
   id.namespaceIndex = 1;
   id.identifierType = UA_NODEIDTYPE_STRING;
-  id.identifier.string = UA_String_fromChars((path+pv_name).c_str());
-  retval = UA_Server_writeObjectProperty_scalar(server, outId, UA_QUALIFIEDNAME(1, "cs_path"),
+  id.identifier.string = UA_String_fromChars((data->rootFolder+"/"+pv_name).c_str());
+  /*retval = */UA_Server_writeObjectProperty_scalar(data->mappedServer, outId, UA_QUALIFIEDNAME(1, "cs_path"),
       &id, &UA_TYPES[UA_TYPES_NODEID]);
-  if(retval != UA_STATUSCODE_GOOD){
+  /*if(retval != UA_STATUSCODE_GOOD){
     UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
         "Setting cs_path failed with StatusCode %s", UA_StatusCode_name(retval));
-  }
+  }*/
   UA_NodeId_clear(&id);
 
-  auto description = "/Description";
-  UA_Variant des_val;
-  UA_Variant_init(&des_val);
-  retval = UA_Server_readValue(server,UA_NODEID_STRING(1, (char*)(path+pv_name+description).c_str()), &des_val);
-  if(retval != UA_STATUSCODE_GOOD){
-    UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-        "Failed to read Type value of PV with StatusCode %s", UA_StatusCode_name(retval));
-  }
-  const auto *desvalue = (UA_String*) des_val.data;
+  UA_String desvalue =  UA_String_fromChars(pv->getDescription().c_str());
   const UA_String null_str = UA_STRING_NULL;
-  if(UA_String_equal(desvalue, &null_str) != 0){
-    retval = UA_Server_writeObjectProperty_scalar(server, outId, UA_QUALIFIEDNAME(1, "Description"),
+  if(UA_String_equal(&desvalue, &null_str) != 0){
+    /*retval =*/ UA_Server_writeObjectProperty_scalar(data->mappedServer, outId, UA_QUALIFIEDNAME(1, "Description"),
         &desvalue, &UA_TYPES[UA_TYPES_STRING]);
-    if(retval != UA_STATUSCODE_GOOD){
+    /*if(retval != UA_STATUSCODE_GOOD){
       UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
           "Setting PV description failed with StatusCode %s", UA_StatusCode_name(retval));
-    }
+    }*/
   }
-  UA_Variant_clear(&des_val);
 
-
-  UA_String typevalue = UA_String_fromChars("Void");
-  retval = UA_Server_writeObjectProperty_scalar(server, outId, UA_QUALIFIEDNAME(1, "Type"),
-      &typevalue, &UA_TYPES[UA_TYPES_STRING]);
-  if(retval != UA_STATUSCODE_GOOD){
+  const auto *type = "/Type";
+  UA_Variant type_val;
+  UA_Variant_init(&type_val);
+  /*retval =*/ UA_Server_readValue(data->mappedServer, UA_NODEID_STRING(1, (char*)(data->rootFolder+"/"+pv_name+type).c_str()), &type_val);
+  /*if(retval != UA_STATUSCODE_GOOD){
+    UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+        "Failed to read Type value of PV with StatusCode %s", UA_StatusCode_name(retval));
+  }*/
+  auto *typevalue =  (UA_String*) type_val.data;
+  /*retval =*/ UA_Server_writeObjectProperty_scalar(data->mappedServer , outId, UA_QUALIFIEDNAME(1, "Type"),
+      typevalue, &UA_TYPES[UA_TYPES_STRING]);
+  /*if(retval != UA_STATUSCODE_GOOD){
     UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
         "Setting PV Type failed with StatusCode %s", UA_StatusCode_name(retval));
-  }
+  }*/
+  UA_Variant_clear(&type_val);
 
-
-  retval = UA_Server_triggerEvent(server, outId,
+  retval = UA_Server_triggerEvent(data->mappedServer, outId,
       UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER),
       nullptr, UA_TRUE);
-  if(retval != UA_STATUSCODE_GOOD){
+  /*if(retval != UA_STATUSCODE_GOOD){
     UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
         "Triggering event failed. StatusCode %s", UA_StatusCode_name(retval));
   }
-  else{
+  else{*/
     UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
         "Fire Event for PV with ID %s", pv_name.c_str());
-  }
+  /*}*/
   return retval;
 }
 
@@ -102,29 +99,30 @@ static void updateLoop (void_observer_data *data){
     idToNameMap[data->csManager->getProcessArray<Void>(pv)->getId()] = pv;
   }
   group.finalise();
-  while(true) {
+  while(data->adapter->isRunning()) {
     // wait for next event
     auto id = group.readAny();
-    UA_StatusCode retval = fire_void_event(data->mappedServer, idToNameMap.at(id), data->csManager);
+    UA_StatusCode retval = fire_void_event(data, idToNameMap.at(id));
     if(retval != UA_STATUSCODE_GOOD){
       UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
           "Failed to fire the Event with StatusCode %s", UA_StatusCode_name(retval));
     }
   }
+  UA_free(data);
 }
 
 void startVoidObserverThread(void_observer_data *data){
-  updateLoop(data);
+  updateLoop(data );
 }
 
 /*
- * declare the eventype for void nodes and add it to the server
+ * declare the eventtype for void nodes and add it to the server
  * */
 
 UA_StatusCode addEventProperty(UA_Server *server, UA_NodeId eventNodeId, char *property_name, UA_NodeId dtype){
   UA_NodeId propertyNodeId;
   UA_VariableAttributes vattr = UA_VariableAttributes_default;
-  vattr.dataType = dtype /*UA_TYPES[UA_TYPES_STRING].typeId*/;
+  vattr.dataType = dtype;
   vattr.displayName = UA_LOCALIZEDTEXT("en-us", property_name);
   vattr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
 

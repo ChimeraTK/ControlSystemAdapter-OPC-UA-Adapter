@@ -557,6 +557,10 @@ if(result) {
 
 }
 
+ServerConfig ua_uaadapter::get_server_config(){
+  return this->serverConfig;
+}
+
 void ua_uaadapter::applyMapping(const boost::shared_ptr<ControlSystemPVManager>& csManager) {
   // build folder structure
   this->buildFolderStructure(csManager);

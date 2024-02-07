@@ -15,7 +15,8 @@ typedef struct{
   vector<std::string> pvs;
   boost::shared_ptr<ControlSystemPVManager> csManager;
   UA_Server *mappedServer;
-  /*UA_Boolean *running;*/
+  string rootFolder;
+  csa_opcua_adapter *adapter;
 }void_observer_data;
 
 void startVoidObserverThread(void_observer_data *data);

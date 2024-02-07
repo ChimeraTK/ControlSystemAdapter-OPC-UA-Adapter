@@ -110,6 +110,7 @@ int main() {
   cout << "Start the OPC UA Adapter" << endl;
   csaOPCUA->start();
 
+
   /* Unblock SIGINT */
   sigprocmask(SIG_UNBLOCK, &intmask, nullptr);
 
