@@ -8,9 +8,9 @@ from typing import List
 class MapOption():
   def __init__(self):
     # True/False in case it should be mapped
-    self.exclude = None
+    self.exclude:bool|None = None
     # True/False in case history is enabled
-    self.history = None
+    self.historizing:str|None = None
 
 class HistorySetting():
   def __init__(self, name:str):
@@ -220,7 +220,6 @@ class XMLVar(MapOption):
     self.newDescription: str|None = None
     self.newDestination: str|None = None
     self.fullName = path + "/" + self.name
-    self.historizing:str|None = None
 
   def __str__(self) -> str:
     return "Variable ({}, {}): {}".format(self.valueType, self.numberOfElements,self.name)
@@ -285,7 +284,6 @@ class XMLDirectory(MapOption):
     self.newName: str|None = None
     self.newDescription: str|None = None
     self.newDestination: str|None = None
-    self.historizing:str|None = None
     self.hierarchyLevel = level
     self.parseDir(data)
     
