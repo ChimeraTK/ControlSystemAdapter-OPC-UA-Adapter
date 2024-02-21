@@ -254,7 +254,7 @@ void ua_uaadapter::constructServer() {
   auto* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
   usernamePasswordLogins->password = UA_STRING_ALLOC((char*)this->serverConfig.password.c_str());
   usernamePasswordLogins->username = UA_STRING_ALLOC((char*)this->serverConfig.username.c_str());
-  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin, nullptr,
+  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
       &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
       usernamePasswordLogins);
 
@@ -457,9 +457,10 @@ if(result) {
     string unsecure = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "unsecure");
     if(!unsecure.empty()) {
       transform(unsecure.begin(), unsecure.end(), unsecure.begin(), ::toupper);
-      if(unsecure.compare("TRUE") == 0){
+      if(unsecure.compare("TRUE") == 0) {
         this->serverConfig.unsecure = true;
-      } else {
+      }
+      else {
         this->serverConfig.unsecure = false;
       }
     }
@@ -732,7 +733,7 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
           this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
           UA_String out = UA_STRING_NULL;
           UA_print(&temp.folder_id, &UA_TYPES[UA_TYPES_NODEID], &out);
-          UA_LOG_INFO(&server_config->logger, UA_LOGCATEGORY_USERLAND, "add folder from destionation and name %.*s ",
+          UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "add folder from destionation and name %.*s ",
               (int)out.length, out.data);
           UA_String_clear(&out);
         }
@@ -745,7 +746,7 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
           this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
           UA_String out = UA_STRING_NULL;
           UA_print(&temp.folder_id, &UA_TYPES[UA_TYPES_NODEID], &out);
-          UA_LOG_INFO(&server_config->logger, UA_LOGCATEGORY_USERLAND, "add folder from source name %.*s ",
+          UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "add folder from source name %.*s ",
               (int)out.length, out.data);
           UA_String_clear(&out);
         }
@@ -757,12 +758,12 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
               to_string(nodeset->nodeTab[i]->line));
         }
         if(description.empty()) {
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
               "Warning! Skipping Folder. Folder creation failed. Name is missing. Mapping line number: %u",
               nodeset->nodeTab[i]->line);
         }
         else {
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
               "Warning! Skipping Folder. Folder creation failed. Name is missing 'description: %s'. Mapping "
               "line number: %u",
               description.c_str(), nodeset->nodeTab[i]->line);
@@ -793,7 +794,7 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
                                    "Mapping line number: " +
               to_string(nodeset->nodeTab[i]->line));
         }
-        UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+        UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
             "Warning! Skipping folder: %s. Folder with source mapping failed. Target folder node id exists. "
             "Mapping line number: %u",
             sourceName.c_str(), nodeset->nodeTab[i]->line);
@@ -804,7 +805,7 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
           throw std::runtime_error("Error! Folder creation failed. Source folder missing. Mapping line number: " +
               to_string(nodeset->nodeTab[i]->line));
         }
-        UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+        UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
             "Warning! Skipping Folder. Source 'name: %s' folder missing. Mapping line number: %u", folder.c_str(),
             nodeset->nodeTab[i]->line);
         continue;
@@ -822,7 +823,7 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
                 "Error! Folder creation failed. Source and Destination equal. Mapping line number: " +
                 to_string(nodeset->nodeTab[i]->line));
           }
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
               "Warning! Skipping Folder. Source '%s' and Destination equal. Mapping line number: %u",
               sourceName.c_str(), nodeset->nodeTab[i]->line);
           continue;
@@ -853,7 +854,7 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
             throw std::runtime_error("Error! Folder creation failed. No corresponding source folder: " + sourceName +
                 ". Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
           }
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
               "Warning! Skipping Folder. No corresponding source '%s' folder. Mapping line number: %u",
               sourceName.c_str(), nodeset->nodeTab[i]->line);
           continue;
@@ -873,7 +874,7 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
               throw std::runtime_error("Error! Folder creation failed. Source and destination must be different for '" +
                   sourceName + "' folder. Mapping line number: " + to_string(nodeset->nodeTab[i]->line));
             }
-            UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
                 "Warning! Skipping Folder. Folder creation failed. Source and destination must be "
                 "different for '%s' folder. Mapping line number: %u",
                 sourceName.c_str(), nodeset->nodeTab[i]->line);
@@ -1038,12 +1039,12 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
           throw std::runtime_error("Error! PV mapping failed. SourceName missing.");
         }
         if(!name.empty()) {
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
               "Warning! Skipping PV mapping. SourceName 'name: %s' is missing.", name.c_str());
         }
         else {
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
-              "Warning! Skipping PV mapping. SourceName is missing.");
+          UA_LOG_WARNING(
+              server_config->logging, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV mapping. SourceName is missing.");
         }
         continue;
       }
@@ -1077,11 +1078,11 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
             throw std::runtime_error("Error! PV mapping failed. No corresponding source pv.");
           }
           if(!name.empty()) {
-            UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
                 "Warning! Skipping PV mapping. No corresponding source pv 'name: %s'.", name.c_str());
           }
           else {
-            UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
                 "Warning! Skipping PV mapping. No corresponding source pv.");
           }
           continue;
@@ -1129,12 +1130,12 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
           }
         }
         if(!name.empty()) {
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
               "Warning! Skipping PV mapping. Source PV not found 'name: %s'. Mapping line number: %u", name.c_str(),
               nodeset->nodeTab[i]->line);
         }
         else {
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
               "Warning! Skipping PV mapping. Source PV not found. Mapping line number: %u", nodeset->nodeTab[i]->line);
         }
         continue;
@@ -1151,7 +1152,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
             throw std::runtime_error(
                 "Error! PV mapping failed. Source and destination must be different if copy='true'.");
           }
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
               "Warning! Skipping PV mapping. Source and destination must be different if copy='true' 'name: "
               "%s'.",
               name.c_str());
@@ -1176,7 +1177,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
               UA_NodeId tmpOutput = UA_NODEID_NULL;
               UA_Server_readNodeId(this->mappedServer, requestedPVBrowseId, &tmpOutput);
               if(!UA_NodeId_isNull(&tmpOutput)) {
-                UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+                UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
                     "Warning! Using legacy code. Mapped PV is used as PV mapping target");
                 UA_NodeId_copy(&requestedPVBrowseId, &destinationFolderNodeId);
               }
@@ -1204,7 +1205,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
               throw std::runtime_error("PV creation failed. PV with same name mapped. Mapping line number: " +
                   to_string(nodeset->nodeTab[i]->line));
             }
-            UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
                 "Warning! Skipping PV %s. PV with same name mapped. Mapping line number: %u", sourceName.c_str(),
                 nodeset->nodeTab[i]->line);
             continue;
@@ -1219,7 +1220,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
             throw std::runtime_error("Folder creation failed.");
           }
           UA_LOG_WARNING(
-              &this->server_config->logger, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV. Folder creation failed.");
+              server_config->logging, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV. Folder creation failed.");
           continue;
         }
         UA_NodeId tmpPVNodeId = processvariable->getOwnNodeId();
@@ -1236,7 +1237,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
           if(this->mappingExceptions) {
             throw std::runtime_error("Error! PV mapping failed. The pv name can't changed if copy is false.");
           }
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
               "Warning! Skipping PV mapping. The pv name can't changed if copy is false. 'name: %s'.", name.c_str());
           continue;
         }
@@ -1253,7 +1254,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
           if(this->mappingExceptions) {
             throw std::runtime_error("PV mapping failed. Can't create reference to original pv.");
           }
-          UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
               "Warning! Skipping PV. Can't create reference to original pv.");
           continue;
         }
@@ -1319,7 +1320,7 @@ void ua_uaadapter::addAdditionalVariables() {
                                    "mandatory. Mapping line number: " +
               to_string(nodeset->nodeTab[i]->line));
         }
-        UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+        UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
             "Warning! Skipping additional variable. Additional variable name is mandatory. Mapping line "
             "number: %u",
             nodeset->nodeTab[i]->line);
@@ -1342,7 +1343,7 @@ void ua_uaadapter::addAdditionalVariables() {
         if(this->mappingExceptions) {
           throw std::runtime_error("Additional variable node creation failed. Additional variable already exists.");
         }
-        UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+        UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
             "Warning! Skipping additional variable %s. Node already exists. Mapping line number: %u", name.c_str(),
             nodeset->nodeTab[i]->line);
         continue;
@@ -1364,7 +1365,7 @@ void ua_uaadapter::addAdditionalVariables() {
         if(this->mappingExceptions) {
           throw std::runtime_error("Additional variable node creation failed. PV with same name already exists.");
         }
-        UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+        UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
             "Warning! Skipping additional variable %s. PV with same name already exists. Mapping line number: "
             "%u",
             name.c_str(), nodeset->nodeTab[i]->line);
@@ -1384,7 +1385,7 @@ void ua_uaadapter::addAdditionalVariables() {
         if(this->mappingExceptions) {
           throw std::runtime_error("Error! Creation of additional variable folder failed.");
         }
-        UA_LOG_WARNING(&this->server_config->logger, UA_LOGCATEGORY_USERLAND,
+        UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
             "Warning! Skipping additional variable. Creation of additional variable folder failed. Skipping.");
         continue;
       }
