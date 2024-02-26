@@ -727,7 +727,6 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
           string folderNodeId;
           if(!nodeFolderPath.empty()) {
             if(strlen(destination.c_str()) == 0) {
-              // todo check whiy destionation is not empty and does not raise an exception
               folderNodeId = this->serverConfig.rootFolder + "/" + folder + "Dir";
             }
             else {
@@ -737,18 +736,20 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
           else {
             folderNodeId = this->serverConfig.rootFolder + "/" + folder + "Dir";
           }
-          AdapterFolderHistorySetup temp;
-          temp.folder_historizing = history;
-          UA_NodeId id = UA_NODEID_STRING(1, (char*)folderNodeId.c_str());
-          UA_NodeId_copy(&id, &temp.folder_id);
-          this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
-          UA_String out = UA_STRING_NULL;
-          UA_print(&temp.folder_id, &UA_TYPES[UA_TYPES_NODEID], &out);
-          UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "add folder from destionation and name %.*s ",
-              (int)out.length, out.data);
-          UA_String_clear(&out);
+          if(!sourceName.empty()){
+            AdapterFolderHistorySetup temp;
+            temp.folder_historizing = history;
+            UA_NodeId id = UA_NODEID_STRING(1, (char*)folderNodeId.c_str());
+            UA_NodeId_copy(&id, &temp.folder_id);
+            this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
+            UA_String out = UA_STRING_NULL;
+            UA_print(&temp.folder_id, &UA_TYPES[UA_TYPES_NODEID], &out);
+            UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "add folder from destination and name %.*s ",
+                (int)out.length, out.data);
+            UA_String_clear(&out);
+          }
         }
-        if(!sourceName.empty() && (copy.empty() || copy == "false")) {
+        if(!sourceName.empty() && (copy.empty() || copy == "FALSE" || copy == "False" || copy == "false")) {
           AdapterFolderHistorySetup temp;
           temp.folder_historizing = history;
           string folderNodeId = this->serverConfig.rootFolder + "/" + sourceName + "Dir";
@@ -1021,7 +1022,7 @@ void ua_uaadapter::explicitVarMapping(const boost::shared_ptr<ControlSystemPVMan
             this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
           }
         }
-        if(!sourceName.empty() && (copy.empty() || copy == "FALSE")) {
+        if(!sourceName.empty() && (copy.empty() || copy == "FALSE" || copy == "False" || copy == "false")) {
           name = sourceName;
           // cout << "print the source name "<<  sourceName << endl;
           targetNodeId = this->serverConfig.rootFolder + "/" + sourceName;

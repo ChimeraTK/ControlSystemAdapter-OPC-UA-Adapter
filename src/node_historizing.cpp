@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
  *
- * Copyright (c) 2022-2023 Fraunhofer IOSB (Author: Florian Düwel)
+ * Copyright (c) 2023-2024 Fraunhofer IOSB (Author: Florian Düwel)
  */
 
 #include "node_historizing.h"
@@ -99,15 +99,9 @@ void set_variable_access_level_historizing(UA_NodeId id, UA_Server* mappedServer
   UA_Byte temp;
   UA_Byte_init(&temp);
   UA_Server_readAccessLevel(mappedServer, id, &temp);
-  if(temp == UA_ACCESSLEVELMASK_READ) {
-    UA_Byte access_level =
-        UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_HISTORYREAD /*^ UA_ACCESSLEVELMASK_HISTORYWRITE*/;
-    UA_Server_writeAccessLevel(mappedServer, id, access_level);
-  }
-  else if(temp == (UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE)) {
-    UA_Byte access_level = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE ^ UA_ACCESSLEVELMASK_HISTORYREAD ^
-        UA_ACCESSLEVELMASK_HISTORYWRITE;
-    UA_Server_writeAccessLevel(mappedServer, id, access_level);
+  if(temp & UA_ACCESSLEVELMASK_READ) {
+    temp |= UA_ACCESSLEVELMASK_HISTORYREAD;
+    UA_Server_writeAccessLevel(mappedServer, id, temp);
   }
   UA_Server_writeHistorizing(mappedServer, id, true);
   UA_Byte_clear(&temp);
@@ -192,11 +186,7 @@ UA_HistoryDataGathering add_historizing_nodes(vector<UA_NodeId>& historizing_nod
       }
     }
     set_variable_access_level_historizing(historizing_nodes[i], mappedServer);
-    /* ToDo
-     * replace line 190 with
-     * setting.historizingBackend = UA_HistoryDataBackend_Memory_Circular(historizing_nodes.size(), hist.max_length);
-     * after circular history is enabled*/
-    setting.historizingBackend = UA_HistoryDataBackend_Memory(historizing_nodes.size(), hist.buffer_length);
+    setting.historizingBackend = UA_HistoryDataBackend_Memory_Circular(historizing_nodes.size(), hist.buffer_length);
     setting.maxHistoryDataResponseSize = hist.entries_per_response;
     setting.pollingInterval = hist.interval;
     UA_StatusCode retval = gathering.registerNodeId(mappedServer, gathering.context, &historizing_nodes[i], setting);
