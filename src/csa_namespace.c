@@ -221,12 +221,12 @@ UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
     attr.accessLevel = 3;
     attr.userAccessLevel = 3;
     attr.valueRank = -1;
-    attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
+    attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
     // UA_String *opcua_node_variable_t_ns_2_i_6012_variant_DataContents =  UA_String_new();
     //*opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING_ALLOC("");
     UA_String opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING_ALLOC("");
     UA_Variant_setScalar(
-        &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
+        &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_INT32]);
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6018);
     UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
