@@ -138,9 +138,10 @@ class ua_uaadapter : ua_mapped_class {
   UA_NodeId createUAFolder(UA_NodeId basenodeId, const string& folderName, const string& description = "");
 
  public:
-  bool running = false; // set to false to stop the worker thread
+  bool running = false;
   //TODO move this field to private and add getter and setter
   vector<string> exclude;
+  vector<string> folder_with_history;
 
   /** @brief Constructor of the class.
    *
