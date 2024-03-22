@@ -61,6 +61,13 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
               break;
             }
           }
+          for(auto folder :this->adapter->folder_with_history) {
+            if(oneProcessVariable->getName().substr(1, folder.size()-1) == folder){
+              cout << "Warning: Skip exclude node - Used in folder history setting:" << oneProcessVariable->getName() << endl;
+              pv_used = true;
+              break;
+            }
+          }
           if(!pv_used){
             cout << "Info: directory var exclude (/*) from mapping " << oneProcessVariable->getName() << endl;
             skip_var = true;
@@ -72,6 +79,13 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
           for(const auto& ele: mappedPvSources){
             if(ele == oneProcessVariable->getName().substr(1, oneProcessVariable->getName().size()-1)){
               cout << "Warning: Skip exclude node - Used in pv-mapping (greedy match) PV:" << oneProcessVariable->getName() << endl;
+              pv_used = true;
+              break;
+            }
+          }
+          for(auto folder :this->adapter->folder_with_history) {
+            if(oneProcessVariable->getName().substr(1, folder.size()-1) == folder){
+              cout << "Warning: Skip exclude node - Used in folder history setting:" << oneProcessVariable->getName() << endl;
               pv_used = true;
               break;
             }
@@ -88,6 +102,13 @@ csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> c
           } else {
             cout << "Info: direct exclude var (direct match) from mapping" << oneProcessVariable->getName() << endl;
             skip_var = true;
+          }
+          for(auto folder :this->adapter->folder_with_history) {
+            if(oneProcessVariable->getName().substr(1, folder.size()-1) == folder){
+              cout << "Warning: Skip exclude node - Used in folder history setting:" << oneProcessVariable->getName() << endl;
+              skip_var = false;
+              break;
+            }
           }
       }
     }

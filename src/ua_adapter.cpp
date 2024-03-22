@@ -539,6 +539,21 @@ if(result) {
     }
   }
   xmlXPathFreeObject(result_exclude);
+
+  xmlXPathObjectPtr folder_with_his = this->fileHandler->getNodeSet("//folder");
+  xmlNodeSetPtr nodeset_folder_with_history;
+  if(folder_with_his) {
+    nodeset_folder_with_history = folder_with_his->nodesetval;
+    for(int32_t i = 0; i < nodeset_folder_with_history->nodeNr; i++) {
+      string folder = xml_file_handler::getAttributeValueFromNode(nodeset_folder_with_history->nodeTab[i], "sourceName");
+      string history = xml_file_handler::getAttributeValueFromNode(nodeset_folder_with_history->nodeTab[i], "history");
+      if(!folder.empty() && !history.empty()) {
+        this->folder_with_history.insert(this->folder_with_history.begin(), "/" + folder);
+      }
+    }
+  }
+  xmlXPathFreeObject(folder_with_his);
+
 }
 
 void ua_uaadapter::applyMapping(const boost::shared_ptr<ControlSystemPVManager>& csManager) {
