@@ -18,7 +18,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framework REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
-find_package(open62541 1.3 REQUIRED)
+find_package(open62541 1.4 REQUIRED)
 
 find_package(ChimeraTK-ControlSystemAdapter 02.05 REQUIRED)
 
