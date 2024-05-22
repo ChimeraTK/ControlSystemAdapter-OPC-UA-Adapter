@@ -33,29 +33,10 @@ using namespace std;
 using namespace ChimeraTK;
 namespace fusion = boost::fusion;
 
-typedef enum {
-  UA_PV_UNKNOWN = 0,
-  UA_PV_INT8 = 1,
-  UA_PV_UINT8 = 2,
-  UA_PV_INT16 = 3,
-  UA_PV_UINT16 = 4,
-  UA_PV_INT32 = 5,
-  UA_PV_UINT32 = 6,
-  UA_PV_FLOAT = 8,
-  UA_PV_DOUBLE = 9,
-  UA_PV_STRING = 10,
-  UA_PV_INT64 = 11,
-  UA_PV_UINT64 = 12,
-  UA_PV_BOOL = 13,
-  UA_PV_VOID = 14
-} UA_Processvariable_Type;
-
-typedef fusion::map<fusion::pair<int8_t, UA_Processvariable_Type>, fusion::pair<uint8_t, UA_Processvariable_Type>,
-    fusion::pair<int16_t, UA_Processvariable_Type>, fusion::pair<uint16_t, UA_Processvariable_Type>,
-    fusion::pair<int32_t, UA_Processvariable_Type>, fusion::pair<uint32_t, UA_Processvariable_Type>,
-    fusion::pair<int64_t, UA_Processvariable_Type>, fusion::pair<uint64_t, UA_Processvariable_Type>,
-    fusion::pair<float, UA_Processvariable_Type>, fusion::pair<double, UA_Processvariable_Type>,
-    fusion::pair<string, UA_Processvariable_Type>, fusion::pair<Boolean, UA_Processvariable_Type>>
+typedef fusion::map<fusion::pair<int8_t, uint>, fusion::pair<uint8_t, uint>, fusion::pair<int16_t, uint>,
+    fusion::pair<uint16_t, uint>, fusion::pair<int32_t, uint>, fusion::pair<uint32_t, uint>,
+    fusion::pair<int64_t, uint>, fusion::pair<uint64_t, uint>, fusion::pair<float, uint>, fusion::pair<double, uint>,
+    fusion::pair<string, uint>, fusion::pair<Boolean, uint>>
     TypesMap;
 
 /** @class ua_processvariable
@@ -73,20 +54,13 @@ class ua_processvariable : ua_mapped_class {
   string engineeringUnit;
   string description;
   UA_NodeId ownNodeId = UA_NODEID_NULL;
-  UA_Processvariable_Type type;
 
-  TypesMap typesMap{fusion::make_pair<int8_t>(UA_Processvariable_Type::UA_PV_INT8),
-      fusion::make_pair<uint8_t>(UA_Processvariable_Type::UA_PV_UINT8),
-      fusion::make_pair<int16_t>(UA_Processvariable_Type::UA_PV_INT16),
-      fusion::make_pair<uint16_t>(UA_Processvariable_Type::UA_PV_UINT16),
-      fusion::make_pair<int32_t>(UA_Processvariable_Type::UA_PV_INT32),
-      fusion::make_pair<uint32_t>(UA_Processvariable_Type::UA_PV_UINT32),
-      fusion::make_pair<int64_t>(UA_Processvariable_Type::UA_PV_INT64),
-      fusion::make_pair<uint64_t>(UA_Processvariable_Type::UA_PV_UINT64),
-      fusion::make_pair<float>(UA_Processvariable_Type::UA_PV_FLOAT),
-      fusion::make_pair<double>(UA_Processvariable_Type::UA_PV_DOUBLE),
-      fusion::make_pair<string>(UA_Processvariable_Type::UA_PV_STRING),
-      fusion::make_pair<Boolean>(UA_Processvariable_Type::UA_PV_BOOL)};
+  TypesMap typesMap{fusion::make_pair<int8_t>(UA_TYPES_SBYTE), fusion::make_pair<uint8_t>(UA_TYPES_BYTE),
+      fusion::make_pair<int16_t>(UA_TYPES_INT16), fusion::make_pair<uint16_t>(UA_TYPES_UINT16),
+      fusion::make_pair<int32_t>(UA_TYPES_INT32), fusion::make_pair<uint32_t>(UA_TYPES_UINT32),
+      fusion::make_pair<int64_t>(UA_TYPES_INT64), fusion::make_pair<uint64_t>(UA_TYPES_UINT64),
+      fusion::make_pair<float>(UA_TYPES_FLOAT), fusion::make_pair<double>(UA_TYPES_DOUBLE),
+      fusion::make_pair<string>(UA_TYPES_STRING), fusion::make_pair<Boolean>(UA_TYPES_BOOLEAN)};
 
  private:
   bool array;
