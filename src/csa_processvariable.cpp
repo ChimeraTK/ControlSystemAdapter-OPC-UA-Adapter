@@ -41,7 +41,6 @@ ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, 
   this->nameNew = namePV;
   this->csManager = std::move(csManager);
   this->nodeStringIdOverwrite = std::move(overwriteNodeString);
-  this->type = UA_PV_UNKNOWN;
   this->array = false;
 
   this->mapSelfToNamespace();
@@ -284,18 +283,16 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(UA_Se
 template<typename T>
 UA_StatusCode ua_processvariable::getValue(UA_Variant* v) {
   UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
-  if(this->type == fusion::at_key<T>(typesMap)) {
-    if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
-      this->csManager->getProcessArray<T>(this->namePV)->readLatest();
-    }
-    if(this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).size() == 1) {
-      T ival = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).at(0);
-      rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[fusion::at_key<T>(typesMap)]);
-    }
-    else {
-      std::vector<T> iarr = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0);
-      rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[fusion::at_key<T>(typesMap)]);
-    }
+  if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
+    this->csManager->getProcessArray<T>(this->namePV)->readLatest();
+  }
+  if(this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).size() == 1) {
+    T ival = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).at(0);
+    rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[fusion::at_key<T>(typesMap)]);
+  }
+  else {
+    std::vector<T> iarr = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0);
+    rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[fusion::at_key<T>(typesMap)]);
   }
   return rv;
 }
@@ -303,25 +300,23 @@ UA_StatusCode ua_processvariable::getValue(UA_Variant* v) {
 template<>
 UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v) {
   UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
-  if(this->type == UA_PV_STRING) {
-    if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
-      this->csManager->getProcessArray<string>(this->namePV)->readLatest();
+  if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
+    this->csManager->getProcessArray<string>(this->namePV)->readLatest();
+  }
+  if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1) {
+    string sval = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).at(0);
+    UA_String ua_val = CPPSTRING_TO_UASTRING(sval);
+    rv = UA_Variant_setScalarCopy(v, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
+    UA_String_clear(&ua_val);
+  }
+  else {
+    std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
+    auto* sarrayval = new UA_String[sarr.size()];
+    for(size_t i = 0; i < sarr.size(); i++) {
+      sarrayval[i] = CPPSTRING_TO_UASTRING(sarr[i]);
     }
-    if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1) {
-      string sval = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).at(0);
-      UA_String ua_val = CPPSTRING_TO_UASTRING(sval);
-      rv = UA_Variant_setScalarCopy(v, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
-      UA_String_clear(&ua_val);
-    }
-    else {
-      std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
-      auto* sarrayval = new UA_String[sarr.size()];
-      for(size_t i = 0; i < sarr.size(); i++) {
-        sarrayval[i] = CPPSTRING_TO_UASTRING(sarr[i]);
-      }
-      rv = UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
-      delete[] sarrayval;
-    }
+    rv = UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
+    delete[] sarrayval;
   }
   return rv;
 }
@@ -340,30 +335,28 @@ template<typename T>
 UA_StatusCode ua_processvariable::setValue(const UA_Variant* data) {
   UA_StatusCode retval = UA_STATUSCODE_BADINTERNALERROR;
 
-  if(type == fusion::at_key<T>(typesMap)) {
-    if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-      vector<T> valueArray;
-      if(UA_Variant_isScalar(data) && (!array)) {
-        T value = *((T*)data->data);
-        valueArray.push_back(value);
-      }
-      else if((!UA_Variant_isScalar(data)) && array) {
-        auto* v = (T*)data->data;
-        valueArray.resize(data->arrayLength);
-        for(size_t i = 0; i < valueArray.size(); i++) {
-          valueArray.at(i) = v[i];
-        }
-        if(this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).size() != data->arrayLength) {
-          return UA_STATUSCODE_BADINVALIDARGUMENT;
-        }
-      }
-      this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0) = valueArray;
-      this->csManager->getProcessArray<T>(this->namePV)->write();
-      retval = UA_STATUSCODE_GOOD;
+  if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
+    vector<T> valueArray;
+    if(UA_Variant_isScalar(data) && (!array)) {
+      T value = *((T*)data->data);
+      valueArray.push_back(value);
     }
-    else {
-      retval = UA_STATUSCODE_BADNOTWRITABLE;
+    else if((!UA_Variant_isScalar(data)) && array) {
+      auto* v = (T*)data->data;
+      valueArray.resize(data->arrayLength);
+      for(size_t i = 0; i < valueArray.size(); i++) {
+        valueArray.at(i) = v[i];
+      }
+      if(this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).size() != data->arrayLength) {
+        return UA_STATUSCODE_BADINVALIDARGUMENT;
+      }
     }
+    this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0) = valueArray;
+    this->csManager->getProcessArray<T>(this->namePV)->write();
+    retval = UA_STATUSCODE_GOOD;
+  }
+  else {
+    retval = UA_STATUSCODE_BADNOTWRITABLE;
   }
 
   return retval;
@@ -373,35 +366,33 @@ template<>
 UA_StatusCode ua_processvariable::setValue<std::string>(const UA_Variant* data) {
   UA_StatusCode retval = UA_STATUSCODE_BADINTERNALERROR;
 
-  if(type == UA_PV_STRING) {
-    if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
-      vector<string> valueArray;
-      if(UA_Variant_isScalar(data) && (!array)) {
+  if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
+    vector<string> valueArray;
+    if(UA_Variant_isScalar(data) && (!array)) {
+      string cpps;
+      UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)data->data)), cpps)
+      // string value = *((string *)data->data);
+      valueArray.push_back(cpps);
+    }
+    else if((!UA_Variant_isScalar(data)) && array) {
+      // Array
+      auto* vdata = (UA_String*)data->data;
+      valueArray.resize(data->arrayLength);
+      for(uint32_t i = 0; i < valueArray.size(); i++) {
         string cpps;
-        UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)data->data)), cpps)
-        // string value = *((string *)data->data);
-        valueArray.push_back(cpps);
+        UASTRING_TO_CPPSTRING(vdata[i], cpps)
+        valueArray.at(i) = cpps;
       }
-      else if((!UA_Variant_isScalar(data)) && array) {
-        // Array
-        auto* vdata = (UA_String*)data->data;
-        valueArray.resize(data->arrayLength);
-        for(uint32_t i = 0; i < valueArray.size(); i++) {
-          string cpps;
-          UASTRING_TO_CPPSTRING(vdata[i], cpps)
-          valueArray.at(i) = cpps;
-        }
-        if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() != data->arrayLength) {
-          return UA_STATUSCODE_BADINVALIDARGUMENT;
-        }
+      if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() != data->arrayLength) {
+        return UA_STATUSCODE_BADINVALIDARGUMENT;
       }
-      this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0) = valueArray;
-      this->csManager->getProcessArray<string>(this->namePV)->write();
-      retval = UA_STATUSCODE_GOOD;
     }
-    else {
-      retval = UA_STATUSCODE_BADNOTWRITABLE;
-    }
+    this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0) = valueArray;
+    this->csManager->getProcessArray<string>(this->namePV)->write();
+    retval = UA_STATUSCODE_GOOD;
+  }
+  else {
+    retval = UA_STATUSCODE_BADNOTWRITABLE;
   }
 
   return retval;
@@ -508,9 +499,7 @@ UA_StatusCode ua_processvariable::mapSelfToNamespace() {
   else if(valueType == typeid(Boolean)) {
     arrayDims[0] = typeSpecificSetup<Boolean>(mapElem, createdNodeId);
   }
-  else {
-    if(valueType == typeid(Void))
-      type = UA_PV_VOID;
+  else if(valueType != typeid(Void)){
     int status;
     auto* demangledName = abi::__cxa_demangle(valueType.name(), nullptr, nullptr, &status);
     std::cout << "Cannot proxy unknown type ";
@@ -741,7 +730,6 @@ UA_NodeId ua_processvariable::getOwnNodeId() {
 
 template<typename T>
 UA_UInt32 ua_processvariable::typeSpecificSetup(UA_DataSource_Map_Element& mapElem, const UA_NodeId nodeId) {
-  type = fusion::at_key<T>(typesMap);
   UA_Int32 arrayDims;
   mapElem.dataSource.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue<T>;
   if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
