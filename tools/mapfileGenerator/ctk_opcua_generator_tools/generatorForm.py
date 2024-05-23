@@ -584,6 +584,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.userName.textChanged.connect(self.updateConfig)
     self.applicationName.textChanged.connect(self.updateConfig)
     self.rootFolder.textChanged.connect(self.updateConfig)
+    self.port.valueChanged.connect(self.updateConfig)
     self.applicationDescription.textChanged.connect(self.updateConfig)
     self.enableEncryptionButton.stateChanged.connect(self.updateEncryptionConfiguration)
     self.addUnsecureEndpoint.stateChanged.connect(self.updateEncryptionConfiguration)
