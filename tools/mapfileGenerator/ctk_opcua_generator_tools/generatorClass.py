@@ -9,7 +9,7 @@ class MapOption():
   def __init__(self):
     # True/False in case it should be mapped
     self.exclude:bool|None = None
-    # True/False in case history is enabled
+    # Name of the history setting in case history is enabled
     self.historizing:str|None = None
 
 class HistorySetting():
@@ -197,9 +197,11 @@ class Config(EncryptionSettings):
         for setup in historizing.findall('setup', namespaces=data.nsmap):
           h = HistorySetting('')
           h.readHistory(setup)
-          self.historySettings.append(h)
-        
-      
+          foundSetting = next((x for x in self.historySettings if x.name == h.name), None)
+          if foundSetting == None:
+            self.historySettings.append(h)
+          else:
+            logging.warning("Found history settings dublicate with name {}. Will not it again.".format(h.name))
 
 class XMLVar(MapOption):
   '''
@@ -235,11 +237,14 @@ class XMLVar(MapOption):
   def generateMapEntry(self, root:ET._Element, path:str, historizingActive:bool = False, excludeActive:bool = False):
     if(self.exclude and not excludeActive):
       exclude = ET.SubElement(root, "exclude")
-      exclude.set("sourceName", self.fullName.removeprefix('/root'))
+      exclude.set("sourceName", self.fullName.removeprefix('/root/'))
     if self.newName or self.newDescription or self.newUnit or self.newDestination or (self.historizing and not historizingActive):
-      logging.debug("Adding xml entry for process_variable for {}/{}".format(path.removeprefix('/root'),self.name))
+      logging.debug("Adding xml entry for process_variable for {}/{}".format(path.removeprefix('/root/'),self.name))
       pv = ET.SubElement(root, "process_variable")
-      pv.set("sourceName", path.removeprefix('/root') + '/' + self.name)
+      if path.removeprefix('/root/') == '':
+        pv.set("sourceName", self.name)
+      else:
+        pv.set("sourceName", path.removeprefix('/root/') + '/' + self.name)
       if self.historizing and not historizingActive:
         pv.set("history", self.historizing)
       if self.newDescription:
@@ -253,7 +258,7 @@ class XMLVar(MapOption):
         unit.text = self.newUnit
       if self.newDestination:
         dest = ET.SubElement(pv, "destination")
-        dest.text = self.newDestination.removeprefix('/root')
+        dest.text = self.newDestination.removeprefix('/root/')
       if self.newName:
         pv.set("copy", "True")
       else:
@@ -343,12 +348,12 @@ class XMLDirectory(MapOption):
       var.generateMapEntry(root, self.path, self.historizing is not None, self.exclude is not None)
     if self.exclude and not excludeActive:
       exclude = ET.SubElement(root, "exclude")
-      exclude.set("sourceName", self.path.removeprefix('/root') + '/*')
+      exclude.set("sourceName", self.path.removeprefix('/root/') + '/*')
     
     if self.newDescription or self.newName or self.newDestination or (self.historizing and not historiszingActive):
-      logging.debug("Adding xml entry for folder {}".format(self.path.removeprefix('/root')))
+      logging.debug("Adding xml entry for folder {}".format(self.path.removeprefix('/root/')))
       folder = ET.SubElement(root, "folder")
-      folder.set("sourceName", self.path.removeprefix('/root'))
+      folder.set("sourceName", self.path.removeprefix('/root/'))
       folder.set("copy", "False")
       if self.historizing and not historiszingActive:
         folder.set("history", self.historizing)
@@ -360,7 +365,7 @@ class XMLDirectory(MapOption):
         name.text = self.newName
       if self.newDestination:
         dest = ET.SubElement(folder, "destination")
-        dest.text = self.newDestination.removeprefix('/root')
+        dest.text = self.newDestination.removeprefix('/root/')
 
   def reset(self):
     '''
@@ -377,11 +382,11 @@ class XMLDirectory(MapOption):
 class MapGenerator(Config):
   def __init__(self, inputFile : str):
     super().__init__()
-    self.inputFile = inputFile
-    self.outputFile = None
-    self.applicationName = None
-    self.nsmap = None
-    self.nsmapMapfile = None
+    self.inputFile: str|None = inputFile
+    self.outputFile: str|None = None
+    self.applicationName: str|None = None
+    self.nsmap: Dict|None = None
+    self.dir: XMLDirectory|None = None
     self.parseChimeraTK()
     
   def parseChimeraTK(self):
@@ -407,7 +412,7 @@ class MapGenerator(Config):
     '''
     Parse an existing map file.
     @param inputFile: The map file name.
-    @return: list that includes the number of not found directories (index 0) and pvs (index 1). 
+    @return: list that includes the number of not found directories (index 0), pvs (index 1) and excludes (index 2). 
              In the map file the sourceName is given and it can happen that the source
              given in the map file does not correspond to a PV or directory from the original
              variable tree.
@@ -423,11 +428,13 @@ class MapGenerator(Config):
         RuntimeError("Wrong name space ({}) used in mapping file.".format(data.nsmap))
       self.readConfig(data)
       # read folder information
-      nSkipped = [0,0]
+      nSkipped = [0,0,0]
       for folder in data.findall('folder', namespaces=data.nsmap):
         if "sourceName" in  folder.attrib:
-          directory = self.dir.findDir("/root" + str(folder.attrib["sourceName"]))
+          directory = self.dir.findDir("/root/" + str(folder.attrib["sourceName"]))
           if directory != None:
+            if 'history' in folder.attrib:
+              directory.historizing = str(folder.attrib["history"])
             if folder.find('description', namespaces=folder.nsmap) != None:
               directory.newDescription = folder.find('description', namespaces=folder.nsmap).text 
             if folder.find('name', namespaces=folder.nsmap) != None:
@@ -435,14 +442,16 @@ class MapGenerator(Config):
             if folder.find('destination', namespaces=folder.nsmap) != None:
               directory.newDestination = folder.find('destination', namespaces=folder.nsmap).text
           else:
-            logging.warning("Failed to find source {} in the application variable tree!".format("/root" + str(folder.attrib["sourceName"])))
+            logging.warning("Failed to find source folder path {} in the application variable tree!".format("/root/" + str(folder.attrib["sourceName"])))
             nSkipped[0] =  nSkipped[0] + 1
 
       # read process_variable information
       for pv in data.findall('process_variable', namespaces=data.nsmap):
         if "sourceName" in  pv.attrib:
-          var = self.dir.findVar("/root" + str(pv.attrib["sourceName"]))
+          var = self.dir.findVar("/root/" + str(pv.attrib["sourceName"]))
           if var != None:
+            if 'history' in pv.attrib:
+              var.historizing = str(pv.attrib["history"])
             if pv.find('description', namespaces=pv.nsmap) != None:
               var.newDescription = pv.find('description', namespaces=pv.nsmap).text 
             if pv.find('unit', namespaces=pv.nsmap) != None:
@@ -452,8 +461,24 @@ class MapGenerator(Config):
             if pv.find('destination', namespaces=pv.nsmap) != None:
               var.newDestination = pv.find('destination', namespaces=pv.nsmap).text 
           else:
-            logging.warning("Failed to find source {} in the application variable tree!".format("/root" + str(pv.attrib["sourceName"])))
+            logging.warning("Failed to find source pv path {} in the application variable tree!".format("/root/" + str(pv.attrib["sourceName"])))
             nSkipped[1] =  nSkipped[1] + 1
+      for exclude in data.findall('exclude', namespaces=data.nsmap):
+        if "sourceName" in exclude.attrib:
+          if exclude.attrib["sourceName"].endswith("/*"):
+            directory = self.dir.findDir("/root/" + exclude.attrib["sourceName"][0:-2])
+            if directory != None:
+              directory.exclude = True
+            else: 
+              logging.warning("Failed to find source exclude path {} in the application variable tree!".format("/root/" + str(exclude.attrib["sourceName"][0:-2])))
+              nSkipped[2] =  nSkipped[2] + 1
+          else:
+            var = self.dir.findVar("/root/" + exclude.attrib["sourceName"])
+            if var != None:
+              var.exclude = True
+            else: 
+              logging.warning("Failed to find source exclude path {} in the application variable tree!".format("/root/" + str(exclude.attrib["sourceName"])))
+              nSkipped[2] =  nSkipped[2] + 1
       return nSkipped
     else:
       raise RuntimeError("Failed to find uamapping tag. Not an ControlSystem-OPC-UA XML mapping file.")
