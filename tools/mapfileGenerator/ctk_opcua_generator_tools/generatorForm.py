@@ -119,9 +119,7 @@ class HistorySettingsDialog(QDialog, Ui_HistoryDialog):
         self.buttonBox.button( QDialogButtonBox.Ok ).setEnabled( True );
         self.data.name = self.historyName.text()
         self.combo.setItemText(self.combo.currentIndex(),self.historyName.text())
-        
-        
-      
+
   def updateData(self):
     self.data.entriesPerResponse = self.entriesPerResponse.value()
     self.data.interval = self.samplingInterval.value()
@@ -167,8 +165,13 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     # are not changed by the user!
     # Simply show what will be used, because root folder and application name default to the
     # application name if not set in the mapping file!
-    self.applicationName.setText(self.MapGenerator.applicationName)
-    self.rootFolder.setText(self.MapGenerator.applicationName)
+    self._blockAndSetTextBox(self.MapGenerator.applicationName, self.applicationName)
+    self._blockAndSetTextBox(self.MapGenerator.applicationDescription, self.applicationDescription)
+    self._bockAndSetValue(self.MapGenerator.port, self.port)
+    if self.rootFolder == None:
+      self._blockAndSetTextBox(self.MapGenerator.rootFolder, self.applicationName)
+    else:
+      self._blockAndSetTextBox(self.MapGenerator.rootFolder, self.rootFolder)
     
     # resize columns
     header = self.treeWidget.header()
@@ -189,6 +192,8 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     @param node: The widget item where the checkbox will be added. It is assumed it is a QTreeWidgetItem with multiple columns.
     '''
     checkbox = QCheckBox(parent=self.treeWidget, text=text)
+    if item.exclude == True:
+      checkbox.setChecked(True)
     if isinstance(item, XMLDirectory) == True:
       checkbox.stateChanged.connect(lambda state: self._mapDirectory(state,item, node))
     else:
@@ -453,7 +458,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.MapGenerator.encryptionEnabled = states[0]
     self.MapGenerator.addUnsecureEndpoint = states[1]
   
-  def addHistorySetting(self):
+  def prepareNewHistorySetting(self):
     histName = 'historySetting'
     if self.histories.findText(histName) != -1:
       i = 0
@@ -467,9 +472,19 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.histories.setCurrentText(setting.name)
     dlg = HistorySettingsDialog(parent=self, data=self.histories, histories=self.MapGenerator.historySettings, edit=False)
     dlg.exec()
+    self.addHistorySetting(setting)
+  
+  def addHistorySetting(self, setting: HistorySetting, updateMapGenerator: bool = True):
+    '''
+    @param setting: The Setting to add.
+    @param updateMapGenerator: If False the setting is not added to the mapGenerator list.
+                               This option is used when an existing map file was read and here
+                               only the combo box should be updated.
+    '''
     logging.info("Adding historizing setting with name: {}".format(setting.name))
     # add HistorySetting to the settings of the MapGenerator
-    self.MapGenerator.historySettings.append(setting)
+    if updateMapGenerator:
+      self.MapGenerator.historySettings.append(setting)
     # add history settings to the combo boxes in the TreeWidget (recursively)
     self.addComboEntry(self.treeWidget.itemAt(0,0), setting)
     header = self.treeWidget.header()
@@ -487,6 +502,24 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
   def editHistorySetting(self):
     dlg = HistorySettingsDialog(parent=self, data=self.histories,histories=self.MapGenerator.historySettings, edit=True)
     dlg.exec()
+
+  def updateHistories(self, item:QTreeWidgetItem):
+    ''' 
+    After reading an existing map file the tree needs to be updated.
+    The information which history to use is already in the Item data.
+    '''
+    data = item.data(0, Qt.UserRole)
+    if isinstance(data, XMLVar):
+      if data.historizing != None:
+        self.treeWidget.itemWidget(item, 2).setCurrentText(data.historizing)
+    elif isinstance(data, XMLDirectory):
+      if data.historizing != None:
+        # if the directory has history set the history -> child will be set automatically by _setHistoryItem
+        self.treeWidget.itemWidget(item, 2).setCurrentText(data.historizing)
+      else:
+        # Check childs for history settings
+        for chId in range(item.childCount()):
+          self.updateHistories(item.child(chId))
     
   def addHistoryForInputs(self, isChecked:bool, node:QTreeWidgetItem):
     data = node.data(0, Qt.UserRole)
@@ -508,8 +541,15 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     control.blockSignals(True)
     if value != None:
       control.setText(value)
-    else:
-      control.setText(value)
+    control.blockSignals(False)
+    
+  def _bockAndSetValue(self, value: int, control):
+    '''
+    Set value of spinbox.
+    '''
+    control.blockSignals(True)
+    if value != None:
+      control.setValue(value)
     control.blockSignals(False)
     
   def _blockAndSetCheckbox(self, value: bool, control):
@@ -533,10 +573,10 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
       if name[0]:
         try:    
           missed = self.MapGenerator.parseMapFile(name[0])
-          if missed[0] != 0 or missed[1] != 0:
+          if missed[0] != 0 or missed[1] != 0 or missed[2] != 0:
             QMessageBox.warning(self, "Map file generator", 
-                           "{} directories and {} PV could not be found by their source name in the original variable tree.\n Probably"
-                           " the mapping file does not correspong to the application XML file or the application was changed in the mean time.".format(missed[0], missed[1]))
+                           "{} directories, {} PV and {} exclude paths could not be found by their source name in the original variable tree.\n Probably"
+                           " the mapping file does not correspong to the application XML file or the application was changed in the mean time.".format(missed[0], missed[1], missed[2]))
           self._blockAndSetCheckbox(self.MapGenerator.addUnsecureEndpoint, self.addUnsecureEndpoint)
           self._blockAndSetCheckbox(self.MapGenerator.encryptionEnabled, self.enableEncryptionButton)
           self._blockAndSetCheckbox(self.MapGenerator.enableLogin, self.enableLoginSwitch)
@@ -552,8 +592,12 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
           for setting in self.MapGenerator.historySettings:
             if self.histories.findText(setting.name) == -1:
               self.histories.addItem(setting.name,setting)
+              self.addHistorySetting(setting=setting, updateMapGenerator=False)
             else:
               logging.warning("Setting with name {} already exist. Not loading parameters from mapping file.".format(setting.name))
+          # loop over tree and apply history settings
+          self.updateHistories(self.treeWidget.itemAt(0,0))
+            
         except RuntimeError as error:
           QMessageBox.critical(self, "Map file generator", 
                                "Failed to load map file: {}\n Error: {}".format(name[0], error) )
@@ -590,7 +634,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.addUnsecureEndpoint.stateChanged.connect(self.updateEncryptionConfiguration)
     self.configureEncryptionButton.clicked.connect(self.configureEncryption)
     self.editHistorySettingButton.clicked.connect(self.editHistorySetting)
-    self.addHistorySettingButton.clicked.connect(self.addHistorySetting)
+    self.addHistorySettingButton.clicked.connect(self.prepareNewHistorySetting)
     self.setHistoryForInputsButton.clicked.connect(lambda isChecked: self.addHistoryForInputs(isChecked, self.treeWidget.itemAt(0,0)))
 
     
