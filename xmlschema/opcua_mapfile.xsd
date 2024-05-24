@@ -366,8 +366,6 @@
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Allows to change the folder name. 
-            If not used the description of the original folder is used. 
-            In case a folder is created the default description is empty.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
