@@ -136,6 +136,21 @@
     <xsd:attribute name="description" type="csa:nonEmptyString"/>
   </xsd:complexType>
   <xsd:complexType name="serverType">
+    <xsd:attribute name="logLevel" type="csa:nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation>
+          Set logging level of the OPC UA server. 
+          Allowed values are:
+          - trace
+          - debug
+          - info
+          - warning
+          - error
+          - fatal
+          If not set the default is: info
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="applicationName" type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation>

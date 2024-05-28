@@ -22,13 +22,12 @@
 #ifndef MTCA_UAADAPTER_H
 #define MTCA_UAADAPTER_H
 
-
+#include "node_historizing.h"
 #include <open62541/config.h>
 #include <open62541/plugin/accesscontrol.h>
 #include <open62541/plugin/accesscontrol_default.h>
 #include <open62541/plugin/historydata/history_data_gathering.h>
 #include <open62541/server_config_default.h>
-#include "node_historizing.h"
 
 using namespace ChimeraTK;
 using namespace std;
@@ -43,6 +42,7 @@ struct ServerConfig {
   uint16_t opcuaPort = 16664;
   bool enableSecurity = false;
   bool unsecure = false;
+  UA_LogLevel logLevel = UA_LOGLEVEL_INFO;
   string certPath;
   string keyPath;
   string allowListFolder;
@@ -83,7 +83,6 @@ struct FolderInfo {
  *
  */
 
-
 /** @class ua_uaadapter
  *	@brief This class provide the opcua server and manage the variable mapping.
  *
@@ -110,6 +109,7 @@ class ua_uaadapter : ua_mapped_class {
   UA_Boolean mappingExceptions;
 
   ServerConfig serverConfig;
+  UA_Logger logger;
 
   vector<ua_processvariable*> variables;
   vector<ua_additionalvariable*> additionalVariables;
@@ -139,7 +139,7 @@ class ua_uaadapter : ua_mapped_class {
 
  public:
   bool running = false;
-  //TODO move this field to private and add getter and setter
+  // TODO move this field to private and add getter and setter
   vector<string> exclude;
   vector<string> folder_with_history;
 
@@ -285,7 +285,6 @@ class ua_uaadapter : ua_mapped_class {
    *
    */
 
-
   void workerThread();
 
   /** @brief This Methode reads the config-tag form the given <variableMap.xml>.
@@ -305,8 +304,7 @@ class ua_uaadapter : ua_mapped_class {
    */
   vector<string> getAllNotMappableVariablesNames();
 
-
-  //ToDo documentation
+  // ToDo documentation
   vector<string> getAllMappedPvSourceNames();
 
   /** @brief Fill server build information.
@@ -320,7 +318,6 @@ class ua_uaadapter : ua_mapped_class {
    * @param returns the serveConfig.
    */
   ServerConfig get_server_config();
-
 };
 
 #endif // MTCA_UAADAPTER_H

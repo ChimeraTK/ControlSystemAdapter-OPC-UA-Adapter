@@ -18,13 +18,13 @@
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
  * Copyright (c) 2018-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
+#include "void_type.h"
 #include <open62541/plugin/historydata/history_data_backend_memory.h>
 #include <open62541/plugin/historydata/history_data_gathering_default.h>
 #include <open62541/plugin/historydata/history_database_default.h>
 #include <open62541/plugin/historydatabase.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
-#include "void_type.h"
 
 extern "C" {
 #include "csa_namespace.h"
@@ -41,6 +41,7 @@ extern "C" {
 #include "ua_adapter.h"
 #include "ua_map_types.h"
 #include "xml_file_handler.h"
+
 #include <functional>
 #include <regex>
 #include <string>
@@ -138,10 +139,12 @@ void ua_uaadapter::fillBuildInfo(UA_ServerConfig* config) const {
 
 void ua_uaadapter::constructServer() {
   auto config = (UA_ServerConfig*)UA_calloc(1, sizeof(UA_ServerConfig));
+  logger = UA_Log_Stdout_withLevel(this->serverConfig.logLevel);
+  config->logging = &logger;
   if(!this->serverConfig.enableSecurity) {
     UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, nullptr);
   }
-
+  config->eventLoop->logger = &logger;
   if(this->serverConfig.enableSecurity) {
     UA_ByteString certificate = UA_BYTESTRING_NULL;
     UA_ByteString privateKey = UA_BYTESTRING_NULL;
@@ -437,6 +440,38 @@ if(result) {
       }
       cout << "No 'applicationName'-Attribute is set in config file. Use default application-name." << endl;
     }
+
+    placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "logLevel");
+    if(!placeHolder.empty()) {
+      transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
+      if(placeHolder.compare("TRACE") == 0) {
+        this->serverConfig.logLevel = UA_LOGLEVEL_TRACE;
+      }
+      else if(placeHolder.compare("DEBUG") == 0) {
+        this->serverConfig.logLevel = UA_LOGLEVEL_DEBUG;
+      }
+      else if(placeHolder.compare("INFO") == 0) {
+        this->serverConfig.logLevel = UA_LOGLEVEL_INFO;
+      }
+      else if(placeHolder.compare("WARNING") == 0) {
+        this->serverConfig.logLevel = UA_LOGLEVEL_WARNING;
+      }
+      else if(placeHolder.compare("ERROR") == 0) {
+        this->serverConfig.logLevel = UA_LOGLEVEL_ERROR;
+      }
+      else if(placeHolder.compare("FATAL") == 0) {
+        this->serverConfig.logLevel = UA_LOGLEVEL_FATAL;
+      }
+      else {
+        // See default set in ServerConfig
+        cout << "Warning: Unknown logLevel (\"" << placeHolder << "\") found in config file. INFO is used instead!"
+             << endl;
+      }
+    }
+    else {
+      cout << "No 'logLevel'-Attribute set in config file. Use default logging level: info" << endl;
+    }
+
     // if no root folder name is set, use application name
     if(this->serverConfig.rootFolder.empty()) {
       this->serverConfig.rootFolder = this->serverConfig.applicationName;
@@ -546,7 +581,8 @@ if(result) {
   if(folder_with_his) {
     nodeset_folder_with_history = folder_with_his->nodesetval;
     for(int32_t i = 0; i < nodeset_folder_with_history->nodeNr; i++) {
-      string folder = xml_file_handler::getAttributeValueFromNode(nodeset_folder_with_history->nodeTab[i], "sourceName");
+      string folder =
+          xml_file_handler::getAttributeValueFromNode(nodeset_folder_with_history->nodeTab[i], "sourceName");
       string history = xml_file_handler::getAttributeValueFromNode(nodeset_folder_with_history->nodeTab[i], "history");
       if(!folder.empty() && !history.empty()) {
         this->folder_with_history.insert(this->folder_with_history.begin(), "/" + folder);
@@ -554,10 +590,9 @@ if(result) {
     }
   }
   xmlXPathFreeObject(folder_with_his);
-
 }
 
-ServerConfig ua_uaadapter::get_server_config(){
+ServerConfig ua_uaadapter::get_server_config() {
   return this->serverConfig;
 }
 
@@ -569,7 +604,6 @@ void ua_uaadapter::applyMapping(const boost::shared_ptr<ControlSystemPVManager>&
   // add configured additional variables
   this->addAdditionalVariables();
 }
-
 
 void ua_uaadapter::workerThread() {
   if(this->mappedServer == nullptr) {
@@ -736,7 +770,7 @@ void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVM
           else {
             folderNodeId = this->serverConfig.rootFolder + "/" + folder + "Dir";
           }
-          if(!sourceName.empty()){
+          if(!sourceName.empty()) {
             AdapterFolderHistorySetup temp;
             temp.folder_historizing = history;
             UA_NodeId id = UA_NODEID_STRING(1, (char*)folderNodeId.c_str());
