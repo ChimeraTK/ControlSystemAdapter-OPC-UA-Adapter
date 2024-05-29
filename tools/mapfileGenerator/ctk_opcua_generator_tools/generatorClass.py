@@ -114,6 +114,7 @@ class Config(EncryptionSettings):
     self.enableLogin = False
     self.port: int|None = None
     self.historySettings: List[HistorySetting] = []
+    self.logLevel: str = "INFO"
   
   def createConfig(self, root:ET._Element):
     '''
@@ -134,6 +135,8 @@ class Config(EncryptionSettings):
       server.set("port", str(self.port))
     else:
       logging.info("Default port of 16664 will be used.")
+      
+    server.set("logLevel", self.logLevel)
     
     if self.enableLogin == True:
       login = ET.SubElement(config, "login")
@@ -174,6 +177,12 @@ class Config(EncryptionSettings):
           self.applicationName = str(server.attrib["applicationName"])
         if 'port' in server.attrib:
           self.port = int(server.attrib['port'])
+        if 'logLevel' in server.attrib:
+          tmp = str(server.attrib["logLevel"]).upper()
+          if tmp in ['TRACE', 'DEBUG', 'INFO', 'WARNING','ERROR','FATAL']:
+            self.logLevel = str(server.attrib["logLevel"]).upper()
+          else:
+            logging.warning("Failed to read log level. {} is not a valid logLevel. Using INFO instead.".format(tmp))
         # security
       login = config.find('login')
       if login is not None:
