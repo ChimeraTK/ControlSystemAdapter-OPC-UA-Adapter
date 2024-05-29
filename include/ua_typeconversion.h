@@ -18,8 +18,7 @@
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
  */
 
-#ifndef HAVE_UA_TYPECONVERSION_H
-#define HAVE_UA_TYPECONVERSION_H
+#pragma once
 
 #include <open62541/server.h>
 
@@ -100,5 +99,3 @@ static inline UA_String CPPSTRING_TO_UASTRING(std::string& s) {
     UA_Server_readDisplayName(_p_server, _p_nodeid, &_p_tmpName);                                                      \
     UASTRING_AS_STRING(_p_tmpName.text, _p_strbuffer);                                                                 \
   }
-
-#endif //#ifndef HAVE_UA_TYPECONVERSION_H

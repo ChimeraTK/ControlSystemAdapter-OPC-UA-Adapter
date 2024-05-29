@@ -26,14 +26,13 @@ extern "C" {
 #include <unistd.h>
 }
 
-#include <iostream>
+#include <ChimeraTK/ControlSystemAdapter/ApplicationBase.h>
+#include <ChimeraTK/ControlSystemAdapter/DevicePVManager.h>
 
 #include <chrono>
 #include <errno.h>
+#include <iostream>
 #include <stdlib.h>
-
-#include <ChimeraTK/ControlSystemAdapter/DevicePVManager.h>
-#include <ChimeraTK/ControlSystemAdapter/ApplicationBase.h>
 
 using namespace std;
 using namespace ChimeraTK;
@@ -52,7 +51,7 @@ struct MyApp : public ApplicationBase {
   void initialise() {
     boost::shared_ptr<DevicePVManager> devManager = this->_processVariableManager;
 
-    //Generate dummy data
+    // Generate dummy data
     ProcessArray<int8_t>::SharedPtr intA8dev = this->_processVariableManager->createProcessArray<int8_t>(
         SynchronizationDirection::controlSystemToDevice, "int8Scalar", 1, "Iatrou^2/Rahm");
     ProcessArray<uint8_t>::SharedPtr intAu8dev = this->_processVariableManager->createProcessArray<uint8_t>(
@@ -76,12 +75,11 @@ struct MyApp : public ApplicationBase {
 
     ProcessArray<int8_t>::SharedPtr intB15A8dev =
         this->_processVariableManager->createProcessArray<int8_t>(SynchronizationDirection::controlSystemToDevice,
-                                                                  "int8Array_s15", 15, "mIatrou*Rahm", "Die Einheit ist essentiel und sollte SI Einheit sein...");
+            "int8Array_s15", 15, "mIatrou*Rahm", "Die Einheit ist essentiel und sollte SI Einheit sein...");
     ProcessArray<uint8_t>::SharedPtr intB10Au8dev = this->_processVariableManager->createProcessArray<uint8_t>(
         SynchronizationDirection::controlSystemToDevice, "uint8Array_s10", 10, "1/Rahm");
-    ProcessArray<int16_t>::SharedPtr intB15A16dev =
-        this->_processVariableManager->createProcessArray<int16_t>(SynchronizationDirection::controlSystemToDevice,
-                                                                   "int16Array_s15", 15, "Iatrou", "Beschreibung eines Iatrous");
+    ProcessArray<int16_t>::SharedPtr intB15A16dev = this->_processVariableManager->createProcessArray<int16_t>(
+        SynchronizationDirection::controlSystemToDevice, "int16Array_s15", 15, "Iatrou", "Beschreibung eines Iatrous");
     ProcessArray<uint16_t>::SharedPtr intB10Au16dev = this->_processVariableManager->createProcessArray<uint16_t>(
         SynchronizationDirection::controlSystemToDevice, "uint16Array_s10", 10);
     ProcessArray<int32_t>::SharedPtr intB15A32dev = this->_processVariableManager->createProcessArray<int32_t>(
@@ -100,7 +98,7 @@ struct MyApp : public ApplicationBase {
         SynchronizationDirection::controlSystemToDevice, "Mein/Name_ist#int8Array", 15, "Iatrou^2/Rahm");
     ProcessArray<uint8_t>::SharedPtr intB10Au8devMap1 =
         devManager->createProcessArray<uint8_t>(SynchronizationDirection::controlSystemToDevice,
-                                                "/Dein/Name//ist/uint8Array_s10", 10, "Iatrou^2/Rahm", "Beschreibung");
+            "/Dein/Name//ist/uint8Array_s10", 10, "Iatrou^2/Rahm", "Beschreibung");
     ProcessArray<uint8_t>::SharedPtr intB10Au8devMap2 = devManager->createProcessArray<uint8_t>(
         SynchronizationDirection::controlSystemToDevice, "Unser/Name/ist_uint8Array_s10", 10);
     ProcessArray<uint32_t>::SharedPtr intAu32devMap = devManager->createProcessArray<uint32_t>(

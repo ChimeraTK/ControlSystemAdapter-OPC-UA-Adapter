@@ -1,15 +1,16 @@
+#include "ua_typeconversion.h"
 #include <csa_additionalvariable.h>
 #include <test_sample_data.h>
+
 #include <boost/test/included/unit_test.hpp>
 
 #include <string.h>
-#include "ua_typeconversion.h"
 
 using namespace boost::unit_test_framework;
 
 /*
  * ProcessVariableTest
- * 
+ *
  */
 class AdditionalVariableTest {
  public:
@@ -33,12 +34,12 @@ void AdditionalVariableTest::testClassSide() {
   UA_ObjectAttributes oAttr;
   memset(&oAttr, 0, sizeof(UA_ObjectAttributes));
   UA_Server_addObjectNode(serverSet->mappedServer, UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()),
-                          UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                          UA_QUALIFIEDNAME(0, (char*)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL,
-                          NULL);
+      UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+      UA_QUALIFIEDNAME(0, (char*)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL,
+      NULL);
 
   ua_additionalvariable* addVar1 = new ua_additionalvariable(serverSet->mappedServer,
-                                                             UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()), "Name", "Value", "Description");
+      UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()), "Name", "Value", "Description");
 
   BOOST_CHECK(addVar1->getSourceTimeStamp() != 0);
   BOOST_CHECK(addVar1->getValue() == "Value");
@@ -74,12 +75,12 @@ void AdditionalVariableTest::testClientSide() {
   UA_ObjectAttributes oAttr;
   memset(&oAttr, 0, sizeof(UA_ObjectAttributes));
   UA_Server_addObjectNode(serverSet->mappedServer, UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()),
-                          UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-                          UA_QUALIFIEDNAME(0, (char*)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL,
-                          NULL);
+      UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+      UA_QUALIFIEDNAME(0, (char*)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL,
+      NULL);
   // add set
   ua_additionalvariable* addVar1 = new ua_additionalvariable(serverSet->mappedServer,
-                                                             UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()), "Name", "Value", "Description");
+      UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()), "Name", "Value", "Description");
 
   // Create client to connect to server
   UA_Client* client = UA_Client_new();
@@ -135,13 +136,12 @@ void AdditionalVariableTest::testClientSide() {
             refe = &(bResp2.results[m].references[k]);
             if(refe->nodeId.nodeId.identifierType == UA_NODEIDTYPE_NUMERIC) {
               size_t lenBrowseName2 = (int)refe->browseName.name.length;
-              string browseNameFound2(
-                  reinterpret_cast<char const*>(refe->browseName.name.data), lenBrowseName2);
+              string browseNameFound2(reinterpret_cast<char const*>(refe->browseName.name.data), lenBrowseName2);
 
               if(browseNameFound2 == "Value") {
                 valueNodeId = refe->nodeId.nodeId;
                 name = browseNameFound;
-                //cout << "Checking ProcessVariable: " <<  name << endl;
+                // cout << "Checking ProcessVariable: " <<  name << endl;
               }
             }
           }
@@ -159,16 +159,14 @@ void AdditionalVariableTest::testClientSide() {
 
           UA_Variant datatypeToCheck;
           UA_Variant_init(&datatypeToCheck);
-          UA_StatusCode retvalValueDatatype =
-              UA_Client_readValueAttribute(client, valueNodeId, &datatypeToCheck);
+          UA_StatusCode retvalValueDatatype = UA_Client_readValueAttribute(client, valueNodeId, &datatypeToCheck);
           if(retvalValueDatatype != UA_STATUSCODE_GOOD) {
             BOOST_CHECK(false);
           }
 
           UA_NodeId datatypeId;
           if(retvalValue == UA_STATUSCODE_GOOD) {
-            UA_StatusCode retvalDatatype =
-                UA_Client_readDataTypeAttribute(client, valueNodeId, &datatypeId);
+            UA_StatusCode retvalDatatype = UA_Client_readDataTypeAttribute(client, valueNodeId, &datatypeId);
             if(retvalDatatype != UA_STATUSCODE_GOOD) {
               BOOST_CHECK(false);
             }
@@ -183,7 +181,7 @@ void AdditionalVariableTest::testClientSide() {
 
             // Check Description -> for all the same
             UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)valueToCheck.data)), valName)
-            //cout << "Description: " << valName << endl;
+            // cout << "Description: " << valName << endl;
             BOOST_CHECK(valName == "Value");
 
             BOOST_CHECK((datatypeId.identifier.numeric - 1) == UA_TYPES_STRING);
@@ -212,7 +210,7 @@ void AdditionalVariableTest::testClientSide() {
   cout << "Delete ServerSet" << endl;
   UA_Server_delete(serverSet->mappedServer);
 
-  //serverSet->server_nl.deleteMembers(&serverSet->server_nl);
+  // serverSet->server_nl.deleteMembers(&serverSet->server_nl);
   cout << "Delete ServerSet" << endl;
   delete serverSet;
   serverSet = NULL;
