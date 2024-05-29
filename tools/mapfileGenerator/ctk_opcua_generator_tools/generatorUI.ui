@@ -71,6 +71,50 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>LogLevel:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="logLevelComboBox">
+        <property name="currentText">
+         <string>INFO</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>TRACE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>DEBUG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>INFO</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>WARNING</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ERROR</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>FATAL</string>
+         </property>
+        </item>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>

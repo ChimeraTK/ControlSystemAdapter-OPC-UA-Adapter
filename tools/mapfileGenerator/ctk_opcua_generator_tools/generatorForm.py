@@ -172,6 +172,9 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
       self._blockAndSetTextBox(self.MapGenerator.rootFolder, self.applicationName)
     else:
       self._blockAndSetTextBox(self.MapGenerator.rootFolder, self.rootFolder)
+    self.logLevelComboBox.blockSignals(True)
+    self.logLevelComboBox.setCurrentText(self.MapGenerator.logLevel)
+    self.logLevelComboBox.blockSignals(False)
     
     # resize columns
     header = self.treeWidget.header()
@@ -421,6 +424,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.MapGenerator.rootFolder = self.rootFolder.text()
     self.MapGenerator.applicationDescription = self.applicationDescription.text()
     self.MapGenerator.port = self.port.value()
+    self.MapGenerator.logLevel = self.logLevelComboBox.currentText()
     
     
   def dropEvent(self, event):
@@ -630,6 +634,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.rootFolder.textChanged.connect(self.updateConfig)
     self.port.valueChanged.connect(self.updateConfig)
     self.applicationDescription.textChanged.connect(self.updateConfig)
+    self.logLevelComboBox.currentTextChanged.connect(self.updateConfig)
     self.enableEncryptionButton.stateChanged.connect(self.updateEncryptionConfiguration)
     self.addUnsecureEndpoint.stateChanged.connect(self.updateEncryptionConfiguration)
     self.configureEncryptionButton.clicked.connect(self.configureEncryption)
