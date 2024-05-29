@@ -16,7 +16,6 @@
  *
  * Copyright (c) 2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
-
 #include "csa_namespace.h"
 
 #include "csa_config.h"

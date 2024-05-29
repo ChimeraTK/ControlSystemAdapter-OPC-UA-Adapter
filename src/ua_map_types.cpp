@@ -25,14 +25,16 @@
 
 using namespace std;
 
-// ToDo move function to remove proxies file
-UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void* handle) {
-  auto* lst = static_cast<nodePairList*>(handle);
+namespace ChimeraTK {
+  // ToDo move function to remove proxies file
+  UA_StatusCode ua_mapInstantiatedNodes(UA_NodeId objectId, UA_NodeId definitionId, void* handle) {
+    auto* lst = static_cast<nodePairList*>(handle);
 
-  auto* thisNode = new UA_NodeId_pair;
-  UA_NodeId_copy(&definitionId, &thisNode->sourceNodeId);
-  UA_NodeId_copy(&objectId, &thisNode->targetNodeId);
-  lst->push_back(thisNode);
+    auto* thisNode = new UA_NodeId_pair;
+    UA_NodeId_copy(&definitionId, &thisNode->sourceNodeId);
+    UA_NodeId_copy(&objectId, &thisNode->targetNodeId);
+    lst->push_back(thisNode);
 
-  return UA_STATUSCODE_GOOD;
-}
+    return UA_STATUSCODE_GOOD;
+  }
+} // namespace ChimeraTK

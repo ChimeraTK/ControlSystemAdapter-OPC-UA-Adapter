@@ -55,9 +55,9 @@ extern "C" {
 #include <iostream>
 #include <string>
 
-boost::shared_ptr<ControlSystemPVManager> csManager;
-boost::shared_ptr<DevicePVManager> devManager;
-csa_opcua_adapter* csaOPCUA;
+boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager;
+boost::shared_ptr<ChimeraTK::DevicePVManager> devManager;
+ChimeraTK::csa_opcua_adapter* csaOPCUA;
 
 std::atomic<bool> terminateMain;
 
@@ -84,8 +84,8 @@ int main() {
   sigprocmask(SIG_BLOCK, &intmask, nullptr);
 
   cout << "Create the Managers" << endl;
-  std::pair<boost::shared_ptr<ControlSystemPVManager>, boost::shared_ptr<DevicePVManager>> pvManagers =
-      createPVManager();
+  std::pair<boost::shared_ptr<ChimeraTK::ControlSystemPVManager>, boost::shared_ptr<ChimeraTK::DevicePVManager>>
+      pvManagers = ChimeraTK::createPVManager();
 
   devManager = pvManagers.second;
   csManager = pvManagers.first;
@@ -99,7 +99,7 @@ int main() {
   cout << pathToConfig << endl;
 
   cout << "Create the adapter" << endl;
-  csaOPCUA = new csa_opcua_adapter(csManager, pathToConfig);
+  csaOPCUA = new ChimeraTK::csa_opcua_adapter(csManager, pathToConfig);
 
   cout << "Optimize unmapped variables in the application base" << endl;
   ChimeraTK::ApplicationBase::getInstance().optimiseUnmappedVariables(csaOPCUA->getUnusedVariables());
@@ -109,7 +109,6 @@ int main() {
 
   cout << "Start the OPC UA Adapter" << endl;
   csaOPCUA->start();
-
 
   /* Unblock SIGINT */
   sigprocmask(SIG_UNBLOCK, &intmask, nullptr);

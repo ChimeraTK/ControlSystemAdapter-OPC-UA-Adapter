@@ -1,10 +1,11 @@
 #include "xml_file_handler.h"
 
-#include <boost/test/included/unit_test.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 using namespace boost::unit_test_framework;
 using namespace std;
+using namespace ChimeraTK;
 
 class XMLFileHandlerTest {
  public:
@@ -83,8 +84,8 @@ void XMLFileHandlerTest::getContent() {
 }
 
 /**
-   * The boost test suite
-   */
+ * The boost test suite
+ */
 class XMLFileHandlerTestSuite : public test_suite {
  public:
   XMLFileHandlerTestSuite() : test_suite("XMLFileHandler Test Suite") {
