@@ -30,6 +30,7 @@ extern "C" {
 
 #include <iostream>
 #include <utility>
+#include "void_type.h"
 
 namespace ChimeraTK {
   csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
@@ -50,6 +51,12 @@ namespace ChimeraTK {
     // start implicit var mapping
     bool skip_var = false;
     for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables) {
+      std::type_info const& valueType = oneProcessVariable->getValueType();
+      if(valueType == typeid(Void)){
+        /*skip_var = true;*/
+        cout << "Skip Variable: Variable: " << oneProcessVariable->getName() << " has a void type" << endl;
+        break;
+      }
       // cout << "Info: " << oneProcessVariable->getName() << endl;
       for(auto e : this->adapter->exclude) {
         string suffix_1 = "/*", suffix_2 = "*";
@@ -161,30 +168,16 @@ namespace ChimeraTK {
     if(!this->adapter_thread.joinable()) {
       this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter);
     }
-    // start void observer loop
-    cout << "Start the void observer thread" << endl;
-    void_observer_data* data = (void_observer_data*)UA_calloc(1, sizeof(void_observer_data));
-    vector<ua_processvariable*> vars = adapter->getVariables();
+    //start void observer loop
+    //cout << "Start the void observer thread" << endl;
+    void_observer_data *data  =  (void_observer_data*) UA_calloc(1, sizeof(void_observer_data));
     auto conf = adapter->get_server_config();
     data->rootFolder = conf.rootFolder;
     data->adapter = this;
-    cout << "application_name: " << data->rootFolder << endl;
-    for(auto& variable : vars) {
-      auto type = variable->getType();
-      if(type == "Void") {
-        data->pvs.insert(data->pvs.end(), variable->getName());
-      }
-    }
-    cout << "Nbr void: " << data->pvs.size() << endl;
-    if(!data->pvs.empty()) {
-      data->mappedServer = adapter->getMappedServer();
-      data->csManager = csManager;
-      std::thread observer_thread(&startVoidObserverThread, data);
-      observer_thread.detach();
-    }
-    else {
-      UA_free(data);
-    }
+    data->mappedServer = adapter->getMappedServer();
+    data->csManager = csManager;
+    std::thread observer_thread(&startVoidObserverThread, data);
+    observer_thread.detach();
   }
 
   void csa_opcua_adapter::stop() {

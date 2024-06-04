@@ -24,7 +24,6 @@
 
 #include <functional>
 using namespace std;
-
 namespace ChimeraTK {
   static UA_StatusCode fire_void_event(void_observer_data* data, const string& pv_name) {
     UA_NodeId outId;
@@ -77,25 +76,14 @@ namespace ChimeraTK {
         throw std::logic_error(error_message);
       }
     }
-    const auto* type = "/Type";
-    UA_Variant type_val;
-    UA_Variant_init(&type_val);
-    retval = UA_Server_readValue(
-        data->mappedServer, UA_NODEID_STRING(1, (char*)(data->rootFolder + "/" + pv_name + type).c_str()), &type_val);
-    if(retval != UA_STATUSCODE_GOOD) {
-      string error_message = "Failed to read Type value of PV with StatusCode ";
-      error_message.append(UA_StatusCode_name(retval));
-      throw std::logic_error(error_message);
-    }
-    auto* typevalue = (UA_String*)type_val.data;
+    UA_String typevalue = UA_String_fromChars("Void");
     retval = UA_Server_writeObjectProperty_scalar(
-        data->mappedServer, outId, UA_QUALIFIEDNAME(1, "Type"), typevalue, &UA_TYPES[UA_TYPES_STRING]);
+        data->mappedServer, outId, UA_QUALIFIEDNAME(1, "Type"), &typevalue, &UA_TYPES[UA_TYPES_STRING]);
     if(retval != UA_STATUSCODE_GOOD) {
       string error_message = "Setting PV Type failed with StatusCode ";
       error_message.append(UA_StatusCode_name(retval));
       throw std::logic_error(error_message);
     }
-    UA_Variant_clear(&type_val);
     retval = UA_Server_triggerEvent(data->mappedServer, outId, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER), nullptr, UA_TRUE);
     if(retval != UA_STATUSCODE_GOOD) {
       string error_message = "Triggering event failed with StatusCode ";
@@ -106,12 +94,17 @@ namespace ChimeraTK {
     return retval;
   }
 
-  static void updateLoop(void_observer_data* data) {
-    ReadAnyGroup group;                                   ///< This group will collect all Void type PVs
+  static void updateLoop (void_observer_data* data){
+    ReadAnyGroup group;                                    ///< This group will collect all Void type PVs
     std::map<TransferElementID, std::string> idToNameMap; ///< Map that connects TransferID to PV name string
-    for(auto& pv : data->pvs) {
-      group.add(data->csManager->getProcessArray<Void>(pv));
-      idToNameMap[data->csManager->getProcessArray<Void>(pv)->getId()] = pv;
+
+    vector<ProcessVariable::SharedPtr> allProcessVariables = data->csManager->getAllProcessVariables();
+    for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables){
+      std::type_info const& valueType = oneProcessVariable->getValueType();
+      if(valueType == typeid(Void)){
+        group.add(data->csManager->getProcessArray<Void>(oneProcessVariable->getName()));
+        idToNameMap[data->csManager->getProcessArray<Void>(oneProcessVariable->getName())->getId()] = oneProcessVariable->getName();
+      }
     }
     group.finalise();
     while(data->adapter->isRunning()) {
