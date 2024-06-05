@@ -43,3 +43,9 @@ Dr. Klaus Zenker
     Institut für Strahlenphysik
     Bautzner Landstraße 400 
     01328 Dresden
+
+Florian Düwel
+-------------
+    Fraunhofer-Institut für Optronik, Systemtechnik und Bildauswertung IOSB 
+    Fraunhoferstraße 1
+    76131 Karlsruhe
