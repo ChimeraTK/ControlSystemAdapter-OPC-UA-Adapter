@@ -200,14 +200,6 @@ namespace ChimeraTK {
      */
     UA_NodeId existFolder(UA_NodeId basenodeid, const string& folderName);
 
-    /** @brief Search PV by name in PV-List
-     *
-     * @param varName The name of the seached pv
-     *
-     * @return index of the matching pv's or empty if the pv not exists
-     */
-    std::vector<int32_t> findMappingIndex(std::string varName);
-
     /** @brief Create folder structure based on the given path.
      *
      * @param path The complete path
@@ -216,13 +208,6 @@ namespace ChimeraTK {
      * @return nodeId of the last created folder (last part of path)
      */
     UA_NodeId enrollFolderPathFromString(const string& path, const string& seperator);
-
-    /** @brief Check if a folder ath exist in opcua server
-     *
-     * @param basenodeId Node id of the parent node
-     * @param folderPathVector Every single string is a folder name, the path ist checked in the given order
-     */
-    void addVariable(string name, boost::shared_ptr<ControlSystemPVManager> csManager);
 
     /** @brief Start implicit mapping process
      *
@@ -290,11 +275,6 @@ namespace ChimeraTK {
      *
      */
     void readConfig();
-
-    /** @brief This Methode reads the additionaNode-tag from the given <variableMap.xml>
-     *
-     */
-    void readAdditionalNodes();
 
     /** @brief Methode to get all names from all potential VarableNodes from XML-Mappingfile which could not allocated.
      *

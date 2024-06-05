@@ -171,7 +171,7 @@ namespace ChimeraTK {
         const UA_NumericRange* range, UA_DataValue* value);
 
     template<typename T>
-    UA_StatusCode getValue(UA_Variant* v);
+    UA_StatusCode getValue(UA_Variant* v, const UA_NumericRange* range);
 
     template<typename T>
     static UA_StatusCode ua_writeproxy_ua_processvariable_setValue(UA_Server* server, const UA_NodeId* sessionId,
@@ -184,7 +184,5 @@ namespace ChimeraTK {
     template<typename T>
     UA_UInt32 typeSpecificSetup(UA_DataSource_Map_Element& mapElem, const UA_NodeId nodeId);
 
-    UA_StatusCode getValue_void();
-    UA_StatusCode getValue_void(UA_Server* server, UA_ServerConfig* conf);
   };
 } // namespace ChimeraTK

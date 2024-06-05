@@ -262,14 +262,13 @@ namespace ChimeraTK {
       return "Unsupported type";
   }
 
-  template<typename T>
-  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(UA_Server* server,
-      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
-      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
+template<typename T>
+UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(UA_Server* server,
+    const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
+    UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
     auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
     UA_StatusCode rv = UA_STATUSCODE_GOOD;
-    rv = thisObj->getValue<T>(&value->value);
-
+    rv = thisObj->getValue<T>(&value->value, range);
     if(rv == UA_STATUSCODE_GOOD) {
       value->hasValue = true;
       if(includeSourceTimeStamp) {
@@ -281,7 +280,7 @@ namespace ChimeraTK {
   }
 
   template<typename T>
-  UA_StatusCode ua_processvariable::getValue(UA_Variant* v) {
+  UA_StatusCode ua_processvariable::getValue(UA_Variant* v, const UA_NumericRange* range) {
     UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
     if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
       this->csManager->getProcessArray<T>(this->namePV)->readLatest();
@@ -297,29 +296,29 @@ namespace ChimeraTK {
     return rv;
   }
 
-  template<>
-  UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v) {
-    UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
-    if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
-      this->csManager->getProcessArray<string>(this->namePV)->readLatest();
-    }
-    if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1) {
-      string sval = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).at(0);
-      UA_String ua_val = CPPSTRING_TO_UASTRING(sval);
-      rv = UA_Variant_setScalarCopy(v, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
-      UA_String_clear(&ua_val);
-    }
-    else {
-      std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
-      auto* sarrayval = new UA_String[sarr.size()];
-      for(size_t i = 0; i < sarr.size(); i++) {
-        sarrayval[i] = CPPSTRING_TO_UASTRING(sarr[i]);
-      }
-      rv = UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
-      delete[] sarrayval;
-    }
-    return rv;
+template<>
+UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v, const UA_NumericRange* range) {
+  UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
+  if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
+    this->csManager->getProcessArray<string>(this->namePV)->readLatest();
   }
+  if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1) {
+    string sval = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).at(0);
+    UA_String ua_val = CPPSTRING_TO_UASTRING(sval);
+    rv = UA_Variant_setScalarCopy(v, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
+    UA_String_clear(&ua_val);
+  }
+  else {
+    std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
+    auto* sarrayval = new UA_String[sarr.size()];
+    for(size_t i = 0; i < sarr.size(); i++) {
+      sarrayval[i] = CPPSTRING_TO_UASTRING(sarr[i]);
+    }
+    rv = UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
+    delete[] sarrayval;
+  }
+  return rv;
+}
 
   template<typename T>
   UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setValue(UA_Server* server,

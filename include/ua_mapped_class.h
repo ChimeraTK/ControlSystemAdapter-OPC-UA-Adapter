@@ -65,15 +65,6 @@ namespace ChimeraTK {
      */
     UA_StatusCode ua_unmapSelfFromNamespace();
 
-    /** @brief This methode return a pointer of a xPath element depending of the given xPathString
-     *
-     * @param map	Contains all Node from the class the should instantiated into the server
-     * @param scrClass Pointer to our class instance
-     *
-     * @return UA_StatusCode
-     */
-    UA_StatusCode ua_mapDataSources(void* srcClass, UA_DataSource_Map* map);
-
     /** @brief Get the SourceTimeStamp from node in the OPC UA server
      * Virtual methode which returned Timestamp is setted into the node with the help of the proxy_callback.h
      *

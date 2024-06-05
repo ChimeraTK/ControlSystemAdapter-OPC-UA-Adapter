@@ -49,8 +49,12 @@ namespace ChimeraTK {
   UA_StatusCode ua_mapped_class::ua_mapSelfToNamespace() {
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
     UA_NodeId nullId = UA_NODEID_NULL;
-    if(UA_NodeId_equal(&this->baseNodeId, &nullId)) return -1;
-    if(this->mappedServer == nullptr) return -2;
+    if(UA_NodeId_equal(&this->baseNodeId, &nullId)) {
+      return -1;
+    }
+    if(this->mappedServer == nullptr) {
+      return -2;
+    }
 
     return retval;
   }
