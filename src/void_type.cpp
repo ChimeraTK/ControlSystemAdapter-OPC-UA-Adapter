@@ -35,23 +35,41 @@ namespace ChimeraTK {
       throw std::logic_error(error_message);
     }
     auto pv = data->csManager->getProcessVariable(pv_name);
-    auto validity = static_cast<UA_Int32>(pv->dataValidity());
-    retval = UA_Server_writeObjectProperty_scalar(
-        data->mappedServer, outId, UA_QUALIFIEDNAME(1, const_cast<char*>("Validity")), &validity, &UA_TYPES[UA_TYPES_INT32]);
+    auto eventValidity = static_cast<UA_Int32>(pv->dataValidity());
+    retval = UA_Server_writeObjectProperty_scalar(data->mappedServer, outId,
+        UA_QUALIFIEDNAME(1, const_cast<char*>("Validity")), &eventValidity, &UA_TYPES[UA_TYPES_INT32]);
     if(retval != UA_STATUSCODE_GOOD) {
-      string error_message = "Setting PV validity failed with StatusCode ";
+      string error_message = "Setting void event validity failed with StatusCode ";
       error_message.append(UA_StatusCode_name(retval));
       throw std::logic_error(error_message);
     }
-    UA_String pvname = UA_String_fromChars(pv_name.c_str());
-    retval = UA_Server_writeObjectProperty_scalar(
-        data->mappedServer, outId, UA_QUALIFIEDNAME(1, const_cast<char*>("Name")), &pvname, &UA_TYPES[UA_TYPES_STRING]);
+    UA_String eventSourceName = UA_String_fromChars(pv_name.c_str());
+    retval = UA_Server_writeObjectProperty_scalar(data->mappedServer, outId,
+        UA_QUALIFIEDNAME(0, const_cast<char*>("SourceName")), &eventSourceName, &UA_TYPES[UA_TYPES_STRING]);
     if(retval != UA_STATUSCODE_GOOD) {
-      string error_message = "Setting PV Name failed with StatusCode ";
+      string error_message = "Setting void event SourceName failed with StatusCode ";
       error_message.append(UA_StatusCode_name(retval));
       throw std::logic_error(error_message);
     }
-    UA_String_clear(&pvname);
+    UA_String_clear(&eventSourceName);
+    UA_LocalizedText eventMessage =
+        UA_LOCALIZEDTEXT(const_cast<char*>("en-US"), const_cast<char*>("ChimeraTK::Void written."));
+    retval = UA_Server_writeObjectProperty_scalar(data->mappedServer, outId,
+        UA_QUALIFIEDNAME(0, const_cast<char*>("Message")), &eventMessage, &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]);
+    if(retval != UA_STATUSCODE_GOOD) {
+      string error_message = "Setting void event Message failed with StatusCode ";
+      error_message.append(UA_StatusCode_name(retval));
+      throw std::logic_error(error_message);
+    }
+    UA_UInt16 eventSeverity = 100;
+    retval = UA_Server_writeObjectProperty_scalar(data->mappedServer, outId,
+        UA_QUALIFIEDNAME(0, const_cast<char*>("Severity")), &eventSeverity, &UA_TYPES[UA_TYPES_UINT16]);
+    if(retval != UA_STATUSCODE_GOOD) {
+      string error_message = "Setting void event Severity failed with StatusCode ";
+      error_message.append(UA_StatusCode_name(retval));
+      throw std::logic_error(error_message);
+    }
+    UA_UInt16_clear(&eventSeverity);
     UA_NodeId id;
     UA_NodeId_init(&id);
     id.namespaceIndex = 1;
@@ -60,33 +78,45 @@ namespace ChimeraTK {
     retval = UA_Server_writeObjectProperty_scalar(
         data->mappedServer, outId, UA_QUALIFIEDNAME(1, const_cast<char*>("cs_path")), &id, &UA_TYPES[UA_TYPES_NODEID]);
     if(retval != UA_STATUSCODE_GOOD) {
-      string error_message = "Setting cs_path failed with StatusCode ";
+      string error_message = "Setting void event cs_path failed with StatusCode ";
       error_message.append(UA_StatusCode_name(retval));
       throw std::logic_error(error_message);
     }
     UA_NodeId_clear(&id);
-    UA_String desvalue = UA_String_fromChars(pv->getDescription().c_str());
+    UA_String eventDescription = UA_String_fromChars(pv->getDescription().c_str());
     const UA_String null_str = UA_STRING_NULL;
-    if(UA_String_equal(&desvalue, &null_str) != 0) {
-      retval = UA_Server_writeObjectProperty_scalar(
-          data->mappedServer, outId, UA_QUALIFIEDNAME(1, const_cast<char*>("Description")), &desvalue, &UA_TYPES[UA_TYPES_STRING]);
+    if(UA_String_equal(&eventDescription, &null_str) != true) {
+      retval = UA_Server_writeObjectProperty_scalar(data->mappedServer, outId,
+          UA_QUALIFIEDNAME(1, const_cast<char*>("Description")), &eventDescription, &UA_TYPES[UA_TYPES_STRING]);
       if(retval != UA_STATUSCODE_GOOD) {
-        string error_message = "Setting PV description failed with StatusCode ";
+        string error_message = "Setting void event description failed with StatusCode ";
         error_message.append(UA_StatusCode_name(retval));
         throw std::logic_error(error_message);
       }
     }
-    UA_String typevalue = UA_String_fromChars("Void");
-    retval = UA_Server_writeObjectProperty_scalar(
-        data->mappedServer, outId, UA_QUALIFIEDNAME(1, const_cast<char*>("Type")), &typevalue, &UA_TYPES[UA_TYPES_STRING]);
+    UA_String_clear(&eventDescription);
+    UA_String eventType = UA_String_fromChars("Void");
+    retval = UA_Server_writeObjectProperty_scalar(data->mappedServer, outId,
+        UA_QUALIFIEDNAME(1, const_cast<char*>("Type")), &eventType, &UA_TYPES[UA_TYPES_STRING]);
     if(retval != UA_STATUSCODE_GOOD) {
-      string error_message = "Setting PV Type failed with StatusCode ";
+      string error_message = "Setting void event Type failed with StatusCode ";
       error_message.append(UA_StatusCode_name(retval));
       throw std::logic_error(error_message);
     }
+    UA_String_clear(&eventType);
+    UA_DateTime eventTime = UA_DateTime_now();
+    retval = UA_Server_writeObjectProperty_scalar(data->mappedServer, outId,
+        UA_QUALIFIEDNAME(0, const_cast<char*>("Time")), &eventTime, &UA_TYPES[UA_TYPES_DATETIME]);
+    if(retval != UA_STATUSCODE_GOOD) {
+      string error_message = "Setting void event Time failed with StatusCode ";
+      error_message.append(UA_StatusCode_name(retval));
+      throw std::logic_error(error_message);
+    }
+    UA_DateTime_clear(&eventTime);
+
     retval = UA_Server_triggerEvent(data->mappedServer, outId, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER), nullptr, UA_TRUE);
     if(retval != UA_STATUSCODE_GOOD) {
-      string error_message = "Triggering event failed with StatusCode ";
+      string error_message = "Triggering void event failed with StatusCode ";
       error_message.append(UA_StatusCode_name(retval));
       throw std::logic_error(error_message);
     }
@@ -94,16 +124,17 @@ namespace ChimeraTK {
     return retval;
   }
 
-  static void updateLoop (void_observer_data* data){
-    ReadAnyGroup group;                                    ///< This group will collect all Void type PVs
+  static void updateLoop(void_observer_data* data) {
+    ReadAnyGroup group;                                   ///< This group will collect all Void type PVs
     std::map<TransferElementID, std::string> idToNameMap; ///< Map that connects TransferID to PV name string
 
     vector<ProcessVariable::SharedPtr> allProcessVariables = data->csManager->getAllProcessVariables();
-    for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables){
+    for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables) {
       std::type_info const& valueType = oneProcessVariable->getValueType();
-      if(valueType == typeid(Void)){
+      if(valueType == typeid(Void)) {
         group.add(data->csManager->getProcessArray<Void>(oneProcessVariable->getName()));
-        idToNameMap[data->csManager->getProcessArray<Void>(oneProcessVariable->getName())->getId()] = oneProcessVariable->getName();
+        idToNameMap[data->csManager->getProcessArray<Void>(oneProcessVariable->getName())->getId()] =
+            oneProcessVariable->getName();
       }
     }
     group.finalise();
@@ -163,11 +194,13 @@ namespace ChimeraTK {
       error_message.append(UA_StatusCode_name(retval));
       throw std::logic_error(error_message);
     }
-    retval |= addEventProperty(server, void_event_NodeId, const_cast<char*>("cs_path"), UA_TYPES[UA_TYPES_NODEID].typeId);
-    retval |= addEventProperty(server, void_event_NodeId, const_cast<char*>("Description"), UA_TYPES[UA_TYPES_STRING].typeId);
-    retval |= addEventProperty(server, void_event_NodeId, const_cast<char*>("Name"), UA_TYPES[UA_TYPES_STRING].typeId);
+    retval |=
+        addEventProperty(server, void_event_NodeId, const_cast<char*>("cs_path"), UA_TYPES[UA_TYPES_NODEID].typeId);
+    retval |=
+        addEventProperty(server, void_event_NodeId, const_cast<char*>("Description"), UA_TYPES[UA_TYPES_STRING].typeId);
     retval |= addEventProperty(server, void_event_NodeId, const_cast<char*>("Type"), UA_TYPES[UA_TYPES_STRING].typeId);
-    retval |= addEventProperty(server, void_event_NodeId, const_cast<char*>("Validity"), UA_TYPES[UA_TYPES_INT32].typeId);
+    retval |=
+        addEventProperty(server, void_event_NodeId, const_cast<char*>("Validity"), UA_TYPES[UA_TYPES_INT32].typeId);
     return retval;
   }
 } // namespace ChimeraTK
