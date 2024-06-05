@@ -56,7 +56,7 @@ namespace ChimeraTK {
     UA_NodeId_init(&id);
     id.namespaceIndex = 1;
     id.identifierType = UA_NODEIDTYPE_STRING;
-    id.identifier.string = UA_String_fromChars((data->rootFolder + "/" + pv_name).c_str());
+    id.identifier.string = UA_String_fromChars((data->rootFolder + /*"/" +*/ pv_name).c_str());
     retval = UA_Server_writeObjectProperty_scalar(
         data->mappedServer, outId, UA_QUALIFIEDNAME(1, "cs_path"), &id, &UA_TYPES[UA_TYPES_NODEID]);
     if(retval != UA_STATUSCODE_GOOD) {
