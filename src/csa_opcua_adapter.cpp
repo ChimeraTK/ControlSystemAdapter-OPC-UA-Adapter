@@ -54,7 +54,7 @@ namespace ChimeraTK {
       std::type_info const& valueType = oneProcessVariable->getValueType();
       if(valueType == typeid(Void)){
         /*skip_var = true;*/
-        cout << "Skip Variable: Variable: " << oneProcessVariable->getName() << " has a void type" << endl;
+        //cout << "Skip Variable: Variable: " << oneProcessVariable->getName() << " has a void type" << endl;
         break;
       }
       // cout << "Info: " << oneProcessVariable->getName() << endl;
@@ -169,15 +169,27 @@ namespace ChimeraTK {
       this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter);
     }
     //start void observer loop
-    //cout << "Start the void observer thread" << endl;
     void_observer_data *data  =  (void_observer_data*) UA_calloc(1, sizeof(void_observer_data));
-    auto conf = adapter->get_server_config();
-    data->rootFolder = conf.rootFolder;
-    data->adapter = this;
-    data->mappedServer = adapter->getMappedServer();
-    data->csManager = csManager;
-    std::thread observer_thread(&startVoidObserverThread, data);
-    observer_thread.detach();
+    vector<ProcessVariable::SharedPtr> allProcessVariables = csManager->getAllProcessVariables();
+    for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables){
+      std::type_info const& valueType = oneProcessVariable->getValueType();
+      if(valueType == typeid(Void)){
+        data->pvs.insert(data->pvs.end(), oneProcessVariable->getName());
+        cout << "insert " << oneProcessVariable->getName() << endl;
+      }
+    }
+    if(!data->pvs.empty()){
+      auto conf = adapter->get_server_config();
+      data->rootFolder = conf.rootFolder;
+      data->adapter = this;
+      data->mappedServer = adapter->getMappedServer();
+      data->csManager = csManager;
+      std::thread observer_thread(&startVoidObserverThread, data);
+      observer_thread.detach();
+    }
+    else{
+      UA_free(data);
+    }
   }
 
   void csa_opcua_adapter::stop() {
