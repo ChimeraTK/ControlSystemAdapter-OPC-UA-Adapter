@@ -132,9 +132,16 @@ namespace ChimeraTK {
     for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables) {
       std::type_info const& valueType = oneProcessVariable->getValueType();
       if(valueType == typeid(Void)) {
-        group.add(data->csManager->getProcessArray<Void>(oneProcessVariable->getName()));
-        idToNameMap[data->csManager->getProcessArray<Void>(oneProcessVariable->getName())->getId()] =
-            oneProcessVariable->getName();
+        // Check if PV is writable - if not assume it is an VoidInput
+        if(!oneProcessVariable->isWriteable()) {
+          group.add(data->csManager->getProcessArray<Void>(oneProcessVariable->getName()));
+          idToNameMap[data->csManager->getProcessArray<Void>(oneProcessVariable->getName())->getId()] =
+              oneProcessVariable->getName();
+        }
+        else {
+          UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+              "Ignoring Void input %s. Void inputs are not yet supported.", oneProcessVariable->getName().c_str());
+        }
       }
     }
     group.finalise();
