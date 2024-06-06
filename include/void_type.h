@@ -31,6 +31,7 @@ typedef struct{
   UA_Server *mappedServer;
   string rootFolder;
   csa_opcua_adapter *adapter;
+  vector<std::string> pvs;
 }void_observer_data;
 
   void startVoidObserverThread(void_observer_data* data);
