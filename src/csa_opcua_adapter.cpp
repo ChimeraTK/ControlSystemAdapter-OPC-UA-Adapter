@@ -30,7 +30,6 @@ extern "C" {
 
 #include <iostream>
 #include <utility>
-#include "void_type.h"
 
 namespace ChimeraTK {
   csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
@@ -52,9 +51,9 @@ namespace ChimeraTK {
     bool skip_var = false;
     for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables) {
       std::type_info const& valueType = oneProcessVariable->getValueType();
-      if(valueType == typeid(Void)){
+      if(valueType == typeid(Void)) {
         /*skip_var = true;*/
-        //cout << "Skip Variable: Variable: " << oneProcessVariable->getName() << " has a void type" << endl;
+        // cout << "Skip Variable: Variable: " << oneProcessVariable->getName() << " has a void type" << endl;
         break;
       }
       // cout << "Info: " << oneProcessVariable->getName() << endl;
@@ -168,17 +167,24 @@ namespace ChimeraTK {
     if(!this->adapter_thread.joinable()) {
       this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter);
     }
-    //start void observer loop
-    void_observer_data *data  =  (void_observer_data*) UA_calloc(1, sizeof(void_observer_data));
+    // start void observer loop
+    void_observer_data* data = (void_observer_data*)UA_calloc(1, sizeof(void_observer_data));
     vector<ProcessVariable::SharedPtr> allProcessVariables = csManager->getAllProcessVariables();
-    for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables){
+    for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables) {
       std::type_info const& valueType = oneProcessVariable->getValueType();
-      if(valueType == typeid(Void)){
-        data->pvs.insert(data->pvs.end(), oneProcessVariable->getName());
-        cout << "insert " << oneProcessVariable->getName() << endl;
+      if(valueType == typeid(Void)) {
+        // Check if PV is writable - if not assume it is an VoidInput
+        if(!oneProcessVariable->isWriteable()) {
+          data->pvs.insert(data->pvs.end(), oneProcessVariable->getName());
+          cout << "insert " << oneProcessVariable->getName() << endl;
+        }
+        else {
+          UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+              "Ignoring Void input %s. Void inputs are not yet supported.", oneProcessVariable->getName().c_str());
+        }
       }
     }
-    if(!data->pvs.empty()){
+    if(!data->pvs.empty()) {
       auto conf = adapter->get_server_config();
       data->rootFolder = conf.rootFolder;
       data->adapter = this;
@@ -187,7 +193,7 @@ namespace ChimeraTK {
       std::thread observer_thread(&startVoidObserverThread, data);
       observer_thread.detach();
     }
-    else{
+    else {
       UA_free(data);
     }
   }
