@@ -190,8 +190,8 @@ namespace ChimeraTK {
       data->adapter = this;
       data->mappedServer = adapter->getMappedServer();
       data->csManager = csManager;
-      std::thread observer_thread(&startVoidObserverThread, data);
-      observer_thread.detach();
+      this->observer_thread = std::thread(&startVoidObserverThread, data);
+      this->observer_thread.detach();
     }
     else {
       UA_free(data);
@@ -202,6 +202,9 @@ namespace ChimeraTK {
     if(this->adapter_thread.joinable()) {
       this->adapter->running = false;
       this->adapter_thread.join();
+    }
+    if(this->observer_thread.joinable()) {
+      this->observer_thread.join();
     }
   }
 

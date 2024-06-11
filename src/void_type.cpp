@@ -125,37 +125,44 @@ namespace ChimeraTK {
   }
 
   static void updateLoop(void_observer_data* data) {
-    ReadAnyGroup group;                                   ///< This group will collect all Void type PVs
-    std::map<TransferElementID, std::string> idToNameMap; ///< Map that connects TransferID to PV name string
-    for(auto pv : data->pvs){
-      group.add(data->csManager->getProcessArray<Void>(pv));
-      idToNameMap[data->csManager->getProcessArray<Void>(pv)->getId()] = pv;
-      //}
-    }
-    /*vector<ProcessVariable::SharedPtr> allProcessVariables = data->csManager->getAllProcessVariables();
-      for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables) {
-        std::type_info const& valueType = oneProcessVariable->getValueType();
-        if(valueType == typeid(Void)) {
-          // Check if PV is writable - if not assume it is an VoidInput
-          if(!oneProcessVariable->isWriteable()) {
-            group.add(data->csManager->getProcessArray<Void>(oneProcessVariable->getName()));
-            idToNameMap[data->csManager->getProcessArray<Void>(oneProcessVariable->getName())->getId()] =
-                oneProcessVariable->getName();
+    try {
+      ReadAnyGroup group;                                   ///< This group will collect all Void type PVs
+      std::map<TransferElementID, std::string> idToNameMap; ///< Map that connects TransferID to PV name string
+      for(auto pv : data->pvs) {
+        group.add(data->csManager->getProcessArray<Void>(pv));
+        idToNameMap[data->csManager->getProcessArray<Void>(pv)->getId()] = pv;
+        //}
+      }
+      /*vector<ProcessVariable::SharedPtr> allProcessVariables = data->csManager->getAllProcessVariables();
+        for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables) {
+          std::type_info const& valueType = oneProcessVariable->getValueType();
+          if(valueType == typeid(Void)) {
+            // Check if PV is writable - if not assume it is an VoidInput
+            if(!oneProcessVariable->isWriteable()) {
+              group.add(data->csManager->getProcessArray<Void>(oneProcessVariable->getName()));
+              idToNameMap[data->csManager->getProcessArray<Void>(oneProcessVariable->getName())->getId()] =
+                  oneProcessVariable->getName();
+            }
+            else {
+              UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                  "Ignoring Void input %s. Void inputs are not yet supported.", oneProcessVariable->getName().c_str());
+            }
           }
-          else {
-            UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-                "Ignoring Void input %s. Void inputs are not yet supported.", oneProcessVariable->getName().c_str());
-          }
-        }
-      }*/
-    group.finalise();
-    while(data->adapter->isRunning()) {
-      // wait for next event
-      auto id = group.readAny();
-      fireVoidEvent(data, idToNameMap.at(id));
+        }*/
+      group.finalise();
+
+      while(data->adapter->isRunning()) {
+        // wait for next event
+        auto id = group.readAny();
+        fireVoidEvent(data, idToNameMap.at(id));
+      }
+      UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Void observer thread terminated.");
+      UA_free(data);
     }
-    cout << "terminate void observer thread " << endl;
-    UA_free(data);
+    catch(boost::thread_interrupted&) {
+      UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Void observer thread terminated.");
+      UA_free(data);
+    }
   }
 
   void startVoidObserverThread(void_observer_data* data) {

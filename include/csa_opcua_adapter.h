@@ -44,6 +44,7 @@ namespace ChimeraTK {
   class csa_opcua_adapter {
    private:
     std::thread adapter_thread;
+    std::thread observer_thread;
     ua_uaadapter* adapter;
     boost::shared_ptr<ControlSystemPVManager> csManager;
     set<string> unusedVariables;
