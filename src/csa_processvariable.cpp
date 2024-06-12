@@ -654,7 +654,7 @@ namespace ChimeraTK {
     UA_VariableAttributes_init(&attr);
     attr = UA_VariableAttributes_default;
     attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Type");
-    attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+    attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Data type used in ChimeraTK");
     attr.accessLevel = UA_ACCESSLEVELMASK_READ;
     attr.userAccessLevel = UA_ACCESSLEVELMASK_READ;
     attr.valueRank = UA_VALUERANK_SCALAR;
@@ -690,7 +690,7 @@ namespace ChimeraTK {
     UA_VariableAttributes_init(&attr);
     attr = UA_VariableAttributes_default;
     attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Validity");
-    attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+    attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Data validity. 0: faulty, 1: ok");
     attr.accessLevel = UA_ACCESSLEVELMASK_READ;
     attr.userAccessLevel = UA_ACCESSLEVELMASK_READ;
     attr.valueRank = UA_VALUERANK_SCALAR;
