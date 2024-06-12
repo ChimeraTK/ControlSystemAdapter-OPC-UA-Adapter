@@ -17,7 +17,7 @@
  * Copyright (c) 2023-2024 Fraunhofer IOSB (Author: Florian Düwel)
  */
 
-#include "../include/void_type.h"
+#include "void_type.h"
 
 #include "csa_processvariable.h"
 #include "open62541/plugin/log_stdout.h"
