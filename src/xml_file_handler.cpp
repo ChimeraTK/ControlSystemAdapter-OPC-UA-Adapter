@@ -21,6 +21,7 @@
 
 #include "xml_file_handler.h"
 
+#include "open62541/plugin/log_stdout.h"
 #include <libxml2/libxml/tree.h>
 #include <libxml2/libxml/xpath.h>
 #include <libxml2/libxml/xpathInternals.h>
@@ -60,25 +61,22 @@ namespace ChimeraTK {
     }
     context = xmlXPathNewContext(this->doc);
     if(context == nullptr) {
-      // std::cout("Error in xmlXPathNewContext\n");
       return nullptr;
     }
     if(xmlXPathRegisterNs(context, (xmlChar*)"csa",
            (xmlChar*)"https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter") != 0) {
-      std::cerr << "Failed to register xml namespace: https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
-                << std::endl;
+      UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+          "Failed to register xml namespace: https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter");
       return nullptr;
     }
 
     result = xmlXPathEvalExpression(xpath, context);
     xmlXPathFreeContext(context);
     if(result == nullptr) {
-      // std::cout("Error in xmlXPathEvalExpression\n");
       return nullptr;
     }
     if(xmlXPathNodeSetIsEmpty(result->nodesetval)) {
       xmlXPathFreeObject(result);
-      // std::cout("No result\n");
       return nullptr;
     }
     return result;
@@ -100,7 +98,7 @@ namespace ChimeraTK {
     this->doc = xmlParseFile(filePath.c_str());
 
     if(this->doc == nullptr) {
-      std::cout << "Document not parsed successfully." << std::endl;
+      UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Document not parsed successfully.");
       return false;
     }
 

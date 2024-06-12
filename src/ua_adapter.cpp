@@ -138,7 +138,6 @@ namespace ChimeraTK {
 
   void ua_uaadapter::constructServer() {
     auto config = (UA_ServerConfig*)UA_calloc(1, sizeof(UA_ServerConfig));
-    logger = UA_Log_Stdout_withLevel(this->serverConfig.logLevel);
     config->logging = &logger;
     if(!this->serverConfig.enableSecurity) {
       UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, nullptr);
@@ -159,7 +158,8 @@ namespace ChimeraTK {
       privateKey = loadFile(this->serverConfig.keyPath.c_str());
       if(UA_ByteString_equal(&certificate, &UA_BYTESTRING_NULL) ||
           UA_ByteString_equal(&privateKey, &UA_BYTESTRING_NULL)) {
-        cout << "Invalid security configuration. Can't load private key or certificate." << endl;
+        UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
+            "Invalid security configuration. Can't load private key or certificate.");
       }
 
       /* Load trust list */
@@ -414,31 +414,6 @@ namespace ChimeraTK {
       if(nodeset->nodeNr > 1) {
         throw std::runtime_error("To many <server>-Tags in config file");
       }
-      string opcuaPort = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "port");
-      if(!opcuaPort.empty()) {
-        this->serverConfig.opcuaPort = std::stoi(opcuaPort);
-      }
-      else {
-        cout << "No 'port'-Attribute in config file is set. Use default Port: 16664" << endl;
-      }
-
-      placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
-      if(!placeHolder.empty()) {
-        this->serverConfig.applicationName = placeHolder;
-        if(this->serverConfig.rootFolder.empty()) {
-          this->serverConfig.rootFolder = placeHolder;
-        }
-      }
-      else {
-        string applicationName;
-        try {
-          string applicationName = ApplicationBase::getInstance().getName();
-          this->serverConfig.applicationName = applicationName;
-        }
-        catch(ChimeraTK::logic_error) {
-        }
-        cout << "No 'applicationName'-Attribute is set in config file. Use default application-name." << endl;
-      }
 
       placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "logLevel");
       if(!placeHolder.empty()) {
@@ -463,12 +438,46 @@ namespace ChimeraTK {
         }
         else {
           // See default set in ServerConfig
-          cout << "Warning: Unknown logLevel (\"" << placeHolder << "\") found in config file. INFO is used instead!"
-               << endl;
+          // Use UA_Log_Stdout because the logger does not yet exist, but log level INFO is used so
+          // writing a warning is ok here.
+          UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+              "Unknown logLevel (\"%s\") found in config file. INFO is used instead!", placeHolder.c_str());
         }
       }
       else {
-        cout << "No 'logLevel'-Attribute set in config file. Use default logging level: info" << endl;
+        // Use UA_Log_Stdout because the logger does not yet exist, but log level INFO is used so
+        // writing a warning is ok here.
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+            "No 'logLevel'-Attribute set in config file. Use default logging level: info");
+      }
+      logger = UA_Log_Stdout_withLevel(this->serverConfig.logLevel);
+
+      string opcuaPort = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "port");
+      if(!opcuaPort.empty()) {
+        this->serverConfig.opcuaPort = std::stoi(opcuaPort);
+      }
+      else {
+        UA_LOG_WARNING(
+            &logger, UA_LOGCATEGORY_USERLAND, "No 'port'-Attribute in config file is set. Use default Port: 16664");
+      }
+
+      placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
+      if(!placeHolder.empty()) {
+        this->serverConfig.applicationName = placeHolder;
+        if(this->serverConfig.rootFolder.empty()) {
+          this->serverConfig.rootFolder = placeHolder;
+        }
+      }
+      else {
+        string applicationName;
+        try {
+          string applicationName = ApplicationBase::getInstance().getName();
+          this->serverConfig.applicationName = applicationName;
+        }
+        catch(ChimeraTK::logic_error) {
+        }
+        UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+            "No 'applicationName'-Attribute is set in config file. Use default application-name.");
       }
 
       // if no root folder name is set, use application name
@@ -478,7 +487,9 @@ namespace ChimeraTK {
       xmlXPathFreeObject(result);
     }
     else {
-      cout << "No <server>-Tag in config file. Use default port 16664 and application name configuration." << endl;
+      logger = UA_Log_Stdout_withLevel(this->serverConfig.logLevel);
+      UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+          "No <server>-Tag in config file. Use default port 16664 and application name configuration.");
       this->serverConfig.rootFolder = this->serverConfig.applicationName;
     }
     result = this->fileHandler->getNodeSet(xpath + "//security");
@@ -500,47 +511,52 @@ namespace ChimeraTK {
       }
       else {
         this->serverConfig.unsecure = false;
-        cout << "No 'unsecure'-Attribute in config file is set. Disable unsecure endpoints" << endl;
+        UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+            "No 'unsecure'-Attribute in config file is set. Disable unsecure endpoints");
       }
       string certPath = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "certificate");
       if(!certPath.empty()) {
         this->serverConfig.certPath = certPath;
       }
       else {
-        cout << "Invalid security configuration. No 'certificate'-Attribute in config file is set." << endl;
+        UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+            "Invalid security configuration. No 'certificate'-Attribute in config file is set.");
       }
       string keyPath = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "privatekey");
       if(!keyPath.empty()) {
         this->serverConfig.keyPath = keyPath;
       }
       else {
-        cout << "Invalid security configuration. No 'privatekey'-Attribute in config file is set." << endl;
+        UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+            "Invalid security configuration. No 'privatekey'-Attribute in config file is set.");
       }
       string allowListFolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "trustlist");
       if(!allowListFolder.empty()) {
         this->serverConfig.allowListFolder = allowListFolder;
       }
       else {
-        cout << "Invalid security configuration. No 'trustlist'-Attribute in config file is set." << endl;
+        UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+            "Invalid security configuration. No 'trustlist'-Attribute in config file is set.");
       }
       string blockListFolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "blocklist");
       if(!blockListFolder.empty()) {
         this->serverConfig.blockListFolder = blockListFolder;
       }
       else {
-        cout << "No 'blockListFolder'-Attribute in config file is set." << endl;
+        UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND, "No 'blockListFolder'-Attribute in config file is set.");
       }
       string issuerListFolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "issuerlist");
       if(!issuerListFolder.empty()) {
         this->serverConfig.issuerListFolder = issuerListFolder;
       }
       else {
-        cout << "No 'issuerListFolder'-Attribute in config file is set." << endl;
+        UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND, "No 'issuerListFolder'-Attribute in config file is set.");
       }
       xmlXPathFreeObject(result);
     }
     else {
-      cout << "No <security>-Tag in config file. Use default configuration with unsecure endpoint." << endl;
+      UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+          "No <security>-Tag in config file. Use default configuration with unsecure endpoint.");
       this->serverConfig.enableSecurity = false;
     }
     result = this->fileHandler->getNodeSet(xpath + "//process_variable_hierarchy");
@@ -558,7 +574,8 @@ namespace ChimeraTK {
       xmlXPathFreeObject(result);
     }
     else {
-      cout << "No <process_variable_hierarchy>-Tag in config file. Use default hierarchical mapping with '/'." << endl;
+      UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+          "No <process_variable_hierarchy>-Tag in config file. Use default hierarchical mapping with '/'.");
       this->pvSeperator = "/";
     }
 
@@ -607,7 +624,7 @@ namespace ChimeraTK {
 
   void ua_uaadapter::workerThread() {
     if(this->mappedServer == nullptr) {
-      cout << "No server mapped" << endl;
+      UA_LOG_DEBUG(server_config->logging, UA_LOGCATEGORY_USERLAND, "No server mapped");
       return;
     }
 
@@ -620,7 +637,7 @@ namespace ChimeraTK {
     UA_HistoryDataGathering gathering =
         add_historizing_nodes(historizing_nodes, historizing_setup, this->mappedServer, this->server_config,
             this->serverConfig.history, this->serverConfig.historyfolders, this->serverConfig.historyvariables);
-    cout << "Starting the server worker thread" << endl;
+    UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Starting the server worker thread");
     add_void_event_type(this->mappedServer);
     UA_Server_run_startup(this->mappedServer);
     this->running = true;
@@ -631,7 +648,7 @@ namespace ChimeraTK {
         this->serverConfig.historyfolders, this->serverConfig.historyvariables);
 
     UA_Server_run_shutdown(this->mappedServer);
-    cout << "Stopped the server worker thread" << endl;
+    UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Stopped the server worker thread");
   }
 
   UA_NodeId ua_uaadapter::enrollFolderPathFromString(const string& path, const string& seperator) {
@@ -654,11 +671,11 @@ namespace ChimeraTK {
     if(!UA_NodeId_isNull(&folderPathNodeId)) {
       processvariable =
           new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1), csManager,
-              xml_file_handler::parseVariablePath(varName, this->pvSeperator).back());
+              server_config->logging, xml_file_handler::parseVariablePath(varName, this->pvSeperator).back());
     }
     else {
-      processvariable =
-          new ua_processvariable(this->mappedServer, this->ownNodeId, varName.substr(1, varName.size() - 1), csManager);
+      processvariable = new ua_processvariable(this->mappedServer, this->ownNodeId,
+          varName.substr(1, varName.size() - 1), csManager, server_config->logging);
     }
     this->variables.push_back(processvariable);
     UA_NodeId tmpNodeId = processvariable->getOwnNodeId();
@@ -696,8 +713,8 @@ namespace ChimeraTK {
       foundPVSourceName = *((UA_String*)value.data);
       UASTRING_TO_CPPSTRING(foundPVSourceName, foundPVSourceNameCPP)
       string varName = xml_file_handler::parseVariablePath(foundPVNameCPP, "/").back();
-      auto* processvariable =
-          new ua_processvariable(this->mappedServer, target, foundPVSourceNameCPP, csManager, foundPVNameCPP);
+      auto* processvariable = new ua_processvariable(
+          this->mappedServer, target, foundPVSourceNameCPP, csManager, server_config->logging, foundPVNameCPP);
       this->variables.push_back(processvariable);
     }
     UA_BrowseResult_clear(&br);
@@ -805,12 +822,12 @@ namespace ChimeraTK {
           }
           if(description.empty()) {
             UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Warning! Skipping Folder. Folder creation failed. Name is missing. Mapping line number: %u",
+                "Skipping Folder. Folder creation failed. Name is missing. Mapping line number: %u",
                 nodeset->nodeTab[i]->line);
           }
           else {
             UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Warning! Skipping Folder. Folder creation failed. Name is missing 'description: %s'. Mapping "
+                "Skipping Folder. Folder creation failed. Name is missing 'description: %s'. Mapping "
                 "line number: %u",
                 description.c_str(), nodeset->nodeTab[i]->line);
           }
@@ -841,7 +858,7 @@ namespace ChimeraTK {
                 std::to_string(nodeset->nodeTab[i]->line));
           }
           UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Warning! Skipping folder: %s. Folder with source mapping failed. Target folder node id exists. "
+              "Skipping folder: %s. Folder with source mapping failed. Target folder node id exists. "
               "Mapping line number: %u",
               sourceName.c_str(), nodeset->nodeTab[i]->line);
           continue;
@@ -852,7 +869,7 @@ namespace ChimeraTK {
                 std::to_string(nodeset->nodeTab[i]->line));
           }
           UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Warning! Skipping Folder. Source 'name: %s' folder missing. Mapping line number: %u", folder.c_str(),
+              "Skipping Folder. Source 'name: %s' folder missing. Mapping line number: %u", folder.c_str(),
               nodeset->nodeTab[i]->line);
           continue;
         }
@@ -870,8 +887,8 @@ namespace ChimeraTK {
                   std::to_string(nodeset->nodeTab[i]->line));
             }
             UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Warning! Skipping Folder. Source '%s' and Destination equal. Mapping line number: %u",
-                sourceName.c_str(), nodeset->nodeTab[i]->line);
+                "Skipping Folder. Source '%s' and Destination equal. Mapping line number: %u", sourceName.c_str(),
+                nodeset->nodeTab[i]->line);
             continue;
           }
           // check if the src is a folder
@@ -901,8 +918,8 @@ namespace ChimeraTK {
                   ". Mapping line number: " + std::to_string(nodeset->nodeTab[i]->line));
             }
             UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Warning! Skipping Folder. No corresponding source '%s' folder. Mapping line number: %u",
-                sourceName.c_str(), nodeset->nodeTab[i]->line);
+                "Skipping Folder. No corresponding source '%s' folder. Mapping line number: %u", sourceName.c_str(),
+                nodeset->nodeTab[i]->line);
             continue;
           }
           // enroll path destination -> copy / link the complete tree to this place
@@ -922,7 +939,7 @@ namespace ChimeraTK {
                     "' folder. Mapping line number: " + std::to_string(nodeset->nodeTab[i]->line));
               }
               UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                  "Warning! Skipping Folder. Folder creation failed. Source and destination must be "
+                  "Skipping Folder. Folder creation failed. Source and destination must be "
                   "different for '%s' folder. Mapping line number: %u",
                   sourceName.c_str(), nodeset->nodeTab[i]->line);
               continue;
@@ -1040,15 +1057,12 @@ namespace ChimeraTK {
           // get the name of the variable
           if(!nodeName.empty()) {
             if(nodeDestination.empty()) {
-              // cout << "nodename: "<<  xml_file_handler::getContentFromNode(nodeName[0]) << endl;
               targetNodeId = this->serverConfig.rootFolder + "/" + xml_file_handler::getContentFromNode(nodeName[0]);
               UA_NodeId id = UA_NODEID_STRING(1, (char*)targetNodeId.c_str());
               UA_NodeId_copy(&id, &temp.variable_id);
               this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
             }
             else {
-              // cout << "nodename: "<<  xml_file_handler::getContentFromNode(nodeName[0]) << endl;
-              // cout << "node destination: "<<  xml_file_handler::getContentFromNode(nodeDestination[0]) << endl;
               targetNodeId = this->serverConfig.rootFolder + "/" +
                   xml_file_handler::getContentFromNode(nodeDestination[0]) + "/" +
                   xml_file_handler::getContentFromNode(nodeName[0]);
@@ -1059,7 +1073,6 @@ namespace ChimeraTK {
           }
           if(!sourceName.empty() && (copy.empty() || copy == "FALSE" || copy == "False" || copy == "false")) {
             name = sourceName;
-            // cout << "print the source name "<<  sourceName << endl;
             targetNodeId = this->serverConfig.rootFolder + "/" + sourceName;
             UA_NodeId id = UA_NODEID_STRING(1, (char*)targetNodeId.c_str());
             UA_NodeId_copy(&id, &temp.variable_id);
@@ -1087,11 +1100,11 @@ namespace ChimeraTK {
           }
           if(!name.empty()) {
             UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Warning! Skipping PV mapping. SourceName 'name: %s' is missing.", name.c_str());
+                "Skipping PV mapping. SourceName 'name: %s' is missing.", name.c_str());
           }
           else {
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Warning! Skipping PV mapping. SourceName is missing.");
+            UA_LOG_WARNING(
+                server_config->logging, UA_LOGCATEGORY_USERLAND, "Skipping PV mapping. SourceName is missing.");
           }
           continue;
         }
@@ -1126,11 +1139,11 @@ namespace ChimeraTK {
             }
             if(!name.empty()) {
               UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                  "Warning! Skipping PV mapping. No corresponding source pv 'name: %s'.", name.c_str());
+                  "Skipping PV mapping. No corresponding source pv 'name: %s'.", name.c_str());
             }
             else {
-              UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                  "Warning! Skipping PV mapping. No corresponding source pv.");
+              UA_LOG_WARNING(
+                  server_config->logging, UA_LOGCATEGORY_USERLAND, "Skipping PV mapping. No corresponding source pv.");
             }
             continue;
           }
@@ -1178,13 +1191,12 @@ namespace ChimeraTK {
           }
           if(!name.empty()) {
             UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Warning! Skipping PV mapping. Source PV not found 'name: %s'. Mapping line number: %u", name.c_str(),
+                "Skipping PV mapping. Source PV not found 'name: %s'. Mapping line number: %u", name.c_str(),
                 nodeset->nodeTab[i]->line);
           }
           else {
             UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Warning! Skipping PV mapping. Source PV not found. Mapping line number: %u",
-                nodeset->nodeTab[i]->line);
+                "Skipping PV mapping. Source PV not found. Mapping line number: %u", nodeset->nodeTab[i]->line);
           }
           continue;
         }
@@ -1201,7 +1213,7 @@ namespace ChimeraTK {
                   "Error! PV mapping failed. Source and destination must be different if copy='true'.");
             }
             UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Warning! Skipping PV mapping. Source and destination must be different if copy='true' 'name: "
+                "Skipping PV mapping. Source and destination must be different if copy='true' 'name: "
                 "%s'.",
                 name.c_str());
             continue;
@@ -1226,7 +1238,7 @@ namespace ChimeraTK {
                 UA_Server_readNodeId(this->mappedServer, requestedPVBrowseId, &tmpOutput);
                 if(!UA_NodeId_isNull(&tmpOutput)) {
                   UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                      "Warning! Using legacy code. Mapped PV is used as PV mapping target");
+                      "Using legacy code. Mapped PV is used as PV mapping target");
                   UA_NodeId_copy(&requestedPVBrowseId, &destinationFolderNodeId);
                 }
                 else {
@@ -1245,8 +1257,8 @@ namespace ChimeraTK {
           }
           ua_processvariable* processvariable;
           if(!UA_NodeId_isNull(&destinationFolderNodeId)) {
-            processvariable =
-                new ua_processvariable(this->mappedServer, destinationFolderNodeId, sourceName, csManager, name);
+            processvariable = new ua_processvariable(
+                this->mappedServer, destinationFolderNodeId, sourceName, csManager, server_config->logging, name);
             UA_NodeId tmpProcessVariableNodeId = processvariable->getOwnNodeId();
             if(UA_NodeId_isNull(&tmpProcessVariableNodeId)) {
               if(this->mappingExceptions) {
@@ -1254,7 +1266,7 @@ namespace ChimeraTK {
                     std::to_string(nodeset->nodeTab[i]->line));
               }
               UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                  "Warning! Skipping PV %s. PV with same name mapped. Mapping line number: %u", sourceName.c_str(),
+                  "Skipping PV %s. PV with same name mapped. Mapping line number: %u", sourceName.c_str(),
                   nodeset->nodeTab[i]->line);
               continue;
             }
@@ -1267,8 +1279,7 @@ namespace ChimeraTK {
             if(this->mappingExceptions) {
               throw std::runtime_error("Folder creation failed.");
             }
-            UA_LOG_WARNING(
-                server_config->logging, UA_LOGCATEGORY_USERLAND, "Warning! Skipping PV. Folder creation failed.");
+            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND, "Skipping PV. Folder creation failed.");
             continue;
           }
           UA_NodeId tmpPVNodeId = processvariable->getOwnNodeId();
@@ -1286,7 +1297,7 @@ namespace ChimeraTK {
               throw std::runtime_error("Error! PV mapping failed. The pv name can't changed if copy is false.");
             }
             UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Warning! Skipping PV mapping. The pv name can't changed if copy is false. 'name: %s'.", name.c_str());
+                "Skipping PV mapping. The pv name can't changed if copy is false. 'name: %s'.", name.c_str());
             continue;
           }
           // create destination folder
@@ -1302,8 +1313,8 @@ namespace ChimeraTK {
             if(this->mappingExceptions) {
               throw std::runtime_error("PV mapping failed. Can't create reference to original pv.");
             }
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Warning! Skipping PV. Can't create reference to original pv.");
+            UA_LOG_WARNING(
+                server_config->logging, UA_LOGCATEGORY_USERLAND, "Skipping PV. Can't create reference to original pv.");
             continue;
           }
           UA_NodeId_copy(&parentSourceId, &createdNodeId);
@@ -1369,7 +1380,7 @@ namespace ChimeraTK {
                 std::to_string(nodeset->nodeTab[i]->line));
           }
           UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Warning! Skipping additional variable. Additional variable name is mandatory. Mapping line "
+              "Skipping additional variable. Additional variable name is mandatory. Mapping line "
               "number: %u",
               nodeset->nodeTab[i]->line);
           continue;
@@ -1392,7 +1403,7 @@ namespace ChimeraTK {
             throw std::runtime_error("Additional variable node creation failed. Additional variable already exists.");
           }
           UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Warning! Skipping additional variable %s. Node already exists. Mapping line number: %u", name.c_str(),
+              "Skipping additional variable %s. Node already exists. Mapping line number: %u", name.c_str(),
               nodeset->nodeTab[i]->line);
           continue;
         }
@@ -1414,7 +1425,7 @@ namespace ChimeraTK {
             throw std::runtime_error("Additional variable node creation failed. PV with same name already exists.");
           }
           UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Warning! Skipping additional variable %s. PV with same name already exists. Mapping line number: "
+              "Skipping additional variable %s. PV with same name already exists. Mapping line number: "
               "%u",
               name.c_str(), nodeset->nodeTab[i]->line);
           continue;
@@ -1434,7 +1445,7 @@ namespace ChimeraTK {
             throw std::runtime_error("Error! Creation of additional variable folder failed.");
           }
           UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Warning! Skipping additional variable. Creation of additional variable folder failed. Skipping.");
+              "Skipping additional variable. Creation of additional variable folder failed. Skipping.");
           continue;
         }
         auto* additionalvariable =

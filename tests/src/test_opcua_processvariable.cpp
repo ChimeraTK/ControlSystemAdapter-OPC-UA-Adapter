@@ -1,3 +1,4 @@
+#include "open62541/plugin/log_stdout.h"
 #include <csa_opcua_adapter.h>
 #include <test_sample_data.h>
 #include <ua_adapter.h>
@@ -40,7 +41,7 @@ void ProcessVariableTest::testClassSide() {
   // ua_processvariable *test;
   for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
     ua_processvariable* test = new ua_processvariable(
-        serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager);
+        serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager, UA_Log_Stdout);
 
     BOOST_CHECK(test->getName() == oneProcessVariable->getName());
 
@@ -471,7 +472,7 @@ void ProcessVariableTest::testClientSide() {
   vector<ua_processvariable*> varList;
   for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
     varList.push_back(new ua_processvariable(
-        serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager));
+        serverSet->mappedServer, serverSet->baseNodeId, oneProcessVariable->getName(), pvSet.csManager, UA_Log_Stdout));
   }
 
   // Create client to connect to server

@@ -27,6 +27,7 @@ extern "C" {
 #include "csa_namespace.h"
 }
 
+#include "open62541/plugin/log_stdout.h"
 #include "ua_map_types.h"
 
 #include <iostream>
@@ -34,7 +35,7 @@ extern "C" {
 #include <vector>
 namespace ChimeraTK {
   ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
-      boost::shared_ptr<ControlSystemPVManager> csManager, string overwriteNodeString)
+      boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, string overwriteNodeString)
   : ua_mapped_class(server, basenodeid) {
     // FIXME Check if name member of a csManager Parameter
     this->namePV = namePV;
@@ -43,7 +44,7 @@ namespace ChimeraTK {
     this->nodeStringIdOverwrite = std::move(overwriteNodeString);
     this->array = false;
 
-    this->mapSelfToNamespace();
+    this->mapSelfToNamespace(logger);
   }
 
   ua_processvariable::~ua_processvariable() {
@@ -262,10 +263,10 @@ namespace ChimeraTK {
       return "Unsupported type";
   }
 
-template<typename T>
-UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(UA_Server* server,
-    const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
-    UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
+  template<typename T>
+  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(UA_Server* server,
+      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
+      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
     auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
     UA_StatusCode rv = UA_STATUSCODE_GOOD;
     rv = thisObj->getValue<T>(&value->value, range);
@@ -296,29 +297,29 @@ UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(UA_Se
     return rv;
   }
 
-template<>
-UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v, const UA_NumericRange* range) {
-  UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
-  if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
-    this->csManager->getProcessArray<string>(this->namePV)->readLatest();
-  }
-  if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1) {
-    string sval = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).at(0);
-    UA_String ua_val = CPPSTRING_TO_UASTRING(sval);
-    rv = UA_Variant_setScalarCopy(v, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
-    UA_String_clear(&ua_val);
-  }
-  else {
-    std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
-    auto* sarrayval = new UA_String[sarr.size()];
-    for(size_t i = 0; i < sarr.size(); i++) {
-      sarrayval[i] = CPPSTRING_TO_UASTRING(sarr[i]);
+  template<>
+  UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v, const UA_NumericRange* range) {
+    UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
+    if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
+      this->csManager->getProcessArray<string>(this->namePV)->readLatest();
     }
-    rv = UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
-    delete[] sarrayval;
+    if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1) {
+      string sval = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).at(0);
+      UA_String ua_val = CPPSTRING_TO_UASTRING(sval);
+      rv = UA_Variant_setScalarCopy(v, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
+      UA_String_clear(&ua_val);
+    }
+    else {
+      std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
+      auto* sarrayval = new UA_String[sarr.size()];
+      for(size_t i = 0; i < sarr.size(); i++) {
+        sarrayval[i] = CPPSTRING_TO_UASTRING(sarr[i]);
+      }
+      rv = UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
+      delete[] sarrayval;
+    }
+    return rv;
   }
-  return rv;
-}
 
   template<typename T>
   UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setValue(UA_Server* server,
@@ -397,7 +398,7 @@ UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v, const UA_Numer
     return retval;
   }
 
-  UA_StatusCode ua_processvariable::mapSelfToNamespace() {
+  UA_StatusCode ua_processvariable::mapSelfToNamespace(const UA_Logger* logger) {
     UA_StatusCode retval = UA_STATUSCODE_GOOD;
     UA_NodeId createdNodeId = UA_NODEID_NULL;
     if(!nodeStringIdOverwrite.empty()) this->nameNew = nodeStringIdOverwrite;
@@ -502,15 +503,16 @@ UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v, const UA_Numer
     else if(valueType != typeid(Void)) {
       int status;
       auto* demangledName = abi::__cxa_demangle(valueType.name(), nullptr, nullptr, &status);
-      std::cout << "Cannot proxy unknown type ";
+
       if(status == 0) {
-        std::cout << demangledName;
+        UA_LOG_WARNING(logger, UA_LOGCATEGORY_USERLAND, "Cannot proxy unknown type %s for variable %s", demangledName,
+            this->namePV.c_str());
         free(demangledName);
       }
       else {
-        std::cout << " (demangling failed) " << valueType.name();
+        UA_LOG_WARNING(logger, UA_LOGCATEGORY_USERLAND,
+            "Cannot proxy unknown type %s (demangling failed) for variable %s", valueType.name(), this->namePV.c_str());
       }
-      std::cout << " for variable " << this->namePV << std::endl;
     }
 
     if(!this->csManager->getProcessVariable(this->namePV)->isWriteable()) {

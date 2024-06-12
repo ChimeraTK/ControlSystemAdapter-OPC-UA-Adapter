@@ -71,7 +71,7 @@ namespace ChimeraTK {
      *
      * @return <UA_StatusCode>
      */
-    UA_StatusCode mapSelfToNamespace();
+    UA_StatusCode mapSelfToNamespace(const UA_Logger* logger);
 
    public:
     /** @brief Constructor from ua_processvaribale for generic creation
@@ -84,7 +84,7 @@ namespace ChimeraTK {
      * UA-Model
      */
     ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
-        boost::shared_ptr<ControlSystemPVManager> csManager, string overwriteNodeString = "");
+        boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, string overwriteNodeString = "");
 
     /** @brief Destructor for ua_processvariable
      *
@@ -183,6 +183,5 @@ namespace ChimeraTK {
 
     template<typename T>
     UA_UInt32 typeSpecificSetup(UA_DataSource_Map_Element& mapElem, const UA_NodeId nodeId);
-
   };
 } // namespace ChimeraTK

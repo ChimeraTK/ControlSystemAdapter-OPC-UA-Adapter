@@ -50,6 +50,7 @@ extern "C" {
 
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
 #include "csa_opcua_adapter.h"
+#include "open62541/plugin/log_stdout.h"
 
 #include <atomic>
 #include <iostream>
@@ -62,14 +63,14 @@ ChimeraTK::csa_opcua_adapter* csaOPCUA;
 std::atomic<bool> terminateMain;
 
 static void SigHandler_Int(int sign) {
-  cout << "Received SIGINT... terminating" << endl;
+  UA_LOG_INFO(csaOPCUA->getLogger(), UA_LOGCATEGORY_USERLAND, "Received SIGINT... terminating");
   terminateMain = true;
   if(csaOPCUA) {
     csaOPCUA->stop();
     csaOPCUA->~csa_opcua_adapter();
   }
   ChimeraTK::ApplicationBase::getInstance().shutdown();
-  cout << "OPC UA adapter termianted." << endl;
+  std::cout << "OPC UA adapter termianted." << std::endl;
 }
 
 int main() {
@@ -83,7 +84,6 @@ int main() {
   sigaddset(&intmask, SIGINT);
   sigprocmask(SIG_BLOCK, &intmask, nullptr);
 
-  cout << "Create the Managers" << endl;
   std::pair<boost::shared_ptr<ChimeraTK::ControlSystemPVManager>, boost::shared_ptr<ChimeraTK::DevicePVManager>>
       pvManagers = ChimeraTK::createPVManager();
 
@@ -94,20 +94,16 @@ int main() {
   ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
   ChimeraTK::ApplicationBase::getInstance().initialise();
 
-  cout << "Start the mapping" << endl;
   string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
-  cout << pathToConfig << endl;
-
-  cout << "Create the adapter" << endl;
   csaOPCUA = new ChimeraTK::csa_opcua_adapter(csManager, pathToConfig);
 
-  cout << "Optimize unmapped variables in the application base" << endl;
+  UA_LOG_INFO(csaOPCUA->getLogger(), UA_LOGCATEGORY_USERLAND, "Optimize unmapped variables in the application base");
   ChimeraTK::ApplicationBase::getInstance().optimiseUnmappedVariables(csaOPCUA->getUnusedVariables());
 
-  cout << "Run the application instance" << endl;
+  UA_LOG_INFO(csaOPCUA->getLogger(), UA_LOGCATEGORY_USERLAND, "Run the application instance");
   ChimeraTK::ApplicationBase::getInstance().run();
 
-  cout << "Start the OPC UA Adapter" << endl;
+  UA_LOG_INFO(csaOPCUA->getLogger(), UA_LOGCATEGORY_USERLAND, "Start the OPC UA Adapter");
   csaOPCUA->start();
 
   /* Unblock SIGINT */
@@ -116,5 +112,5 @@ int main() {
   while(!terminateMain) sleep(3600); // sleep will be interrupted when signal is received
   csManager.reset();
 
-  cout << "Application termianted." << endl;
+  std::cout << "Application termianted." << std::endl;
 }
