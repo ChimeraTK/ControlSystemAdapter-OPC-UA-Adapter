@@ -95,5 +95,12 @@ namespace ChimeraTK {
      * @return The current running state in form of true/false
      */
     bool isRunning();
+
+    /**
+     * @brief Get the adapter logger.
+     *
+     * @return The pointer of the logger used in the adapter.
+     */
+    const UA_Logger* getLogger();
   };
 } // namespace ChimeraTK

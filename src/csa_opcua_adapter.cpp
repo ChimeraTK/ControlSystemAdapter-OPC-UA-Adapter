@@ -37,12 +37,17 @@ namespace ChimeraTK {
 
     // Create new server adapter
     this->adapter = new ua_uaadapter(std::move(configFile));
+    UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Start the mapping of %s", configFile.c_str());
+    UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Create the adapter");
 
     // Pre-Processing - get list of PV's to skip excluding
     vector<string> mappedPvSources = adapter->getAllMappedPvSourceNames();
-    cout << "List of mapped process variables: " << endl;
-    for(const auto& f : mappedPvSources) {
-      cout << "\t" << f << endl;
+    if(mappedPvSources.size() > 0) {
+      std::stringstream ss;
+      for(const auto& f : mappedPvSources) {
+        ss << "\n\t\t - " << f;
+      }
+      UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "List of mapped process variables: %s", ss.str().c_str());
     }
 
     vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
@@ -53,10 +58,10 @@ namespace ChimeraTK {
       std::type_info const& valueType = oneProcessVariable->getValueType();
       if(valueType == typeid(Void)) {
         /*skip_var = true;*/
-        // cout << "Skip Variable: Variable: " << oneProcessVariable->getName() << " has a void type" << endl;
+        UA_LOG_DEBUG(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Skip Variable: Variable: %s has a void type",
+            oneProcessVariable->getName().c_str());
         break;
       }
-      // cout << "Info: " << oneProcessVariable->getName() << endl;
       for(auto e : this->adapter->exclude) {
         string suffix_1 = "/*", suffix_2 = "*";
         if(e.rfind(suffix_1) == e.size() - suffix_1.size()) {
@@ -64,22 +69,24 @@ namespace ChimeraTK {
             bool pv_used = false;
             for(const auto& ele : mappedPvSources) {
               if(ele == oneProcessVariable->getName().substr(1, oneProcessVariable->getName().size() - 1)) {
-                cout << "Warning: Skip exclude node - Used in pv-mapping (directory match) PV:"
-                     << oneProcessVariable->getName() << endl;
+                UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
+                    "Skip exclude node - Used in pv-mapping (directory match) PV: %s",
+                    oneProcessVariable->getName().c_str());
                 pv_used = true;
                 break;
               }
             }
             for(auto folder : this->adapter->folder_with_history) {
               if(oneProcessVariable->getName().substr(1, folder.size() - 1) == folder) {
-                cout << "Warning: Skip exclude node - Used in folder history setting:" << oneProcessVariable->getName()
-                     << endl;
+                UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
+                    "Skip exclude node - Used in folder history setting: %s", oneProcessVariable->getName().c_str());
                 pv_used = true;
                 break;
               }
             }
             if(!pv_used) {
-              cout << "Info: directory var exclude (/*) from mapping " << oneProcessVariable->getName() << endl;
+              UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Directory var exclude (/*) from mapping %s",
+                  oneProcessVariable->getName().c_str());
               skip_var = true;
             }
           }
@@ -89,22 +96,24 @@ namespace ChimeraTK {
             bool pv_used = false;
             for(const auto& ele : mappedPvSources) {
               if(ele == oneProcessVariable->getName().substr(1, oneProcessVariable->getName().size() - 1)) {
-                cout << "Warning: Skip exclude node - Used in pv-mapping (greedy match) PV:"
-                     << oneProcessVariable->getName() << endl;
+                UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
+                    "Skip exclude node - Used in pv-mapping (greedy match) PV: %s",
+                    oneProcessVariable->getName().c_str());
                 pv_used = true;
                 break;
               }
             }
             for(auto folder : this->adapter->folder_with_history) {
               if(oneProcessVariable->getName().substr(1, folder.size() - 1) == folder) {
-                cout << "Warning: Skip exclude node - Used in folder history setting:" << oneProcessVariable->getName()
-                     << endl;
+                UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
+                    "Skip exclude node - Used in folder history setting: %s", oneProcessVariable->getName().c_str());
                 pv_used = true;
                 break;
               }
             }
             if(!pv_used) {
-              cout << "Info: greedy var exclude (*) from mapping " << oneProcessVariable->getName() << endl;
+              UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Greedy var exclude (*) from mapping %s",
+                  oneProcessVariable->getName().c_str());
               skip_var = true;
             }
           }
@@ -113,17 +122,18 @@ namespace ChimeraTK {
           // check if this node is mapped later
           if(std::find(mappedPvSources.begin(), mappedPvSources.end(), e.substr(1, e.size() - 1)) !=
               mappedPvSources.end()) {
-            cout << "Warning: Skip exclude node - Used in pv-mapping (direct match) PV:"
-                 << oneProcessVariable->getName() << endl; // Print namen
+            UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
+                "Skip exclude node - Used in pv-mapping (direct match) PV: %s", oneProcessVariable->getName().c_str());
           }
           else {
-            cout << "Info: direct exclude var (direct match) from mapping" << oneProcessVariable->getName() << endl;
+            UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Direct exclude var (direct match) from mapping %s",
+                oneProcessVariable->getName().c_str());
             skip_var = true;
           }
           for(auto folder : this->adapter->folder_with_history) {
             if(oneProcessVariable->getName().substr(1, folder.size() - 1) == folder) {
-              cout << "Warning: Skip exclude node - Used in folder history setting:" << oneProcessVariable->getName()
-                   << endl;
+              UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
+                  "Skip exclude node - Used in folder history setting: %s", oneProcessVariable->getName().c_str());
               skip_var = false;
               break;
             }
@@ -143,10 +153,13 @@ namespace ChimeraTK {
     adapter->applyMapping(this->csManager);
     vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
     if(!allNotMappedVariables.empty()) {
-      cout << "The following VariableNodes cant be mapped, because they are not member in PV-Manager:" << endl;
+      std::stringstream ss;
       for(const string& var : allNotMappedVariables) {
-        cout << var << endl;
+        ss << "\t" << var << endl;
       }
+      UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
+          "The following VariableNodes cant be mapped, because they are not member in PV-Manager: \n%s",
+          ss.str().c_str());
     }
   }
 
@@ -176,10 +189,11 @@ namespace ChimeraTK {
         // Check if PV is writable - if not assume it is an VoidInput
         if(!oneProcessVariable->isWriteable()) {
           data->pvs.insert(data->pvs.end(), oneProcessVariable->getName());
-          cout << "insert " << oneProcessVariable->getName() << endl;
+          UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Adding vartiable %s to void thread.",
+              oneProcessVariable->getName().c_str());
         }
         else {
-          UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
               "Ignoring Void input %s. Void inputs are not yet supported.", oneProcessVariable->getName().c_str());
         }
       }
@@ -190,7 +204,7 @@ namespace ChimeraTK {
       data->adapter = this;
       data->mappedServer = adapter->getMappedServer();
       data->csManager = csManager;
-      this->observer_thread = std::thread(&startVoidObserverThread, data);
+      this->observer_thread = std::thread(&startVoidObserverThread, data, this->getLogger());
       this->observer_thread.detach();
     }
     else {
@@ -213,5 +227,9 @@ namespace ChimeraTK {
   }
   const set<string>& csa_opcua_adapter::getUnusedVariables() const {
     return unusedVariables;
+  }
+
+  const UA_Logger* csa_opcua_adapter::getLogger() {
+    return adapter->server_config->logging;
   }
 } // namespace ChimeraTK

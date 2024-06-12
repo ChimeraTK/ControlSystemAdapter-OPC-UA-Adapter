@@ -297,5 +297,8 @@ namespace ChimeraTK {
      * @param returns the serveConfig.
      */
     ServerConfig get_server_config();
+
+    // friend class declaration
+    friend class csa_opcua_adapter;
   };
 } // namespace ChimeraTK

@@ -25,7 +25,7 @@
 #include <functional>
 using namespace std;
 namespace ChimeraTK {
-  static UA_StatusCode fireVoidEvent(void_observer_data* data, const string& pv_name) {
+  static UA_StatusCode fireVoidEvent(void_observer_data* data, const string& pv_name, const UA_Logger* logger) {
     UA_NodeId outId;
     UA_NodeId void_event_NodeId = UA_NODEID_STRING(1, const_cast<char*>("VoidEventType"));
     UA_StatusCode retval = UA_Server_createEvent(data->mappedServer, void_event_NodeId, &outId);
@@ -120,11 +120,11 @@ namespace ChimeraTK {
       error_message.append(UA_StatusCode_name(retval));
       throw std::logic_error(error_message);
     }
-    UA_LOG_TRACE(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Fire Void Event for PV with ID %s", pv_name.c_str());
+    UA_LOG_DEBUG(logger, UA_LOGCATEGORY_USERLAND, "Fire Void Event for PV with ID %s", pv_name.c_str());
     return retval;
   }
 
-  static void updateLoop(void_observer_data* data) {
+  static void updateLoop(void_observer_data* data, const UA_Logger* logger) {
     try {
       ReadAnyGroup group;                                   ///< This group will collect all Void type PVs
       std::map<TransferElementID, std::string> idToNameMap; ///< Map that connects TransferID to PV name string
@@ -154,19 +154,19 @@ namespace ChimeraTK {
       while(data->adapter->isRunning()) {
         // wait for next event
         auto id = group.readAny();
-        fireVoidEvent(data, idToNameMap.at(id));
+        fireVoidEvent(data, idToNameMap.at(id), logger);
       }
-      UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Void observer thread terminated.");
+      UA_LOG_INFO(logger, UA_LOGCATEGORY_USERLAND, "Void observer thread terminated.");
       UA_free(data);
     }
     catch(boost::thread_interrupted&) {
-      UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Void observer thread terminated.");
+      UA_LOG_INFO(logger, UA_LOGCATEGORY_USERLAND, "Void observer thread terminated.");
       UA_free(data);
     }
   }
 
-  void startVoidObserverThread(void_observer_data* data) {
-    updateLoop(data);
+  void startVoidObserverThread(void_observer_data* data, const UA_Logger* logger) {
+    updateLoop(data, logger);
   }
 
   /*
