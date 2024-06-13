@@ -19,8 +19,9 @@
 #include "csa_namespace.h"
 
 #include "csa_config.h"
+#include "loggingLevel_type.h"
 
-static UA_StatusCode csa_namespace_add_additional_variable(UA_Server* server) {
+UA_INLINE UA_StatusCode csa_namespace_add_additional_variable(UA_Server* server) {
   UA_VariableTypeAttributes attr;
   UA_VariableTypeAttributes_init(&attr);
   attr.displayName = UA_LOCALIZEDTEXT("en-US", "ctkAdditionalVariable");
@@ -37,6 +38,65 @@ static UA_StatusCode csa_namespace_add_additional_variable(UA_Server* server) {
 }
 
 // ToDo move node add logic to seperated functions, use macros for node-id's
+
+UA_INLINE UA_StatusCode csa_namespace_add_LoggingLevelValues(UA_Server* server, const UA_NodeId* parent) {
+  UA_StatusCode retVal = UA_STATUSCODE_GOOD;
+  UA_VariableAttributes attr = UA_VariableAttributes_default;
+  attr.minimumSamplingInterval = 0.000000;
+  attr.userAccessLevel = 1;
+  attr.accessLevel = 1;
+  attr.valueRank = 1;
+  attr.arrayDimensionsSize = 1;
+  attr.arrayDimensions = (UA_UInt32*)UA_Array_new(1, &UA_TYPES[UA_TYPES_UINT32]);
+  if(!attr.arrayDimensions) {
+    return UA_STATUSCODE_BADOUTOFMEMORY;
+  }
+  attr.arrayDimensions[0] = 6;
+  attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_LOCALIZEDTEXT);
+
+  UA_LocalizedText enumValues[6] = {UA_LOCALIZEDTEXT("", "Trace"), UA_LOCALIZEDTEXT("", "Debug"),
+      UA_LOCALIZEDTEXT("", "Info"), UA_LOCALIZEDTEXT("", "Warning"), UA_LOCALIZEDTEXT("", "Error"),
+      UA_LOCALIZEDTEXT("", "Fatal")};
+  UA_Variant_setArray(&attr.value, enumValues, 6, &UA_TYPES[UA_TYPES_LOCALIZEDTEXT]);
+
+  attr.displayName = UA_LOCALIZEDTEXT("", "EnumStrings");
+  attr.description = UA_LOCALIZEDTEXT("", "");
+  attr.writeMask = 0;
+  attr.userWriteMask = 0;
+
+  UA_Server_addNode_begin(server, UA_NODECLASS_VARIABLE, UA_NODEID_STRING(1, "EnumStrings"),
+      UA_NODEID_STRING(1, "LoggingLevels"), UA_NODEID_NUMERIC(0, UA_NS0ID_HASPROPERTY),
+      UA_QUALIFIEDNAME(0, "EnumStrings"), UA_NODEID_NUMERIC(0, UA_NS0ID_PROPERTYTYPE), (const UA_NodeAttributes*)&attr,
+      &UA_TYPES[UA_TYPES_VARIABLEATTRIBUTES], NULL, NULL);
+  // cleanup
+  UA_Array_delete(attr.arrayDimensions, 1, &UA_TYPES[UA_TYPES_UINT32]);
+  if(retVal != UA_STATUSCODE_GOOD) {
+    UA_ServerConfig* config = UA_Server_getConfig(server);
+    UA_LOG_ERROR(
+        config->logging, UA_LOGCATEGORY_USERLAND, "Failed adding variable reference. %s", UA_StatusCode_name(retVal));
+  }
+  return retVal;
+}
+
+UA_INLINE void csa_namespace_add_LoggingLevelEnumType(UA_Server* server, char* enumName) {
+  UA_DataTypeAttributes attr = UA_DataTypeAttributes_default;
+  attr.description = UA_LOCALIZEDTEXT("", enumName);
+  attr.displayName = UA_LOCALIZEDTEXT("", enumName);
+  UA_StatusCode st =
+      UA_Server_addDataTypeNode(server, UA_NODEID_STRING(1, enumName), UA_NODEID_NUMERIC(0, UA_NS0ID_ENUMERATION),
+          UA_NODEID_NUMERIC(0, UA_NS0ID_HASSUBTYPE), UA_QUALIFIEDNAME(1, enumName), attr, NULL, NULL);
+  if(st != UA_STATUSCODE_GOOD) {
+    UA_ServerConfig* config = UA_Server_getConfig(server);
+    UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_USERLAND, "Failed adding type node. %s", UA_StatusCode_name(st));
+  }
+  // add enum values
+  st = csa_namespace_add_LoggingLevelValues(server, &LoggingLevelType.typeId);
+  if(st != UA_STATUSCODE_GOOD) {
+    UA_ServerConfig* config = UA_Server_getConfig(server);
+    UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_USERLAND, "Failed adding LoggingLevels  enum values. %s",
+        UA_StatusCode_name(st));
+  }
+}
 
 UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
   UA_StatusCode retval = UA_STATUSCODE_GOOD;
@@ -243,6 +303,8 @@ UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
     UA_Server_addReference(
         server, UA_NODEID_NUMERIC(2, 6018), UA_NODEID_NUMERIC(0, 40), UA_EXPANDEDNODEID_NUMERIC(0, 63), true);
   } while(0);
+
+  csa_namespace_add_LoggingLevelEnumType(server, (char*)"LoggingLevels");
 
   return retval;
 }

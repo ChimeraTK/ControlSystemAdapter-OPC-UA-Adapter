@@ -28,6 +28,7 @@
 
 extern "C" {
 #include "csa_namespace.h"
+#include "loggingLevel_type.h"
 #include "unistd.h"
 
 #include <dirent.h>
@@ -252,6 +253,12 @@ namespace ChimeraTK {
 
     this->mappedServer = UA_Server_newWithConfig(config);
     this->server_config = UA_Server_getConfig(this->mappedServer);
+
+    // Add custom tpye to server
+    UA_DataType* types = (UA_DataType*)UA_malloc(1 * sizeof(UA_DataType));
+    types[0] = LoggingLevelType;
+    this->customDataTypes.reset(new UA_DataTypeArray{this->server_config->customDataTypes, 1, types, UA_FALSE});
+    this->server_config->customDataTypes = customDataTypes.get();
 
     // Username/Password handling
     auto* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
@@ -1544,9 +1551,10 @@ namespace ChimeraTK {
       UA_VariableAttributes attr = UA_VariableAttributes_default;
       attr.displayName = UA_LOCALIZEDTEXT((char*)"en-US", (char*)"logLevel");
       attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
-      attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BYTE);
-      UA_Byte b = 1;
-      UA_Variant_setScalarCopy(&attr.value, &b, &UA_TYPES[UA_TYPES_BYTE]);
+      attr.valueRank = -1;
+      attr.dataType = LoggingLevelType.typeId;
+      UA_LoggingLevel l = UA_LOGGINGLEVEL_INFO;
+      UA_Variant_setScalarCopy(&attr.value, &l, &UA_TYPES[UA_TYPES_BYTE]);
 
       UA_NodeId currentNodeId = UA_NODEID_STRING(1, (char*)"logLevel");
       UA_QualifiedName currentName = UA_QUALIFIEDNAME(1, (char*)"logLevel");
@@ -1700,31 +1708,8 @@ namespace ChimeraTK {
       const UA_NodeId* nodeId, void* nodeContext, UA_Boolean sourceTimeStamp, const UA_NumericRange* range,
       UA_DataValue* dataValue) {
     auto adapter = (ua_uaadapter*)nodeContext;
-    UA_Byte b;
-    switch(adapter->serverConfig.logLevel) {
-      case UA_LOGLEVEL_TRACE:
-        b = 0;
-        break;
-      case UA_LOGLEVEL_DEBUG:
-        b = 1;
-        break;
-      case UA_LOGLEVEL_INFO:
-        b = 2;
-        break;
-      case UA_LOGLEVEL_WARNING:
-        b = 3;
-        break;
-      case UA_LOGLEVEL_ERROR:
-        b = 4;
-        break;
-      case UA_LOGLEVEL_FATAL:
-        b = 5;
-        break;
-      default:
-        b = 99;
-        break;
-    }
-    UA_Variant_setScalarCopy(&dataValue->value, &b, &UA_TYPES[UA_TYPES_BYTE]);
+    UA_LoggingLevel l = toLoggingLevel(adapter->serverConfig.logLevel);
+    UA_Variant_setScalarCopy(&dataValue->value, &l, &LoggingLevelType);
     dataValue->hasValue = true;
     return UA_STATUSCODE_GOOD;
   }
@@ -1733,34 +1718,11 @@ namespace ChimeraTK {
       const UA_NodeId* nodeId, void* nodeContext, const UA_NumericRange* range, const UA_DataValue* data) {
     auto adapter = (ua_uaadapter*)nodeContext;
     const UA_Variant* var = &data->value;
-    UA_Byte level = *((UA_Byte*)var->data);
-    switch(level) {
-      case 0:
-        adapter->serverConfig.logLevel = UA_LOGLEVEL_TRACE;
-        break;
-      case 1:
-        adapter->serverConfig.logLevel = UA_LOGLEVEL_DEBUG;
-        break;
-      case 2:
-        adapter->serverConfig.logLevel = UA_LOGLEVEL_INFO;
-        break;
-      case 3:
-        adapter->serverConfig.logLevel = UA_LOGLEVEL_WARNING;
-        break;
-      case 4:
-        adapter->serverConfig.logLevel = UA_LOGLEVEL_ERROR;
-        break;
-      case 5:
-        adapter->serverConfig.logLevel = UA_LOGLEVEL_FATAL;
-        break;
-      default:
-        adapter->serverConfig.logLevel = UA_LOGLEVEL_INFO;
-        break;
-    }
-    //    UA_free(&adapter->logger);
+    adapter->serverConfig.logLevel = toLogLevel(*((UA_LoggingLevel*)var->data));
     adapter->logger = UA_Log_Stdout_withLevel(adapter->serverConfig.logLevel);
     adapter->server_config->logging = &adapter->logger;
-    UA_LOG_INFO(adapter->server_config->logging, UA_LOGCATEGORY_USERLAND, "Set log level to %d", level);
+    UA_LOG_INFO(adapter->server_config->logging, UA_LOGCATEGORY_USERLAND, "Set log level to %d",
+        adapter->serverConfig.logLevel);
     return UA_STATUSCODE_GOOD;
   }
 

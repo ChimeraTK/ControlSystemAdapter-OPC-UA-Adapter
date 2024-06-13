@@ -28,6 +28,8 @@
 #include <open62541/plugin/historydata/history_data_gathering.h>
 #include <open62541/server_config_default.h>
 
+#include <memory>
+
 using namespace std;
 
 namespace ChimeraTK {
@@ -101,6 +103,7 @@ namespace ChimeraTK {
 
     UA_NodeId variablesListId;
     UA_NodeId constantsListId;
+    std::shared_ptr<UA_DataTypeArray> customDataTypes;
 
     vector<FolderInfo> folderVector;
     UA_NodeId ownNodeId;
