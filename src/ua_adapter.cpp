@@ -29,6 +29,7 @@
 extern "C" {
 #include "csa_namespace.h"
 #include "unistd.h"
+
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1507,21 +1508,57 @@ namespace ChimeraTK {
       return 0;
     }
 
-    // Create our toplevel instance
-    UA_ObjectAttributes oAttr;
-    UA_ObjectAttributes_init(&oAttr);
-    // Classcast to prevent Warnings
-    oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.rootFolder.c_str());
-    oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.descriptionFolder.c_str());
+    {
+      // Create our toplevel instance
+      UA_ObjectAttributes oAttr;
+      UA_ObjectAttributes_init(&oAttr);
+      // Classcast to prevent Warnings
+      oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.rootFolder.c_str());
+      oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.descriptionFolder.c_str());
 
-    UA_Server_addObjectNode(this->mappedServer,
-        UA_NODEID_STRING(1, ((char*)(this->serverConfig.rootFolder + "Dir").c_str())),
-        UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-        UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()),
-        UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &this->ownedNodes, &createdNodeId);
+      UA_Server_addObjectNode(this->mappedServer,
+          UA_NODEID_STRING(1, ((char*)(this->serverConfig.rootFolder + "Dir").c_str())),
+          UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
+          UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()),
+          UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &this->ownedNodes, &createdNodeId);
 
-    this->ownNodeId = createdNodeId;
-    ua_mapInstantiatedNodes(this->ownNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &this->ownedNodes);
+      this->ownNodeId = createdNodeId;
+      ua_mapInstantiatedNodes(this->ownNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &this->ownedNodes);
+    }
+    {
+      // Create our toplevel instance for configuration
+      UA_ObjectAttributes oAttr;
+      UA_ObjectAttributes_init(&oAttr);
+      // Classcast to prevent Warnings
+      oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"ServerConfiguration");
+      oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Here adapter configurations are placed.");
+      nodePairList tmp;
+      UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char*)"ServerConfigurationDir"),
+          UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
+          UA_QUALIFIEDNAME(1, (char*)"ServerConfiguration"), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr,
+          &tmp, &createdNodeId);
+
+      ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &tmp);
+
+      // create log level node
+      UA_VariableAttributes attr = UA_VariableAttributes_default;
+      attr.displayName = UA_LOCALIZEDTEXT((char*)"en-US", (char*)"logLevel");
+      attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+      attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BYTE);
+      UA_Byte b = 1;
+      UA_Variant_setScalarCopy(&attr.value, &b, &UA_TYPES[UA_TYPES_BYTE]);
+
+      UA_NodeId currentNodeId = UA_NODEID_STRING(1, (char*)"logLevel");
+      UA_QualifiedName currentName = UA_QUALIFIEDNAME(1, (char*)"logLevel");
+      UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
+      UA_NodeId variableTypeNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE);
+
+      UA_DataSource logLevelDataSource;
+      logLevelDataSource.read = readLogLevel;
+      logLevelDataSource.write = writeLogLevel;
+      UA_Server_addDataSourceVariableNode(this->mappedServer, currentNodeId, createdNodeId, parentReferenceNodeId,
+          currentName, variableTypeNodeId, attr, logLevelDataSource, this, NULL);
+    }
 
     return UA_STATUSCODE_GOOD;
   }
@@ -1658,4 +1695,73 @@ namespace ChimeraTK {
   UA_Server* ua_uaadapter::getMappedServer() {
     return this->mappedServer;
   }
+
+  UA_StatusCode ua_uaadapter::readLogLevel(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext,
+      const UA_NodeId* nodeId, void* nodeContext, UA_Boolean sourceTimeStamp, const UA_NumericRange* range,
+      UA_DataValue* dataValue) {
+    auto adapter = (ua_uaadapter*)nodeContext;
+    UA_Byte b;
+    switch(adapter->serverConfig.logLevel) {
+      case UA_LOGLEVEL_TRACE:
+        b = 0;
+        break;
+      case UA_LOGLEVEL_DEBUG:
+        b = 1;
+        break;
+      case UA_LOGLEVEL_INFO:
+        b = 2;
+        break;
+      case UA_LOGLEVEL_WARNING:
+        b = 3;
+        break;
+      case UA_LOGLEVEL_ERROR:
+        b = 4;
+        break;
+      case UA_LOGLEVEL_FATAL:
+        b = 5;
+        break;
+      default:
+        b = 99;
+        break;
+    }
+    UA_Variant_setScalarCopy(&dataValue->value, &b, &UA_TYPES[UA_TYPES_BYTE]);
+    dataValue->hasValue = true;
+    return UA_STATUSCODE_GOOD;
+  }
+
+  UA_StatusCode ua_uaadapter::writeLogLevel(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext,
+      const UA_NodeId* nodeId, void* nodeContext, const UA_NumericRange* range, const UA_DataValue* data) {
+    auto adapter = (ua_uaadapter*)nodeContext;
+    const UA_Variant* var = &data->value;
+    UA_Byte level = *((UA_Byte*)var->data);
+    switch(level) {
+      case 0:
+        adapter->serverConfig.logLevel = UA_LOGLEVEL_TRACE;
+        break;
+      case 1:
+        adapter->serverConfig.logLevel = UA_LOGLEVEL_DEBUG;
+        break;
+      case 2:
+        adapter->serverConfig.logLevel = UA_LOGLEVEL_INFO;
+        break;
+      case 3:
+        adapter->serverConfig.logLevel = UA_LOGLEVEL_WARNING;
+        break;
+      case 4:
+        adapter->serverConfig.logLevel = UA_LOGLEVEL_ERROR;
+        break;
+      case 5:
+        adapter->serverConfig.logLevel = UA_LOGLEVEL_FATAL;
+        break;
+      default:
+        adapter->serverConfig.logLevel = UA_LOGLEVEL_INFO;
+        break;
+    }
+    //    UA_free(&adapter->logger);
+    adapter->logger = UA_Log_Stdout_withLevel(adapter->serverConfig.logLevel);
+    adapter->server_config->logging = &adapter->logger;
+    UA_LOG_INFO(adapter->server_config->logging, UA_LOGCATEGORY_USERLAND, "Set log level to %d", level);
+    return UA_STATUSCODE_GOOD;
+  }
+
 } // namespace ChimeraTK

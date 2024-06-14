@@ -298,6 +298,22 @@ namespace ChimeraTK {
      */
     ServerConfig get_server_config();
 
+    /**
+     * @brief callback function used to read the servers logging level.
+     *
+     * Read the current logging level stored in adapter->serverConfig.logLevel.
+     */
+    static UA_StatusCode readLogLevel(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext,
+        const UA_NodeId* nodeId, void* nodeContext, UA_Boolean sourceTimeStamp, const UA_NumericRange* range,
+        UA_DataValue* dataValue);
+
+    /**
+     * @brief callback function used to change the servers logging level.
+     *
+     * Set the new logging level entered by the user. Replace the servers logger by a new one.
+     */
+    static UA_StatusCode writeLogLevel(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext,
+        const UA_NodeId* nodeId, void* nodeContext, const UA_NumericRange* range, const UA_DataValue* data);
     // friend class declaration
     friend class csa_opcua_adapter;
   };
