@@ -121,21 +121,21 @@ namespace ChimeraTK {
     *hostName = UA_STRING_ALLOC(hostname);
     config->applicationDescription.discoveryUrls = hostName;
     config->applicationDescription.discoveryUrlsSize = 1;
-    config->applicationDescription.applicationUri = UA_STRING_ALLOC((char*)(cleanUri(hostname_uri)).c_str());
-    config->buildInfo.manufacturerName = UA_STRING_ALLOC((char*)"ChimeraTK Team");
+    config->applicationDescription.applicationUri = UA_STRING_ALLOC(const_cast<char*>(cleanUri(hostname_uri).c_str()));
+    config->buildInfo.manufacturerName = UA_STRING_ALLOC(const_cast<char*>("ChimeraTK Team"));
     std::string
         versionString =
             "open62541: " xstr(UA_OPEN62541_VER_MAJOR) "." xstr(UA_OPEN62541_VER_MINOR) "." xstr(UA_OPEN62541_VER_PATCH) ", ControlSystemAdapter-OPC-UA-Adapter: " xstr(
                 PROJECT_VER_MAJOR) "." xstr(PROJECT_VER_MINOR) "." xstr(PTOJECT_VER_PATCH) "";
-    config->buildInfo.softwareVersion = UA_STRING_ALLOC((char*)versionString.c_str());
+    config->buildInfo.softwareVersion = UA_STRING_ALLOC(const_cast<char*>(versionString.c_str()));
     config->buildInfo.buildDate = UA_DateTime_now();
-    config->buildInfo.buildNumber = UA_STRING_ALLOC((char*)"");
+    config->buildInfo.buildNumber = UA_STRING_ALLOC(const_cast<char*>(""));
 
-    config->buildInfo.productName = UA_STRING_ALLOC((char*)this->serverConfig.applicationName.c_str());
+    config->buildInfo.productName = UA_STRING_ALLOC(const_cast<char*>(this->serverConfig.applicationName.c_str()));
     string product_urn = "urn:ChimeraTK:" + this->serverConfig.applicationName;
-    config->buildInfo.productUri = UA_STRING_ALLOC((char*)(cleanUri(product_urn)).c_str());
-    config->applicationDescription.applicationName =
-        UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)this->serverConfig.applicationName.c_str());
+    config->buildInfo.productUri = UA_STRING_ALLOC(const_cast<char*>(cleanUri(product_urn).c_str()));
+    config->applicationDescription.applicationName = UA_LOCALIZEDTEXT_ALLOC(
+        const_cast<char*>("en_US"), const_cast<char*>(this->serverConfig.applicationName.c_str()));
   }
 
   void ua_uaadapter::constructServer() {
@@ -262,8 +262,8 @@ namespace ChimeraTK {
 
     // Username/Password handling
     auto* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
-    usernamePasswordLogins->password = UA_STRING_ALLOC((char*)this->serverConfig.password.c_str());
-    usernamePasswordLogins->username = UA_STRING_ALLOC((char*)this->serverConfig.username.c_str());
+    usernamePasswordLogins->password = UA_STRING_ALLOC(const_cast<char*>(this->serverConfig.password.c_str()));
+    usernamePasswordLogins->username = UA_STRING_ALLOC(const_cast<char*>(this->serverConfig.username.c_str()));
     UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
         &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
         usernamePasswordLogins);
@@ -688,8 +688,8 @@ namespace ChimeraTK {
     this->variables.push_back(processvariable);
     UA_NodeId tmpNodeId = processvariable->getOwnNodeId();
     UA_Server_writeDisplayName(this->mappedServer, tmpNodeId,
-        UA_LOCALIZEDTEXT(
-            (char*)"en_US", (char*)xml_file_handler::parseVariablePath(varName, this->pvSeperator).back().c_str()));
+        UA_LOCALIZEDTEXT(const_cast<char*>("en_US"),
+            const_cast<char*>(xml_file_handler::parseVariablePath(varName, this->pvSeperator).back().c_str())));
     UA_NodeId_clear(&tmpNodeId);
   }
 
@@ -717,7 +717,8 @@ namespace ChimeraTK {
       string foundPVSourceNameCPP;
       UA_Variant value;
       UA_STRING_TO_CPPSTRING_COPY(&rd.nodeId.nodeId.identifier.string, &pvSourceNameid)
-      UA_Server_readValue(this->mappedServer, UA_NODEID_STRING(1, (char*)(pvSourceNameid + "/Name").c_str()), &value);
+      UA_Server_readValue(
+          this->mappedServer, UA_NODEID_STRING(1, const_cast<char*>((pvSourceNameid + "/Name").c_str())), &value);
       foundPVSourceName = *((UA_String*)value.data);
       UASTRING_TO_CPPSTRING(foundPVSourceName, foundPVSourceNameCPP)
       string varName = xml_file_handler::parseVariablePath(foundPVNameCPP, "/").back();
@@ -798,7 +799,7 @@ namespace ChimeraTK {
             if(!sourceName.empty()) {
               AdapterFolderHistorySetup temp;
               temp.folder_historizing = history;
-              UA_NodeId id = UA_NODEID_STRING(1, (char*)folderNodeId.c_str());
+              UA_NodeId id = UA_NODEID_STRING(1, const_cast<char*>(folderNodeId.c_str()));
               UA_NodeId_copy(&id, &temp.folder_id);
               this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
               UA_String out = UA_STRING_NULL;
@@ -812,7 +813,7 @@ namespace ChimeraTK {
             AdapterFolderHistorySetup temp;
             temp.folder_historizing = history;
             string folderNodeId = this->serverConfig.rootFolder + "/" + sourceName + "Dir";
-            UA_NodeId id = UA_NODEID_STRING(1, (char*)folderNodeId.c_str());
+            UA_NodeId id = UA_NODEID_STRING(1, const_cast<char*>(folderNodeId.c_str()));
             UA_NodeId_copy(&id, &temp.folder_id);
             this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
             UA_String out = UA_STRING_NULL;
@@ -850,14 +851,14 @@ namespace ChimeraTK {
         else {
           pvNodeString += this->serverConfig.rootFolder + "/" + destination + "/" + folder + "Dir";
         }
-        UA_NodeId pvNode = UA_NODEID_STRING(1, (char*)pvNodeString.c_str());
+        UA_NodeId pvNode = UA_NODEID_STRING(1, const_cast<char*>(pvNodeString.c_str()));
         UA_Server_readNodeId(this->mappedServer, pvNode, &tmpOutput);
         if(!UA_NodeId_isNull(&tmpOutput)) {
           UA_NodeId_clear(&tmpOutput);
           // set folder description
           if(sourceName.empty() && !description.empty()) {
-            UA_Server_writeDescription(
-                this->mappedServer, pvNode, UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
+            UA_Server_writeDescription(this->mappedServer, pvNode,
+                UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(description.c_str())));
             continue;
           }
           if(this->mappingExceptions) {
@@ -883,7 +884,7 @@ namespace ChimeraTK {
         }
         folderPathNodeId = enrollFolderPathFromString(destination + "/replacePart", "/");
         if(UA_NodeId_isNull(&folderPathNodeId)) {
-          folderPathNodeId = UA_NODEID_STRING(1, (char*)(this->serverConfig.rootFolder + "Dir").c_str());
+          folderPathNodeId = UA_NODEID_STRING(1, const_cast<char*>((this->serverConfig.rootFolder + "Dir").c_str()));
         }
         // check if source name is set -> map complete hierarchical structure to the destination
         if(!sourceName.empty()) {
@@ -902,7 +903,7 @@ namespace ChimeraTK {
           // check if the src is a folder
           string sourceFolder = this->serverConfig.rootFolder + "/" + sourceName + "Dir";
           bool isFolderType = false;
-          UA_NodeId sourceFolderId = UA_NODEID_STRING(1, (char*)sourceFolder.c_str());
+          UA_NodeId sourceFolderId = UA_NODEID_STRING(1, const_cast<char*>(sourceFolder.c_str()));
 
           UA_BrowseDescription bd;
           bd.includeSubtypes = false;
@@ -964,12 +965,12 @@ namespace ChimeraTK {
                 existingDestinationFolderString = this->serverConfig.rootFolder +=
                     "/" + destination + "/" + folder + "Dir";
               }
-              copyRoot = UA_NODEID_STRING(1, (char*)existingDestinationFolderString.c_str());
+              copyRoot = UA_NODEID_STRING(1, const_cast<char*>(existingDestinationFolderString.c_str()));
             }
             deepCopyHierarchicalLayer(csManager, sourceFolderId, copyRoot);
             if(!description.empty()) {
-              UA_Server_writeDescription(
-                  this->mappedServer, copyRoot, UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
+              UA_Server_writeDescription(this->mappedServer, copyRoot,
+                  UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(description.c_str())));
             }
           }
           else {
@@ -982,12 +983,12 @@ namespace ChimeraTK {
               else {
                 existingDestinationFolderString = this->serverConfig.rootFolder + "/" + destination + "/" + folder;
               }
-              copyRoot = UA_NODEID_STRING(1, (char*)existingDestinationFolderString.c_str());
+              copyRoot = UA_NODEID_STRING(1, const_cast<char*>(existingDestinationFolderString.c_str()));
             }
             else {
               if(!description.empty()) {
-                UA_Server_writeDescription(
-                    this->mappedServer, copyRoot, UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
+                UA_Server_writeDescription(this->mappedServer, copyRoot,
+                    UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(description.c_str())));
               }
             }
             UA_BrowseDescription bd;
@@ -1029,8 +1030,8 @@ namespace ChimeraTK {
         UA_NodeId retnode = createFolder(folderPathNodeId, folder);
         // set folder description
         if(copy.empty() && sourceName.empty() && !description.empty()) {
-          UA_Server_writeDescription(
-              this->mappedServer, retnode, UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str()));
+          UA_Server_writeDescription(this->mappedServer, retnode,
+              UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(description.c_str())));
         }
       }
 
@@ -1066,7 +1067,7 @@ namespace ChimeraTK {
           if(!nodeName.empty()) {
             if(nodeDestination.empty()) {
               targetNodeId = this->serverConfig.rootFolder + "/" + xml_file_handler::getContentFromNode(nodeName[0]);
-              UA_NodeId id = UA_NODEID_STRING(1, (char*)targetNodeId.c_str());
+              UA_NodeId id = UA_NODEID_STRING(1, const_cast<char*>(targetNodeId.c_str()));
               UA_NodeId_copy(&id, &temp.variable_id);
               this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
             }
@@ -1074,7 +1075,7 @@ namespace ChimeraTK {
               targetNodeId = this->serverConfig.rootFolder + "/" +
                   xml_file_handler::getContentFromNode(nodeDestination[0]) + "/" +
                   xml_file_handler::getContentFromNode(nodeName[0]);
-              UA_NodeId id = UA_NODEID_STRING(1, (char*)targetNodeId.c_str());
+              UA_NodeId id = UA_NODEID_STRING(1, const_cast<char*>(targetNodeId.c_str()));
               UA_NodeId_copy(&id, &temp.variable_id);
               this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
             }
@@ -1082,7 +1083,7 @@ namespace ChimeraTK {
           if(!sourceName.empty() && (copy.empty() || copy == "FALSE" || copy == "False" || copy == "false")) {
             name = sourceName;
             targetNodeId = this->serverConfig.rootFolder + "/" + sourceName;
-            UA_NodeId id = UA_NODEID_STRING(1, (char*)targetNodeId.c_str());
+            UA_NodeId id = UA_NODEID_STRING(1, const_cast<char*>(targetNodeId.c_str()));
             UA_NodeId_copy(&id, &temp.variable_id);
             this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
           }
@@ -1122,7 +1123,7 @@ namespace ChimeraTK {
           string parentSourceFolder = this->serverConfig.rootFolder + "/" +
               (sourceName.substr(
                   0, sourceName.length() - xml_file_handler::parseVariablePath(sourceName, "/").back().length() - 1));
-          UA_NodeId parentSourceFolderId = UA_NODEID_STRING(1, (char*)parentSourceFolder.c_str());
+          UA_NodeId parentSourceFolderId = UA_NODEID_STRING(1, const_cast<char*>(parentSourceFolder.c_str()));
           UA_NodeId pvNodeId = UA_NODEID_NULL;
           UA_BrowseDescription bd;
           bd.includeSubtypes = false;
@@ -1183,7 +1184,7 @@ namespace ChimeraTK {
         }
         // check if the source pv exists
         string parentSourceString = this->serverConfig.rootFolder + "/" + sourceName;
-        UA_NodeId parentSourceId = UA_NODEID_STRING(1, (char*)parentSourceString.c_str());
+        UA_NodeId parentSourceId = UA_NODEID_STRING(1, const_cast<char*>(parentSourceString.c_str()));
         UA_NodeId tmpOutput = UA_NODEID_NULL;
         UA_Server_readNodeId(this->mappedServer, parentSourceId, &tmpOutput);
         if(UA_NodeId_isNull(&tmpOutput)) {
@@ -1241,7 +1242,7 @@ namespace ChimeraTK {
                 requestedBrowseName.erase(0, ("Variables" + unrollPath).length());
                 // check if the requested path still exists in the Variables folder
                 string requestedPVBrowseName = this->serverConfig.rootFolder + "/Variables/" + requestedBrowseName;
-                UA_NodeId requestedPVBrowseId = UA_NODEID_STRING(1, (char*)requestedPVBrowseName.c_str());
+                UA_NodeId requestedPVBrowseId = UA_NODEID_STRING(1, const_cast<char*>(requestedPVBrowseName.c_str()));
                 UA_NodeId tmpOutput = UA_NODEID_NULL;
                 UA_Server_readNodeId(this->mappedServer, requestedPVBrowseId, &tmpOutput);
                 if(!UA_NodeId_isNull(&tmpOutput)) {
@@ -1345,8 +1346,8 @@ namespace ChimeraTK {
             UA_NodeId_clear(&tmpNodeId);
           }
         }
-        UA_Server_writeDisplayName(
-            this->mappedServer, createdNodeId, UA_LOCALIZEDTEXT((char*)"en_US", (char*)name.c_str()));
+        UA_Server_writeDisplayName(this->mappedServer, createdNodeId,
+            UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(name.c_str())));
         UA_NodeId_clear(&createdNodeId);
       }
 
@@ -1402,7 +1403,7 @@ namespace ChimeraTK {
         else {
           avNodeString = this->serverConfig.rootFolder + "/" + destination + "/" + name + "AdditionalVariable";
         }
-        UA_NodeId avNode = UA_NODEID_STRING(1, (char*)avNodeString.c_str());
+        UA_NodeId avNode = UA_NODEID_STRING(1, const_cast<char*>(avNodeString.c_str()));
         UA_Server_readNodeId(this->mappedServer, avNode, &tmpOutput);
         if(!UA_NodeId_isNull(&tmpOutput)) {
           UA_NodeId_clear(&tmpOutput);
@@ -1424,7 +1425,7 @@ namespace ChimeraTK {
         else {
           pvNodeString = this->serverConfig.rootFolder + "/" + destination + "/" + name + "Value";
         }
-        UA_NodeId pvNode = UA_NODEID_STRING(1, (char*)pvNodeString.c_str());
+        UA_NodeId pvNode = UA_NODEID_STRING(1, const_cast<char*>(pvNodeString.c_str()));
         UA_Server_readNodeId(this->mappedServer, pvNode, &tmpOutput);
         if(!UA_NodeId_isNull(&tmpOutput)) {
           UA_NodeId_clear(&tmpOutput);
@@ -1446,7 +1447,7 @@ namespace ChimeraTK {
         }
         else {
           additionalVarFolderPathNodeId += this->serverConfig.rootFolder + "Dir";
-          additionalVarFolderPath = UA_NODEID_STRING_ALLOC(1, (char*)additionalVarFolderPathNodeId.c_str());
+          additionalVarFolderPath = UA_NODEID_STRING_ALLOC(1, const_cast<char*>(additionalVarFolderPathNodeId.c_str()));
         }
         if(UA_NodeId_isNull(&additionalVarFolderPath)) {
           if(this->mappingExceptions) {
@@ -1483,8 +1484,8 @@ namespace ChimeraTK {
     UA_ObjectAttributes oAttr;
     UA_ObjectAttributes_init(&oAttr);
     // Classcast to prevent Warnings
-    oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)folderName.c_str());
-    oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)description.c_str());
+    oAttr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(folderName.c_str()));
+    oAttr.description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(description.c_str()));
 
     string parentNodeIdString;
     if(basenodeid.identifierType == UA_NODEIDTYPE_STRING) {
@@ -1499,9 +1500,10 @@ namespace ChimeraTK {
     }
 
     UA_Server_addObjectNode(this->mappedServer,
-        UA_NODEID_STRING(1, (char*)parentNodeIdString.c_str()), // UA_NODEID_NUMERIC(1,0)
-        basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), UA_QUALIFIEDNAME(1, (char*)folderName.c_str()),
-        UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr, &this->ownedNodes, &createdNodeId);
+        UA_NODEID_STRING(1, const_cast<char*>(parentNodeIdString.c_str())), // UA_NODEID_NUMERIC(1,0)
+        basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
+        UA_QUALIFIEDNAME(1, const_cast<char*>(folderName.c_str())), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr,
+        &this->ownedNodes, &createdNodeId);
 
     ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), &this->ownedNodes);
     return createdNodeId;
@@ -1520,13 +1522,15 @@ namespace ChimeraTK {
       UA_ObjectAttributes oAttr;
       UA_ObjectAttributes_init(&oAttr);
       // Classcast to prevent Warnings
-      oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.rootFolder.c_str());
-      oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->serverConfig.descriptionFolder.c_str());
+      oAttr.displayName =
+          UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(this->serverConfig.rootFolder.c_str()));
+      oAttr.description =
+          UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(this->serverConfig.descriptionFolder.c_str()));
 
       UA_Server_addObjectNode(this->mappedServer,
-          UA_NODEID_STRING(1, ((char*)(this->serverConfig.rootFolder + "Dir").c_str())),
+          UA_NODEID_STRING(1, (const_cast<char*>((this->serverConfig.rootFolder + "Dir").c_str()))),
           UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-          UA_QUALIFIEDNAME(1, (char*)this->serverConfig.rootFolder.c_str()),
+          UA_QUALIFIEDNAME(1, const_cast<char*>(this->serverConfig.rootFolder.c_str())),
           UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &this->ownedNodes, &createdNodeId);
 
       this->ownNodeId = createdNodeId;
@@ -1537,27 +1541,28 @@ namespace ChimeraTK {
       UA_ObjectAttributes oAttr;
       UA_ObjectAttributes_init(&oAttr);
       // Classcast to prevent Warnings
-      oAttr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"ServerConfiguration");
-      oAttr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Here adapter configurations are placed.");
+      oAttr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("ServerConfiguration"));
+      oAttr.description =
+          UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("Here adapter configurations are placed."));
       nodePairList tmp;
-      UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, (char*)"ServerConfigurationDir"),
+      UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, const_cast<char*>("ServerConfigurationDir")),
           UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-          UA_QUALIFIEDNAME(1, (char*)"ServerConfiguration"), UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr,
-          &tmp, &createdNodeId);
+          UA_QUALIFIEDNAME(1, const_cast<char*>("ServerConfiguration")),
+          UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &tmp, &createdNodeId);
 
       ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &tmp);
 
       // create log level node
       UA_VariableAttributes attr = UA_VariableAttributes_default;
-      attr.displayName = UA_LOCALIZEDTEXT((char*)"en-US", (char*)"logLevel");
+      attr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en-US"), const_cast<char*>("logLevel"));
       attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
       attr.valueRank = -1;
       attr.dataType = LoggingLevelType.typeId;
       UA_LoggingLevel l = UA_LOGGINGLEVEL_INFO;
       UA_Variant_setScalarCopy(&attr.value, &l, &UA_TYPES[UA_TYPES_BYTE]);
 
-      UA_NodeId currentNodeId = UA_NODEID_STRING(1, (char*)"logLevel");
-      UA_QualifiedName currentName = UA_QUALIFIEDNAME(1, (char*)"logLevel");
+      UA_NodeId currentNodeId = UA_NODEID_STRING(1, const_cast<char*>("logLevel"));
+      UA_QualifiedName currentName = UA_QUALIFIEDNAME(1, const_cast<char*>("logLevel"));
       UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
       UA_NodeId variableTypeNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE);
 

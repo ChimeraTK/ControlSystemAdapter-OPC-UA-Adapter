@@ -97,16 +97,17 @@ namespace ChimeraTK {
     UA_VariableAttributes vAttr;
     UA_VariableAttributes_init(&vAttr);
     vAttr = UA_VariableAttributes_default;
-    vAttr.displayName = UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)this->name.c_str());
-    vAttr.description = UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)this->description.c_str());
+    vAttr.displayName = UA_LOCALIZEDTEXT_ALLOC(const_cast<char*>("en_US"), const_cast<char*>(this->name.c_str()));
+    vAttr.description =
+        UA_LOCALIZEDTEXT_ALLOC(const_cast<char*>("en_US"), const_cast<char*>(this->description.c_str()));
     vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
     vAttr.valueRank = UA_VALUERANK_SCALAR;
     UA_Variant_setScalar(&vAttr.value, opcua_node_variable_t_ns_2_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
 
     UA_QualifiedName qualName = UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str());
     retval |= UA_Server_addVariableNode(this->mappedServer,
-        UA_NODEID_STRING(1, (char*)(baseNodeIdStringCPP + "/" + name + "AdditionalVariable").c_str()), this->baseNodeId,
-        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName,
+        UA_NODEID_STRING(1, const_cast<char*>((baseNodeIdStringCPP + "/" + name + "AdditionalVariable").c_str())),
+        this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName,
         UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), vAttr, (void*)this, &createdNodeId);
     UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
     ua_mapInstantiatedNodes(
@@ -118,8 +119,9 @@ namespace ChimeraTK {
     UA_VariableAttributes vAttr2;
     UA_VariableAttributes_init(&vAttr2);
     vAttr2 = UA_VariableAttributes_default;
-    vAttr2.displayName = UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)"Description");
-    vAttr2.description = UA_LOCALIZEDTEXT_ALLOC((char*)"en_US", (char*)this->description.c_str());
+    vAttr2.displayName = UA_LOCALIZEDTEXT_ALLOC(const_cast<char*>("en_US"), const_cast<char*>("Description"));
+    vAttr2.description =
+        UA_LOCALIZEDTEXT_ALLOC(const_cast<char*>("en_US"), const_cast<char*>(this->description.c_str()));
     vAttr2.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
     vAttr.valueRank = UA_VALUERANK_SCALAR;
     UA_String addVarDescription = UA_STRING_ALLOC(description.c_str());
@@ -127,10 +129,10 @@ namespace ChimeraTK {
 
     UA_QualifiedName qualName2 = UA_QUALIFIEDNAME_ALLOC(1, this->description.c_str());
     string parentNodeStringDescription = baseNodeIdStringCPP + "/" + name + "/Description";
-    retval |=
-        UA_Server_addVariableNode(this->mappedServer, UA_NODEID_STRING(1, (char*)parentNodeStringDescription.c_str()),
-            this->ownNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName2,
-            UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), vAttr2, nullptr, nullptr);
+    retval |= UA_Server_addVariableNode(this->mappedServer,
+        UA_NODEID_STRING(1, const_cast<char*>(parentNodeStringDescription.c_str())), this->ownNodeId,
+        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName2, UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
+        vAttr2, nullptr, nullptr);
 
     UA_QualifiedName_clear(&qualName2);
 

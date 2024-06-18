@@ -407,8 +407,8 @@ namespace ChimeraTK {
       return UA_STATUSCODE_GOOD; // initializer should have set this!
 
     UA_LocalizedText description;
-    description = UA_LOCALIZEDTEXT(
-        (char*)"en_US", (char*)this->csManager->getProcessVariable(this->namePV)->getDescription().c_str());
+    description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"),
+        const_cast<char*>(this->csManager->getProcessVariable(this->namePV)->getDescription().c_str()));
 
     // Create our toplevel instance
     UA_VariableAttributes attr;
@@ -416,7 +416,7 @@ namespace ChimeraTK {
     attr = UA_VariableAttributes_default;
     // Allow negative sampling intervals -> used by Labview and handled by open62541-interface 1.3.3.-2
     attr.minimumSamplingInterval = -1.;
-    attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)this->nameNew.c_str());
+    attr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(this->nameNew.c_str()));
     attr.description = description;
     attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
 
@@ -438,12 +438,13 @@ namespace ChimeraTK {
     // check if the nodeId is used by another mapping and find next free NodeId
     UA_NodeId result;
     if(UA_Server_readDataType(this->mappedServer,
-           UA_NODEID_STRING(1, (char*)(baseNodeIdName + "/" + this->nameNew).c_str()), &result) == UA_STATUSCODE_GOOD) {
+           UA_NODEID_STRING(1, const_cast<char*>((baseNodeIdName + "/" + this->nameNew).c_str())),
+           &result) == UA_STATUSCODE_GOOD) {
       return UA_STATUSCODE_BADNODEIDEXISTS;
     }
     retval = UA_Server_addVariableNode(this->mappedServer,
-        UA_NODEID_STRING(1, (char*)(baseNodeIdName + "/" + this->nameNew).c_str()), this->baseNodeId,
-        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*)this->nameNew.c_str()),
+        UA_NODEID_STRING(1, const_cast<char*>((baseNodeIdName + "/" + this->nameNew).c_str())), this->baseNodeId,
+        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>(this->nameNew.c_str())),
         UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, (void*)this, &createdNodeId);
     UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
     ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, 1001), &this->ownedNodes);
@@ -550,22 +551,22 @@ namespace ChimeraTK {
     // Adding the 'name' node to the PV
     UA_DataSource_Map_Element mapElemName;
     mapElemName.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
-    mapElemName.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+    mapElemName.description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(""));
     mapElemName.dataSource.read = ua_readproxy_ua_processvariable_getName;
     mapElemName.dataSource.write = nullptr;
 
     UA_VariableAttributes_init(&attr);
     attr = UA_VariableAttributes_default;
-    attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Name");
-    attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+    attr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("Name"));
+    attr.description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(""));
     attr.valueRank = UA_VALUERANK_SCALAR;
     attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
-    UA_String opcua_node_variable_t_ns_2_i_6004_variant_DataContents = UA_STRING_ALLOC((char*)"");
+    UA_String opcua_node_variable_t_ns_2_i_6004_variant_DataContents = UA_STRING_ALLOC(const_cast<char*>(""));
     UA_Variant_setScalar(
         &attr.value, &opcua_node_variable_t_ns_2_i_6004_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
-        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Name").c_str()), pvNodeId,
-        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, (char*)"Name"),
+        UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Name").c_str())), pvNodeId,
+        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Name")),
         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId nameVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
@@ -582,25 +583,25 @@ namespace ChimeraTK {
     // Adding the 'Description' node to the PV
     UA_DataSource_Map_Element mapElemDesc;
     mapElemDesc.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
-    mapElemDesc.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+    mapElemDesc.description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(""));
     mapElemDesc.dataSource.read = ua_readproxy_ua_processvariable_getDescription;
     mapElemDesc.dataSource.write = nullptr;
 
     UA_VariableAttributes_init(&attr);
     attr = UA_VariableAttributes_default;
-    attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Description");
-    attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+    attr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("Description"));
+    attr.description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(""));
     attr.accessLevel = UA_ACCESSLEVELMASK_READ;
     attr.userAccessLevel = UA_ACCESSLEVELMASK_READ;
     attr.valueRank = UA_VALUERANK_SCALAR;
     attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
-    UA_String opcua_node_variable_t_ns_2_i_6001_variant_DataContents = UA_STRING((char*)"");
+    UA_String opcua_node_variable_t_ns_2_i_6001_variant_DataContents = UA_STRING(const_cast<char*>(""));
     UA_Variant_setScalar(
         &attr.value, &opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
-        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Description").c_str()), pvNodeId,
-        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"Description"), UA_NODEID_NUMERIC(0, 63), attr, this,
-        &createdNodeId);
+        UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Description").c_str())), pvNodeId,
+        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("Description")), UA_NODEID_NUMERIC(0, 63), attr,
+        this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId descVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
       NODE_PAIR_PUSH(this->ownedNodes, descVariable, createdNodeId)
@@ -616,23 +617,23 @@ namespace ChimeraTK {
     // Adding the 'EngineeringUnit' node to the PV
     UA_DataSource_Map_Element mapElemEU;
     mapElemEU.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
-    mapElemEU.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+    mapElemEU.description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(""));
     mapElemEU.dataSource.read = ua_readproxy_ua_processvariable_getEngineeringUnit;
     mapElemEU.dataSource.write = nullptr;
     UA_VariableAttributes_init(&attr);
     attr = UA_VariableAttributes_default;
-    attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"EngineeringUnit");
-    attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+    attr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("EngineeringUnit"));
+    attr.description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(""));
     attr.accessLevel = UA_ACCESSLEVELMASK_READ;
     attr.userAccessLevel = UA_ACCESSLEVELMASK_READ;
     attr.valueRank = UA_VALUERANK_SCALAR;
     attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
-    UA_String defaultEngineeringUnit = UA_STRING((char*)"");
+    UA_String defaultEngineeringUnit = UA_STRING(const_cast<char*>(""));
     UA_Variant_setScalar(&attr.value, &defaultEngineeringUnit, &UA_TYPES[UA_TYPES_STRING]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
-        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/EngineeringUnit").c_str()), pvNodeId,
-        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"EngineeringUnit"), UA_NODEID_NUMERIC(0, 63), attr, this,
-        &createdNodeId);
+        UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/EngineeringUnit").c_str())),
+        pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("EngineeringUnit")),
+        UA_NODEID_NUMERIC(0, 63), attr, this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId engineeringunitVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
       NODE_PAIR_PUSH(this->ownedNodes, engineeringunitVariable, createdNodeId)
@@ -648,26 +649,26 @@ namespace ChimeraTK {
     // Adding the 'Type' node to the PV
     UA_DataSource_Map_Element mapElemType;
     mapElemType.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
-    mapElemType.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+    mapElemType.description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(""));
     mapElemType.dataSource.read = ua_readproxy_ua_processvariable_getType;
     mapElemType.dataSource.write = nullptr;
     UA_VariableAttributes_init(&attr);
     attr = UA_VariableAttributes_default;
-    attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Type");
-    attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Data type used in ChimeraTK");
+    attr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("Type"));
+    attr.description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("Data type used in ChimeraTK"));
     attr.accessLevel = UA_ACCESSLEVELMASK_READ;
     attr.userAccessLevel = UA_ACCESSLEVELMASK_READ;
     attr.valueRank = UA_VALUERANK_SCALAR;
     attr.dataType = UA_TYPES[UA_TYPES_STRING].typeId;
-    UA_String opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING((char*)"");
+    UA_String opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING(const_cast<char*>(""));
     UA_Variant_setScalar(
         &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6012);
     UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
     addResult = UA_Server_addVariableNode(this->mappedServer,
-        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Type").c_str()), pvNodeId,
-        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"Type"), UA_NODEID_NUMERIC(0, 63), attr, this,
+        UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Type").c_str())), pvNodeId,
+        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("Type")), UA_NODEID_NUMERIC(0, 63), attr, this,
         &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId typeVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
@@ -684,13 +685,14 @@ namespace ChimeraTK {
     // Adding the Validity node to the PV
     UA_DataSource_Map_Element mapElemValidity;
     mapElemValidity.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
-    mapElemValidity.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"");
+    mapElemValidity.description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(""));
     mapElemValidity.dataSource.read = ua_readproxy_ua_processvariable_getValidity;
     mapElemValidity.dataSource.write = nullptr;
     UA_VariableAttributes_init(&attr);
     attr = UA_VariableAttributes_default;
-    attr.displayName = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Validity");
-    attr.description = UA_LOCALIZEDTEXT((char*)"en_US", (char*)"Data validity. 0: faulty, 1: ok");
+    attr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("Validity"));
+    attr.description =
+        UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("Data validity. 0: faulty, 1: ok"));
     attr.accessLevel = UA_ACCESSLEVELMASK_READ;
     attr.userAccessLevel = UA_ACCESSLEVELMASK_READ;
     attr.valueRank = UA_VALUERANK_SCALAR;
@@ -698,9 +700,9 @@ namespace ChimeraTK {
     UA_Int32 defaultValidity = -1;
     UA_Variant_setScalar(&attr.value, &defaultValidity, &UA_TYPES[UA_TYPES_INT32]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
-        UA_NODEID_STRING(1, (char*)(baseNodePath + "/" + this->nameNew + "/Validity").c_str()), pvNodeId,
-        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, (char*)"Validity"), UA_NODEID_NUMERIC(0, 63), attr, this,
-        &createdNodeId);
+        UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Validity").c_str())), pvNodeId,
+        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("Validity")), UA_NODEID_NUMERIC(0, 63), attr,
+        this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId vadilityVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
       NODE_PAIR_PUSH(this->ownedNodes, vadilityVariable, createdNodeId)
