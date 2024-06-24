@@ -320,9 +320,7 @@ void ua_uaadapter::constructServer() {
     UA_ByteString_clear(&privateKey);
     for(size_t i = 0; i < trustListSize; i++) UA_ByteString_clear(&trustList[i]);
   }
-  UA_PubSubTransportLayer pubsubTransportLayer;
-  pubsubTransportLayer = UA_PubSubTransportLayerUDPMP();
-  UA_ServerConfig_addPubSubTransportLayer(config, &pubsubTransportLayer);
+  UA_ServerConfig_addPubSubTransportLayer(config, UA_PubSubTransportLayerUDPMP());
   fillBuildInfo(config);
   for(size_t i = 0; i < config->endpointsSize; ++i) {
     UA_ApplicationDescription_clear(&config->endpoints[i].server);
@@ -344,7 +342,7 @@ void ua_uaadapter::constructServer() {
   auto* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
   usernamePasswordLogins->password = UA_STRING_ALLOC((char*)this->serverConfig.password.c_str());
   usernamePasswordLogins->username = UA_STRING_ALLOC((char*)this->serverConfig.username.c_str());
-  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
+  UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin, NULL,
       &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
       usernamePasswordLogins);
 

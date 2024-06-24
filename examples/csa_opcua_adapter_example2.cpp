@@ -44,9 +44,7 @@ struct MyApp : public ApplicationBase {
   void run() { cout << "Application run..." << endl; }
 
   void shutdown() {
-    std::lock_guard<std::mutex> lock(instance_mutex);
-    instance = nullptr;
-    hasBeenShutdown = true;
+    ApplicationBase::shutdown();
     cout << "Application shutdown..." << endl;
   }
 
