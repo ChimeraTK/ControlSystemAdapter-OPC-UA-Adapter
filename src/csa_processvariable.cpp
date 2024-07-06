@@ -292,7 +292,10 @@ namespace ChimeraTK {
     }
     else {
       std::vector<T> iarr = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0);
+      //UA_Variant tmpVariant;
       rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[fusion::at_key<T>(typesMap)]);
+      //UA_Variant_setRange(v, iarr.data(), iarr.size(), *range);
+      //UA_Variant_copyRange(v, &tmpVariant, *range);
     }
     return rv;
   }
