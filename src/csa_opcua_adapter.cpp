@@ -60,7 +60,7 @@ namespace ChimeraTK {
         /*skip_var = true;*/
         UA_LOG_DEBUG(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Skip Variable: Variable: %s has a void type",
             oneProcessVariable->getName().c_str());
-        break;
+        continue;
       }
       for(auto e : this->adapter->exclude) {
         string suffix_1 = "/*", suffix_2 = "*";
