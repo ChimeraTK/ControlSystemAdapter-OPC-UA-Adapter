@@ -189,7 +189,7 @@ namespace ChimeraTK {
         // Check if PV is writable - if not assume it is an VoidInput
         if(!oneProcessVariable->isWriteable()) {
           data->pvs.insert(data->pvs.end(), oneProcessVariable->getName());
-          UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Adding vartiable %s to void thread.",
+          UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Adding variable %s to void thread.",
               oneProcessVariable->getName().c_str());
         }
         else {
