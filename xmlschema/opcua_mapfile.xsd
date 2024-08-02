@@ -1,61 +1,74 @@
 <?xml version="1.0"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
-            xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
-            elementFormDefault="unqualified"
-            attributeFormDefault="unqualified">
+  targetNamespace="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
+  xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
+  elementFormDefault="unqualified" attributeFormDefault="unqualified">
 
   <xsd:annotation>
     <xsd:documentation xml:lang="en">
-     Map file description schema for ChimeraTK ControlSystemAdapter-OPC-UA-Adapter.
+      Map file description schema for ChimeraTK
+      ControlSystemAdapter-OPC-UA-Adapter.
     </xsd:documentation>
   </xsd:annotation>
 
-  <xsd:element name="uamapping" type="csa:UAMappingType"/>
+  <xsd:element name="uamapping" type="csa:UAMappingType" />
 
   <xsd:complexType name="UAMappingType">
     <xsd:sequence>
-      <xsd:element name="config" type="csa:configType" minOccurs="0" maxOccurs="1">
+      <xsd:element name="config" type="csa:configType"
+        minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             General settings realted to the mapping and the OPC UA server.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="exclude" type="csa:exclude" minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="exclude" type="csa:exclude"
+        minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            Used to exclude proces variables or folders from the mapping process. 
-            The is useful to hide parts of the ChimeraTK application from the control system adatper.
-            This safes resources!  
+            Used to exclude proces variables or folders from the mapping process.
+            The is useful to hide parts of the ChimeraTK application from the
+            control system adatper.
+            This safes resources!
           </xsd:documentation>
         </xsd:annotation>
-      </xsd:element>      
-      <xsd:element name="process_variable" type="csa:pvType" minOccurs="0" maxOccurs="unbounded">
+      </xsd:element>
+      <xsd:element name="process_variable" type="csa:pvType"
+        minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            Used to edit OPC UA nodes and to copy or link OPC UA nodes to new OPC UA nodes.
-            If new nodes are created they will still be connected to the same ChimeraTK process variable
+            Used to edit OPC UA nodes and to copy or link OPC UA nodes to new OPC
+            UA nodes.
+            If new nodes are created they will still be connected to the same
+            ChimeraTK process variable
             as the source OPC UA node.
-            
+
             This can be used to do different things:
             - change unit/description of an existing OPC UA node
-            - create a link to an existing OPC UA node with different browse name
-              Attention: If a link is used and the unit/description is changed this will affect 
-                         the source node too!
-            - create a new node (different browse name and node ID) connected to an existing OPC UA node
-              This allows to change name/unit/description independent of the source node
+            - create a link to an existing OPC UA node with different browse
+            name
+            Attention: If a link is used and the unit/description is changed this will
+            affect
+            the source node too!
+            - create a new node (different browse name and node ID) connected
+            to an existing OPC UA node
+            This allows to change name/unit/description independent of the source
+            node
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="additional_variable" type="csa:additionalPVType" minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="additional_variable"
+        type="csa:additionalPVType" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            Used to add additional OPC UA nodes, that have a fixed value and are not linked to a ChimeraTK process variable.
+            Used to add additional OPC UA nodes, that have a fixed value and are
+            not linked to a ChimeraTK process variable.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="folder" type="csa:folderType" minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="folder" type="csa:folderType"
+        minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Used to create, copy or link folders.
@@ -66,66 +79,84 @@
   </xsd:complexType>
   <xsd:complexType name="configType">
     <xsd:sequence>
-      <xsd:element name="server" type="csa:serverType"  minOccurs="0" maxOccurs="1">
+      <xsd:element name="server" type="csa:serverType"
+        minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Change server properties, else defaults are used.
           </xsd:documentation>
         </xsd:annotation>
-      </xsd:element>   
-      <xsd:element name="security" type="csa:securityType" minOccurs="0" maxOccurs="1">
+      </xsd:element>
+      <xsd:element name="security" type="csa:securityType"
+        minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            Configure OPC UA server endpoints. If this element is not found in the 
+            Configure OPC UA server endpoints. If this element is not found in the
             maping file only one unencrypted end point is created.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="login" type="csa:loginType"  minOccurs="0" maxOccurs="1">
+      <xsd:element name="login" type="csa:loginType"
+        minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            If clients should be requiered to login with username and password, use
+            If clients should be requiered to login with username and password,
+            use
             this element to set this data.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="process_variable_hierarchy" type="csa:hierarchyType" minOccurs="0" maxOccurs="1">
+      <xsd:element name="process_variable_hierarchy"
+        type="csa:hierarchyType" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            Change the behaviour of how process varibale names and the hierarchy included in the 
+            Change the behaviour of how process varibale names and the
+            hierarchy included in the
             process variable name are represented in OPC UA.
-            The default is that process variable names are unrolled at "/" characters.
-            Folders are created for all string before the last delimiter. The last string
-            is used as OPC UA node browse name. However the OPC UA node ID is a string node ID
-            that includes the complete register path corresponding to the CHimeraTK process variable.
-            E.g. from a variable "A/B/myvar" the folders "A" and "B" are created and the OPC UA node "myvar"
-            is put into folder B. The Browse name is "myvar" and the Node ID is "/A/B/myvar".
-            
+            The default is that process variable names are unrolled at "/"
+            characters.
+            Folders are created for all string before the last delimiter. The last
+            string
+            is used as OPC UA node browse name. However the OPC UA node ID is a
+            string node ID
+            that includes the complete register path corresponding to the
+            CHimeraTK process variable.
+            E.g. from a variable "A/B/myvar" the folders "A" and "B" are created
+            and the OPC UA node "myvar"
+            is put into folder B. The Browse name is "myvar" and the Node ID is
+            "/A/B/myvar".
+
             This default behaviour corresponds to:
-              <unroll pathSep="/"> True </unroll>
+            <unroll pathSep="/"> True </unroll>
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="mapping_exceptions" type="csa:exceptionType" minOccurs="0" maxOccurs="1">
+      <xsd:element name="mapping_exceptions"
+        type="csa:exceptionType" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            Set the bahaviour in case error occur while parsing this mapping file.
-            If True Exceptions occuring in the mapping process are thrown. 
-            Else error messages are send to std::cerr and the mapping block caused exception is ignored. 
+            Set the bahaviour in case error occur while parsing this mapping
+            file.
+            If True Exceptions occuring in the mapping process are thrown.
+            Else error messages are send to std::cerr and the mapping block caused
+            exception is ignored.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="historizing" type="csa:historizingType" minOccurs="0" maxOccurs="1">
+      <xsd:element name="historizing"
+        type="csa:historizingType" minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            Define different historizing settings. 
-            Those can be assigned to directories and folders via the history attribute. The value
-            of the history attribute has to match the settings defined here. 
+            Define different historizing settings.
+            Those can be assigned to directories and folders via the history
+            attribute. The value
+            of the history attribute has to match the settings defined here.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="rootFolder" type="csa:nonEmptyString">
+    <xsd:attribute name="rootFolder"
+      type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation>
           Set the name of the root node of the OPC UA server.
@@ -133,13 +164,14 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="description" type="csa:nonEmptyString"/>
+    <xsd:attribute name="description"
+      type="csa:nonEmptyString" />
   </xsd:complexType>
   <xsd:complexType name="serverType">
     <xsd:attribute name="logLevel" type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation>
-          Set logging level of the OPC UA server. 
+          Set logging level of the OPC UA server.
           Allowed values are:
           - trace
           - debug
@@ -151,10 +183,11 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="applicationName" type="csa:nonEmptyString">
+    <xsd:attribute name="applicationName"
+      type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation>
-          Set the name application name. 
+          Set the name application name.
           If not set the default is the ChimeraTK application name.
           It is used e.g. as the Configuration Name of the end point.
         </xsd:documentation>
@@ -163,12 +196,12 @@
     <xsd:attribute name="port" type="xsd:positiveInteger">
       <xsd:annotation>
         <xsd:documentation>
-          Set the name OPC UA server port. 
+          Set the name OPC UA server port.
           If not set the default 16664 is used.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-  </xsd:complexType> 
+  </xsd:complexType>
   <xsd:complexType name="securityType">
     <xsd:attribute name="unsecure" type="xsd:boolean">
       <xsd:annotation>
@@ -178,31 +211,38 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="certificate" type="csa:nonEmptyString">
+    <xsd:attribute name="certificate"
+      type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           The server certificate given as *.der file. The certificate has
-          to have the v3 Subject Alternative Name field URI. It has to be set to
+          to have the v3 Subject Alternative Name field URI. It has to be set
+          to
           "urn:HOSTNAME:ChimeraTK:APPNAME", where HOST name is the name of the HOST where
-          the server is supposed to run. The APPNAME is the application name set in the
-          mapping file (applicationName attribute of the server node). 
-          The certificate test is not excact, which means the certificate URI has to 
-          include the above given string, but it can include aditional information. 
-          E.g. "urn:HOSTNAME:ChimeraTK:APPNAME:PORT" will also be verified successfully.
+          the server is supposed to run. The APPNAME is the application name set
+          in the
+          mapping file (applicationName attribute of the server node).
+          The certificate test is not excact, which means the certificate URI
+          has to
+          include the above given string, but it can include aditional information.
+          E.g. "urn:HOSTNAME:ChimeraTK:APPNAME:PORT" will also be verified
+          successfully.
           Self-signed server certificates can be created using the python script
-          provided in the tools/certs directory. Use -u option to specify the 
+          provided in the tools/certs directory. Use -u option to specify the
           URI as pointed out before.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="privatekey" type="csa:nonEmptyString">
+    <xsd:attribute name="privatekey"
+      type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
-          The servers private key given as *.der file. 
+          The servers private key given as *.der file.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="trustlist" type="csa:nonEmptyString">
+    <xsd:attribute name="trustlist"
+      type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           Directory where to find trusted certificates, e.g. if no certification
@@ -210,14 +250,16 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="blocklist" type="csa:nonEmptyString">
+    <xsd:attribute name="blocklist"
+      type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           Directory where to find revocation lists of CAs.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="issuerlist" type="csa:nonEmptyString">
+    <xsd:attribute name="issuerlist"
+      type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           Directory where to issuer certificates given as *.der files.
@@ -226,22 +268,25 @@
     </xsd:attribute>
   </xsd:complexType>
   <xsd:complexType name="loginType">
-    <xsd:attribute name="username" type="csa:nonEmptyString" use="required"/>
-    <xsd:attribute name="password" type="csa:nonEmptyString" use="required"/>
+    <xsd:attribute name="username" type="csa:nonEmptyString"
+      use="required" />
+    <xsd:attribute name="password" type="csa:nonEmptyString"
+      use="required" />
   </xsd:complexType>
   <xsd:complexType name="hierarchyType">
     <xsd:sequence>
-      <xsd:element name="unroll" type="csa:unrollType" minOccurs="1" maxOccurs="unbounded">
+      <xsd:element name="unroll" type="csa:unrollType"
+        minOccurs="1" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Change the default path seperator.
-            Example: 
+            Example:
             a) To change the seperator to "_" one has to use:
-               <unroll pathSep="/"> False </unroll>
-               <unroll pathSep="_"> True </unroll>
+            <unroll pathSep="/"> False </unroll>
+            <unroll pathSep="_"> True </unroll>
             b) To use two seperators:
-               <unroll pathSep="/"> True </unroll>
-               <unroll pathSep="_"> True </unroll>
+            <unroll pathSep="/"> True </unroll>
+            <unroll pathSep="_"> True </unroll>
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -250,62 +295,75 @@
   <xsd:complexType name="unrollType">
     <xsd:simpleContent>
       <xsd:extension base="xsd:boolean">
-        <xsd:attribute name="pathSep" type="csa:nonEmptyString"/>
+        <xsd:attribute name="pathSep"
+          type="csa:nonEmptyString" />
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
   <xsd:complexType name="exceptionType">
     <xsd:simpleContent>
-      <xsd:extension base="xsd:boolean"/>
+      <xsd:extension base="xsd:boolean" />
     </xsd:simpleContent>
   </xsd:complexType>
-  
+
   <xsd:complexType name="historizingType">
     <xsd:sequence>
-      <xsd:element name="setup" type="csa:historizingSetupType" minOccurs="1" maxOccurs="unbounded"/>
+      <xsd:element name="setup" type="csa:historizingSetupType"
+        minOccurs="1" maxOccurs="unbounded" />
     </xsd:sequence>
   </xsd:complexType>
-         
+
   <xsd:complexType name="historizingSetupType">
-    <xsd:attribute name="name" type="csa:nonEmptyString" use="required">
+    <xsd:attribute name="name" type="csa:nonEmptyString"
+      use="required">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           The name of the historizing setting.
-          It is used as identifier when assigning a historiy to a pv or folder and
-          should match the name used in the history attribute of process_variable or folder.
+          It is used as identifier when assigning a historiy to a pv or folder
+          and
+          should match the name used in the history attribute of process_variable
+          or folder.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="entries_per_response" type="xsd:positiveInteger" use="required">
+    <xsd:attribute name="entries_per_response"
+      type="xsd:positiveInteger" use="required">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
-          The number of histroy entries send per reponse. If a large number is used
-          one big message is send as a single HistoryReadResponse. Else the history 
-          data is send via multiple HostroyReadResponses and a continuation point is used
-          to link the different responses. 
+          The number of histroy entries send per reponse. If a large number is
+          used
+          one big message is send as a single HistoryReadResponse. Else the
+          history
+          data is send via multiple HostroyReadResponses and a continuation point
+          is used
+          to link the different responses.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="buffer_length" type="xsd:positiveInteger" use="required">
+    <xsd:attribute name="buffer_length"
+      type="xsd:positiveInteger" use="required">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
-           Length of the circular buffer.
+          Length of the circular buffer.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="interval" type="xsd:positiveInteger" use="required">
+    <xsd:attribute name="interval"
+      type="xsd:positiveInteger" use="required">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
-          Polling interval [ms] used to read data by the servers internal client thread.
+          Polling interval [ms] used to read data by the servers internal client
+          thread.
           If no data change is seen no entry is added to the history buffer.
         </xsd:documentation>
       </xsd:annotation>
-    </xsd:attribute>        
+    </xsd:attribute>
   </xsd:complexType>
- 
+
   <xsd:complexType name="pvType">
     <xsd:all>
-      <xsd:element name="destination" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1">
+      <xsd:element name="destination" type="csa:nonEmptyString"
+        minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Give target browse path of the OPC UA node.
@@ -314,20 +372,25 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="name" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1">
+      <xsd:element name="name" type="csa:nonEmptyString"
+        minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            Give the name of the new OPC UA node. 
-            If not used the name of the original process variable is used. 
-            This could be the case if only a destination is given, where to copy the original process variable.
+            Give the name of the new OPC UA node.
+            If not used the name of the original process variable is used.
+            This could be the case if only a destination is given, where to copy
+            the original process variable.
             The name should not contain the delimiter "/".
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="unit" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1"/>
-      <xsd:element name="description" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="unit" type="csa:nonEmptyString"
+        minOccurs="0" maxOccurs="1" />
+      <xsd:element name="description" type="csa:nonEmptyString"
+        minOccurs="0" maxOccurs="1" />
     </xsd:all>
-    <xsd:attribute name="sourceName" type="csa:nonEmptyString" use="required">
+    <xsd:attribute name="sourceName"
+      type="csa:nonEmptyString" use="required">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           The node ID of the node to be used as reference.
@@ -339,7 +402,8 @@
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           If copy=flase a link is created to the source process variable.
-          Else a new OPC UA node is created - it is still connected to the same ChimeraTK process variable.
+          Else a new OPC UA node is created - it is still connected to the same
+          ChimeraTK process variable.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -347,60 +411,74 @@
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           If used history is turned on for all PVs in the created folder.
-          The name given here has to match a history setup in the config section.
+          The name given here has to match a history setup in the config
+          section.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
   <xsd:complexType name="additionalPVType">
-   <xsd:all>
-      <xsd:element name="destination" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1"/>
-      <xsd:element name="name" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1"/>
-      <xsd:element name="value" type="xsd:string" minOccurs="0" maxOccurs="1"/>
-      <xsd:element name="description" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1"/>
-    </xsd:all> 
-  </xsd:complexType>   
-  <xsd:complexType name="folderType">  
     <xsd:all>
-      <xsd:element name="name" type="csa:nonEmptyString" minOccurs="1" maxOccurs="1">
+      <xsd:element name="destination" type="csa:nonEmptyString"
+        minOccurs="0" maxOccurs="1" />
+      <xsd:element name="name" type="csa:nonEmptyString"
+        minOccurs="0" maxOccurs="1" />
+      <xsd:element name="value" type="xsd:string" minOccurs="0"
+        maxOccurs="1" />
+      <xsd:element name="description" type="csa:nonEmptyString"
+        minOccurs="0" maxOccurs="1" />
+    </xsd:all>
+  </xsd:complexType>
+  <xsd:complexType name="folderType">
+    <xsd:all>
+      <xsd:element name="name" type="csa:nonEmptyString"
+        minOccurs="1" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            Allows to change the folder name. 
-            If not used the description of the original folder is used. 
+            Allows to change the folder name.
+            If not used the description of the original folder is used.
             In case a folder is created the default description is empty.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="destination" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1">
+      <xsd:element name="destination" type="csa:nonEmptyString"
+        minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            Folder destination. The destination can include a hierachy, e.g. A/B. Folders in the target hierachy that do not exist are created on the fly.
+            Folder destination. The destination can include a hierachy, e.g. A/B.
+            Folders in the target hierachy that do not exist are created on
+            the fly.
             The path seperator for the destination tag is "/".
-            If not set the default destination is the root node of the OPC UA server.
+            If not set the default destination is the root node of the OPC UA
+            server.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="description" type="csa:nonEmptyString" minOccurs="0" maxOccurs="1">
+      <xsd:element name="description" type="csa:nonEmptyString"
+        minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
-            Allows to change the folder description. 
-            If not used the description of the original folder is used. 
+            Allows to change the folder description.
+            If not used the description of the original folder is used.
             In case a folder is created the default description is empty.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
     </xsd:all>
-    <xsd:attribute name="sourceName" type="csa:nonEmptyString">
+    <xsd:attribute name="sourceName"
+      type="csa:nonEmptyString">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
-          If moving or linking exsisting folders give the path to the existing folder.
+          If moving or linking exsisting folders give the path to the existing
+          folder.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="copy" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
-          If using exsisting folders decide if the directory should be only linked to the source 
+          If using exsisting folders decide if the directory should be only
+          linked to the source
           folder or if it should be copied.
           By default copying is enabled.
         </xsd:documentation>
@@ -410,14 +488,16 @@
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           If used history is turned on for all PVs in the created folder.
-          The name given here has to match a history setup in the config section.
+          The name given here has to match a history setup in the config
+          section.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
-  
+
   <xsd:complexType name="exclude">
-    <xsd:attribute name="sourceName" type="csa:nonEmptyString"  use="required">
+    <xsd:attribute name="sourceName"
+      type="csa:nonEmptyString" use="required">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           Source name used to identify folder/process variable to be excluded.
@@ -431,8 +511,8 @@
   </xsd:complexType>
 
   <xsd:simpleType name="nonEmptyString">
-   <xsd:restriction base='xsd:string'>
-      <xsd:minLength value='1'/>
+    <xsd:restriction base='xsd:string'>
+      <xsd:minLength value='1' />
     </xsd:restriction>
   </xsd:simpleType>
 </xsd:schema>
