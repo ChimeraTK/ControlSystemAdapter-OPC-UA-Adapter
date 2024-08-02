@@ -787,14 +787,7 @@ namespace ChimeraTK {
           // After discussion we only allow history if source name is set.
           // Else the exclude logic would become more complex!
           if(sourceName.empty()) {
-            if(this->mappingExceptions) {
-              throw std::runtime_error(
-                  "Error! Can not add history if no sourceName attribute is set. Mapping line number: " +
-                  std::to_string(nodeset->nodeTab[i]->line));
-            }
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Can not add history if no sourceName attribute is  set. Mapping line number: %u",
-                nodeset->nodeTab[i]->line);
+            raiseError("Can not add history if no sourceName attribute is set.", "", nodeset->nodeTab[i]->line);
           }
           if(!nodeFolder.empty()) {
             string folderNodeId;
@@ -835,28 +828,14 @@ namespace ChimeraTK {
             UA_String_clear(&out);
           }
           else {
-            if(this->mappingExceptions) {
-              throw std::runtime_error(
-                  "Error! Can not add history if copy is true and no source name is given. Mapping line number: " +
-                  std::to_string(nodeset->nodeTab[i]->line));
-            }
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Can not add history if copy is true and no source name is given. Mapping line number: %u",
-                nodeset->nodeTab[i]->line);
+            raiseError(
+                "Can not add history if copy is true and no source name is given.", "", nodeset->nodeTab[i]->line);
           }
         }
 
         if(folder.empty()) {
           // only if no history is set raise error/warning
-          if(this->mappingExceptions && history.empty()) {
-            throw std::runtime_error("Error! Folder creation failed. Name is missing. Mapping line number: " +
-                std::to_string(nodeset->nodeTab[i]->line));
-          }
-          if(history.empty()) {
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Skipping Folder. Folder creation failed. Name is missing. Mapping line number: %u",
-                nodeset->nodeTab[i]->line);
-          }
+          raiseError("Folder creation failed. Name is missing.", "Skipping Folder.", nodeset->nodeTab[i]->line);
           continue;
         }
         // check if a pv with the requested node id exists
@@ -878,24 +857,12 @@ namespace ChimeraTK {
                 UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(description.c_str())));
             continue;
           }
-          if(this->mappingExceptions) {
-            throw std::runtime_error("Error! Folder with source mapping failed. Target folder node id exists. "
-                                     "Mapping line number: " +
-                std::to_string(nodeset->nodeTab[i]->line));
-          }
-          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Skipping folder: %s. Folder with source mapping failed. Target folder node id exists. "
-              "Mapping line number: %u",
-              sourceName.c_str(), nodeset->nodeTab[i]->line);
+          raiseError("Folder with source mapping failed. Target folder node id exists.",
+              std::string("Skipping folder: ") + sourceName, nodeset->nodeTab[i]->line);
           continue;
         }
         if(!copy.empty() && sourceName.empty()) {
-          if(this->mappingExceptions) {
-            throw std::runtime_error("Error! Folder creation failed. Source folder missing. Mapping line number: " +
-                std::to_string(nodeset->nodeTab[i]->line));
-          }
-          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Skipping Folder. Source 'name: %s' folder missing. Mapping line number: %u", folder.c_str(),
+          raiseError(std::string("Source 'name: ") + folder + "' folder missing.", "Skipping Folder.",
               nodeset->nodeTab[i]->line);
           continue;
         }
@@ -907,14 +874,8 @@ namespace ChimeraTK {
         if(!sourceName.empty()) {
           if((destination.empty() && sourceName == folder) ||
               (!destination.empty() && sourceName == destination + "/" + folder)) {
-            if(this->mappingExceptions) {
-              throw std::runtime_error(
-                  "Error! Folder creation failed. Source and Destination equal. Mapping line number: " +
-                  std::to_string(nodeset->nodeTab[i]->line));
-            }
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Skipping Folder. Source '%s' and Destination equal. Mapping line number: %u", sourceName.c_str(),
-                nodeset->nodeTab[i]->line);
+            raiseError(
+                "Folder creation failed. Source and Destination equal.", "Skipping Folder.", nodeset->nodeTab[i]->line);
             continue;
           }
           // check if the src is a folder
@@ -939,13 +900,8 @@ namespace ChimeraTK {
           }
           UA_BrowseResult_clear(&br);
           if(!isFolderType) {
-            if(this->mappingExceptions) {
-              throw std::runtime_error("Error! Folder creation failed. No corresponding source folder: " + sourceName +
-                  ". Mapping line number: " + std::to_string(nodeset->nodeTab[i]->line));
-            }
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Skipping Folder. No corresponding source '%s' folder. Mapping line number: %u", sourceName.c_str(),
-                nodeset->nodeTab[i]->line);
+            raiseError(std::string("Folder creation failed. No corresponding source folder: ") + sourceName,
+                "Skipping Folder.", nodeset->nodeTab[i]->line);
             continue;
           }
           // enroll path destination -> copy / link the complete tree to this place
@@ -958,15 +914,9 @@ namespace ChimeraTK {
               if(sourceName == folder) sourceAndDestinationEqual = true;
             }
             if(sourceAndDestinationEqual) {
-              if(this->mappingExceptions) {
-                throw std::runtime_error(
-                    "Error! Folder creation failed. Source and destination must be different for '" + sourceName +
-                    "' folder. Mapping line number: " + std::to_string(nodeset->nodeTab[i]->line));
-              }
-              UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                  "Skipping Folder. Folder creation failed. Source and destination must be "
-                  "different for '%s' folder. Mapping line number: %u",
-                  sourceName.c_str(), nodeset->nodeTab[i]->line);
+              raiseError(std::string("Folder creation failed. Source and destination must be different for '") +
+                      sourceName + "' folder.",
+                  "Skipping Folder.", nodeset->nodeTab[i]->line);
               continue;
             }
             // folder structure must be copied, pv nodes must be added
@@ -1120,16 +1070,12 @@ namespace ChimeraTK {
         }
 
         if(sourceName.empty()) {
-          if(this->mappingExceptions) {
-            throw std::runtime_error("Error! PV mapping failed. SourceName missing.");
-          }
           if(!name.empty()) {
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Skipping PV mapping. SourceName 'name: %s' is missing.", name.c_str());
+            raiseError(std::string("PV mapping failed. SourceName missing for 'name' : '") + name,
+                "Skipping PV mapping.", nodeset->nodeTab[i]->line);
           }
           else {
-            UA_LOG_WARNING(
-                server_config->logging, UA_LOGCATEGORY_USERLAND, "Skipping PV mapping. SourceName is missing.");
+            raiseError("PV mapping failed. SourceName is missing.", "Skipping PV mapping.", nodeset->nodeTab[i]->line);
           }
           continue;
         }
@@ -1159,16 +1105,13 @@ namespace ChimeraTK {
           }
           UA_BrowseResult_clear(&br);
           if(UA_NodeId_isNull(&pvNodeId)) {
-            if(this->mappingExceptions) {
-              throw std::runtime_error("Error! PV mapping failed. No corresponding source pv.");
-            }
             if(!name.empty()) {
-              UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                  "Skipping PV mapping. No corresponding source pv 'name: %s'.", name.c_str());
+              raiseError(std::string("PV mapping failed. No corresponding source pv for 'name' : '") + name,
+                  "Skipping PV mapping.", nodeset->nodeTab[i]->line);
             }
             else {
-              UA_LOG_WARNING(
-                  server_config->logging, UA_LOGCATEGORY_USERLAND, "Skipping PV mapping. No corresponding source pv.");
+              raiseError(
+                  "PV mapping failed. No corresponding source pv.", "Skipping PV mapping.", nodeset->nodeTab[i]->line);
             }
             continue;
           }
@@ -1204,24 +1147,12 @@ namespace ChimeraTK {
         UA_NodeId tmpOutput = UA_NODEID_NULL;
         UA_Server_readNodeId(this->mappedServer, parentSourceId, &tmpOutput);
         if(UA_NodeId_isNull(&tmpOutput)) {
-          if(this->mappingExceptions) {
-            if(!name.empty()) {
-              throw std::runtime_error("Error! PV mapping failed. Source PV not found 'name' : '" + name +
-                  "'. Mapping line number: " + std::to_string(nodeset->nodeTab[i]->line));
-            }
-            else {
-              throw std::runtime_error("Error! PV mapping failed. Source PV not found. Mapping line number: " +
-                  std::to_string(nodeset->nodeTab[i]->line));
-            }
-          }
           if(!name.empty()) {
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Skipping PV mapping. Source PV not found 'name: %s'. Mapping line number: %u", name.c_str(),
+            raiseError(std::string("PV mapping failed. Source PV not found 'name' : '") + name, "Skipping PV mapping.",
                 nodeset->nodeTab[i]->line);
           }
           else {
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Skipping PV mapping. Source PV not found. Mapping line number: %u", nodeset->nodeTab[i]->line);
+            raiseError("PV mapping failed. Source PV not found", "Skipping PV mapping.", nodeset->nodeTab[i]->line);
           }
           continue;
         }
@@ -1233,14 +1164,8 @@ namespace ChimeraTK {
         UA_NodeId createdNodeId = UA_NODEID_NULL;
         if(copy == "TRUE") {
           if(sourceName == (destination + "/" + name)) {
-            if(this->mappingExceptions) {
-              throw std::runtime_error(
-                  "Error! PV mapping failed. Source and destination must be different if copy='true'.");
-            }
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Skipping PV mapping. Source and destination must be different if copy='true' 'name: "
-                "%s'.",
-                name.c_str());
+            raiseError("PV mapping failed. Source and destination must be different if copy='true'.",
+                std::string("Skipping PV ") + sourceName, nodeset->nodeTab[i]->line);
             continue;
           }
           UA_NodeId destinationFolderNodeId = UA_NODEID_NULL;
@@ -1286,12 +1211,7 @@ namespace ChimeraTK {
                 this->mappedServer, destinationFolderNodeId, sourceName, csManager, server_config->logging, name);
             UA_NodeId tmpProcessVariableNodeId = processvariable->getOwnNodeId();
             if(UA_NodeId_isNull(&tmpProcessVariableNodeId)) {
-              if(this->mappingExceptions) {
-                throw std::runtime_error("PV creation failed. PV with same name mapped. Mapping line number: " +
-                    std::to_string(nodeset->nodeTab[i]->line));
-              }
-              UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                  "Skipping PV %s. PV with same name mapped. Mapping line number: %u", sourceName.c_str(),
+              raiseError("PV creation failed. PV with same name mapped.", std::string("Skipping PV ") + sourceName,
                   nodeset->nodeTab[i]->line);
               continue;
             }
@@ -1301,10 +1221,7 @@ namespace ChimeraTK {
             this->variables.push_back(processvariable);
           }
           else {
-            if(this->mappingExceptions) {
-              throw std::runtime_error("Folder creation failed.");
-            }
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND, "Skipping PV. Folder creation failed.");
+            raiseError("Folder creation failed.", std::string("Skipping PV ") + sourceName, nodeset->nodeTab[i]->line);
             continue;
           }
           UA_NodeId tmpPVNodeId = processvariable->getOwnNodeId();
@@ -1318,11 +1235,8 @@ namespace ChimeraTK {
             name = sourceVarName;
           }
           if(sourceVarName != name) {
-            if(this->mappingExceptions) {
-              throw std::runtime_error("Error! PV mapping failed. The pv name can't changed if copy is false.");
-            }
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Skipping PV mapping. The pv name can't changed if copy is false. 'name: %s'.", name.c_str());
+            raiseError("PV mapping failed. The pv name can't changed if copy is false.",
+                std::string("Skipping PV mapping of pv ") + name);
             continue;
           }
           // create destination folder
@@ -1335,11 +1249,8 @@ namespace ChimeraTK {
           UA_StatusCode addRef = UA_Server_addReference(
               this->mappedServer, destinationFolder, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, true);
           if(sourceVarName != name) {
-            if(this->mappingExceptions) {
-              throw std::runtime_error("PV mapping failed. Can't create reference to original pv.");
-            }
-            UA_LOG_WARNING(
-                server_config->logging, UA_LOGCATEGORY_USERLAND, "Skipping PV. Can't create reference to original pv.");
+            raiseError("PV mapping failed. Can't create reference to original pv.",
+                std::string("Skipping PV mapping of pv ") + name);
             continue;
           }
           UA_NodeId_copy(&parentSourceId, &createdNodeId);
@@ -1399,15 +1310,8 @@ namespace ChimeraTK {
         }
         // check if name is empty
         if(name.empty()) {
-          if(this->mappingExceptions) {
-            throw std::runtime_error("Additional variable node creation failed. Additional variable name is "
-                                     "mandatory. Mapping line number: " +
-                std::to_string(nodeset->nodeTab[i]->line));
-          }
-          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Skipping additional variable. Additional variable name is mandatory. Mapping line "
-              "number: %u",
-              nodeset->nodeTab[i]->line);
+          raiseError("Additional variable node creation failed. Additional variable name is mandatory.",
+              "Skipping additional variable.", nodeset->nodeTab[i]->line);
           continue;
         }
         // check if the av node still exists
@@ -1424,12 +1328,8 @@ namespace ChimeraTK {
         if(!UA_NodeId_isNull(&tmpOutput)) {
           UA_NodeId_clear(&tmpOutput);
           UA_NodeId_init(&tmpOutput);
-          if(this->mappingExceptions) {
-            throw std::runtime_error("Additional variable node creation failed. Additional variable already exists.");
-          }
-          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Skipping additional variable %s. Node already exists. Mapping line number: %u", name.c_str(),
-              nodeset->nodeTab[i]->line);
+          raiseError("Additional variable node creation failed. Additional variable already exists.",
+              std::string("Skipping additional variable ") + name, nodeset->nodeTab[i]->line);
           continue;
         }
         // check if pv with same name exists in the target folder
@@ -1446,13 +1346,8 @@ namespace ChimeraTK {
         if(!UA_NodeId_isNull(&tmpOutput)) {
           UA_NodeId_clear(&tmpOutput);
           UA_NodeId_init(&tmpOutput);
-          if(this->mappingExceptions) {
-            throw std::runtime_error("Additional variable node creation failed. PV with same name already exists.");
-          }
-          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Skipping additional variable %s. PV with same name already exists. Mapping line number: "
-              "%u",
-              name.c_str(), nodeset->nodeTab[i]->line);
+          raiseError("Additional variable node creation failed. PV with same name already exists.",
+              std::string("Skipping additional variable ") + name, nodeset->nodeTab[i]->line);
           continue;
         }
 
@@ -1466,11 +1361,8 @@ namespace ChimeraTK {
           additionalVarFolderPath = UA_NODEID_STRING_ALLOC(1, const_cast<char*>(additionalVarFolderPathNodeId.c_str()));
         }
         if(UA_NodeId_isNull(&additionalVarFolderPath)) {
-          if(this->mappingExceptions) {
-            throw std::runtime_error("Error! Creation of additional variable folder failed.");
-          }
-          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Skipping additional variable. Creation of additional variable folder failed. Skipping.");
+          raiseError("Creation of additional variable folder failed.", "Skipping additional variable.",
+              nodeset->nodeTab[i]->line);
           continue;
         }
         auto* additionalvariable =
@@ -1523,6 +1415,25 @@ namespace ChimeraTK {
 
     ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), &this->ownedNodes);
     return createdNodeId;
+  }
+
+  void ua_uaadapter::raiseError(std::string errorMesssage, std::string consequenceMessage, const int& line) {
+    std::string lineMessage("");
+    if(line > 0) {
+      lineMessage = std::string(" Mapping line number: ") + std::to_string(line) + ".";
+    }
+    std::string tmp[2] = {errorMesssage, consequenceMessage};
+    if(errorMesssage.back() != '.') {
+      errorMesssage += ".";
+    }
+    if(consequenceMessage.back() != '.') {
+      consequenceMessage += ".";
+    }
+    if(this->mappingExceptions) {
+      throw std::runtime_error(std::string("Error! ") + errorMesssage + lineMessage);
+    }
+    UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND, "%s %s", errorMesssage.c_str(),
+        (consequenceMessage + lineMessage).c_str());
   }
 
   UA_StatusCode ua_uaadapter::mapSelfToNamespace() {

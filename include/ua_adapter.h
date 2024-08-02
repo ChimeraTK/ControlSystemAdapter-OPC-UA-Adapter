@@ -139,6 +139,20 @@ namespace ChimeraTK {
      */
     UA_NodeId createUAFolder(UA_NodeId basenodeId, const string& folderName, const string& description = "");
 
+    /** @brief Handle mapping error.
+     *
+     * If mappingExceptions=true raise std::runtime_error. Else print Warning that includes the error
+     * message and the consequence of that warning, e.g. folder will not be mapped.
+     *
+     * @param errorMesssage The message raised in the exception.
+     * @param consequenceMessage Message explaining the consequence of the error in case no exception is raised.
+     * @param line The line number in the mapping file that resulted in raising the error. If negative no line number
+     *             is printed.
+     *
+     * @exception std::runtime_error if mappingExceptions=true.
+     */
+    void raiseError(std::string errorMesssage, std::string consequenceMessage, const int& line = -1);
+
    public:
     bool running = false;
     // TODO move this field to private and add getter and setter
