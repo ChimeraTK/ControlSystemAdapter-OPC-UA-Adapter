@@ -41,20 +41,19 @@
             Used to edit OPC UA nodes and to copy or link OPC UA nodes to new OPC
             UA nodes.
             If new nodes are created they will still be connected to the same
-            ChimeraTK process variable
-            as the source OPC UA node.
+            ChimeraTK process variable as the source OPC UA node.
 
             This can be used to do different things:
-            - change unit/description of an existing OPC UA node
-            - create a link to an existing OPC UA node with different browse
-            name
-            Attention: If a link is used and the unit/description is changed this will
-            affect
-            the source node too!
-            - create a new node (different browse name and node ID) connected
-            to an existing OPC UA node
-            This allows to change name/unit/description independent of the source
-            node
+            - Assign a history setting. In this case only use the corresponding attribute.
+            - Change unit/description of an existing OPC UA node
+            - Create a link to an existing OPC UA node with different browse
+              name
+              Attention: If a link is used and the unit/description is changed this will
+              affect the source node too!
+            - Create a new node (different browse name and node ID) connected
+              to an existing OPC UA node
+              This allows to change name/unit/description independent of the source
+              node
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -72,6 +71,8 @@
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Used to create, copy or link folders.
+            Can also be used to assign a histroy setting.
+            In this case only use the corresponding attribute.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -432,7 +433,7 @@
   <xsd:complexType name="folderType">
     <xsd:all>
       <xsd:element name="name" type="csa:nonEmptyString"
-        minOccurs="1" maxOccurs="1">
+        minOccurs="0" maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Allows to change the folder name.
