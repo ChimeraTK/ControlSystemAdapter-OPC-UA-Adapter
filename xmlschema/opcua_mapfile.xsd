@@ -328,7 +328,7 @@
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="entries_per_response"
-      type="xsd:positiveInteger" use="required">
+      type="xsd:positiveInteger">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           The number of histroy entries send per reponse. If a large number is
@@ -338,24 +338,27 @@
           data is send via multiple HostroyReadResponses and a continuation point
           is used
           to link the different responses.
+          Default value: 100
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="buffer_length"
-      type="xsd:positiveInteger" use="required">
+      type="xsd:positiveInteger">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           Length of the circular buffer.
+          Default: 100
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="interval"
-      type="xsd:positiveInteger" use="required">
+      type="xsd:positiveInteger">
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           Polling interval [ms] used to read data by the servers internal client
           thread.
           If no data change is seen no entry is added to the history buffer.
+          Default: 1s
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -413,7 +416,10 @@
         <xsd:documentation xml:lang="en">
           If used history is turned on for all PVs in the created folder.
           The name given here has to match a history setup in the config
-          section.
+          section. If history is enabled for multiple folder that overlap
+          the first entry in the mapping file will be considered. 
+          If a histroy is also assiged to this PV by a folder setting,
+          it is ignored and the configuration set here is applied.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -490,7 +496,8 @@
         <xsd:documentation xml:lang="en">
           If used history is turned on for all PVs in the created folder.
           The name given here has to match a history setup in the config
-          section.
+          section. If history is enabled for multiple folder that overlap
+          the first entry in the mapping file will be considered. 
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>

@@ -44,9 +44,9 @@ namespace ChimeraTK {
 
   typedef struct {
     string name;
-    size_t buffer_length;
-    size_t entries_per_response;
-    size_t interval;
+    size_t buffer_length{100};
+    size_t entries_per_response{100};
+    size_t interval{1000};
   } AdapterHistorySetup;
 
   UA_HistoryDataGathering add_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup,
