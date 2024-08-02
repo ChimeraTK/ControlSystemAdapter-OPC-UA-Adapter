@@ -108,7 +108,16 @@ namespace ChimeraTK {
     UA_Byte_clear(&temp);
   }
 
-  // avoid multiple setups for one node
+  /**
+   * This assumes both lists have the same size.
+   * Avoid multiple setups for one node.
+   * Because first nodes from pv settings in the mapping file are added,
+   * those settings will be used instaed of a setting added by mapping
+   * a folder.
+   *
+   * @param historizing_nodes List of nodes with history.
+   * @param historizing_setup List of setups.
+   */
   void check_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup) {
     bool repeat = true;
     /*size_t position = 0;*/
@@ -120,7 +129,10 @@ namespace ChimeraTK {
                  reinterpret_cast<UA_NodeId*>(&historizing_nodes[j]))) {
             UA_String out = UA_STRING_NULL;
             UA_print(reinterpret_cast<UA_NodeId*>(&historizing_nodes[j]), &UA_TYPES[UA_TYPES_NODEID], &out);
-            UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Warning! Node %.*s has multiple history settings.",
+            UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                "Node %.*s has multiple history settings. The first folder/process_variable setting in the mapping "
+                "file is considered if multiple exists/overlap. "
+                "process_variable settings are preferred over folder settings.",
                 (int)out.length, out.data);
             UA_String_clear(&out);
             UA_NodeId_clear(reinterpret_cast<UA_NodeId*>(&historizing_nodes[j]));

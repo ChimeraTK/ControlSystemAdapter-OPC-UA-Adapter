@@ -319,6 +319,10 @@ namespace ChimeraTK {
               if(!history_name.empty()) {
                 temp.name = history_name;
               }
+              else {
+                throw std::logic_error("Incomplete history configuration for history " + history_name +
+                    " Missing history parameter 'name'.");
+              }
               string history_buffer_length =
                   xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "buffer_length");
               if(!history_buffer_length.empty()) {
@@ -333,29 +337,19 @@ namespace ChimeraTK {
               if(!history_interval.empty()) {
                 sscanf(history_interval.c_str(), "%zu", &temp.interval);
               }
-              if(history_name.empty() || history_buffer_length.empty() || history_entries_per_response.empty() ||
-                  history_interval.empty()) {
-                if(!history_name.empty()) {
-                  throw std::logic_error("Incomplete History Configuration for history " + history_name);
-                }
-                else {
-                  throw std::logic_error("Incomplete History Configuration. Missing history name");
+
+              // check if a configuration is redefined
+              bool existing = false;
+              for(size_t j = 0; j < this->serverConfig.history.size(); j++) {
+                if(history_name == this->serverConfig.history[j].name) {
+                  existing = true;
                 }
               }
+              if(!existing) {
+                this->serverConfig.history.insert(this->serverConfig.history.end(), temp);
+              }
               else {
-                // check if a configuration is redefined
-                bool existing = false;
-                for(size_t j = 0; j < this->serverConfig.history.size(); j++) {
-                  if(history_name == this->serverConfig.history[j].name) {
-                    existing = true;
-                  }
-                }
-                if(!existing) {
-                  this->serverConfig.history.insert(this->serverConfig.history.end(), temp);
-                }
-                else {
-                  throw std::logic_error("redefinition of history configuration " + history_name);
-                }
+                throw std::logic_error("redefinition of history configuration " + history_name);
               }
             }
           }
@@ -835,7 +829,9 @@ namespace ChimeraTK {
 
         if(folder.empty()) {
           // only if no history is set raise error/warning
-          raiseError("Folder creation failed. Name is missing.", "Skipping Folder.", nodeset->nodeTab[i]->line);
+          if(history.empty()) {
+            raiseError("Folder creation failed. Name is missing.", "Skipping Folder.", nodeset->nodeTab[i]->line);
+          }
           continue;
         }
         // check if a pv with the requested node id exists
@@ -1235,8 +1231,10 @@ namespace ChimeraTK {
             name = sourceVarName;
           }
           if(sourceVarName != name) {
-            raiseError("PV mapping failed. The pv name can't changed if copy is false.",
-                std::string("Skipping PV mapping of pv ") + name);
+            if(history.empty()) {
+              raiseError("PV mapping failed. The pv name can't changed if copy is false.",
+                  std::string("Skipping PV mapping of pv ") + name);
+            }
             continue;
           }
           // create destination folder
