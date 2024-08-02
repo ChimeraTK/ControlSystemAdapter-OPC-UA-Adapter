@@ -772,6 +772,7 @@ namespace ChimeraTK {
             xml_file_handler::getNodesByName(nodeset->nodeTab[i]->children, "description");
         string sourceName = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "sourceName");
         string copy = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "copy");
+        transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
         if(!nodeFolderPath.empty()) {
           destination = xml_file_handler::getContentFromNode(nodeFolderPath[0]);
         }
@@ -783,6 +784,18 @@ namespace ChimeraTK {
         }
         string history = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[i], "history");
         if(!history.empty()) {
+          // After discussion we only allow history if source name is set.
+          // Else the exclude logic would become more complex!
+          if(sourceName.empty()) {
+            if(this->mappingExceptions) {
+              throw std::runtime_error(
+                  "Error! Can not add history if no sourceName attribute is set. Mapping line number: " +
+                  std::to_string(nodeset->nodeTab[i]->line));
+            }
+            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
+                "Can not add history if no sourceName attribute is  set. Mapping line number: %u",
+                nodeset->nodeTab[i]->line);
+          }
           if(!nodeFolder.empty()) {
             string folderNodeId;
             if(!nodeFolderPath.empty()) {
@@ -796,20 +809,19 @@ namespace ChimeraTK {
             else {
               folderNodeId = this->serverConfig.rootFolder + "/" + folder + "Dir";
             }
-            if(!sourceName.empty()) {
-              AdapterFolderHistorySetup temp;
-              temp.folder_historizing = history;
-              UA_NodeId id = UA_NODEID_STRING(1, const_cast<char*>(folderNodeId.c_str()));
-              UA_NodeId_copy(&id, &temp.folder_id);
-              this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
-              UA_String out = UA_STRING_NULL;
-              UA_print(&temp.folder_id, &UA_TYPES[UA_TYPES_NODEID], &out);
-              UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "add folder from destination and name %.*s ",
-                  (int)out.length, out.data);
-              UA_String_clear(&out);
-            }
+
+            AdapterFolderHistorySetup temp;
+            temp.folder_historizing = history;
+            UA_NodeId id = UA_NODEID_STRING(1, const_cast<char*>(folderNodeId.c_str()));
+            UA_NodeId_copy(&id, &temp.folder_id);
+            this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
+            UA_String out = UA_STRING_NULL;
+            UA_print(&temp.folder_id, &UA_TYPES[UA_TYPES_NODEID], &out);
+            UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND,
+                "Adding history for folder from destination and name %.*s ", (int)out.length, out.data);
+            UA_String_clear(&out);
           }
-          if(!sourceName.empty() && (copy.empty() || copy == "FALSE" || copy == "False" || copy == "false")) {
+          else if(copy.empty() || copy == "FALSE") {
             AdapterFolderHistorySetup temp;
             temp.folder_historizing = history;
             string folderNodeId = this->serverConfig.rootFolder + "/" + sourceName + "Dir";
@@ -818,27 +830,32 @@ namespace ChimeraTK {
             this->serverConfig.historyfolders.insert(this->serverConfig.historyfolders.end(), temp);
             UA_String out = UA_STRING_NULL;
             UA_print(&temp.folder_id, &UA_TYPES[UA_TYPES_NODEID], &out);
-            UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "add folder from source name %.*s ",
-                (int)out.length, out.data);
+            UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND,
+                "Adding history for folder from source name %.*s ", (int)out.length, out.data);
             UA_String_clear(&out);
+          }
+          else {
+            if(this->mappingExceptions) {
+              throw std::runtime_error(
+                  "Error! Can not add history if copy is true and no source name is given. Mapping line number: " +
+                  std::to_string(nodeset->nodeTab[i]->line));
+            }
+            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
+                "Can not add history if copy is true and no source name is given. Mapping line number: %u",
+                nodeset->nodeTab[i]->line);
           }
         }
 
         if(folder.empty()) {
-          if(this->mappingExceptions) {
+          // only if no history is set raise error/warning
+          if(this->mappingExceptions && history.empty()) {
             throw std::runtime_error("Error! Folder creation failed. Name is missing. Mapping line number: " +
                 std::to_string(nodeset->nodeTab[i]->line));
           }
-          if(description.empty()) {
+          if(history.empty()) {
             UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
                 "Skipping Folder. Folder creation failed. Name is missing. Mapping line number: %u",
                 nodeset->nodeTab[i]->line);
-          }
-          else {
-            UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-                "Skipping Folder. Folder creation failed. Name is missing 'description: %s'. Mapping "
-                "line number: %u",
-                description.c_str(), nodeset->nodeTab[i]->line);
           }
           continue;
         }
@@ -932,7 +949,6 @@ namespace ChimeraTK {
             continue;
           }
           // enroll path destination -> copy / link the complete tree to this place
-          transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
           if(copy == "TRUE") {
             bool sourceAndDestinationEqual = false;
             if(!destination.empty()) {
@@ -1080,7 +1096,7 @@ namespace ChimeraTK {
               this->serverConfig.historyvariables.insert(this->serverConfig.historyvariables.end(), temp);
             }
           }
-          if(!sourceName.empty() && (copy.empty() || copy == "FALSE" || copy == "False" || copy == "false")) {
+          if(!sourceName.empty() && (copy.empty() || copy == "FALSE")) {
             name = sourceName;
             targetNodeId = this->serverConfig.rootFolder + "/" + sourceName;
             UA_NodeId id = UA_NODEID_STRING(1, const_cast<char*>(targetNodeId.c_str()));
