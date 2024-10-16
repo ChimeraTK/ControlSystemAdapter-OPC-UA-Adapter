@@ -108,17 +108,8 @@ namespace ChimeraTK {
     UA_Byte_clear(&temp);
   }
 
-  /**
-   * This assumes both lists have the same size.
-   * Avoid multiple setups for one node.
-   * Because first nodes from pv settings in the mapping file are added,
-   * those settings will be used instaed of a setting added by mapping
-   * a folder.
-   *
-   * @param historizing_nodes List of nodes with history.
-   * @param historizing_setup List of setups.
-   */
-  void check_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup) {
+  void check_historizing_nodes(
+      vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup, UA_ServerConfig* server_config) {
     bool repeat = true;
     /*size_t position = 0;*/
     while(repeat) {
@@ -129,7 +120,7 @@ namespace ChimeraTK {
                  reinterpret_cast<UA_NodeId*>(&historizing_nodes[j]))) {
             UA_String out = UA_STRING_NULL;
             UA_print(reinterpret_cast<UA_NodeId*>(&historizing_nodes[j]), &UA_TYPES[UA_TYPES_NODEID], &out);
-            UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+            UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND,
                 "Node %.*s has multiple history settings. The first folder/process_variable setting in the mapping "
                 "file is considered if multiple exists/overlap. "
                 "process_variable settings are preferred over folder settings.",
@@ -147,8 +138,8 @@ namespace ChimeraTK {
     }
   }
 
-  static void remove_nodes_with_incomplete_historizing_setup(
-      vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup, vector<AdapterHistorySetup> history) {
+  void remove_nodes_with_incomplete_historizing_setup(vector<UA_NodeId>& historizing_nodes,
+      vector<string>& historizing_setup, UA_ServerConfig* server_config, vector<AdapterHistorySetup> history) {
     bool repeat = true;
     size_t position = 0;
     while(repeat) {
@@ -164,7 +155,7 @@ namespace ChimeraTK {
         if(!found) {
           UA_String out = UA_STRING_NULL;
           UA_print(reinterpret_cast<UA_NodeId*>(&historizing_nodes[i]), &UA_TYPES[UA_TYPES_NODEID], &out);
-          UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+          UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
               "Warning! Remove node %.*s from historizing because the setup %s  is missing.", (int)out.length, out.data,
               historizing_setup[i].c_str());
           UA_String_clear(&out);
@@ -184,9 +175,9 @@ namespace ChimeraTK {
       vector<AdapterFolderHistorySetup> historyfolders, vector<AdapterPVHistorySetup> historyvariables) {
     add_variable_historizing(&historizing_nodes, &historizing_setup, historyvariables, mappedServer, server_config);
     add_folder_historizing(&historizing_nodes, &historizing_setup, historyfolders, mappedServer, server_config);
-    check_historizing_nodes(historizing_nodes, historizing_setup);
+    check_historizing_nodes(historizing_nodes, historizing_setup, server_config);
     // search nodes with incomplete history config
-    remove_nodes_with_incomplete_historizing_setup(historizing_nodes, historizing_setup, history);
+    remove_nodes_with_incomplete_historizing_setup(historizing_nodes, historizing_setup, server_config, history);
     UA_HistoryDataGathering gathering = UA_HistoryDataGathering_Default(historizing_nodes.size());
     server_config->historyDatabase = UA_HistoryDatabase_default(gathering);
     for(size_t i = 0; i < historizing_nodes.size(); i++) {
@@ -226,11 +217,12 @@ namespace ChimeraTK {
 
   void clear_history(UA_HistoryDataGathering gathering, vector<UA_NodeId>& historizing_nodes,
       vector<string>& historizing_setup, UA_Server* mappedServer, vector<AdapterFolderHistorySetup> historyfolders,
-      vector<AdapterPVHistorySetup> historyvariables) {
+      vector<AdapterPVHistorySetup> historyvariables, UA_ServerConfig* server_config) {
     // stop the poll for all historizing variables
     for(auto& historizing_node : historizing_nodes) {
       UA_StatusCode retval = gathering.stopPoll(mappedServer, gathering.context, &historizing_node);
-      UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "stopPoll %s", UA_StatusCode_name(retval));
+      UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_SERVER,
+          "Stopping polling thread used by the historizing -> %s", UA_StatusCode_name(retval));
     }
     // clear the list of valid historizing nodes
     historizing_nodes.clear();

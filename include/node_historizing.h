@@ -55,5 +55,22 @@ namespace ChimeraTK {
 
   void clear_history(UA_HistoryDataGathering gathering, vector<UA_NodeId>& historizing_nodes,
       vector<string>& historizing_setup, UA_Server* mappedServer, vector<AdapterFolderHistorySetup> historyfolders,
-      vector<AdapterPVHistorySetup> historyvariables);
+      vector<AdapterPVHistorySetup> historyvariables, UA_ServerConfig* server_config);
+
+  /**
+   * This assumes both lists have the same size.
+   * Avoid multiple setups for one node.
+   * Because first nodes from pv settings in the mapping file are added,
+   * those settings will be used instaed of a setting added by mapping
+   * a folder.
+   *
+   * @param historizing_nodes List of nodes with history.
+   * @param historizing_setup List of setups.
+   * @param server_config Server configuration used to get the log level.
+   */
+  void check_historizing_nodes(
+      vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup, UA_ServerConfig* server_config);
+
+  void remove_nodes_with_incomplete_historizing_setup(vector<UA_NodeId>& historizing_nodes,
+      vector<string>& historizing_setup, UA_ServerConfig* server_config, vector<AdapterHistorySetup> history);
 } // namespace ChimeraTK
