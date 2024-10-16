@@ -301,6 +301,106 @@ namespace ChimeraTK {
       }
     }
        */
+      vector<xmlNodePtr> mappingExceptionsVector =
+          xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "mapping_exceptions");
+      if(mappingExceptionsVector.empty()) {
+        this->mappingExceptions = UA_FALSE;
+      }
+      else {
+        placeHolder = xml_file_handler::getContentFromNode(mappingExceptionsVector[0]);
+        transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
+        if(placeHolder == "TRUE") {
+          this->mappingExceptions = UA_TRUE;
+        }
+        else {
+          this->mappingExceptions = UA_FALSE;
+        }
+      }
+
+      xmlXPathObjectPtr sub_result = this->fileHandler->getNodeSet(xpath + "//server");
+      if(result) {
+        xmlNodeSetPtr nodeset = sub_result->nodesetval;
+        if(nodeset->nodeNr > 1) {
+          throw std::runtime_error("To many <server>-Tags in config file");
+        }
+
+        placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "logLevel");
+        if(!placeHolder.empty()) {
+          transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
+          if(placeHolder.compare("TRACE") == 0) {
+            this->serverConfig.logLevel = UA_LOGLEVEL_TRACE;
+          }
+          else if(placeHolder.compare("DEBUG") == 0) {
+            this->serverConfig.logLevel = UA_LOGLEVEL_DEBUG;
+          }
+          else if(placeHolder.compare("INFO") == 0) {
+            this->serverConfig.logLevel = UA_LOGLEVEL_INFO;
+          }
+          else if(placeHolder.compare("WARNING") == 0) {
+            this->serverConfig.logLevel = UA_LOGLEVEL_WARNING;
+          }
+          else if(placeHolder.compare("ERROR") == 0) {
+            this->serverConfig.logLevel = UA_LOGLEVEL_ERROR;
+          }
+          else if(placeHolder.compare("FATAL") == 0) {
+            this->serverConfig.logLevel = UA_LOGLEVEL_FATAL;
+          }
+          else {
+            // See default set in ServerConfig
+            // Use UA_Log_Stdout because the logger does not yet exist, but log level INFO is used so
+            // writing a warning is ok here.
+            UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+                "Unknown logLevel (\"%s\") found in config file. INFO is used instead!", placeHolder.c_str());
+          }
+        }
+        else {
+          // Use UA_Log_Stdout because the logger does not yet exist, but log level INFO is used so
+          // writing a warning is ok here.
+          UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+              "No 'logLevel'-Attribute set in config file. Use default logging level: info");
+        }
+        logger = UA_Log_Stdout_withLevel(this->serverConfig.logLevel);
+
+        string opcuaPort = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "port");
+        if(!opcuaPort.empty()) {
+          this->serverConfig.opcuaPort = std::stoi(opcuaPort);
+        }
+        else {
+          UA_LOG_WARNING(
+              &logger, UA_LOGCATEGORY_USERLAND, "No 'port'-Attribute in config file is set. Use default Port: 16664");
+        }
+
+        placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
+        if(!placeHolder.empty()) {
+          this->serverConfig.applicationName = placeHolder;
+          if(this->serverConfig.rootFolder.empty()) {
+            this->serverConfig.rootFolder = placeHolder;
+          }
+        }
+        else {
+          string applicationName;
+          try {
+            string applicationName = ApplicationBase::getInstance().getName();
+            this->serverConfig.applicationName = applicationName;
+          }
+          catch(ChimeraTK::logic_error) {
+          }
+          UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+              "No 'applicationName'-Attribute is set in config file. Use default application-name.");
+        }
+
+        // if no root folder name is set, use application name
+        if(this->serverConfig.rootFolder.empty()) {
+          this->serverConfig.rootFolder = this->serverConfig.applicationName;
+        }
+        xmlXPathFreeObject(sub_result);
+      }
+      else {
+        logger = UA_Log_Stdout_withLevel(this->serverConfig.logLevel);
+        UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+            "No <server>-Tag in config file. Use default port 16664 and application name configuration.");
+        this->serverConfig.rootFolder = this->serverConfig.applicationName;
+      }
 
       // check if historizing is configured
       vector<xmlNodePtr> historizing = xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "historizing");
@@ -316,26 +416,50 @@ namespace ChimeraTK {
               string history_name = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "name");
               AdapterHistorySetup temp;
               char* c;
+              bool incomplete = false;
               if(!history_name.empty()) {
                 temp.name = history_name;
               }
               else {
-                throw std::logic_error("Incomplete history configuration for history " + history_name +
-                    " Missing history parameter 'name'.");
+                raiseError("Missing history parameter 'name'.",
+                    "History configuration is not added to the list of available history configurations",
+                    nodeHistorizingPath->line);
+                incomplete = true;
               }
               string history_buffer_length =
                   xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "buffer_length");
               if(!history_buffer_length.empty()) {
                 sscanf(history_buffer_length.c_str(), "%zu", &temp.buffer_length);
               }
+              else {
+                raiseError("Missing history parameter 'buffer_length'.",
+                    "History configuration " + history_name +
+                        " is not added to the list of available history configurations",
+                    nodeHistorizingPath->line);
+                incomplete = true;
+              }
               string history_entries_per_response =
                   xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "entries_per_response");
               if(!history_entries_per_response.empty()) {
                 sscanf(history_entries_per_response.c_str(), "%zu", &temp.entries_per_response);
               }
+              else {
+                raiseError("Missing history parameter 'entries_per_response'.",
+                    "History configuration " + history_name +
+                        " is not added to the list of available history configurations",
+                    nodeHistorizingPath->line);
+                incomplete = true;
+              }
               string history_interval = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "interval");
               if(!history_interval.empty()) {
                 sscanf(history_interval.c_str(), "%zu", &temp.interval);
+              }
+              else {
+                raiseError("Missing history parameter 'interval'.",
+                    "History configuration " + history_name +
+                        " is not added to the list of available history configurations",
+                    nodeHistorizingPath->line);
+                incomplete = true;
               }
 
               // check if a configuration is redefined
@@ -346,10 +470,14 @@ namespace ChimeraTK {
                 }
               }
               if(!existing) {
-                this->serverConfig.history.insert(this->serverConfig.history.end(), temp);
+                if(!incomplete) {
+                  this->serverConfig.history.insert(this->serverConfig.history.end(), temp);
+                }
               }
               else {
-                throw std::logic_error("redefinition of history configuration " + history_name);
+                raiseError("Redefinition of history configuration.",
+                    "History configuration " + history_name +
+                        " is not added to the list of available history configurations");
               }
             }
           }
@@ -364,21 +492,6 @@ namespace ChimeraTK {
       placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "description");
       if(!placeHolder.empty()) {
         this->serverConfig.descriptionFolder = placeHolder;
-      }
-      vector<xmlNodePtr> mappingExceptionsVector =
-          xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "mapping_exceptions");
-      if(mappingExceptionsVector.empty()) {
-        this->mappingExceptions = UA_FALSE;
-      }
-      else {
-        placeHolder = xml_file_handler::getContentFromNode(mappingExceptionsVector[0]);
-        transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
-        if(placeHolder == "TRUE") {
-          this->mappingExceptions = UA_TRUE;
-        }
-        else {
-          this->mappingExceptions = UA_FALSE;
-        }
       }
       xmlXPathFreeObject(result);
     }
@@ -410,90 +523,7 @@ namespace ChimeraTK {
     else {
       this->serverConfig.UsernamePasswordLogin = UA_FALSE;
     }
-    result = this->fileHandler->getNodeSet(xpath + "//server");
-    if(result) {
-      xmlNodeSetPtr nodeset = result->nodesetval;
-      if(nodeset->nodeNr > 1) {
-        throw std::runtime_error("To many <server>-Tags in config file");
-      }
 
-      placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "logLevel");
-      if(!placeHolder.empty()) {
-        transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
-        if(placeHolder.compare("TRACE") == 0) {
-          this->serverConfig.logLevel = UA_LOGLEVEL_TRACE;
-        }
-        else if(placeHolder.compare("DEBUG") == 0) {
-          this->serverConfig.logLevel = UA_LOGLEVEL_DEBUG;
-        }
-        else if(placeHolder.compare("INFO") == 0) {
-          this->serverConfig.logLevel = UA_LOGLEVEL_INFO;
-        }
-        else if(placeHolder.compare("WARNING") == 0) {
-          this->serverConfig.logLevel = UA_LOGLEVEL_WARNING;
-        }
-        else if(placeHolder.compare("ERROR") == 0) {
-          this->serverConfig.logLevel = UA_LOGLEVEL_ERROR;
-        }
-        else if(placeHolder.compare("FATAL") == 0) {
-          this->serverConfig.logLevel = UA_LOGLEVEL_FATAL;
-        }
-        else {
-          // See default set in ServerConfig
-          // Use UA_Log_Stdout because the logger does not yet exist, but log level INFO is used so
-          // writing a warning is ok here.
-          UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-              "Unknown logLevel (\"%s\") found in config file. INFO is used instead!", placeHolder.c_str());
-        }
-      }
-      else {
-        // Use UA_Log_Stdout because the logger does not yet exist, but log level INFO is used so
-        // writing a warning is ok here.
-        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-            "No 'logLevel'-Attribute set in config file. Use default logging level: info");
-      }
-      logger = UA_Log_Stdout_withLevel(this->serverConfig.logLevel);
-
-      string opcuaPort = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "port");
-      if(!opcuaPort.empty()) {
-        this->serverConfig.opcuaPort = std::stoi(opcuaPort);
-      }
-      else {
-        UA_LOG_WARNING(
-            &logger, UA_LOGCATEGORY_USERLAND, "No 'port'-Attribute in config file is set. Use default Port: 16664");
-      }
-
-      placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "applicationName");
-      if(!placeHolder.empty()) {
-        this->serverConfig.applicationName = placeHolder;
-        if(this->serverConfig.rootFolder.empty()) {
-          this->serverConfig.rootFolder = placeHolder;
-        }
-      }
-      else {
-        string applicationName;
-        try {
-          string applicationName = ApplicationBase::getInstance().getName();
-          this->serverConfig.applicationName = applicationName;
-        }
-        catch(ChimeraTK::logic_error) {
-        }
-        UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
-            "No 'applicationName'-Attribute is set in config file. Use default application-name.");
-      }
-
-      // if no root folder name is set, use application name
-      if(this->serverConfig.rootFolder.empty()) {
-        this->serverConfig.rootFolder = this->serverConfig.applicationName;
-      }
-      xmlXPathFreeObject(result);
-    }
-    else {
-      logger = UA_Log_Stdout_withLevel(this->serverConfig.logLevel);
-      UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
-          "No <server>-Tag in config file. Use default port 16664 and application name configuration.");
-      this->serverConfig.rootFolder = this->serverConfig.applicationName;
-    }
     result = this->fileHandler->getNodeSet(xpath + "//security");
     if(result) {
       xmlNodeSetPtr nodeset = result->nodesetval;
@@ -647,7 +677,7 @@ namespace ChimeraTK {
       UA_Server_run_iterate(this->mappedServer, true);
     }
     clear_history(gathering, historizing_nodes, historizing_setup, this->mappedServer,
-        this->serverConfig.historyfolders, this->serverConfig.historyvariables);
+        this->serverConfig.historyfolders, this->serverConfig.historyvariables, this->server_config);
 
     UA_Server_run_shutdown(this->mappedServer);
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Stopped the server worker thread");
@@ -1430,8 +1460,14 @@ namespace ChimeraTK {
     if(this->mappingExceptions) {
       throw std::runtime_error(std::string("Error! ") + errorMesssage + lineMessage);
     }
-    UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND, "%s %s", errorMesssage.c_str(),
-        (consequenceMessage + lineMessage).c_str());
+    if(server_config) {
+      UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND, "%s %s", errorMesssage.c_str(),
+          (consequenceMessage + lineMessage).c_str());
+    }
+    else {
+      UA_LOG_WARNING(
+          &logger, UA_LOGCATEGORY_USERLAND, "%s %s", errorMesssage.c_str(), (consequenceMessage + lineMessage).c_str());
+    }
   }
 
   UA_StatusCode ua_uaadapter::mapSelfToNamespace() {

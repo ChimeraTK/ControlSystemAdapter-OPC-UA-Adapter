@@ -99,7 +99,7 @@ namespace ChimeraTK {
    */
   class ua_uaadapter : ua_mapped_class {
    private:
-    UA_ServerConfig* server_config;
+    UA_ServerConfig* server_config{nullptr};
 
     UA_NodeId variablesListId;
     UA_NodeId constantsListId;
