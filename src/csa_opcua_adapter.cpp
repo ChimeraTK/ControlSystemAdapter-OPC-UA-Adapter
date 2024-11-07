@@ -76,12 +76,14 @@ namespace ChimeraTK {
                 break;
               }
             }
-            for(auto folder : this->adapter->folder_with_history) {
-              if(oneProcessVariable->getName().substr(1, folder.size() - 1) == folder) {
-                UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
-                    "Skip exclude node - Used in folder history setting: %s", oneProcessVariable->getName().c_str());
-                pv_used = true;
-                break;
+            if(!pv_used) {
+              for(auto folder : this->adapter->folder_with_history) {
+                if(oneProcessVariable->getName().substr(0, folder.size()) == folder) {
+                  UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
+                      "Skip exclude node - Used in folder history setting: %s", oneProcessVariable->getName().c_str());
+                  pv_used = true;
+                  break;
+                }
               }
             }
             if(!pv_used) {
