@@ -35,8 +35,10 @@ using namespace std;
 
 namespace ChimeraTK {
   xml_file_handler::xml_file_handler(const std::string& filePath) {
-    // FIXME: Add some check routine if file realy exist
-    this->createDoc(filePath);
+    if(!this->createDoc(filePath)) {
+      throw logic_error(
+          std::string("Failed to parse ") + filePath + (". Check if mapping file exsists and is well formated."));
+    }
   }
 
   std::vector<xmlNodePtr> xml_file_handler::getNodesByName(xmlNodePtr startNode, const std::string& nodeName) {
