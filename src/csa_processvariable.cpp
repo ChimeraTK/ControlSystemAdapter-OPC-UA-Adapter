@@ -293,13 +293,14 @@ namespace ChimeraTK {
     else {
       std::vector<T> iarr = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0);
       v->type = &UA_TYPES[fusion::at_key<T>(typesMap)];
-      if(range != nullptr){
-        //v->type = &UA_TYPES[fusion::at_key<T>(typesMap)];
-        //rv = UA_Variant_setRangeCopy(v, iarr.data(), iarr.size(), *range);
+      if(range != nullptr) {
+        // v->type = &UA_TYPES[fusion::at_key<T>(typesMap)];
+        // rv = UA_Variant_setRangeCopy(v, iarr.data(), iarr.size(), *range);
         UA_Variant tmpVariant;
         UA_Variant_setArray(&tmpVariant, iarr.data(), iarr.size(), &UA_TYPES[fusion::at_key<T>(typesMap)]);
         rv = UA_Variant_copyRange(&tmpVariant, v, *range);
-      } else {
+      }
+      else {
         rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[fusion::at_key<T>(typesMap)]);
       }
     }
@@ -732,6 +733,12 @@ namespace ChimeraTK {
   UA_DateTime ua_processvariable::getSourceTimeStamp() {
     auto t = this->csManager->getProcessVariable(this->namePV)->getVersionNumber().getTime();
     auto microseconds = std::chrono::time_point_cast<std::chrono::microseconds>(t).time_since_epoch().count();
+    // For the initial value from ChimeraTK microseconds will be 0 -> use current time in this case
+    if(microseconds == 0) {
+      microseconds = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::system_clock::now())
+                         .time_since_epoch()
+                         .count();
+    }
     return (microseconds * UA_DATETIME_USEC) + UA_DATETIME_UNIX_EPOCH;
   }
 
