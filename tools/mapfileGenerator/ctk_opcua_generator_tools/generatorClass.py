@@ -359,7 +359,19 @@ class XMLDirectory(MapOption):
       exclude = ET.SubElement(root, "exclude")
       exclude.set("sourceName", self.path.removeprefix('/root/') + '/*')
     
-    if self.newDescription or self.newName or self.newDestination or (self.historizing and not historiszingActive):
+    # special case: If only the description is to be changed no sourceName has to be given put name and destination
+    if self.newDescription and not self.newName and not self.newDestination and not self.historizing:
+      logging.debug("Adding xml entry for folder {} that only changes the description of an existing folder".format(self.path.removeprefix('/root/')))
+      folder = ET.SubElement(root, "folder")
+      dest = ET.SubElement(folder, "description")
+      dest.text = self.newDescription
+      name = ET.SubElement(folder, "name")
+      name.text = self.name
+      destText = self.path.removeprefix('/root/').removesuffix(self.name)
+      if not destText == '':
+        dest = ET.SubElement(folder, "destination")
+        dest.text = destText.removesuffix('/')
+    elif self.newDescription or self.newName or self.newDestination or (self.historizing and not historiszingActive):
       logging.debug("Adding xml entry for folder {}".format(self.path.removeprefix('/root/')))
       folder = ET.SubElement(root, "folder")
       folder.set("sourceName", self.path.removeprefix('/root/'))
@@ -372,6 +384,9 @@ class XMLDirectory(MapOption):
       if self.newName:
         name = ET.SubElement(folder, "name")
         name.text = self.newName
+      else:
+        name = ET.SubElement(folder, "name")
+        name.text = self.name
       if self.newDestination:
         dest = ET.SubElement(folder, "destination")
         dest.text = self.newDestination.removeprefix('/root/')
@@ -453,7 +468,27 @@ class MapGenerator(Config):
           else:
             logging.warning("Failed to find source folder path {} in the application variable tree!".format("/root/" + str(folder.attrib["sourceName"])))
             nSkipped[0] =  nSkipped[0] + 1
-
+        else:
+          tmpDestination = None
+          tmpName = None
+          if folder.find('destination', namespaces=folder.nsmap) != None:
+            tmpDestination = folder.find('destination', namespaces=folder.nsmap).text
+          if folder.find('name', namespaces=folder.nsmap) != None:
+            tmpName = folder.find('name', namespaces=folder.nsmap).text
+          if tmpName == None:
+            logging.warning("For folder entry in the map file with no sourceName no name is given. Will be skipped.")
+          tmpSourceName = "/root/"
+          if tmpDestination == None:
+            tmpSourceName = tmpSourceName + tmpName
+          else:
+            tmpSourceName = tmpSourceName + tmpDestination + "/" + tmpName
+          directory = self.dir.findDir(tmpSourceName)
+          if directory != None:
+            if folder.find('description', namespaces=folder.nsmap) != None:
+              directory.newDescription = folder.find('description', namespaces=folder.nsmap).text 
+          else:
+            logging.warning("Failed to find source folder path {} in the application variable tree!".format(tmpSourceName))
+            nSkipped[0] =  nSkipped[0] + 1
       # read process_variable information
       for pv in data.findall('process_variable', namespaces=data.nsmap):
         if "sourceName" in  pv.attrib:
