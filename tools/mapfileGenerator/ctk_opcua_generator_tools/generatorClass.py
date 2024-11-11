@@ -267,7 +267,14 @@ class XMLVar(MapOption):
         unit.text = self.newUnit
       if self.newDestination:
         dest = ET.SubElement(pv, "destination")
-        dest.text = self.newDestination.removeprefix('/root/')
+        if self.newDestination == "/root":
+          # PV is moved to root -> No destination needs to be set in that case
+          # If no new name is assigned the original name needs to be set 
+          if not self.newName:
+            name = ET.SubElement(pv, "name")
+            name.text = self.name
+        else:
+          dest.text = self.newDestination.removeprefix('/root/')
       if self.newName:
         pv.set("copy", "True")
       else:
@@ -358,27 +365,39 @@ class XMLDirectory(MapOption):
     if self.exclude and not excludeActive:
       exclude = ET.SubElement(root, "exclude")
       exclude.set("sourceName", self.path.removeprefix('/root/') + '/*')
-    
+    destText = self.path.removeprefix('/root').removesuffix(self.name)
     # special case: If only the description is to be changed no sourceName has to be given put name and destination
-    if self.newDescription and not self.newName and not self.newDestination and not self.historizing:
+    # If a history is assigned and a description is given two entries have to be created!
+    #<folder sourceName="watchdog/logging" copy="False" history="short_history">
+    #  <name>logging</name>
+    #  <destination>watchdog</destination>
+    #</folder>
+    #<folder>
+    #  <description>Test</description>
+    #  <name>logging</name>
+    #  <destination>watchdog</destination>
+    #</folder>
+    descriptionAlreadySet = False
+    if self.newDescription and not self.newName and not self.newDestination:
       logging.debug("Adding xml entry for folder {} that only changes the description of an existing folder".format(self.path.removeprefix('/root/')))
       folder = ET.SubElement(root, "folder")
-      dest = ET.SubElement(folder, "description")
-      dest.text = self.newDescription
+      description = ET.SubElement(folder, "description")
+      description.text = self.newDescription
       name = ET.SubElement(folder, "name")
       name.text = self.name
-      destText = self.path.removeprefix('/root/').removesuffix(self.name)
       if not destText == '':
         dest = ET.SubElement(folder, "destination")
-        dest.text = destText.removesuffix('/')
-    elif self.newDescription or self.newName or self.newDestination or (self.historizing and not historiszingActive):
+        dest.text = destText.removeprefix('/').removesuffix('/')
+      descriptionAlreadySet = True
+      
+    if self.newName or self.newDestination or (self.historizing and not historiszingActive):
       logging.debug("Adding xml entry for folder {}".format(self.path.removeprefix('/root/')))
       folder = ET.SubElement(root, "folder")
       folder.set("sourceName", self.path.removeprefix('/root/'))
       folder.set("copy", "False")
       if self.historizing and not historiszingActive:
         folder.set("history", self.historizing)
-      if self.newDescription:
+      if self.newDescription and not descriptionAlreadySet:
         dest = ET.SubElement(folder, "description")
         dest.text = self.newDescription
       if self.newName:
@@ -387,9 +406,12 @@ class XMLDirectory(MapOption):
       else:
         name = ET.SubElement(folder, "name")
         name.text = self.name
+      dest = ET.SubElement(folder, "destination")
       if self.newDestination:
-        dest = ET.SubElement(folder, "destination")
-        dest.text = self.newDestination.removeprefix('/root/')
+        # If folder is moved to root the new destination is '/root' -> that is why the '/' is removed in an extra call
+        dest.text = self.newDestination.removeprefix('/root').removeprefix('/')
+      else:
+        dest.text = destText.removeprefix('/').removesuffix('/')
 
   def reset(self):
     '''
@@ -404,14 +426,15 @@ class XMLDirectory(MapOption):
       var.reset()      
   
 class MapGenerator(Config):
-  def __init__(self, inputFile : str):
+  def __init__(self, inputFile : str|None):
     super().__init__()
     self.inputFile: str|None = inputFile
     self.outputFile: str|None = None
     self.applicationName: str|None = None
     self.nsmap: Dict|None = None
     self.dir: XMLDirectory|None = None
-    self.parseChimeraTK()
+    if self.inputFile:
+      self.parseChimeraTK()
     
   def parseChimeraTK(self):
     '''
@@ -444,27 +467,43 @@ class MapGenerator(Config):
                          A mapping file is identified by the root node called 'uamapping'.
     '''
     logging.debug("Parsing map file.")
-    self.dir.reset()
+    if self.dir:
+      self.dir.reset()
     data = self._openFile(inputFile)
     if data.tag == 'uamapping':
       nsmap = {'csa': 'https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter'}
       if nsmap != data.nsmap:
         RuntimeError("Wrong name space ({}) used in mapping file.".format(data.nsmap))
       self.readConfig(data)
-      # read folder information
+      
       nSkipped = [0,0,0]
+      if self.dir == None:
+        # No xml input was given so we do not parse any further
+        return nSkipped
+      # read folder information
       for folder in data.findall('folder', namespaces=data.nsmap):
         if "sourceName" in  folder.attrib:
           directory = self.dir.findDir("/root/" + str(folder.attrib["sourceName"]))
           if directory != None:
+            # construct test path from name and destination to compare to the directory path 
+            # if both match only the history is added
+            # else the folder is moved
+            tmpPath = "/root/"
             if 'history' in folder.attrib:
               directory.historizing = str(folder.attrib["history"])
-            if folder.find('description', namespaces=folder.nsmap) != None:
+            if folder.find('description', namespaces=folder.nsmap) != None and folder.find('description', namespaces=folder.nsmap).text != None:
               directory.newDescription = folder.find('description', namespaces=folder.nsmap).text 
-            if folder.find('name', namespaces=folder.nsmap) != None:
-              directory.newName = folder.find('name', namespaces=folder.nsmap).text  
-            if folder.find('destination', namespaces=folder.nsmap) != None:
-              directory.newDestination = folder.find('destination', namespaces=folder.nsmap).text
+            if folder.find('destination', namespaces=folder.nsmap) != None and folder.find('destination', namespaces=folder.nsmap).text != None:
+              tmpDestination = directory.path.removeprefix("/root").removeprefix("/").removesuffix(directory.name).removesuffix("/")
+              tmpPath = tmpPath + folder.find('destination', namespaces=folder.nsmap).text
+              if tmpDestination != folder.find('destination', namespaces=folder.nsmap).text:
+                directory.newDestination = "/root/"+folder.find('destination', namespaces=folder.nsmap).text
+            if folder.find('name', namespaces=folder.nsmap) != None and directory.name != folder.find('name', namespaces=folder.nsmap).text:
+              directory.newName = folder.find('name', namespaces=folder.nsmap).text
+            # first remove "/" avoids resulting "//" when no destination was added
+            tmpPath = tmpPath.removesuffix("/") + "/" + folder.find('name', namespaces=folder.nsmap).text
+            if directory.newDestination == None and tmpPath != directory.path:
+              directory.newDestination = "/root"
           else:
             logging.warning("Failed to find source folder path {} in the application variable tree!".format("/root/" + str(folder.attrib["sourceName"])))
             nSkipped[0] =  nSkipped[0] + 1
@@ -504,6 +543,9 @@ class MapGenerator(Config):
               var.newName = pv.find('name', namespaces=pv.nsmap).text  
             if pv.find('destination', namespaces=pv.nsmap) != None:
               var.newDestination = pv.find('destination', namespaces=pv.nsmap).text 
+            if (var.newDestination == "" or var.newDestination == None) and var.name == var.newName:
+              var.newDestination = "/root"
+              var.newName = None
           else:
             logging.warning("Failed to find source pv path {} in the application variable tree!".format("/root/" + str(pv.attrib["sourceName"])))
             nSkipped[1] =  nSkipped[1] + 1
@@ -533,7 +575,8 @@ class MapGenerator(Config):
     logging.info("Writing map file: {}".format(self.outputFile))
     root = ET.Element("uamapping", nsmap = {'csa': 'https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter'})
     self.createConfig(root)
-    self.dir.generateMapEntries(root)
+    if self.dir:
+      self.dir.generateMapEntries(root)
     tree = ET.ElementTree()
     tree._setroot(root)
     uglyXml = ET.tounicode(tree, pretty_print = True)

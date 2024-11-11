@@ -20,6 +20,7 @@ def main(args):
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description="ChimeraTK mapfile generator", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument('--input', type=str, help='XML file created by the XML generator of the ChimeraTK application.')
+  parser.add_argument('--noinput', action='store_true', help='Use if you do not have an XML file created by the XML generator of the ChimeraTK application.')
   parser.add_argument('-d', '--debug', action='store_true', help='Enable debug messages.')
   args = parser.parse_args()
   logLevel = logging.DEBUG if args.debug else logging.INFO
