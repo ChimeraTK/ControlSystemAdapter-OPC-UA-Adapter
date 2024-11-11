@@ -73,6 +73,9 @@
             Used to create, copy or link folders.
             Can also be used to assign a histroy setting.
             In this case only use the corresponding attribute.
+          	In case only the description of an existing foder
+          	is to be changed leave out the sourceName and
+          	specify destination, name and the new description.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -439,12 +442,11 @@
   <xsd:complexType name="folderType">
     <xsd:all>
       <xsd:element name="name" type="csa:nonEmptyString"
-        minOccurs="0" maxOccurs="1">
+        minOccurs="1">
         <xsd:annotation>
           <xsd:documentation xml:lang="en">
             Allows to change the folder name.
-            If not used the description of the original folder is used.
-            In case a folder is created the default description is empty.
+            If you don't want to change the name simply put the original name here.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -477,7 +479,10 @@
       <xsd:annotation>
         <xsd:documentation xml:lang="en">
           If moving or linking exsisting folders give the path to the existing
-          folder.
+          folder. Also if assigning a history the sourceName is required.
+          If you want to change the description of an existing 
+          folder leave out the sourceName attribute. Instead specify the folder
+          using name and destination. 
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
