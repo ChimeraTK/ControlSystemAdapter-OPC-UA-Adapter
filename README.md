@@ -1,5 +1,10 @@
 ControlSystem-OPCUA_Adapter
 ===========================
+[![License](https://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0.html)
+[![DOI](https://rodare.hzdr.de/badge/DOI/10.14278/rodare.3257.svg)](https://doi.org/10.14278/rodare.3257)
+![Supported Platforms][api-platforms]
+
+[api-platforms]: https://img.shields.io/badge/platforms-linux%20-blue.svg "Supported Platforms"
 
 Welcome to the ControlSystem-OPCUA_Adapter project. 
 This project add an control system adapter to [ChimeraTK](https://github.com/ChimeraTK), that is based on the OPC UA stack [open62541](https://open62541.org/).
