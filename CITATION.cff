@@ -1,0 +1,58 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  OPC UA based control system adapter for the ChimeraTK
+  framework
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Klaus
+    family-names: Zenker
+    orcid: 'https://orcid.org/0000-0002-8120-6806'
+    affiliation: Helmholtz-Zentrum Dresden-Rossendorf
+  - given-names: Chris
+    family-names: Iatrou
+    affiliation: Technische Universität Dresden
+  - family-names: Rahm
+    given-names: Julian
+    affiliation: Technische Universität Dresden
+  - family-names: Pfrommer
+    given-names: Julius
+    affiliation: >-
+      Fraunhofer-Institut für Optronik, Systemtechnik und
+      Bildauswertung IOSB 
+  - affiliation: >-
+      Fraunhofer-Institut für Optronik, Systemtechnik und
+      Bildauswertung IOSB 
+    family-names: Bischoff
+    given-names: Tino
+  - family-names: Ebner
+    given-names: Andreas
+    affiliation: >-
+      Fraunhofer-Institut für Optronik, Systemtechnik und
+      Bildauswertung IOSB 
+  - family-names: Düwel
+    given-names: Florian
+    affiliation: >-
+      Fraunhofer-Institut für Optronik, Systemtechnik und
+      Bildauswertung IOSB 
+identifiers:
+  - type: doi
+    value: 10.14278/rodare.3257
+repository-code: >-
+  https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter
+url: >-
+  https://chimeratk.github.io/ChimeraTK-ControlSystemAdapter-OPCUAAdapter/head/html/index.html
+keywords:
+  - OPC UA
+  - ChimeraTK
+  - Control System
+license: LGPL-3.0
+commit: >-
+  https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter/commit/87b06e423945897cffb9f0c17869c0ac7cfdd928
+version: 04.00.00
+date-released: '2024-11-11'

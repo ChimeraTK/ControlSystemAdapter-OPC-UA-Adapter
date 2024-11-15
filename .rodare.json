@@ -1,0 +1,15 @@
+{
+    "creators": [
+        {
+            "name": "Zenker, Klaus",
+            "affiliation": "Helmholtz-Zentrum Dresden-Rossendorf",
+            "orcid": "0000-0002-8120-6806"
+        }
+    ],
+    "title": "OPC UA based control system adapter for the ChimeraTK framework",
+    "access_right": "open",
+    "upload_type": "software",
+    "license": "LGPL-3.0",
+    "pub_id": "39902",
+    "description": "The OPC UA based control system adapter implements an OPC UA server for the ChimeraTK framework. The implementation is based on the open source OPC UA stack open62541. It allows to generate an OPC UA server from any application written in the ChimeraTK framework."
+}
