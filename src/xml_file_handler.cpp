@@ -21,10 +21,7 @@
 
 #include "xml_file_handler.h"
 
-<<<<<<< HEAD
-=======
 #include "open62541/plugin/log_stdout.h"
->>>>>>> refs/remotes/origin/master
 #include <libxml2/libxml/tree.h>
 #include <libxml2/libxml/xpath.h>
 #include <libxml2/libxml/xpathInternals.h>
@@ -56,41 +53,10 @@ namespace ChimeraTK {
     return nodeVector;
   }
 
-<<<<<<< HEAD
-  if(!isDocSetted()) {
-    return NULL;
-  }
-  context = xmlXPathNewContext(this->doc);
-  if(context == NULL) {
-    // std::cout("Error in xmlXPathNewContext\n");
-    return NULL;
-  }
-  if(xmlXPathRegisterNs(
-         context, (xmlChar*)"csa", (xmlChar*)"https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter") != 0) {
-    std::cerr << "Failed to register xml namespace: https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
-              << std::endl;
-    return NULL;
-  }
-
-  result = xmlXPathEvalExpression(xpath, context);
-  xmlXPathFreeContext(context);
-  if(result == NULL) {
-    // std::cout("Error in xmlXPathEvalExpression\n");
-    return NULL;
-  }
-  if(xmlXPathNodeSetIsEmpty(result->nodesetval)) {
-    xmlXPathFreeObject(result);
-    // std::cout("No result\n");
-    return NULL;
-  }
-  return result;
-}
-=======
   xmlXPathObjectPtr xml_file_handler::getNodeSet(const std::string& xPathString) {
     auto* xpath = (xmlChar*)xPathString.c_str();
     xmlXPathContextPtr context;
     xmlXPathObjectPtr result;
->>>>>>> refs/remotes/origin/master
 
     if(!isDocSetted()) {
       return nullptr;

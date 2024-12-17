@@ -4,14 +4,10 @@ cmake_minimum_required(VERSION 3.16)
 ## Project specification
 ##########################################################################################################
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
-<<<<<<< HEAD
 
-SET(${PROJECT_NAME}_MAJOR_VERSION 02)
-SET(${PROJECT_NAME}_MINOR_VERSION 99)
-=======
 SET(${PROJECT_NAME}_MAJOR_VERSION 04)
-SET(${PROJECT_NAME}_MINOR_VERSION 00)
->>>>>>> refs/remotes/origin/master
+SET(${PROJECT_NAME}_MINOR_VERSION 99)
+
 SET(${PROJECT_NAME}_PATCH_VERSION 00)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
@@ -61,10 +57,14 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/examples/)
+include_directories(SYSTEM ${ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS})
+include_directories(SYSTEM ${ChimeraTK-DeviceAccess_INCLUDE_DIRS})
 include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR})
 
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 link_directories(${LIBXML2_LIBRARIES})
+link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
+link_directories(${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
 
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
         ${CMAKE_SOURCE_DIR}/src/ua_map_types.cpp
@@ -170,12 +170,13 @@ target_link_libraries(mtca_c_objetcs PRIVATE open62541::open62541)
 add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects> $<TARGET_OBJECTS:mtca_c_objetcs>)
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_FULL_LIBRARY_VERSION}
         SOVERSION ${${PROJECT_NAME}_SOVERSION})
-target_link_libraries(${PROJECT_NAME} PUBLIC ChimeraTK::ChimeraTK-ControlSystemAdapter)
-target_link_libraries(${PROJECT_NAME} PRIVATE open62541::open62541)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBXML2_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
-target_link_libraries(${PROJECT_NAME} PRIVATE dl)
-target_link_libraries(${PROJECT_NAME} PRIVATE 
+target_link_libraries(${PROJECT_NAME} ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${ChimeraTK-DeviceAccess_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} open62541::open62541)
+target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} pthread)
+target_link_libraries(${PROJECT_NAME} dl)
+target_link_libraries(${PROJECT_NAME}
         ${Boost_FILESYSTEM_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
         ${Boost_THREAD_LIBRARY}
