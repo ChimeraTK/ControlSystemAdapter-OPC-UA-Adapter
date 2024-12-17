@@ -97,9 +97,6 @@ int main() {
   string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
   csaOPCUA = new ChimeraTK::csa_opcua_adapter(csManager, pathToConfig);
 
-  UA_LOG_INFO(csaOPCUA->getLogger(), UA_LOGCATEGORY_USERLAND, "Optimize unmapped variables in the application base");
-  ChimeraTK::ApplicationBase::getInstance().optimiseUnmappedVariables(csaOPCUA->getUnusedVariables());
-
   UA_LOG_INFO(csaOPCUA->getLogger(), UA_LOGCATEGORY_USERLAND, "Run the application instance");
   ChimeraTK::ApplicationBase::getInstance().run();
 
