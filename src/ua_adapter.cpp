@@ -18,7 +18,7 @@
  * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
  * Copyright (c) 2018-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
-#include "void_type.h"
+
 #include <open62541/plugin/historydata/history_data_backend_memory.h>
 #include <open62541/plugin/historydata/history_data_gathering_default.h>
 #include <open62541/plugin/historydata/history_database_default.h>
@@ -685,7 +685,6 @@ namespace ChimeraTK {
         add_historizing_nodes(historizing_nodes, historizing_setup, this->mappedServer, this->server_config,
             this->serverConfig.history, this->serverConfig.historyfolders, this->serverConfig.historyvariables);
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Starting the server worker thread");
-    add_void_event_type(this->mappedServer);
     UA_Server_run_startup(this->mappedServer);
     this->running = true;
     while(this->running) {

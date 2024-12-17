@@ -71,10 +71,6 @@ void runtime_value_generator::generateValues(boost::shared_ptr<DevicePVManager> 
     devManager->getProcessArray<double>("double_sine")->write();
     devManager->getProcessArray<int32_t>("int_sine")->accessChannel(0) = vector<int32_t>{int_sine};
     devManager->getProcessArray<int32_t>("int_sine")->write();
-    devManager->getProcessArray<ChimeraTK::Boolean>("bool")->accessChannel(0) =
-        vector<ChimeraTK::Boolean>{!devManager->getProcessArray<ChimeraTK::Boolean>("bool")->accessChannel(0).at(0)};
-    devManager->getProcessArray<ChimeraTK::Boolean>("bool")->write();
-    devManager->getProcessArray<ChimeraTK::Void>("void")->write();
     devManager->getProcessArray<int32_t>("t")->accessChannel(0) =
         vector<int32_t>{(int32_t)((end - start) / (CLOCKS_PER_SEC / 1000))};
     devManager->getProcessArray<int32_t>("t")->write();

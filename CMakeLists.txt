@@ -58,7 +58,6 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
         ${CMAKE_SOURCE_DIR}/src/ua_map_types.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_opcua_adapter.cpp
         ${CMAKE_SOURCE_DIR}/src/node_historizing.cpp
-        ${CMAKE_SOURCE_DIR}/src/void_type.cpp
         ${CMAKE_SOURCE_DIR}/src/xml_file_handler.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_processvariable.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_additionalvariable.cpp
@@ -148,8 +147,8 @@ configure_file (
 
 ## Object Files
 add_library(mtca_objects OBJECT ${objectSources})
-target_link_libraries(mtca_objects PRIVATE open62541::open62541)
-target_link_libraries(mtca_objects PUBLIC ChimeraTK::ChimeraTK-ControlSystemAdapter)
+target_link_libraries(mtca_objects open62541::open62541)
+target_link_libraries(mtca_objects ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
 
 # ChimeraTK::ChimeraTK-ControlSystemAdapter exports the flag c++-17 with INTERFACE_COMPILE_OPTIONS. 
 # This causes a problem with clang c compilation.

@@ -118,10 +118,6 @@ int main() {
       devManager->createProcessArray<double>(SynchronizationDirection::deviceToControlSystem, "double_sine", 1);
   ProcessArray<int32_t>::SharedPtr int_sineDev =
       devManager->createProcessArray<int32_t>(SynchronizationDirection::deviceToControlSystem, "int_sine", 1);
-  ProcessArray<ChimeraTK::Boolean>::SharedPtr boolDev =
-      devManager->createProcessArray<ChimeraTK::Boolean>(SynchronizationDirection::deviceToControlSystem, "bool", 1);
-  ProcessArray<ChimeraTK::Void>::SharedPtr voidDev =
-      devManager->createProcessArray<ChimeraTK::Void>(SynchronizationDirection::deviceToControlSystem, "void", 1);
 
   // example mapping variable
   ProcessArray<int8_t>::SharedPtr intB15A8devMap = devManager->createProcessArray<int8_t>(
