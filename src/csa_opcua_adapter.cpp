@@ -10,7 +10,6 @@ extern "C" {
 #include "csa_opcua_adapter.h"
 #include "csa_processvariable.h"
 #include "ua_adapter.h"
-#include "void_type.h"
 
 #include <iostream>
 #include <utility>
@@ -43,12 +42,6 @@ namespace ChimeraTK {
     bool skip_var = false;
     for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables) {
       std::type_info const& valueType = oneProcessVariable->getValueType();
-      if(valueType == typeid(Void)) {
-        /*skip_var = true;*/
-        UA_LOG_DEBUG(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Skip Variable: Variable: %s has a void type",
-            oneProcessVariable->getName().c_str());
-        continue;
-      }
       for(auto e : this->adapter->exclude) {
         string suffix_1 = "/*", suffix_2 = "*";
         if(e.rfind(suffix_1) == e.size() - suffix_1.size()) {
@@ -167,37 +160,6 @@ namespace ChimeraTK {
   void csa_opcua_adapter::start() {
     if(!this->adapter_thread.joinable()) {
       this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter.get());
-    }
-    // start void observer loop
-    void_observer_data* data = (void_observer_data*)UA_calloc(1, sizeof(void_observer_data));
-    vector<ProcessVariable::SharedPtr> allProcessVariables = csManager->getAllProcessVariables();
-    for(const ProcessVariable::SharedPtr& oneProcessVariable : allProcessVariables) {
-      std::type_info const& valueType = oneProcessVariable->getValueType();
-      if(valueType == typeid(Void)) {
-        // Check if PV is writable - if not assume it is an VoidInput
-        if(!oneProcessVariable->isWriteable()) {
-          data->pvs.insert(data->pvs.end(), oneProcessVariable->getName());
-          UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Adding variable %s to void thread.",
-              oneProcessVariable->getName().c_str());
-        }
-        else {
-          UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
-              "Ignoring Void input %s. Void inputs are not yet supported.", oneProcessVariable->getName().c_str());
-        }
-      }
-    }
-    if(!data->pvs.empty()) {
-      add_void_event_type(adapter->mappedServer);
-      auto conf = adapter->get_server_config();
-      data->rootFolder = conf.rootFolder;
-      data->adapter = this;
-      data->mappedServer = adapter->getMappedServer();
-      data->csManager = csManager;
-      this->observer_thread = std::thread(&startVoidObserverThread, data, this->getLogger());
-      this->observer_thread.detach();
-    }
-    else {
-      UA_free(data);
     }
   }
 

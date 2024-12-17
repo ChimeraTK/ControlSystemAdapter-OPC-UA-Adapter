@@ -236,7 +236,7 @@ namespace ChimeraTK {
     UA_DurationRange range = {10, 3600.0 * 1000.0};
     config->publishingIntervalLimits = range;
     config->samplingIntervalLimits = range;
-    
+
     this->mappedServer = UA_Server_newWithConfig(config);
     this->server_config = UA_Server_getConfig(this->mappedServer);
 
