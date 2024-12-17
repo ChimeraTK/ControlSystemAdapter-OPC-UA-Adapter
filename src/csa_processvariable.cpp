@@ -155,18 +155,7 @@ namespace ChimeraTK {
       const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext,
       UA_Boolean includeSourceTimeStamp, const UA_NumericRange* /*range*/, UA_DataValue* value) {
     auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
-    DataValidity dv = thisObj->csManager->getProcessVariable(thisObj->namePV)->dataValidity();
-    UA_Int32 validity;
-    switch(dv) {
-      case DataValidity::ok:
-        validity = 1;
-        break;
-      case DataValidity::faulty:
-        validity = 0;
-        break;
-      default:
-        validity = -1;
-    }
+    UA_Int32 validity = 1;
     UA_Variant_setScalarCopy(&value->value, &validity, &UA_TYPES[UA_TYPES_INT32]);
     value->hasValue = true;
     if(includeSourceTimeStamp) {
@@ -228,10 +217,6 @@ namespace ChimeraTK {
       return "double";
     else if(valueType == typeid(string))
       return "string";
-    else if(valueType == typeid(Boolean))
-      return "Boolean";
-    else if(valueType == typeid(Void))
-      return "Void";
     else
       return "Unsupported type";
   }
@@ -481,10 +466,7 @@ namespace ChimeraTK {
     else if(valueType == typeid(string)) {
       arrayDims[0] = typeSpecificSetup<std::string>(mapElem, createdNodeId);
     }
-    else if(valueType == typeid(Boolean)) {
-      arrayDims[0] = typeSpecificSetup<Boolean>(mapElem, createdNodeId);
-    }
-    else if(valueType != typeid(Void)) {
+    else {
       int status;
       auto* demangledName = abi::__cxa_demangle(valueType.name(), nullptr, nullptr, &status);
 

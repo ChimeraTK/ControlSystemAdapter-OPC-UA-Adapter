@@ -36,7 +36,7 @@ namespace ChimeraTK {
   typedef fusion::map<fusion::pair<int8_t, uint>, fusion::pair<uint8_t, uint>, fusion::pair<int16_t, uint>,
       fusion::pair<uint16_t, uint>, fusion::pair<int32_t, uint>, fusion::pair<uint32_t, uint>,
       fusion::pair<int64_t, uint>, fusion::pair<uint64_t, uint>, fusion::pair<float, uint>, fusion::pair<double, uint>,
-      fusion::pair<string, uint>, fusion::pair<Boolean, uint>>
+      fusion::pair<string, uint>>
       TypesMap;
 
   /** @class ua_processvariable
@@ -60,7 +60,7 @@ namespace ChimeraTK {
         fusion::make_pair<int32_t>(UA_TYPES_INT32), fusion::make_pair<uint32_t>(UA_TYPES_UINT32),
         fusion::make_pair<int64_t>(UA_TYPES_INT64), fusion::make_pair<uint64_t>(UA_TYPES_UINT64),
         fusion::make_pair<float>(UA_TYPES_FLOAT), fusion::make_pair<double>(UA_TYPES_DOUBLE),
-        fusion::make_pair<string>(UA_TYPES_STRING), fusion::make_pair<Boolean>(UA_TYPES_BOOLEAN)};
+        fusion::make_pair<string>(UA_TYPES_STRING)};
 
    private:
     bool array;
