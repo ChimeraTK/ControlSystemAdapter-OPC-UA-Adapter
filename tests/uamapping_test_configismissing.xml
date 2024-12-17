@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<uamapping>
+<csa:uamapping xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
 
-	<folder>
-		<name></name>
-		<description>DescriptionOfEmptyFolder</description>
-	</folder>
-
-	<!-- old config
-	<additionalNodes folderName="" description="DescriptionOfEmptyFolder">
-	</additionalNodes>
-	-->
-
-	<folder>
-		<name>EPICS</name>
-	</folder>
-	<process_variable sourceName="Mein/Name/ist/uint32Scalar">
+  <process_variable sourceName="Mein/Name/ist/uint32Scalar">
 		<destination>EPICS</destination>
 		<name>uint32S</name>
 	</process_variable>
@@ -24,19 +11,4 @@
 	<process_variable sourceName="Dieser/Name/ist/doubleScalar">
 		<destination>EPICS</destination>
 	</process_variable>
-
-	<!-- old config
-	<application name="EPICS">
-		<map sourceVariableName="Mein/Name/ist/uint32Scalar" rename="uint32S">
-			<unrollPath pathSep="/">True</unrollPath>
-		  <folder>EastSide/LINAC</folder>
-    </map>
-		<map sourceVariableName="Dein/Name/ist/int32Scalar">
-		  <folder>NorthSideLINAC/partA</folder>
-    </map>
-		<map sourceVariableName="Dieser/Name/ist/doubleScalar">
-			<unrollPath pathSep="/">True</unrollPath>
-    </map>
-	</application>
-	-->
-</uamapping>
+</csa:uamapping>

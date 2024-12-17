@@ -16,12 +16,11 @@
  *
  * Copyright (c) 2023 Andreas Ebner <andreas.ebner@iosb.fraunhofer.de>
  */
-
-#ifndef CSA_NAMESPACE_H_
-#define CSA_NAMESPACE_H_
+#pragma once
 
 #include <open62541/server.h>
 
-extern UA_StatusCode csa_namespace_init(UA_Server *server);
-
-#endif /* CSA_NAMESPACE_H_ */
+extern UA_StatusCode csa_namespace_init(UA_Server* server);
+extern void csa_namespace_add_LoggingLevelEnumType(UA_Server* server, char* enumName);
+extern UA_StatusCode csa_namespace_add_LoggingLevelValues(UA_Server* server, const UA_NodeId* parent);
+extern UA_StatusCode csa_namespace_add_additional_variable(UA_Server* server);

@@ -1,2 +1,3 @@
 @Library('ChimeraTK') _
-buildTestDeploy(['ChimeraTK-ControlSystemAdapter'])
+env.CTESTOPTS="-j1"
+autojob(['ChimeraTK/open62541-interface','ChimeraTK/ControlSystemAdapter'], 'https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter')

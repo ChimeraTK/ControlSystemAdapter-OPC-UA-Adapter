@@ -6,11 +6,14 @@
 build
 .project
 .cproject
+.pydevproject
 .settings
 .kdev4
 *.kdev4
 .vscode
 CMakeLists.txt.user
+*.code-workspace
+.cache
 #files ending with ~ are emacs backups
 *~
 #files ending with .swp might show up when using vi
@@ -30,3 +33,5 @@ ControlSystemAdapter-OPC-UA-Adapter.kdev4
 cov_htmp/
 app.info
 doc/html/
+__pycache__
+/.mypy_cache/

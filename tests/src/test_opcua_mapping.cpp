@@ -1,7 +1,7 @@
 #include <csa_opcua_adapter.h>
+#include <test_sample_data.h>
 #include <ua_adapter.h>
 #include <xml_file_handler.h>
-#include <test_sample_data.h>
 
 #include <boost/test/included/unit_test.hpp>
 
@@ -38,11 +38,11 @@ void UAMappingTest::testExampleSet() {
   BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
   result = UA_NODEID_NULL;
   UA_Server_readNodeId(uaadapter->getMappedServer(),
-                       UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSepDir"), &result);
+      UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSepDir"), &result);
   BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
   result = UA_NODEID_NULL;
   UA_Server_readNodeId(uaadapter->getMappedServer(),
-                       UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSep/stringScalar"), &result);
+      UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSep/stringScalar"), &result);
   BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
 
   result = UA_NODEID_NULL;

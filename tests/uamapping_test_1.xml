@@ -1,107 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<uamapping>
+<csa:uamapping xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
 
 
 	<config rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
 		<server applicationName="OPCUAServer" port="16664" />
 		<login username="test" password="test123" />
 		<process_variable_hierarchy>
-			<unroll pathSep="/">True</unroll>
+			<unroll pathSep="/">true</unroll>
 		</process_variable_hierarchy>
-		<mapping_exceptions>False</mapping_exceptions>
+		<mapping_exceptions>false</mapping_exceptions>
 	</config>
-	<!--old config
-	<config rootFolder="TestFolder_1" description="Ich bin die Beschreibung des TestFolders">
-		<serverConfig applicationName="OPCUAServer" port="16664" />
-		<login username="test" password="test123" /> 
-	</config>
-	-->
 
-	<folder>
-		<name>AdditionalNodesFolder</name>
-		<description>DescriptionOfAdditionalNodes</description>
-	</folder>
-	<additional_variable>
-		<destination>AdditionalNodesFolder</destination>
-		<name>BrowseName1</name>
-		<description>myDescription1</description>
-		<value>Wert1</value>
-	</additional_variable>
-	<additional_variable>
-		<destination>AdditionalNodesFolder</destination>
-		<name>BrowseName2</name>
-		<description>myDescription2</description>
-		<value>Wert2</value>
-	</additional_variable>
-	<additional_variable>
-		<destination>AdditionalNodesFolder</destination>
-		<name>BrowseName3</name>
-		<description>myDescription3</description>
-		<value>Wert3</value>
-	</additional_variable>
-	<additional_variable>
-		<destination>AdditionalNodesFolder</destination>
-		<name>BrowseName4</name>
-		<description>myDescription4</description>
-		<value>Wert4</value>
-	</additional_variable>
-	<additional_variable>
-		<destination>AdditionalNodesFolder</destination>
-		<name>BrowseName5</name>
-		<description>myDescription5</description>
-		<value>Wert5</value>
-	</additional_variable>
-	<foler>
-		<name>ConfigFolder</name>
-		<description>DescriptionOfConfigFolder</description>
-	</foler>
-	<additional_variable>
-		<destination>ConfigFolder</destination>
-		<name>BrowseNameA</name>
-		<description>myDescriptionA</description>
-		<value>WertA</value>
-	</additional_variable>
-	<additional_variable>
-		<destination>ConfigFolder</destination>
-		<name>BrowseNameB</name>
-		<description>myDescriptionB</description>
-		<value>WertB</value>
-	</additional_variable>
-
-	<!-- old config
-	<additionalNodes folderName="AdditionalNodesFolder" description="DescriptionOfAdditionalNodes">
-		<variable name="BrowseName1" description="myDescription1" value="Wert1" />
-		<variable name="BrowseName2" description="myDescription2" value="Wert2" />
-		<variable name="BrowseName3" description="myDescription3" value="Wert3" />
-		<variable name="BrowseName4" description="myDescription4" value="Wert4" />
-		<variable name="BrowseName5" description="myDescription5" value="Wert5" />
-	</additionalNodes>
-	<additionalNodes folderName="ConfigFolder" description="DescriptionOfConfigFolder">
-		<variable name="BrowseNameA" description="myDescriptionA" value="WertA" />
-		<variable name="BrowseNameB" description="myDescriptionB" value="WertB" />
-	</additionalNodes>
-	-->
-
-	<folder>
-		<name>TestCaseForXMLFileHandlerTest::getContent</name>
-	</folder>
 	<process_variable sourceName="int8Array__s15">
 		<destination>TestCaseForXMLFileHandlerTest::getContent/NorthSideLINAC/partB</destination>
 		<name>GainPV</name>
 	</process_variable>
-	<!-- old config
-	<application name="TestCaseForXMLFileHandlerTest::getContent">
-		<map sourceVariableName="int8Array__s15" rename="GainPV">
-			<unrollPath pathSep="_">True</unrollPath>
-			<unrollPath pathSep="8">True</unrollPath>
-		  <folder>NorthSideLINAC/partB</folder>
-   </map>
-	</application>
-	-->
 
-	<folder>
-		<name>WinAA</name>
-	</folder>
 	<process_variable sourceName="Mein/Name_ist#int16Array">
 		<destination>WinAA/NorthSide/LINAC/partA</destination>
 		<name>Array_s15_int8</name>
@@ -119,28 +33,6 @@
 		<name>Array</name>
 	</process_variable>
 
-	<!-- old config
-	<application name="WinAA">
-		<map sourceVariableName="Mein/Name_ist#int16Array" rename="Array_s15_int8">
-			<unrollPath pathSep="_">True</unrollPath>
-			<unrollPath pathSep="/">True</unrollPath>
-			<unrollPath pathSep="#">True</unrollPath>
-		  <folder>NorthSide/LINAC/partA</folder>
-			<folder>NorthSide/LINAC/partX</folder>
-  	</map>
-		<map sourceVariableName="Mein/Name_ist#int16Array_s15" rename="Array">
-			<unrollPath pathSep="_">True</unrollPath>
-			<unrollPath pathSep="/">True</unrollPath>
-			<unrollPath pathSep="#">True</unrollPath>
-		  <folder>NorthSide/LINAC/partA</folder>
-			<folder>NorthSide/LINAC/partX</folder>
-  	</map>
-	</application>
-	-->
-
-	<folder>
-		<name>WinBB</name>
-	</folder>
 	<process_variable sourceName="Dein/Name/ist/uint8Array_s10">
 		<destination>WinBB/NorthSideLINAC/partA</destination>
 	</process_variable>
@@ -154,27 +46,6 @@
 		<destination>WinBB/EastSide/LINAC</destination>
 	</process_variable>
 
-	<!-- old config
-	<application name="WinBB">
-		<map sourceVariableName="Dein/Name/ist/uint8Array_s10" rename="">
-			<unrollPath pathSep="_">True</unrollPath>
-		  <folder>NorthSideLINAC/partA</folder>
-   	</map>
-		<map sourceVariableName="int16Array_s15">
-			<unrollPath pathSep="_">False</unrollPath>
-		  <folder>SouthSide/LINAC/partA</folder>
-			<folder>SouthSide/LINAC/partB</folder>
-		</map>
-		<map sourceVariableName="Dein/Name/ist/int32Scalar">
-			<unrollPath pathSep="-">True</unrollPath>
-			<folder>EastSide/LINAC</folder>
-  	</map>
-	</application>
-	-->
-
-	<folder>
-		<name>WinCC</name>
-	</folder>
 	<process_variable sourceName="Unser/Name/ist_uint8Array_s10">
 		<destination>WinCC</destination>
 	</process_variable>
@@ -186,26 +57,6 @@
 		<name>Gustav</name>
 	</process_variable>
 
-	<!-- old config
-	<application name="WinCC">
-		<map sourceVariableName="Unser/Name/ist_uint8Array_s10">
-			<unrollPath pathSep="_">True</unrollPath>
-			<unrollPath pathSep="/">True</unrollPath>
-		  <folder></folder>
-    </map>
-		<map sourceVariableName="int16Array_s15">
-			<unrollPath pathSep="_">False</unrollPath>
-		  <folder>NorthSideLINAC/partB</folder>
-    </map>
-		<map sourceVariableName="floatArray_s10" rename="Gustav">
-			<unrollPath pathSep="_">False</unrollPath>
-   	</map>
-	</application>
-	-->
-
-	<folder>
-		<name>EPICS</name>
-	</folder>
 	<process_variable sourceName="Mein/Name/ist/uint32Scalar">
 		<destination>EPICS</destination>
 		<name>uint32S</name>
@@ -217,16 +68,46 @@
 		<destination>EPICS</destination>
 	</process_variable>
 
-	<!-- old config
-	<application name="EPICS">
-		<map sourceVariableName="Mein/Name/ist/uint32Scalar" rename="uint32S">
-			<unrollPath pathSep="/">True</unrollPath>
-    </map>
-		<map sourceVariableName="Dein/Name/ist/int32Scalar">
-		  <folder>NorthSideLINAC/partA</folder>
-    </map>
-		<map sourceVariableName="Dieser/Name/ist/doubleScalar">
-    </map>
-	</application>
-	-->
-</uamapping>
+  <additional_variable>
+    <destination>AdditionalNodesFolder</destination>
+    <name>BrowseName1</name>
+    <description>myDescription1</description>
+    <value>Wert1</value>
+  </additional_variable>
+  <additional_variable>
+    <destination>AdditionalNodesFolder</destination>
+    <name>BrowseName2</name>
+    <description>myDescription2</description>
+    <value>Wert2</value>
+  </additional_variable>
+  <additional_variable>
+    <destination>AdditionalNodesFolder</destination>
+    <name>BrowseName3</name>
+    <description>myDescription3</description>
+    <value>Wert3</value>
+  </additional_variable>
+  <additional_variable>
+    <destination>AdditionalNodesFolder</destination>
+    <name>BrowseName4</name>
+    <description>myDescription4</description>
+    <value>Wert4</value>
+  </additional_variable>
+  <additional_variable>
+    <destination>AdditionalNodesFolder</destination>
+    <name>BrowseName5</name>
+    <description>myDescription5</description>
+    <value>Wert5</value>
+  </additional_variable>
+  <additional_variable>
+    <destination>ConfigFolder</destination>
+    <name>BrowseNameA</name>
+    <description>myDescriptionA</description>
+    <value>WertA</value>
+  </additional_variable>
+  <additional_variable>
+    <destination>ConfigFolder</destination>
+    <name>BrowseNameB</name>
+    <description>myDescriptionB</description>
+    <value>WertB</value>
+  </additional_variable>	
+</csa:uamapping>
