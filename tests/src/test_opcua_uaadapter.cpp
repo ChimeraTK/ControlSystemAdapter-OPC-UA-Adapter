@@ -24,12 +24,11 @@ void UAAdapterTest::testExampleSet() {
 
   // Test config handling
   BOOST_CHECK_THROW(ua_uaadapter("./uamapping_test_twoconfigs.xml"), std::runtime_error);
+  BOOST_CHECK_THROW(ua_uaadapter("./uamapping_test_notwellformed.xml"), std::logic_error);
 
   ua_uaadapter* ad1 = new ua_uaadapter("./uamapping_test_applicationismissing.xml");
   ad1->~ua_uaadapter();
   ad1 = new ua_uaadapter("./uamapping_test_configismissing.xml");
-  ad1->~ua_uaadapter();
-  ad1 = new ua_uaadapter("./uamapping_test_notwellformed.xml");
   ad1->~ua_uaadapter();
   ad1 = new ua_uaadapter("./uamapping_test_portismissing.xml");
   ad1->~ua_uaadapter();

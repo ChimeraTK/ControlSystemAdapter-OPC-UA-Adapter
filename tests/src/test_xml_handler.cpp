@@ -15,26 +15,21 @@ class XMLFileHandlerTest {
 
 void XMLFileHandlerTest::readDocFile() {
   std::cout << "Enter XMLFileHandlerTest - readDocFile" << std::endl;
-  xml_file_handler* xmlHandlerOne = new xml_file_handler("../tests/uamapping_test_1.xml");
+  xml_file_handler* xmlHandlerOne = new xml_file_handler("uamapping_test_1.xml");
   BOOST_CHECK(xmlHandlerOne != NULL);
 
   // Emtpy path
-  xml_file_handler* xmlHandlerTwo = new xml_file_handler("");
-  BOOST_CHECK(xmlHandlerTwo->isDocSetted() == false);
-  BOOST_CHECK(xmlHandlerTwo->getNodeSet("//process_variable") == NULL);
+  BOOST_CHECK_THROW(xml_file_handler(""), std::logic_error);
+  // Set a not wellformed document
+  BOOST_CHECK_THROW(xml_file_handler("uamapping_test_notwellformed.xml"), std::logic_error);
+
   // Set a document
-  xmlHandlerTwo->createDoc("../tests/uamapping_test_2.xml");
+  xml_file_handler* xmlHandlerTwo = new xml_file_handler("uamapping_test_2.xml");
   BOOST_CHECK(xmlHandlerTwo->isDocSetted() == true);
   BOOST_CHECK(xmlHandlerTwo->getNodeSet("//process_variable") != NULL);
 
-  // Set a not wellformed document
-  xml_file_handler* xmlHandlerThree = new xml_file_handler("../tests/uamapping_test_notwellformed.xml");
-  BOOST_CHECK(xmlHandlerThree->isDocSetted() == false);
-  BOOST_CHECK(xmlHandlerThree->getNodeSet("//process_variable") == NULL);
-
   xmlHandlerOne->~xml_file_handler();
   xmlHandlerTwo->~xml_file_handler();
-  xmlHandlerThree->~xml_file_handler();
 }
 
 void XMLFileHandlerTest::getContent() {
