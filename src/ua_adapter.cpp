@@ -1512,8 +1512,8 @@ namespace ChimeraTK {
           UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
           UA_QUALIFIEDNAME(1, const_cast<char*>("ServerConfiguration")),
           UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &ownedNodes, &createdNodeId);
-      ownNodeId = createdNodeId;
-      ua_mapInstantiatedNodes(ownNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &ownedNodes);
+      configNodeId = createdNodeId;
+      ua_mapInstantiatedNodes(configNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &ownedNodes);
 
       // create log level node
       UA_VariableAttributes attr = UA_VariableAttributes_default;
