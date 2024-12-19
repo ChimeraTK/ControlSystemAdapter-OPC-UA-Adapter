@@ -19,7 +19,7 @@ typedef enum {
   UA_LOGGINGLEVEL_WARNING = 3,
   UA_LOGGINGLEVEL_ERROR = 4,
   UA_LOGGINGLEVEL_FATAL = 5,
-  __UA_LOGGINGLEVEL__FORCE32BIT = 0x7fffffff
+  __UA_LOGGINGLEVEL_FORCE32BIT = 0x7fffffff
 } UA_LoggingLevel;
 
 UA_STATIC_ASSERT(sizeof(UA_LoggingLevel) == sizeof(UA_Int32), enum_must_be_32bit);
