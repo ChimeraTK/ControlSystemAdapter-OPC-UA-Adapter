@@ -16,17 +16,17 @@ class UAMappingTest {
 void UAMappingTest::testExampleSet() {
   cout << "General PV mapping test." << endl;
   TestFixturePVSet tfExampleSet;
-  csa_opcua_adapter* csaOPCUA = new csa_opcua_adapter(tfExampleSet.csManager, "../tests/uamapping_test_general.xml");
+  csa_opcua_adapter csaOPCUA(tfExampleSet.csManager, "uamapping_test_general.xml");
   // is Server running?
-  csaOPCUA->start();
-  BOOST_CHECK(csaOPCUA->isRunning());
-  while(!csaOPCUA->getUAAdapter()->running) {
+  csaOPCUA.start();
+  BOOST_CHECK(csaOPCUA.isRunning());
+  while(!csaOPCUA.getUAAdapter()->running) {
   };
-  BOOST_CHECK(csaOPCUA->getUAAdapter()->running);
+  BOOST_CHECK(csaOPCUA.getUAAdapter()->running);
   // is csManager init
-  BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 21);
+  BOOST_CHECK(csaOPCUA.getControlSystemManager()->getAllProcessVariables().size() == 21);
 
-  ua_uaadapter* uaadapter = csaOPCUA->getUAAdapter();
+  std::shared_ptr<ua_uaadapter> uaadapter = csaOPCUA.getUAAdapter();
 
   UA_NodeId result = UA_NODEID_NULL;
   UA_Server_readNodeId(uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/1/FOLDERDir"), &result);
@@ -77,9 +77,8 @@ void UAMappingTest::testExampleSet() {
   }
   UA_BrowseResult_clear(&br);
 
-  csaOPCUA->stop();
-  BOOST_CHECK(csaOPCUA->isRunning() != true);
-  csaOPCUA->~csa_opcua_adapter();
+  csaOPCUA.stop();
+  BOOST_CHECK(csaOPCUA.isRunning() != true);
 }
 
 class UAMappingTestSuite : public test_suite {
@@ -87,7 +86,7 @@ class UAMappingTestSuite : public test_suite {
   UAMappingTestSuite() : test_suite("PV mapping Test Suite") { add(BOOST_TEST_CASE(&UAMappingTest::testExampleSet)); }
 };
 
-test_suite* init_unit_test_suite(int argc, char* argv[]) {
+test_suite* init_unit_test_suite([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
   framework::master_test_suite().add(new UAMappingTestSuite);
   return 0;
 }
