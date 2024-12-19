@@ -45,7 +45,7 @@ namespace ChimeraTK {
    private:
     std::thread adapter_thread;
     std::thread observer_thread;
-    ua_uaadapter* adapter;
+    std::shared_ptr<ua_uaadapter> adapter;
     boost::shared_ptr<ControlSystemPVManager> csManager;
     set<string> unusedVariables;
 
@@ -75,7 +75,7 @@ namespace ChimeraTK {
      *
      * @return Return the ua_uaadapter
      */
-    ua_uaadapter* getUAAdapter();
+    std::shared_ptr<ua_uaadapter> getUAAdapter();
 
     const set<string>& getUnusedVariables() const;
 

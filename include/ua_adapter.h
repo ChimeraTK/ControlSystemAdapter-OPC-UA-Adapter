@@ -117,7 +117,7 @@ namespace ChimeraTK {
     vector<ua_additionalvariable*> additionalVariables;
     vector<ua_processvariable*> mappedVariables;
 
-    xml_file_handler* fileHandler;
+    std::shared_ptr<xml_file_handler> fileHandler;
 
     /** @brief This methode construct the parameter for the opcua server, depending of the <serverConfig> struct
      */

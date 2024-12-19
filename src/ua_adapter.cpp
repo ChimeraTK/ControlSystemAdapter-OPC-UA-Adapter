@@ -56,7 +56,7 @@ using namespace std;
 namespace ChimeraTK {
   ua_uaadapter::ua_uaadapter(const string& configFile) : ua_mapped_class() {
     this->mappingExceptions = UA_FALSE;
-    this->fileHandler = new xml_file_handler(configFile);
+    this->fileHandler = std::make_shared<xml_file_handler>(configFile);
     this->readConfig();
     this->constructServer();
     this->mapSelfToNamespace();
@@ -64,7 +64,6 @@ namespace ChimeraTK {
 
   ua_uaadapter::~ua_uaadapter() {
     UA_Server_delete(this->mappedServer);
-    this->fileHandler->~xml_file_handler();
     for(auto ptr : variables) delete ptr;
     for(auto ptr : additionalVariables) delete ptr;
     for(auto ptr : mappedVariables) delete ptr;
@@ -272,6 +271,7 @@ namespace ChimeraTK {
     csa_namespace_init(this->mappedServer);
 
     UA_free(config);
+    UA_free(types);
     UA_String_clear(&usernamePasswordLogins->password);
     UA_String_clear(&usernamePasswordLogins->username);
     delete usernamePasswordLogins;
@@ -494,6 +494,9 @@ namespace ChimeraTK {
         this->serverConfig.descriptionFolder = placeHolder;
       }
       xmlXPathFreeObject(result);
+    }
+    else {
+      logger = UA_Log_Stdout_withLevel(this->serverConfig.logLevel);
     }
     result = this->fileHandler->getNodeSet(xpath + "//login");
     if(result) {
@@ -1492,10 +1495,10 @@ namespace ChimeraTK {
           UA_NODEID_STRING(1, (const_cast<char*>((this->serverConfig.rootFolder + "Dir").c_str()))),
           UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
           UA_QUALIFIEDNAME(1, const_cast<char*>(this->serverConfig.rootFolder.c_str())),
-          UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &this->ownedNodes, &createdNodeId);
+          UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &ownedNodes, &createdNodeId);
 
       this->ownNodeId = createdNodeId;
-      ua_mapInstantiatedNodes(this->ownNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &this->ownedNodes);
+      ua_mapInstantiatedNodes(this->ownNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &ownedNodes);
     }
     {
       // Create our toplevel instance for configuration
@@ -1505,13 +1508,12 @@ namespace ChimeraTK {
       oAttr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("ServerConfiguration"));
       oAttr.description =
           UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("Here adapter configurations are placed."));
-      nodePairList tmp;
       UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, const_cast<char*>("ServerConfigurationDir")),
           UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
           UA_QUALIFIEDNAME(1, const_cast<char*>("ServerConfiguration")),
-          UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &tmp, &createdNodeId);
-
-      ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &tmp);
+          UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &ownedNodes, &createdNodeId);
+      ownNodeId = createdNodeId;
+      ua_mapInstantiatedNodes(ownNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &ownedNodes);
 
       // create log level node
       UA_VariableAttributes attr = UA_VariableAttributes_default;
@@ -1520,7 +1522,7 @@ namespace ChimeraTK {
       attr.valueRank = -1;
       attr.dataType = LoggingLevelType.typeId;
       UA_LoggingLevel l = UA_LOGGINGLEVEL_INFO;
-      UA_Variant_setScalarCopy(&attr.value, &l, &UA_TYPES[UA_TYPES_BYTE]);
+      auto status = UA_Variant_setScalarCopy(&attr.value, &l, &LoggingLevelType);
 
       UA_NodeId currentNodeId = UA_NODEID_STRING(1, const_cast<char*>("logLevel"));
       UA_QualifiedName currentName = UA_QUALIFIEDNAME(1, const_cast<char*>("logLevel"));
@@ -1532,6 +1534,7 @@ namespace ChimeraTK {
       logLevelDataSource.write = writeLogLevel;
       UA_Server_addDataSourceVariableNode(this->mappedServer, currentNodeId, createdNodeId, parentReferenceNodeId,
           currentName, variableTypeNodeId, attr, logLevelDataSource, this, NULL);
+      UA_Variant_clear(&attr.value);
     }
 
     return UA_STATUSCODE_GOOD;
@@ -1670,9 +1673,10 @@ namespace ChimeraTK {
     return this->mappedServer;
   }
 
-  UA_StatusCode ua_uaadapter::readLogLevel(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext,
-      const UA_NodeId* nodeId, void* nodeContext, UA_Boolean sourceTimeStamp, const UA_NumericRange* range,
-      UA_DataValue* dataValue) {
+  UA_StatusCode ua_uaadapter::readLogLevel([[maybe_unused]] UA_Server* server,
+      [[maybe_unused]] const UA_NodeId* sessionId, [[maybe_unused]] void* sessionContext,
+      [[maybe_unused]] const UA_NodeId* nodeId, void* nodeContext, [[maybe_unused]] UA_Boolean sourceTimeStamp,
+      [[maybe_unused]] const UA_NumericRange* range, UA_DataValue* dataValue) {
     auto adapter = (ua_uaadapter*)nodeContext;
     UA_LoggingLevel l = toLoggingLevel(adapter->serverConfig.logLevel);
     UA_Variant_setScalarCopy(&dataValue->value, &l, &LoggingLevelType);
@@ -1680,8 +1684,10 @@ namespace ChimeraTK {
     return UA_STATUSCODE_GOOD;
   }
 
-  UA_StatusCode ua_uaadapter::writeLogLevel(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext,
-      const UA_NodeId* nodeId, void* nodeContext, const UA_NumericRange* range, const UA_DataValue* data) {
+  UA_StatusCode ua_uaadapter::writeLogLevel([[maybe_unused]] UA_Server* server,
+      [[maybe_unused]] const UA_NodeId* sessionId, [[maybe_unused]] void* sessionContext,
+      [[maybe_unused]] const UA_NodeId* nodeId, void* nodeContext, [[maybe_unused]] const UA_NumericRange* range,
+      const UA_DataValue* data) {
     auto adapter = (ua_uaadapter*)nodeContext;
     const UA_Variant* var = &data->value;
     adapter->serverConfig.logLevel = toLogLevel(*((UA_LoggingLevel*)var->data));

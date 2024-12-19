@@ -36,7 +36,7 @@ namespace ChimeraTK {
     this->csManager = std::move(csManager);
 
     // Create new server adapter
-    this->adapter = new ua_uaadapter(std::move(configFile));
+    adapter = std::make_shared<ua_uaadapter>(std::move(configFile));
     UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Start the mapping of %s", configFile.c_str());
     UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Create the adapter");
 
@@ -167,20 +167,19 @@ namespace ChimeraTK {
 
   csa_opcua_adapter::~csa_opcua_adapter() {
     this->stop();
-    this->adapter->~ua_uaadapter();
   }
 
   boost::shared_ptr<ControlSystemPVManager> const& csa_opcua_adapter::getControlSystemManager() const {
     return this->csManager;
   }
 
-  ua_uaadapter* csa_opcua_adapter::getUAAdapter() {
-    return this->adapter;
+  std::shared_ptr<ua_uaadapter> csa_opcua_adapter::getUAAdapter() {
+    return adapter;
   }
 
   void csa_opcua_adapter::start() {
     if(!this->adapter_thread.joinable()) {
-      this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter);
+      this->adapter_thread = std::thread(&ua_uaadapter::workerThread, this->adapter.get());
     }
     // start void observer loop
     void_observer_data* data = (void_observer_data*)UA_calloc(1, sizeof(void_observer_data));
@@ -216,7 +215,7 @@ namespace ChimeraTK {
 
   void csa_opcua_adapter::stop() {
     if(this->adapter_thread.joinable()) {
-      this->adapter->running = false;
+      adapter->running = false;
       this->adapter_thread.join();
     }
     if(this->observer_thread.joinable()) {
