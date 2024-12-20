@@ -83,7 +83,7 @@ class XMLFileHandlerTestSuite : public test_suite {
   }
 };
 
-test_suite* init_unit_test_suite([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
+test_suite* init_unit_test_suite(int /*argc*/, char** /*argv[]*/) {
   framework::master_test_suite().add(new XMLFileHandlerTestSuite);
   return 0;
 }

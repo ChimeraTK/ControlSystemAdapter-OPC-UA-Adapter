@@ -86,7 +86,7 @@ class UAMappingTestSuite : public test_suite {
   UAMappingTestSuite() : test_suite("PV mapping Test Suite") { add(BOOST_TEST_CASE(&UAMappingTest::testExampleSet)); }
 };
 
-test_suite* init_unit_test_suite([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
+test_suite* init_unit_test_suite(int /*argc*/, char** /*argv[]*/) {
   framework::master_test_suite().add(new UAMappingTestSuite);
   return 0;
 }

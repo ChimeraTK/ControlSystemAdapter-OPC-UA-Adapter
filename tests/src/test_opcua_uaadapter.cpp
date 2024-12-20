@@ -90,7 +90,7 @@ class UAAdapterTestSuite : public test_suite {
   UAAdapterTestSuite() : test_suite("ua_uaadapter Test Suite") { add(BOOST_TEST_CASE(&UAAdapterTest::testExampleSet)); }
 };
 
-test_suite* init_unit_test_suite([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
+test_suite* init_unit_test_suite(int /*argc*/, char** /*argv[]*/) {
   framework::master_test_suite().add(new UAAdapterTestSuite);
   return 0;
 }
