@@ -32,22 +32,22 @@
 #include <vector>
 
 namespace ChimeraTK {
-  typedef struct {
+  struct AdapterFolderHistorySetup {
     string folder_historizing;
     UA_NodeId folder_id;
-  } AdapterFolderHistorySetup;
+  };
 
-  typedef struct {
+  struct AdapterPVHistorySetup {
     string variable_historizing;
     UA_NodeId variable_id;
-  } AdapterPVHistorySetup;
+  };
 
-  typedef struct {
+  struct AdapterHistorySetup {
     string name;
     size_t buffer_length{100};
     size_t entries_per_response{100};
     size_t interval{1000};
-  } AdapterHistorySetup;
+  };
 
   UA_HistoryDataGathering add_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup,
       UA_Server* mappedServer, UA_ServerConfig* server_config, vector<AdapterHistorySetup> history,
