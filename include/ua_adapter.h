@@ -107,6 +107,7 @@ namespace ChimeraTK {
 
     vector<FolderInfo> folderVector;
     UA_NodeId ownNodeId;
+    UA_NodeId configNodeId;
     string pvSeperator;
     UA_Boolean mappingExceptions;
 
