@@ -50,8 +50,6 @@ void AdditionalVariableTest::testClassSide() {
     serverThread->join();
   }
 
-  UA_Server_delete(serverSet->mappedServer);
-
   delete serverSet;
   serverSet = NULL;
 
@@ -207,8 +205,6 @@ void AdditionalVariableTest::testClientSide() {
   if(serverThread->joinable()) {
     serverThread->join();
   }
-  cout << "Delete ServerSet" << endl;
-  UA_Server_delete(serverSet->mappedServer);
 
   // serverSet->server_nl.deleteMembers(&serverSet->server_nl);
   cout << "Delete ServerSet" << endl;
@@ -227,7 +223,7 @@ class AdditionalVariableTestSuite : public test_suite {
   }
 };
 
-test_suite* init_unit_test_suite([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
+test_suite* init_unit_test_suite(int /*argc*/, char** /*argv[]*/) {
   framework::master_test_suite().add(new AdditionalVariableTestSuite);
   return 0;
 }
