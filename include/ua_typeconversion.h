@@ -58,27 +58,6 @@
     free(s);                                                                                                           \
   } while(0);
 
-/* CPPSTRING_TO_UASTRING(UA_String s_ua, std::string s_cpp)
- *
- * Copy contents of s_cpp into s_ua
- */
-static inline UA_String CPPSTRING_TO_UASTRING(std::string& s) {
-  char* buf = (char*)malloc(s.length());
-  if(!buf) return UA_STRING_NULL;
-  strncpy(buf, (char*)s.c_str(), s.length());
-  return {s.length(), (UA_Byte*)buf};
-}
-
-#define CPPSTRING_TO_UASTRING_NEW(_p_uastring, _p_cppstring)                                                           \
-  {                                                                                                                    \
-    char* s = (char*)malloc(_p_cppstring->length() + 1);                                                               \
-    strncpy(s, (char*)_p_cppstring->c_str(), _p_cppstring->length());                                                  \
-    _p_uastring.length = _p_cppstring->length();                                                                       \
-    _p_uastring.data = (UA_Byte*)malloc(_p_uastring.length);                                                           \
-    memcpy(_p_uastring.data, s, _p_uastring.length);                                                                   \
-    free(s);                                                                                                           \
-  }
-
 #define NODE_BROWSENAME_AS_STRING(_p_server, _p_nodeid, _p_strbuffer)                                                  \
   {                                                                                                                    \
     UA_QualifiedName _p_tmpName;                                                                                       \
