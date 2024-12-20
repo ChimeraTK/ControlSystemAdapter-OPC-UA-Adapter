@@ -752,6 +752,7 @@ namespace ChimeraTK {
       auto* processvariable = new ua_processvariable(
           this->mappedServer, target, foundPVSourceNameCPP, csManager, server_config->logging, foundPVNameCPP);
       this->variables.push_back(processvariable);
+      UA_Variant_clear(&value);
     }
     UA_BrowseResult_clear(&br);
     // copy folders of current layer
@@ -1673,10 +1674,9 @@ namespace ChimeraTK {
     return this->mappedServer;
   }
 
-  UA_StatusCode ua_uaadapter::readLogLevel([[maybe_unused]] UA_Server* server,
-      [[maybe_unused]] const UA_NodeId* sessionId, [[maybe_unused]] void* sessionContext,
-      [[maybe_unused]] const UA_NodeId* nodeId, void* nodeContext, [[maybe_unused]] UA_Boolean sourceTimeStamp,
-      [[maybe_unused]] const UA_NumericRange* range, UA_DataValue* dataValue) {
+  UA_StatusCode ua_uaadapter::readLogLevel(UA_Server* /*server*/, const UA_NodeId* /*sessionId*/,
+      void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext, UA_Boolean /*sourceTimeStamp*/,
+      const UA_NumericRange* /*range*/, UA_DataValue* dataValue) {
     auto adapter = (ua_uaadapter*)nodeContext;
     UA_LoggingLevel l = toLoggingLevel(adapter->serverConfig.logLevel);
     UA_Variant_setScalarCopy(&dataValue->value, &l, &LoggingLevelType);
@@ -1684,9 +1684,8 @@ namespace ChimeraTK {
     return UA_STATUSCODE_GOOD;
   }
 
-  UA_StatusCode ua_uaadapter::writeLogLevel([[maybe_unused]] UA_Server* server,
-      [[maybe_unused]] const UA_NodeId* sessionId, [[maybe_unused]] void* sessionContext,
-      [[maybe_unused]] const UA_NodeId* nodeId, void* nodeContext, [[maybe_unused]] const UA_NumericRange* range,
+  UA_StatusCode ua_uaadapter::writeLogLevel(UA_Server* /*server*/, const UA_NodeId* /*sessionId*/,
+      void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext, const UA_NumericRange* /*range*/,
       const UA_DataValue* data) {
     auto adapter = (ua_uaadapter*)nodeContext;
     const UA_Variant* var = &data->value;
