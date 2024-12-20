@@ -94,7 +94,7 @@ struct TestFixtureServerSet {
   uint32_t opcuaPort = 16663;
   /* Create new Server */
   UA_ServerConfig* server_config;
-  UA_Server* mappedServer;
+  UA_Server* mappedServer{nullptr};
   UA_NodeId baseNodeId;
   UA_Boolean runUAServer;
 
@@ -107,6 +107,10 @@ struct TestFixtureServerSet {
     baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
 
     csa_namespace_init(mappedServer);
+  }
+
+  ~TestFixtureServerSet() {
+    if(mappedServer != nullptr) UA_Server_delete(mappedServer);
   }
 };
 
