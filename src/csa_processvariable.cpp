@@ -272,6 +272,7 @@ namespace ChimeraTK {
         UA_Variant tmpVariant;
         UA_Variant_setArray(&tmpVariant, iarr.data(), iarr.size(), &UA_TYPES[fusion::at_key<T>(typesMap)]);
         rv = UA_Variant_copyRange(&tmpVariant, v, *range);
+        UA_Variant_clear(&tmpVariant);
       }
       else {
         rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[fusion::at_key<T>(typesMap)]);
@@ -520,6 +521,8 @@ namespace ChimeraTK {
 
     for(auto i : mapDs) {
       retval |= UA_Server_setVariableNode_dataSource(this->mappedServer, i.concreteNodeId, i.dataSource);
+      UA_NodeId_clear(&i.concreteNodeId);
+      UA_NodeId_clear(&i.typeTemplateId);
     }
     UA_NodeId_clear(&createdNodeId);
     return retval;
@@ -557,9 +560,10 @@ namespace ChimeraTK {
       UA_NodeId_copy(&createdNodeId, &mapElemName.concreteNodeId);
       map.push_back(mapElemName);
     }
-    else
+    else {
+      UA_NodeId_clear(&createdNodeId);
       return addResult;
-
+    }
     UA_NodeId_clear(&createdNodeId);
     createdNodeId = UA_NODEID_NULL;
 
@@ -591,8 +595,10 @@ namespace ChimeraTK {
       UA_NodeId_copy(&createdNodeId, &mapElemDesc.concreteNodeId);
       map.push_back(mapElemDesc);
     }
-    else
+    else {
+      UA_NodeId_clear(&createdNodeId);
       return addResult;
+    }
 
     UA_NodeId_clear(&createdNodeId);
     createdNodeId = UA_NODEID_NULL;
@@ -623,8 +629,10 @@ namespace ChimeraTK {
       UA_NodeId_copy(&createdNodeId, &mapElemEU.concreteNodeId);
       map.push_back(mapElemEU);
     }
-    else
+    else {
+      UA_NodeId_clear(&createdNodeId);
       return addResult;
+    }
 
     UA_NodeId_clear(&createdNodeId);
     createdNodeId = UA_NODEID_NULL;
@@ -659,8 +667,10 @@ namespace ChimeraTK {
       UA_NodeId_copy(&createdNodeId, &mapElemType.concreteNodeId);
       map.push_back(mapElemType);
     }
-    else
+    else {
+      UA_NodeId_clear(&createdNodeId);
       return addResult;
+    }
 
     UA_NodeId_clear(&createdNodeId);
     createdNodeId = UA_NODEID_NULL;
@@ -692,8 +702,10 @@ namespace ChimeraTK {
       UA_NodeId_copy(&createdNodeId, &mapElemValidity.concreteNodeId);
       map.push_back(mapElemValidity);
     }
-    else
+    else {
+      UA_NodeId_clear(&createdNodeId);
       return addResult;
+    }
 
     UA_NodeId_clear(&createdNodeId);
 

@@ -13,6 +13,13 @@ class UAMappingTest {
   static void testExampleSet();
 };
 
+void checkNode(const std::string& node, std::shared_ptr<ua_uaadapter> uaadapter) {
+  UA_NodeId result = UA_NODEID_NULL;
+  UA_Server_readNodeId(uaadapter->getMappedServer(), UA_NODEID_STRING(1, const_cast<char*>(node.c_str())), &result);
+  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
+  UA_NodeId_clear(&result);
+}
+
 void UAMappingTest::testExampleSet() {
   cout << "General PV mapping test." << endl;
   TestFixturePVSet tfExampleSet;
@@ -28,27 +35,11 @@ void UAMappingTest::testExampleSet() {
 
   std::shared_ptr<ua_uaadapter> uaadapter = csaOPCUA.getUAAdapter();
 
-  UA_NodeId result = UA_NODEID_NULL;
-  UA_Server_readNodeId(uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/1/FOLDERDir"), &result);
-  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
-  // check if target folder for copy with source was created
-  result = UA_NODEID_NULL;
-  UA_Server_readNodeId(
-      uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTestDir"), &result);
-  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
-  result = UA_NODEID_NULL;
-  UA_Server_readNodeId(uaadapter->getMappedServer(),
-      UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSepDir"), &result);
-  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
-  result = UA_NODEID_NULL;
-  UA_Server_readNodeId(uaadapter->getMappedServer(),
-      UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSep/stringScalar"), &result);
-  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
-
-  result = UA_NODEID_NULL;
-  UA_Server_readNodeId(
-      uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/linkWithSourceTestDir"), &result);
-  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
+  checkNode("llrfCtrl_hzdr/1/FOLDERDir", uaadapter);
+  checkNode("llrfCtrl_hzdr/copyWithSourceTestDir", uaadapter);
+  checkNode("llrfCtrl_hzdr/copyWithSourceTest/defaultSepDir", uaadapter);
+  checkNode("llrfCtrl_hzdr/copyWithSourceTest/defaultSep/stringScalar", uaadapter);
+  checkNode("llrfCtrl_hzdr/linkWithSourceTestDir", uaadapter);
   UA_BrowseDescription bd;
   bd.includeSubtypes = false;
   bd.nodeId = UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/linkWithSourceTestDir");

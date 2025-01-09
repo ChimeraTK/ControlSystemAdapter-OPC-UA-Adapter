@@ -67,6 +67,11 @@ namespace ChimeraTK {
     for(auto ptr : variables) delete ptr;
     for(auto ptr : additionalVariables) delete ptr;
     for(auto ptr : mappedVariables) delete ptr;
+    for(auto dir : folderVector) {
+      UA_NodeId_clear(&dir.folderNodeId);
+    }
+    UA_NodeId_clear(&this->ownNodeId);
+    UA_NodeId_clear(&this->configNodeId);
   }
 
   static string cleanUri(string s) {
@@ -753,6 +758,7 @@ namespace ChimeraTK {
           this->mappedServer, target, foundPVSourceNameCPP, csManager, server_config->logging, foundPVNameCPP);
       this->variables.push_back(processvariable);
       UA_Variant_clear(&value);
+      UA_LocalizedText_clear(&foundPVName);
     }
     UA_BrowseResult_clear(&br);
     // copy folders of current layer
@@ -780,6 +786,8 @@ namespace ChimeraTK {
       if(foundFolderDescription.text.length > 0)
         UA_Server_writeDescription(this->mappedServer, newRootFolder, foundFolderDescription);
       deepCopyHierarchicalLayer(csManager, rd.nodeId.nodeId, newRootFolder);
+      UA_LocalizedText_clear(&foundFolderName);
+      UA_LocalizedText_clear(&foundFolderDescription);
     }
     UA_BrowseResult_clear(&br);
   }

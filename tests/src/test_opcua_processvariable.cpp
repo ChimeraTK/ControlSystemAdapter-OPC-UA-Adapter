@@ -56,7 +56,6 @@ void ProcessVariableTest::testData(
     CTK_TYPE newValue;
     BOOST_CHECK(*(CTK_TYPE*)(var->data) == 0);
     newValue = 100;
-
     UA_Variant_setScalarCopy(var, &newValue, &fusion::at_key<CTK_TYPE>(tMap));
     test->setValue<CTK_TYPE>(var);
 
@@ -77,6 +76,7 @@ void ProcessVariableTest::testData(
       BOOST_CHECK(((CTK_TYPE*)(var->data))[i] == 0);
       newVector.at(i) = (100 - i);
     }
+    UA_Variant_clear(var);
     UA_Variant_setArrayCopy(var, newVector.data(), newVector.size(), &fusion::at_key<CTK_TYPE>(tMap));
     test->setValue<CTK_TYPE>(var);
 
@@ -171,8 +171,9 @@ void ProcessVariableTest::testClassSide() {
     else
       BOOST_CHECK(false);
 
-    const UA_NodeId nodeId = test.getOwnNodeId();
+    UA_NodeId nodeId = test.getOwnNodeId();
     BOOST_CHECK(!UA_NodeId_isNull(&nodeId));
+    UA_NodeId_clear(&nodeId);
 
     string newName = "";
     newName = oneProcessVariable->getName();
