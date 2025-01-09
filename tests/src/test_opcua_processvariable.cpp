@@ -88,6 +88,17 @@ void ProcessVariableTest::testData(
       BOOST_CHECK(value == (CTK_TYPE)(100 - i));
       i++;
     }
+
+    // now a certain range
+    UA_Variant_clear(var);
+    UA_NumericRange range = UA_NUMERICRANGE("0:5");
+    //    UA_NumericRange_parse(&range, UA_String_fromChars("0:5"));
+    test->getValue<CTK_TYPE>(var, &range);
+    BOOST_CHECK(var->arrayLength == 6);
+    for(size_t i = 0; i < var->arrayLength; i++) {
+      BOOST_CHECK(((CTK_TYPE*)(var->data))[i] == (CTK_TYPE)(100 - i));
+    }
+    UA_free(range.dimensions);
   }
   UA_Variant_delete(var);
 }
