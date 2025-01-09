@@ -272,7 +272,6 @@ namespace ChimeraTK {
         UA_Variant tmpVariant;
         UA_Variant_setArray(&tmpVariant, iarr.data(), iarr.size(), &UA_TYPES[fusion::at_key<T>(typesMap)]);
         rv = UA_Variant_copyRange(&tmpVariant, v, *range);
-        UA_Variant_clear(&tmpVariant);
       }
       else {
         rv = UA_Variant_setArrayCopy(v, iarr.data(), iarr.size(), &UA_TYPES[fusion::at_key<T>(typesMap)]);
