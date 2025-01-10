@@ -125,19 +125,26 @@ namespace ChimeraTK {
     *hostName = UA_STRING_ALLOC(hostname);
     config->applicationDescription.discoveryUrls = hostName;
     config->applicationDescription.discoveryUrlsSize = 1;
+    UA_String_clear(&config->applicationDescription.applicationUri);
     config->applicationDescription.applicationUri = UA_STRING_ALLOC(const_cast<char*>(cleanUri(hostname_uri).c_str()));
+    UA_String_clear(&config->buildInfo.manufacturerName);
     config->buildInfo.manufacturerName = UA_STRING_ALLOC(const_cast<char*>("ChimeraTK Team"));
     std::string
         versionString =
             "open62541: " xstr(UA_OPEN62541_VER_MAJOR) "." xstr(UA_OPEN62541_VER_MINOR) "." xstr(UA_OPEN62541_VER_PATCH) ", ControlSystemAdapter-OPC-UA-Adapter: " xstr(
                 PROJECT_VER_MAJOR) "." xstr(PROJECT_VER_MINOR) "." xstr(PTOJECT_VER_PATCH) "";
+    UA_String_clear(&config->buildInfo.softwareVersion);
     config->buildInfo.softwareVersion = UA_STRING_ALLOC(const_cast<char*>(versionString.c_str()));
     config->buildInfo.buildDate = UA_DateTime_now();
+    UA_String_clear(&config->buildInfo.buildNumber);
     config->buildInfo.buildNumber = UA_STRING_ALLOC(const_cast<char*>(""));
 
+    UA_String_clear(&config->buildInfo.productName);
     config->buildInfo.productName = UA_STRING_ALLOC(const_cast<char*>(this->serverConfig.applicationName.c_str()));
     string product_urn = "urn:ChimeraTK:" + this->serverConfig.applicationName;
+    UA_String_clear(&config->buildInfo.productUri);
     config->buildInfo.productUri = UA_STRING_ALLOC(const_cast<char*>(cleanUri(product_urn).c_str()));
+    UA_LocalizedText_clear(&config->applicationDescription.applicationName);
     config->applicationDescription.applicationName = UA_LOCALIZEDTEXT_ALLOC(
         const_cast<char*>("en_US"), const_cast<char*>(this->serverConfig.applicationName.c_str()));
   }
@@ -274,7 +281,6 @@ namespace ChimeraTK {
 
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
     csa_namespace_init(this->mappedServer);
-
     UA_free(config);
     UA_free(types);
     UA_String_clear(&usernamePasswordLogins->password);
@@ -1408,6 +1414,9 @@ namespace ChimeraTK {
         auto* additionalvariable =
             new ua_additionalvariable(this->mappedServer, additionalVarFolderPath, name, value, description);
         this->additionalVariables.push_back(additionalvariable);
+        if(destination.empty()) {
+          UA_NodeId_clear(&additionalVarFolderPath);
+        }
       }
 
       xmlXPathFreeObject(result);
