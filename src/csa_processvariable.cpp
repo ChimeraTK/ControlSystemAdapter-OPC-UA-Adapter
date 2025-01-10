@@ -261,7 +261,7 @@ namespace ChimeraTK {
     }
     if(this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).size() == 1) {
       T ival = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).at(0);
-      UA_Variant_setScalar(v, &ival, &UA_TYPES[fusion::at_key<T>(typesMap)]);
+      UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[fusion::at_key<T>(typesMap)]);
     }
     else {
       std::vector<T> iarr = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0);
