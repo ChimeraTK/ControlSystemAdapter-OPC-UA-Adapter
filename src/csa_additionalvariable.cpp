@@ -52,9 +52,9 @@ namespace ChimeraTK {
   }
 
   // Value
-  UA_StatusCode ua_additionalvariable::ua_readproxy_ua_additionalvariable_getValue(UA_Server* server,
-      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
-      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
+  UA_StatusCode ua_additionalvariable::ua_readproxy_ua_additionalvariable_getValue(UA_Server* /*server*/,
+      const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext,
+      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* /*range*/, UA_DataValue* value) {
     auto thisObj = static_cast<ua_additionalvariable*>(nodeContext);
     UA_String ua_val;
     char* s = (char*)malloc(thisObj->getValue().length() + 1);

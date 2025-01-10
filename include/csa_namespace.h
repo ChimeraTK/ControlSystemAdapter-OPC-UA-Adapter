@@ -22,5 +22,5 @@
 
 extern UA_StatusCode csa_namespace_init(UA_Server* server);
 extern void csa_namespace_add_LoggingLevelEnumType(UA_Server* server, char* enumName);
-extern UA_StatusCode csa_namespace_add_LoggingLevelValues(UA_Server* server, const UA_NodeId* parent);
+extern UA_StatusCode csa_namespace_add_LoggingLevelValues(UA_Server* server);
 extern UA_StatusCode csa_namespace_add_additional_variable(UA_Server* server);
