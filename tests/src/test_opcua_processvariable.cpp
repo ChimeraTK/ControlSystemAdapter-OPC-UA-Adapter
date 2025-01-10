@@ -56,6 +56,7 @@ void ProcessVariableTest::testData(
     CTK_TYPE newValue;
     BOOST_CHECK(*(CTK_TYPE*)(var->data) == 0);
     newValue = 100;
+    UA_Variant_clear(var);
     UA_Variant_setScalarCopy(var, &newValue, &fusion::at_key<CTK_TYPE>(tMap));
     test->setValue<CTK_TYPE>(var);
 
