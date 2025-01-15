@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 ##########################################################################################################
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 SET(${PROJECT_NAME}_MAJOR_VERSION 04)
-SET(${PROJECT_NAME}_MINOR_VERSION 00)
+SET(${PROJECT_NAME}_MINOR_VERSION 99)
 SET(${PROJECT_NAME}_PATCH_VERSION 02)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
@@ -20,7 +20,13 @@ find_package(LibXml2 REQUIRED)
 find_package(PythonInterp REQUIRED)
 find_package(open62541 1.4 REQUIRED)
 
-find_package(ChimeraTK-ControlSystemAdapter 02.05 REQUIRED)
+#Do not put any of the following packages as required. We will install it if it is not found.
+find_package(ChimeraTK-ControlSystemAdapter 01.00)
+find_package(ChimeraTK-DeviceAccess 01.00)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${ChimeraTK-ControlSystemAdapter_LINKER_FLAGS}")
+
 
 ##########################################################################################################
 ## Set the build type to Release if none is specified
@@ -49,10 +55,14 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/examples/)
+include_directories(SYSTEM ${ChimeraTK-ControlSystemAdapter_INCLUDE_DIRS})
+include_directories(SYSTEM ${ChimeraTK-DeviceAccess_INCLUDE_DIRS})
 include_directories(SYSTEM ${LIBXML2_INCLUDE_DIR})
 
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 link_directories(${LIBXML2_LIBRARIES})
+link_directories(${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS})
+link_directories(${ChimeraTK-DeviceAccess_LIBRARY_DIRS})
 
 set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
         ${CMAKE_SOURCE_DIR}/src/ua_map_types.cpp
@@ -84,8 +94,6 @@ option(INSTALL_SAMPLE_ADAPTER "Install an example application called ControlSyst
 # TODO: As soon if the test passes enable it per default. 
 #       If removing the option add info in csa_opcua_application.cpp doxygen docu.
 option(CHECK_CTK_STYLE        "Check ChimeraTK code style and license information." OFF)
-
-include(cmake/enable_code_coverage_report.cmake)
 
 ##########################################################################################################
 ## Definition for compiler for static analysis
@@ -160,12 +168,13 @@ target_link_libraries(mtca_c_objetcs PRIVATE open62541::open62541)
 add_library(${PROJECT_NAME} SHARED $<TARGET_OBJECTS:mtca_objects> $<TARGET_OBJECTS:mtca_c_objetcs>)
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_FULL_LIBRARY_VERSION}
         SOVERSION ${${PROJECT_NAME}_SOVERSION})
-target_link_libraries(${PROJECT_NAME} PUBLIC ChimeraTK::ChimeraTK-ControlSystemAdapter)
-target_link_libraries(${PROJECT_NAME} PRIVATE open62541::open62541)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBXML2_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
-target_link_libraries(${PROJECT_NAME} PRIVATE dl)
-target_link_libraries(${PROJECT_NAME} PRIVATE 
+target_link_libraries(${PROJECT_NAME} ${ChimeraTK-ControlSystemAdapter_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${ChimeraTK-DeviceAccess_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} open62541::open62541)
+target_link_libraries(${PROJECT_NAME} ${LIBXML2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} pthread)
+target_link_libraries(${PROJECT_NAME} dl)
+target_link_libraries(${PROJECT_NAME}
         ${Boost_FILESYSTEM_LIBRARY}
         ${Boost_SYSTEM_LIBRARY}
         ${Boost_THREAD_LIBRARY}
@@ -192,69 +201,6 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 link_directories(${CMAKE_BINARY_DIR})
 file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
 
-add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541::open62541)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
-        ${Boost_FILESYSTEM_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
-        ${Boost_THREAD_LIBRARY}
-        ${Boost_CHRONO_LIBRARY}
-        )
-
-add_executable(ControlSystem-OPCUA_Sample_Application ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example2.cpp)
-target_link_libraries(ControlSystem-OPCUA_Sample_Application ${PROJECT_NAME})
-target_link_libraries(ControlSystem-OPCUA_Sample_Application pthread)
-target_link_libraries(ControlSystem-OPCUA_Sample_Application open62541::open62541)
-target_link_libraries(ControlSystem-OPCUA_Sample_Application
-        ${Boost_FILESYSTEM_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
-        ${Boost_THREAD_LIBRARY}
-        ${Boost_CHRONO_LIBRARY}
-        )
-
-if(ENABLE_LINTING)
-    file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/static_analysis")
-    add_custom_command( TARGET ControlSystem-OPCUA_Sample_Adapter
-            PRE_BUILD
-            COMMAND /usr/bin/cppcheck --std=c++11 --inline-suppr --force --template=gcc --enable=all ${objectSources} 2> ${CMAKE_BINARY_DIR}/static_analysis/cppcheck.log
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMENT "Running CppCheck on all CPP Sources" VERBATIM)
-endif()
-
-if(CHECK_CTK_STYLE)
-  include(cmake/enable_code_style_check.cmake)
-endif(CHECK_CTK_STYLE)
-
-if(INSTALL_SAMPLE_ADAPTER)
-  install(TARGETS ControlSystem-OPCUA_Sample_Adapter RUNTIME DESTINATION bin)
-  file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)  
-endif(INSTALL_SAMPLE_ADAPTER)
-
-##########################################################################################################
-##  Install map file generator
-##########################################################################################################
-
-
-include(pythonBindingHelperMacros)
-
-#
-# We build for python3 by default
-set(PYTHON3 TRUE CACHE BOOL "Builds modules for python3 if true and python2 if false")
-initialize()
-
-find_package(PythonLibs 3 REQUIRED)
-get_python_module_install_path(PYTHONLIBS_VERSION_STRING python_module_path)
-
-install(DIRECTORY tools/mapfileGenerator/ctk_opcua_generator_tools
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/${python_module_path})
-install(FILES tools/mapfileGenerator/chimeratk-opc-ua-mapfile-generator
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                     GROUP_READ GROUP_EXECUTE
-                     WORLD_READ WORLD_EXECUTE)
-
 ##########################################################################################################
 ## Create the config files by filling the correct variables into the template (*.cmake.in).
 ## All variables @VARIABLE@ are replaced with the current values, but they have to be set first....
@@ -262,13 +208,12 @@ install(FILES tools/mapfileGenerator/chimeratk-opc-ua-mapfile-generator
 ## but there are none.
 ##########################################################################################################
 
-
-# we support our cmake EXPORTS as imported targets
-set(PROVIDES_EXPORTED_TARGETS 1)
-# we need the public dependencies so create_cmake_config_files can find them as implicit dependencies
-list(APPEND ${PROJECT_NAME}_PUBLIC_DEPENDENCIES "ChimeraTK-ControlSystemAdapter")
+set(${PROJECT_NAME}_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
+set(${PROJECT_NAME}_LIBRARIES "${ChimeraTK-ControlSystemAdapter_LIBRARIES} ${open62541_LIBRARIES}")
+set(${PROJECT_NAME}_LIBRARY_DIRS "${CMAKE_INSTALL_PREFIX}/lib ${ChimeraTK-ControlSystemAdapter_LIBRARY_DIRS}")
+set(${PROJECT_NAME}_CXX_FLAGS "${ChimeraTK-ControlSystemAdapter_CXX_FLAGS}")
+set(${PROJECT_NAME}_LINKER_FLAGS "${ChimeraTK-ControlSystemAdapter_LINKER_FLAGS} -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib,--enable-new-dtags")
 include(${CMAKE_SOURCE_DIR}/cmake/create_cmake_config_files.cmake)
-
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})
