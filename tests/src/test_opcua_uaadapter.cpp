@@ -18,21 +18,20 @@ class UAAdapterTest {
 void UAAdapterTest::testExampleSet() {
   cout << "UAAdapterTest with ExampleSet started." << endl;
   TestFixturePVSet tfExampleSet;
-  // Create the managers
-  ua_uaadapter* adapter = new ua_uaadapter("./uamapping_test_2.xml");
-  xml_file_handler* xmlHandler = new xml_file_handler("./uamapping_test_2.xml");
-
   // Test config handling
-  BOOST_CHECK_THROW(ua_uaadapter("./uamapping_test_twoconfigs.xml"), std::runtime_error);
+  BOOST_CHECK_THROW(ua_uaadapter("uamapping_test_twoconfigs.xml"), std::runtime_error);
+  BOOST_CHECK_THROW(ua_uaadapter("uamapping_test_notwellformed.xml"), std::logic_error);
 
-  ua_uaadapter* ad1 = new ua_uaadapter("./uamapping_test_applicationismissing.xml");
-  ad1->~ua_uaadapter();
-  ad1 = new ua_uaadapter("./uamapping_test_configismissing.xml");
-  ad1->~ua_uaadapter();
-  ad1 = new ua_uaadapter("./uamapping_test_notwellformed.xml");
-  ad1->~ua_uaadapter();
-  ad1 = new ua_uaadapter("./uamapping_test_portismissing.xml");
-  ad1->~ua_uaadapter();
+  ua_uaadapter* ad1 = new ua_uaadapter("uamapping_test_applicationismissing.xml");
+  delete ad1;
+  ad1 = new ua_uaadapter("uamapping_test_configismissing.xml");
+  delete ad1;
+  ad1 = new ua_uaadapter("uamapping_test_portismissing.xml");
+  delete ad1;
+
+  // Create the managers
+  ua_uaadapter* adapter = new ua_uaadapter("uamapping_test_2.xml");
+  xml_file_handler* xmlHandler = new xml_file_handler("uamapping_test_2.xml");
 
   // is Server running?
   UA_NodeId ownNodeId = adapter->getOwnNodeId();
@@ -82,8 +81,8 @@ void UAAdapterTest::testExampleSet() {
   string dateTime = "";
   BOOST_CHECK(adapter->getSourceTimeStamp() != 0);
 
-  adapter->~ua_uaadapter();
-  xmlHandler->~xml_file_handler();
+  delete adapter;
+  delete xmlHandler;
 }
 
 class UAAdapterTestSuite : public test_suite {
@@ -91,7 +90,7 @@ class UAAdapterTestSuite : public test_suite {
   UAAdapterTestSuite() : test_suite("ua_uaadapter Test Suite") { add(BOOST_TEST_CASE(&UAAdapterTest::testExampleSet)); }
 };
 
-test_suite* init_unit_test_suite(int argc, char* argv[]) {
+test_suite* init_unit_test_suite(int /*argc*/, char** /*argv[]*/) {
   framework::master_test_suite().add(new UAAdapterTestSuite);
   return 0;
 }

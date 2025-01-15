@@ -36,14 +36,8 @@ extern "C" {
 namespace ChimeraTK {
   ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
       boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, string overwriteNodeString)
-  : ua_mapped_class(server, basenodeid) {
-    // FIXME Check if name member of a csManager Parameter
-    this->namePV = namePV;
-    this->nameNew = namePV;
-    this->csManager = std::move(csManager);
-    this->nodeStringIdOverwrite = std::move(overwriteNodeString);
-    this->array = false;
-
+  : namePV(namePV), nameNew(namePV), csManager(std::move(csManager)),
+    nodeStringIdOverwrite(std::move(overwriteNodeString)), array(false), ua_mapped_class(server, basenodeid) {
     this->mapSelfToNamespace(logger);
   }
 
@@ -53,17 +47,12 @@ namespace ChimeraTK {
     UA_NodeId_clear(&this->ownNodeId);
   }
 
-  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getName(UA_Server* server,
-      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
-      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
+  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getName(UA_Server* /*server*/,
+      const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext,
+      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* /*range*/, UA_DataValue* value) {
     auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
-    UA_String ua_val;
-    char* s = (char*)malloc(thisObj->getName().length() + 1);
-    strncpy(s, (char*)thisObj->getName().c_str(), thisObj->getName().length());
-    ua_val.length = thisObj->getName().length();
-    ua_val.data = (UA_Byte*)malloc(ua_val.length);
-    memcpy(ua_val.data, s, ua_val.length);
-    free(s);
+
+    UA_String ua_val = UA_String_fromChars((char*)thisObj->getName().c_str());
     UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
     UA_String_clear(&ua_val);
     value->hasValue = true;
@@ -79,9 +68,9 @@ namespace ChimeraTK {
   }
 
   // EngineeringUnit
-  UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setEngineeringUnit(UA_Server* server,
-      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
-      const UA_NumericRange* range, const UA_DataValue* value) {
+  UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setEngineeringUnit(UA_Server* /*server*/,
+      const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext,
+      const UA_NumericRange* /*range*/, const UA_DataValue* value) {
     auto* theClass = static_cast<ua_processvariable*>(nodeContext);
     std::string cpps;
     char* s;
@@ -99,18 +88,12 @@ namespace ChimeraTK {
     this->engineeringUnit = std::move(engineeringUnit);
   }
 
-  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getEngineeringUnit(UA_Server* server,
-      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
-      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
+  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getEngineeringUnit(UA_Server* /*server*/,
+      const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext,
+      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* /*range*/, UA_DataValue* value) {
     auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
-    UA_String ua_val;
-    char* s = (char*)malloc(thisObj->getEngineeringUnit().length() + 1);
-    strncpy(s, (char*)thisObj->getEngineeringUnit().c_str(), thisObj->getEngineeringUnit().length());
-    ua_val.length = thisObj->getEngineeringUnit().length();
-    ua_val.data = (UA_Byte*)malloc(ua_val.length);
-    memcpy(ua_val.data, s, ua_val.length);
-    free(s);
 
+    UA_String ua_val = UA_String_fromChars((char*)thisObj->getEngineeringUnit().c_str());
     UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
     UA_String_clear(&ua_val);
     value->hasValue = true;
@@ -132,9 +115,9 @@ namespace ChimeraTK {
   }
 
   // Description
-  UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setDescription(UA_Server* server,
-      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
-      const UA_NumericRange* range, const UA_DataValue* value) {
+  UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setDescription(UA_Server* /*server*/,
+      const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext,
+      const UA_NumericRange* /*range*/, const UA_DataValue* value) {
     auto* theClass = static_cast<ua_processvariable*>(nodeContext);
     std::string cpps;
     char* s;
@@ -152,17 +135,12 @@ namespace ChimeraTK {
     this->description = std::move(description);
   }
 
-  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getDescription(UA_Server* server,
-      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
-      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
+  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getDescription(UA_Server* /*server*/,
+      const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext,
+      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* /*range*/, UA_DataValue* value) {
     auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
-    UA_String ua_val;
-    char* s = (char*)malloc(thisObj->getDescription().length() + 1);
-    strncpy(s, (char*)thisObj->getDescription().c_str(), thisObj->getDescription().length());
-    ua_val.length = thisObj->getDescription().length();
-    ua_val.data = (UA_Byte*)malloc(ua_val.length);
-    memcpy(ua_val.data, s, ua_val.length);
-    free(s);
+
+    UA_String ua_val = UA_String_fromChars((char*)thisObj->getDescription().c_str());
     UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
     UA_String_clear(&ua_val);
     value->hasValue = true;
@@ -173,9 +151,9 @@ namespace ChimeraTK {
     return UA_STATUSCODE_GOOD;
   }
 
-  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValidity(UA_Server* server,
-      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
-      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
+  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValidity(UA_Server* /*server*/,
+      const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext,
+      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* /*range*/, UA_DataValue* value) {
     auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
     DataValidity dv = thisObj->csManager->getProcessVariable(thisObj->namePV)->dataValidity();
     UA_Int32 validity;
@@ -209,17 +187,12 @@ namespace ChimeraTK {
   }
 
   // Type
-  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getType(UA_Server* server,
-      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
-      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
+  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getType(UA_Server* /*server*/,
+      const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext,
+      UA_Boolean includeSourceTimeStamp, const UA_NumericRange* /*range*/, UA_DataValue* value) {
     auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
-    UA_String ua_val;
-    char* s = (char*)malloc(thisObj->getType().length() + 1);
-    strncpy(s, (char*)thisObj->getType().c_str(), thisObj->getType().length());
-    ua_val.length = thisObj->getType().length();
-    ua_val.data = (UA_Byte*)malloc(ua_val.length);
-    memcpy(ua_val.data, s, ua_val.length);
-    free(s);
+
+    UA_String ua_val = UA_String_fromChars((char*)thisObj->getType().c_str());
     UA_Variant_setScalarCopy(&value->value, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
     UA_String_clear(&ua_val);
     value->hasValue = true;
@@ -264,8 +237,8 @@ namespace ChimeraTK {
   }
 
   template<typename T>
-  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(UA_Server* server,
-      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
+  UA_StatusCode ua_processvariable::ua_readproxy_ua_processvariable_getValue(UA_Server* /*server*/,
+      const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext,
       UA_Boolean includeSourceTimeStamp, const UA_NumericRange* range, UA_DataValue* value) {
     auto* thisObj = static_cast<ua_processvariable*>(nodeContext);
     UA_StatusCode rv = UA_STATUSCODE_GOOD;
@@ -288,7 +261,7 @@ namespace ChimeraTK {
     }
     if(this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).size() == 1) {
       T ival = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).at(0);
-      rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[fusion::at_key<T>(typesMap)]);
+      UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[fusion::at_key<T>(typesMap)]);
     }
     else {
       std::vector<T> iarr = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0);
@@ -308,14 +281,14 @@ namespace ChimeraTK {
   }
 
   template<>
-  UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v, const UA_NumericRange* range) {
+  UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v, const UA_NumericRange* /*range*/) {
     UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
     if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
       this->csManager->getProcessArray<string>(this->namePV)->readLatest();
     }
     if(this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).size() == 1) {
       string sval = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0).at(0);
-      UA_String ua_val = CPPSTRING_TO_UASTRING(sval);
+      UA_String ua_val = UA_String_fromChars((char*)sval.c_str());
       rv = UA_Variant_setScalarCopy(v, &ua_val, &UA_TYPES[UA_TYPES_STRING]);
       UA_String_clear(&ua_val);
     }
@@ -323,7 +296,7 @@ namespace ChimeraTK {
       std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
       auto* sarrayval = new UA_String[sarr.size()];
       for(size_t i = 0; i < sarr.size(); i++) {
-        sarrayval[i] = CPPSTRING_TO_UASTRING(sarr[i]);
+        sarrayval[i] = UA_String_fromChars((char*)sarr[i].c_str());
       }
       rv = UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
       delete[] sarrayval;
@@ -332,9 +305,9 @@ namespace ChimeraTK {
   }
 
   template<typename T>
-  UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setValue(UA_Server* server,
-      const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId, void* nodeContext,
-      const UA_NumericRange* range, const UA_DataValue* value) {
+  UA_StatusCode ua_processvariable::ua_writeproxy_ua_processvariable_setValue(UA_Server* /*server*/,
+      const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/, void* nodeContext,
+      const UA_NumericRange* /*range*/, const UA_DataValue* value) {
     UA_StatusCode retval = UA_STATUSCODE_BADINTERNALERROR;
     auto* theClass = static_cast<ua_processvariable*>(nodeContext);
     retval = theClass->setValue<T>(&value->value);
@@ -547,6 +520,8 @@ namespace ChimeraTK {
 
     for(auto i : mapDs) {
       retval |= UA_Server_setVariableNode_dataSource(this->mappedServer, i.concreteNodeId, i.dataSource);
+      UA_NodeId_clear(&i.concreteNodeId);
+      UA_NodeId_clear(&i.typeTemplateId);
     }
     UA_NodeId_clear(&createdNodeId);
     return retval;
@@ -584,9 +559,10 @@ namespace ChimeraTK {
       UA_NodeId_copy(&createdNodeId, &mapElemName.concreteNodeId);
       map.push_back(mapElemName);
     }
-    else
+    else {
+      UA_NodeId_clear(&createdNodeId);
       return addResult;
-
+    }
     UA_NodeId_clear(&createdNodeId);
     createdNodeId = UA_NODEID_NULL;
 
@@ -618,8 +594,10 @@ namespace ChimeraTK {
       UA_NodeId_copy(&createdNodeId, &mapElemDesc.concreteNodeId);
       map.push_back(mapElemDesc);
     }
-    else
+    else {
+      UA_NodeId_clear(&createdNodeId);
       return addResult;
+    }
 
     UA_NodeId_clear(&createdNodeId);
     createdNodeId = UA_NODEID_NULL;
@@ -650,8 +628,10 @@ namespace ChimeraTK {
       UA_NodeId_copy(&createdNodeId, &mapElemEU.concreteNodeId);
       map.push_back(mapElemEU);
     }
-    else
+    else {
+      UA_NodeId_clear(&createdNodeId);
       return addResult;
+    }
 
     UA_NodeId_clear(&createdNodeId);
     createdNodeId = UA_NODEID_NULL;
@@ -686,8 +666,10 @@ namespace ChimeraTK {
       UA_NodeId_copy(&createdNodeId, &mapElemType.concreteNodeId);
       map.push_back(mapElemType);
     }
-    else
+    else {
+      UA_NodeId_clear(&createdNodeId);
       return addResult;
+    }
 
     UA_NodeId_clear(&createdNodeId);
     createdNodeId = UA_NODEID_NULL;
@@ -719,8 +701,10 @@ namespace ChimeraTK {
       UA_NodeId_copy(&createdNodeId, &mapElemValidity.concreteNodeId);
       map.push_back(mapElemValidity);
     }
-    else
+    else {
+      UA_NodeId_clear(&createdNodeId);
       return addResult;
+    }
 
     UA_NodeId_clear(&createdNodeId);
 

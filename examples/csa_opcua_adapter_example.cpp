@@ -43,7 +43,7 @@ runtime_value_generator* valGen;
 csa_opcua_adapter* csaOPCUA;
 
 /* FUNCTIONS */
-static void SigHandler_Int(int sign) {
+static void SigHandler_Int(int /*sign*/) {
   cout << "Received SIGINT... terminating" << endl;
   valGen->~runtime_value_generator();
   csaOPCUA->stop();

@@ -13,42 +13,33 @@ class UAMappingTest {
   static void testExampleSet();
 };
 
+void checkNode(const std::string& node, std::shared_ptr<ua_uaadapter> uaadapter) {
+  UA_NodeId result = UA_NODEID_NULL;
+  UA_Server_readNodeId(uaadapter->getMappedServer(), UA_NODEID_STRING(1, const_cast<char*>(node.c_str())), &result);
+  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
+  UA_NodeId_clear(&result);
+}
+
 void UAMappingTest::testExampleSet() {
   cout << "General PV mapping test." << endl;
   TestFixturePVSet tfExampleSet;
-  csa_opcua_adapter* csaOPCUA = new csa_opcua_adapter(tfExampleSet.csManager, "../tests/uamapping_test_general.xml");
+  csa_opcua_adapter csaOPCUA(tfExampleSet.csManager, "uamapping_test_general.xml");
   // is Server running?
-  csaOPCUA->start();
-  BOOST_CHECK(csaOPCUA->isRunning());
-  while(!csaOPCUA->getUAAdapter()->running) {
+  csaOPCUA.start();
+  BOOST_CHECK(csaOPCUA.isRunning());
+  while(!csaOPCUA.getUAAdapter()->running) {
   };
-  BOOST_CHECK(csaOPCUA->getUAAdapter()->running);
+  BOOST_CHECK(csaOPCUA.getUAAdapter()->running);
   // is csManager init
-  BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 21);
+  BOOST_CHECK(csaOPCUA.getControlSystemManager()->getAllProcessVariables().size() == 21);
 
-  ua_uaadapter* uaadapter = csaOPCUA->getUAAdapter();
+  std::shared_ptr<ua_uaadapter> uaadapter = csaOPCUA.getUAAdapter();
 
-  UA_NodeId result = UA_NODEID_NULL;
-  UA_Server_readNodeId(uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/1/FOLDERDir"), &result);
-  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
-  // check if target folder for copy with source was created
-  result = UA_NODEID_NULL;
-  UA_Server_readNodeId(
-      uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTestDir"), &result);
-  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
-  result = UA_NODEID_NULL;
-  UA_Server_readNodeId(uaadapter->getMappedServer(),
-      UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSepDir"), &result);
-  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
-  result = UA_NODEID_NULL;
-  UA_Server_readNodeId(uaadapter->getMappedServer(),
-      UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/copyWithSourceTest/defaultSep/stringScalar"), &result);
-  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
-
-  result = UA_NODEID_NULL;
-  UA_Server_readNodeId(
-      uaadapter->getMappedServer(), UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/linkWithSourceTestDir"), &result);
-  BOOST_CHECK(UA_NodeId_isNull(&result) == UA_FALSE);
+  checkNode("llrfCtrl_hzdr/1/FOLDERDir", uaadapter);
+  checkNode("llrfCtrl_hzdr/copyWithSourceTestDir", uaadapter);
+  checkNode("llrfCtrl_hzdr/copyWithSourceTest/defaultSepDir", uaadapter);
+  checkNode("llrfCtrl_hzdr/copyWithSourceTest/defaultSep/stringScalar", uaadapter);
+  checkNode("llrfCtrl_hzdr/linkWithSourceTestDir", uaadapter);
   UA_BrowseDescription bd;
   bd.includeSubtypes = false;
   bd.nodeId = UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/linkWithSourceTestDir");
@@ -77,9 +68,8 @@ void UAMappingTest::testExampleSet() {
   }
   UA_BrowseResult_clear(&br);
 
-  csaOPCUA->stop();
-  BOOST_CHECK(csaOPCUA->isRunning() != true);
-  csaOPCUA->~csa_opcua_adapter();
+  csaOPCUA.stop();
+  BOOST_CHECK(csaOPCUA.isRunning() != true);
 }
 
 class UAMappingTestSuite : public test_suite {
@@ -87,7 +77,7 @@ class UAMappingTestSuite : public test_suite {
   UAMappingTestSuite() : test_suite("PV mapping Test Suite") { add(BOOST_TEST_CASE(&UAMappingTest::testExampleSet)); }
 };
 
-test_suite* init_unit_test_suite(int argc, char* argv[]) {
+test_suite* init_unit_test_suite(int /*argc*/, char** /*argv[]*/) {
   framework::master_test_suite().add(new UAMappingTestSuite);
   return 0;
 }

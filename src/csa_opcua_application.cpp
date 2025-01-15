@@ -62,7 +62,7 @@ ChimeraTK::csa_opcua_adapter* csaOPCUA;
 
 std::atomic<bool> terminateMain;
 
-static void SigHandler_Int(int sign) {
+static void SigHandler_Int(int /*sign*/) {
   UA_LOG_INFO(csaOPCUA->getLogger(), UA_LOGCATEGORY_USERLAND, "Received SIGINT... terminating");
   terminateMain = true;
   if(csaOPCUA) {

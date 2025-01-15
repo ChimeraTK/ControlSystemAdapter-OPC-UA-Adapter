@@ -38,19 +38,17 @@ void AdditionalVariableTest::testClassSide() {
       UA_QUALIFIEDNAME(0, (char*)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL,
       NULL);
 
-  ua_additionalvariable* addVar1 = new ua_additionalvariable(serverSet->mappedServer,
+  ua_additionalvariable addVar1(serverSet->mappedServer,
       UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()), "Name", "Value", "Description");
 
-  BOOST_CHECK(addVar1->getSourceTimeStamp() != 0);
-  BOOST_CHECK(addVar1->getValue() == "Value");
+  BOOST_CHECK(addVar1.getSourceTimeStamp() != 0);
+  BOOST_CHECK(addVar1.getValue() == "Value");
 
   serverSet->runUAServer = UA_FALSE;
 
   if(serverThread->joinable()) {
     serverThread->join();
   }
-
-  UA_Server_delete(serverSet->mappedServer);
 
   delete serverSet;
   serverSet = NULL;
@@ -79,7 +77,7 @@ void AdditionalVariableTest::testClientSide() {
       UA_QUALIFIEDNAME(0, (char*)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL,
       NULL);
   // add set
-  ua_additionalvariable* addVar1 = new ua_additionalvariable(serverSet->mappedServer,
+  ua_additionalvariable addVar1(serverSet->mappedServer,
       UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()), "Name", "Value", "Description");
 
   // Create client to connect to server
@@ -207,8 +205,6 @@ void AdditionalVariableTest::testClientSide() {
   if(serverThread->joinable()) {
     serverThread->join();
   }
-  cout << "Delete ServerSet" << endl;
-  UA_Server_delete(serverSet->mappedServer);
 
   // serverSet->server_nl.deleteMembers(&serverSet->server_nl);
   cout << "Delete ServerSet" << endl;
@@ -227,7 +223,7 @@ class AdditionalVariableTestSuite : public test_suite {
   }
 };
 
-test_suite* init_unit_test_suite(int argc, char* argv[]) {
+test_suite* init_unit_test_suite(int /*argc*/, char** /*argv[]*/) {
   framework::master_test_suite().add(new AdditionalVariableTestSuite);
   return 0;
 }

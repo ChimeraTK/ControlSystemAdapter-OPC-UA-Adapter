@@ -39,7 +39,7 @@ UA_INLINE UA_StatusCode csa_namespace_add_additional_variable(UA_Server* server)
 
 // ToDo move node add logic to seperated functions, use macros for node-id's
 
-UA_INLINE UA_StatusCode csa_namespace_add_LoggingLevelValues(UA_Server* server, const UA_NodeId* parent) {
+UA_INLINE UA_StatusCode csa_namespace_add_LoggingLevelValues(UA_Server* server) {
   UA_StatusCode retVal = UA_STATUSCODE_GOOD;
   UA_VariableAttributes attr = UA_VariableAttributes_default;
   attr.minimumSamplingInterval = 0.000000;
@@ -90,7 +90,7 @@ UA_INLINE void csa_namespace_add_LoggingLevelEnumType(UA_Server* server, char* e
     UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_USERLAND, "Failed adding type node. %s", UA_StatusCode_name(st));
   }
   // add enum values
-  st = csa_namespace_add_LoggingLevelValues(server, &LoggingLevelType.typeId);
+  st = csa_namespace_add_LoggingLevelValues(server);
   if(st != UA_STATUSCODE_GOOD) {
     UA_ServerConfig* config = UA_Server_getConfig(server);
     UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_USERLAND, "Failed adding LoggingLevels  enum values. %s",

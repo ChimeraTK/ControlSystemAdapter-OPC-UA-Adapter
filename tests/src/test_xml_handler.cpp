@@ -15,33 +15,24 @@ class XMLFileHandlerTest {
 
 void XMLFileHandlerTest::readDocFile() {
   std::cout << "Enter XMLFileHandlerTest - readDocFile" << std::endl;
-  xml_file_handler* xmlHandlerOne = new xml_file_handler("../tests/uamapping_test_1.xml");
-  BOOST_CHECK(xmlHandlerOne != NULL);
+  BOOST_CHECK_NO_THROW(xml_file_handler("uamapping_test_1.xml"));
 
   // Emtpy path
-  xml_file_handler* xmlHandlerTwo = new xml_file_handler("");
-  BOOST_CHECK(xmlHandlerTwo->isDocSetted() == false);
-  BOOST_CHECK(xmlHandlerTwo->getNodeSet("//process_variable") == NULL);
-  // Set a document
-  xmlHandlerTwo->createDoc("../tests/uamapping_test_2.xml");
-  BOOST_CHECK(xmlHandlerTwo->isDocSetted() == true);
-  BOOST_CHECK(xmlHandlerTwo->getNodeSet("//process_variable") != NULL);
-
+  BOOST_CHECK_THROW(xml_file_handler(""), std::logic_error);
   // Set a not wellformed document
-  xml_file_handler* xmlHandlerThree = new xml_file_handler("../tests/uamapping_test_notwellformed.xml");
-  BOOST_CHECK(xmlHandlerThree->isDocSetted() == false);
-  BOOST_CHECK(xmlHandlerThree->getNodeSet("//process_variable") == NULL);
+  BOOST_CHECK_THROW(xml_file_handler("uamapping_test_notwellformed.xml"), std::logic_error);
 
-  xmlHandlerOne->~xml_file_handler();
-  xmlHandlerTwo->~xml_file_handler();
-  xmlHandlerThree->~xml_file_handler();
+  // Set a document
+  xml_file_handler xmlHandlerTwo("uamapping_test_2.xml");
+  BOOST_CHECK(xmlHandlerTwo.isDocSetted() == true);
+  BOOST_CHECK(xmlHandlerTwo.getNodeSet("//process_variable") != NULL);
 }
 
 void XMLFileHandlerTest::getContent() {
   std::cout << "Enter XMLFileHandlerTest - getContent" << std::endl;
-  xml_file_handler* xmlHandler = new xml_file_handler("../tests/uamapping_test_1.xml");
+  xml_file_handler xmlHandler("uamapping_test_1.xml");
 
-  xmlXPathObjectPtr result = xmlHandler->getNodeSet(
+  xmlXPathObjectPtr result = xmlHandler.getNodeSet(
       //"//application[@name='TestCaseForXMLFileHandlerTest::getContent']//map");
       "//process_variable[@sourceName='int8Array__s15']");
   BOOST_CHECK(result != NULL);
@@ -51,26 +42,26 @@ void XMLFileHandlerTest::getContent() {
     nodeset = result->nodesetval;
 
     // Check if Tag <map> contain a Attribute "sourceVariableName" with value
-    string sourceVariableName = xmlHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "sourceName");
+    string sourceVariableName = xmlHandler.getAttributeValueFromNode(nodeset->nodeTab[0], "sourceName");
     BOOST_CHECK(sourceVariableName != "");
 
     // We want to get a value from a not existing attribute
-    BOOST_CHECK(xmlHandler->getAttributeValueFromNode(nodeset->nodeTab[0], "notExistingAttribute") == "");
+    BOOST_CHECK(xmlHandler.getAttributeValueFromNode(nodeset->nodeTab[0], "notExistingAttribute") == "");
 
     // Get a nodeList
-    vector<xmlNodePtr> nodeList = xmlHandler->getNodesByName(nodeset->nodeTab[0]->children, "destination");
+    vector<xmlNodePtr> nodeList = xmlHandler.getNodesByName(nodeset->nodeTab[0]->children, "destination");
     BOOST_CHECK(nodeList.size() == 1);
 
     // Get a content from a tag element like: <tag>content</tag>
-    string unrollPath = xmlHandler->getContentFromNode(nodeList[0]);
+    string unrollPath = xmlHandler.getContentFromNode(nodeList[0]);
     BOOST_CHECK(unrollPath == "TestCaseForXMLFileHandlerTest::getContent/NorthSideLINAC/partB");
 
     // We want to get a conten from a not existing node
-    string emptyContent = xmlHandler->getContentFromNode(NULL);
+    string emptyContent = xmlHandler.getContentFromNode(NULL);
     BOOST_CHECK(emptyContent == "");
 
     vector<string> path =
-        xmlHandler->parseVariablePath(sourceVariableName, xmlHandler->getAttributeValueFromNode(nodeList[0], "name"));
+        xmlHandler.parseVariablePath(sourceVariableName, xmlHandler.getAttributeValueFromNode(nodeList[0], "name"));
     BOOST_CHECK(path.size() == 1);
   }
   else {
@@ -78,9 +69,7 @@ void XMLFileHandlerTest::getContent() {
   }
 
   // We want to get an nodeset from a node which not exist
-  BOOST_CHECK(xmlHandler->getNodeSet("//test") == NULL);
-
-  xmlHandler->~xml_file_handler();
+  BOOST_CHECK(xmlHandler.getNodeSet("//test") == NULL);
 }
 
 /**
@@ -94,7 +83,7 @@ class XMLFileHandlerTestSuite : public test_suite {
   }
 };
 
-test_suite* init_unit_test_suite(int argc, char* argv[]) {
+test_suite* init_unit_test_suite(int /*argc*/, char** /*argv[]*/) {
   framework::master_test_suite().add(new XMLFileHandlerTestSuite);
   return 0;
 }

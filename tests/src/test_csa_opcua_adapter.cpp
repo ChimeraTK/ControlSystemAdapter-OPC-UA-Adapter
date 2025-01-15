@@ -23,41 +23,37 @@ void CSAOPCUATest::testWithoutPVSet() {
   cout << "Enter CSAOPCUATest without any pv" << std::endl;
   TestFixtureEmptySet tfEmptySet;
   // Create the managers
-  csa_opcua_adapter* csaOPCUA = new csa_opcua_adapter(tfEmptySet.csManager, "../tests/uamapping_test_1.xml");
+  csa_opcua_adapter csaOPCUA(tfEmptySet.csManager, "uamapping_test_1.xml");
 
   // is Server running?
-  csaOPCUA->start();
-  while(!csaOPCUA->getUAAdapter()->running) {
+  csaOPCUA.start();
+  while(!csaOPCUA.getUAAdapter()->running) {
   }
-  BOOST_CHECK(csaOPCUA->isRunning());
-  BOOST_CHECK(csaOPCUA->getUAAdapter()->running);
+  BOOST_CHECK(csaOPCUA.isRunning());
+  BOOST_CHECK(csaOPCUA.getUAAdapter()->running);
   // is csManager init
-  BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 0);
+  BOOST_CHECK(csaOPCUA.getControlSystemManager()->getAllProcessVariables().size() == 0);
 
-  csaOPCUA->stop();
-  BOOST_CHECK(!csaOPCUA->isRunning());
-
-  csaOPCUA->~csa_opcua_adapter();
+  csaOPCUA.stop();
+  BOOST_CHECK(!csaOPCUA.isRunning());
 }
 
 void CSAOPCUATest::testWithPVSet() {
   std::cout << "Enter CSAOPCUATest with ExampleSet" << std::endl;
   TestFixturePVSet tfExampleSet;
-  csa_opcua_adapter* csaOPCUA = new csa_opcua_adapter(tfExampleSet.csManager, "../tests/uamapping_test_2.xml");
-  csaOPCUA->start();
-  BOOST_CHECK(csaOPCUA->isRunning());
-  while(!csaOPCUA->getUAAdapter()->running) {
+  csa_opcua_adapter csaOPCUA(tfExampleSet.csManager, "../tests/uamapping_test_2.xml");
+  csaOPCUA.start();
+  BOOST_CHECK(csaOPCUA.isRunning());
+  while(!csaOPCUA.getUAAdapter()->running) {
   }
-  BOOST_CHECK(csaOPCUA->getUAAdapter()->running);
+  BOOST_CHECK(csaOPCUA.getUAAdapter()->running);
   // is csManager init
-  BOOST_CHECK(csaOPCUA->getControlSystemManager()->getAllProcessVariables().size() == 21);
+  BOOST_CHECK(csaOPCUA.getControlSystemManager()->getAllProcessVariables().size() == 21);
 
-  BOOST_CHECK(csaOPCUA->getUAAdapter() != NULL);
+  BOOST_CHECK(csaOPCUA.getUAAdapter() != NULL);
 
-  csaOPCUA->stop();
-  BOOST_CHECK(!csaOPCUA->isRunning());
-
-  csaOPCUA->~csa_opcua_adapter();
+  csaOPCUA.stop();
+  BOOST_CHECK(!csaOPCUA.isRunning());
 }
 
 /**
@@ -71,7 +67,7 @@ class CSAOPCUATestSuite : public test_suite {
   }
 };
 
-test_suite* init_unit_test_suite(int argc, char* argv[]) {
+test_suite* init_unit_test_suite(int /*argc*/, char** /*argv[]*/) {
   framework::master_test_suite().add(new CSAOPCUATestSuite);
   return 0;
 }
