@@ -265,10 +265,8 @@ namespace ChimeraTK {
     this->mappedServer = UA_Server_newWithConfig(config);
     this->server_config = UA_Server_getConfig(this->mappedServer);
 
-    // Add custom tpye to server
-    UA_DataType* types = (UA_DataType*)UA_malloc(1 * sizeof(UA_DataType));
-    types[0] = LoggingLevelType;
-    this->customDataTypes.reset(new UA_DataTypeArray{this->server_config->customDataTypes, 1, types, UA_FALSE});
+    customType[0] = LoggingLevelType;
+    this->customDataTypes.reset(new UA_DataTypeArray{this->server_config->customDataTypes, 1, customType, UA_FALSE});
     this->server_config->customDataTypes = customDataTypes.get();
 
     // Username/Password handling
@@ -282,7 +280,6 @@ namespace ChimeraTK {
     this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
     csa_namespace_init(this->mappedServer);
     UA_free(config);
-    UA_free(types);
     UA_String_clear(&usernamePasswordLogins->password);
     UA_String_clear(&usernamePasswordLogins->username);
     delete usernamePasswordLogins;

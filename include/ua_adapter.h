@@ -104,6 +104,7 @@ namespace ChimeraTK {
     UA_NodeId variablesListId;
     UA_NodeId constantsListId;
     std::shared_ptr<UA_DataTypeArray> customDataTypes;
+    UA_DataType customType[1];
 
     vector<FolderInfo> folderVector;
     UA_NodeId ownNodeId;
