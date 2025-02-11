@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.16)
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 SET(${PROJECT_NAME}_MAJOR_VERSION 04)
 SET(${PROJECT_NAME}_MINOR_VERSION 00)
-SET(${PROJECT_NAME}_PATCH_VERSION 03)
+SET(${PROJECT_NAME}_PATCH_VERSION 04)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
@@ -237,19 +237,17 @@ endif(INSTALL_SAMPLE_ADAPTER)
 ##  Install map file generator
 ##########################################################################################################
 
+find_package(Python3 REQUIRED)
 
-include(pythonBindingHelperMacros)
+# install Python modules to correct platform-dependent directory (if installing to system prefix)
+if("${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr" OR "${CMAKE_INSTALL_PREFIX}" STREQUAL "/usr/local")
+  install(DIRECTORY tools/mapfileGenerator/ctk_opcua_generator_tools
+          DESTINATION ${Python3_STDLIB})
+else()
+  install(DIRECTORY tools/mapfileGenerator/ctk_opcua_generator_tools
+          DESTINATION lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages)
+endif()
 
-#
-# We build for python3 by default
-set(PYTHON3 TRUE CACHE BOOL "Builds modules for python3 if true and python2 if false")
-initialize()
-
-find_package(PythonLibs 3 REQUIRED)
-get_python_module_install_path(PYTHONLIBS_VERSION_STRING python_module_path)
-
-install(DIRECTORY tools/mapfileGenerator/ctk_opcua_generator_tools
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/${python_module_path})
 install(FILES tools/mapfileGenerator/chimeratk-opc-ua-mapfile-generator
         DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
