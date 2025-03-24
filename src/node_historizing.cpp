@@ -79,7 +79,8 @@ namespace ChimeraTK {
       if(retval == UA_STATUSCODE_GOOD) {
         UA_String out = UA_STRING_NULL;
         UA_print(&id, &UA_TYPES[UA_TYPES_NODEID], &out);
-        UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "add Node %.*s ", (int)out.length, out.data);
+        UA_LOG_DEBUG(
+            server_config->logging, UA_LOGCATEGORY_USERLAND, "Add history for node %.*s ", (int)out.length, out.data);
         UA_String_clear(&out);
         historizing_nodes->insert(historizing_nodes->end(), historyvariables[i].variable_id);
         historizing_setup->insert(historizing_setup->end(), historyvariables[i].variable_historizing);
@@ -94,6 +95,8 @@ namespace ChimeraTK {
       }
       UA_NodeId_clear(temp);
     }
+    UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Added %ld nodes to the historizing.",
+        historizing_nodes->size());
   }
 
   void set_variable_access_level_historizing(UA_NodeId id, UA_Server* mappedServer) {

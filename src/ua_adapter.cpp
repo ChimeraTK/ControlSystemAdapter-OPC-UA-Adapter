@@ -681,7 +681,6 @@ namespace ChimeraTK {
         add_historizing_nodes(historizing_nodes, historizing_setup, this->mappedServer, this->server_config,
             this->serverConfig.history, this->serverConfig.historyfolders, this->serverConfig.historyvariables);
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Starting the server worker thread");
-    add_void_event_type(this->mappedServer);
     UA_Server_run_startup(this->mappedServer);
     this->running = true;
     while(this->running) {
@@ -1667,6 +1666,18 @@ namespace ChimeraTK {
         for(auto var : this->getVariables()) {
           if(var->getName() == mappedVar) {
             mapped = true;
+            break;
+          }
+        }
+        if(!mapped) {
+          for(auto histVar : this->serverConfig.historyvariables) {
+            string mappedVarHist = serverConfig.rootFolder + "/" + mappedVar;
+            std::string tmp;
+            UASTRING_TO_CPPSTRING(histVar.variable_id.identifier.string, tmp);
+            if(tmp.compare(mappedVarHist) == 0) {
+              mapped = true;
+              break;
+            }
           }
         }
         if(!mapped) {

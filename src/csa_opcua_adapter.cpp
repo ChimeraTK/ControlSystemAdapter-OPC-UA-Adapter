@@ -47,7 +47,10 @@ namespace ChimeraTK {
       for(const auto& f : mappedPvSources) {
         ss << "\n\t\t - " << f;
       }
-      UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "List of mapped process variables: %s", ss.str().c_str());
+      UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND,
+          "Mapped %zu process variables. To list them use logging level debug.", mappedPvSources.size());
+      UA_LOG_DEBUG(
+          this->getLogger(), UA_LOGCATEGORY_USERLAND, "List of mapped process variables: %s", ss.str().c_str());
     }
 
     vector<ProcessVariable::SharedPtr> allProcessVariables = this->csManager->getAllProcessVariables();
@@ -200,6 +203,7 @@ namespace ChimeraTK {
       }
     }
     if(!data->pvs.empty()) {
+      add_void_event_type(adapter->mappedServer);
       auto conf = adapter->get_server_config();
       data->rootFolder = conf.rootFolder;
       data->adapter = this;
