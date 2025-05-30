@@ -1,10 +1,10 @@
 #include "ua_typeconversion.h"
-#include <csa_additionalvariable.h>
-#include <test_sample_data.h>
 
 #include <boost/test/included/unit_test.hpp>
 
+#include <csa_additionalvariable.h>
 #include <string.h>
+#include <test_sample_data.h>
 
 using namespace boost::unit_test_framework;
 

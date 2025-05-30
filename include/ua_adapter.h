@@ -22,6 +22,7 @@
 #pragma once
 
 #include "node_historizing.h"
+
 #include <open62541/config.h>
 #include <open62541/plugin/accesscontrol.h>
 #include <open62541/plugin/accesscontrol_default.h>

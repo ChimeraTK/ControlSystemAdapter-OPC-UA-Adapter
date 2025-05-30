@@ -22,6 +22,7 @@
 #pragma once
 
 #include "ua_typeconversion.h"
+
 #include <open62541/server.h>
 
 #include <iostream>

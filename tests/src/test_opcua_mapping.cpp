@@ -1,9 +1,9 @@
+#include <boost/test/included/unit_test.hpp>
+
 #include <csa_opcua_adapter.h>
 #include <test_sample_data.h>
 #include <ua_adapter.h>
 #include <xml_file_handler.h>
-
-#include <boost/test/included/unit_test.hpp>
 
 using namespace boost::unit_test_framework;
 using namespace std;

@@ -22,6 +22,7 @@
 #include "xml_file_handler.h"
 
 #include "open62541/plugin/log_stdout.h"
+
 #include <libxml2/libxml/tree.h>
 #include <libxml2/libxml/xpath.h>
 #include <libxml2/libxml/xpathInternals.h>

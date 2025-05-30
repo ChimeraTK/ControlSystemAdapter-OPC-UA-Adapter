@@ -1,12 +1,12 @@
 #include "open62541/plugin/log_stdout.h"
-#include <csa_opcua_adapter.h>
-#include <test_sample_data.h>
-#include <ua_adapter.h>
 
 #include <boost/fusion/container/map.hpp>
 #include <boost/test/included/unit_test.hpp>
 
+#include <csa_opcua_adapter.h>
 #include <string.h>
+#include <test_sample_data.h>
+#include <ua_adapter.h>
 
 extern "C" {
 #include "csa_namespace.h"
@@ -420,7 +420,7 @@ void ProcessVariableTest::testClientSide() {
                   UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)nameToCheck->data)), valName);
                   BOOST_CHECK(valName == "/int8Scalar");
                   // Check Value
-                  uint8_t value = (uint8_t) * ((uint8_t*)valueToCheck->data);
+                  uint8_t value = (uint8_t)*((uint8_t*)valueToCheck->data);
                   BOOST_CHECK(value == 0);
                   // cout << "Wert: " << std::to_string(value) << endl;
                   //  set new value
@@ -432,7 +432,7 @@ void ProcessVariableTest::testClientSide() {
                     // get value from server
                     UA_Variant_init(valueToCheck);
                     UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                    value = (uint8_t) * ((uint8_t*)valueToCheck->data);
+                    value = (uint8_t)*((uint8_t*)valueToCheck->data);
                     BOOST_CHECK(value == newValue);
                   }
                   else {
@@ -448,7 +448,7 @@ void ProcessVariableTest::testClientSide() {
                   UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)nameToCheck->data)), valName);
                   BOOST_CHECK(valName == "/uint8Scalar");
                   // Check Value
-                  int8_t value = (int8_t) * ((int8_t*)valueToCheck->data);
+                  int8_t value = (int8_t)*((int8_t*)valueToCheck->data);
                   BOOST_CHECK(value == 0);
                   // cout << "Wert: " << std::to_string(value) << endl;
                   //  set new value
@@ -460,7 +460,7 @@ void ProcessVariableTest::testClientSide() {
                     // get value from server
                     UA_Variant_init(valueToCheck);
                     UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                    value = (int8_t) * ((int8_t*)valueToCheck->data);
+                    value = (int8_t)*((int8_t*)valueToCheck->data);
                     BOOST_CHECK(value == newValue);
                   }
                   else {
@@ -476,7 +476,7 @@ void ProcessVariableTest::testClientSide() {
                   UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)nameToCheck->data)), valName);
                   BOOST_CHECK(valName == "/int16Scalar");
                   // Check Value
-                  int16_t value = (int16_t) * ((int16_t*)valueToCheck->data);
+                  int16_t value = (int16_t)*((int16_t*)valueToCheck->data);
                   BOOST_CHECK(value == 0);
                   // cout << "Wert: " << std::to_string(value) << endl;
                   // set new value, should be wrong
@@ -488,7 +488,7 @@ void ProcessVariableTest::testClientSide() {
                     // get value from server
                     UA_Variant_init(valueToCheck);
                     UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                    value = (int16_t) * ((int16_t*)valueToCheck->data);
+                    value = (int16_t)*((int16_t*)valueToCheck->data);
                     BOOST_CHECK(value == newValue);
                   }
                   else {
@@ -504,7 +504,7 @@ void ProcessVariableTest::testClientSide() {
                   UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)nameToCheck->data)), valName);
                   BOOST_CHECK(valName == "/uint16Scalar");
                   // Check Value
-                  uint16_t value = (uint16_t) * ((uint16_t*)valueToCheck->data);
+                  uint16_t value = (uint16_t)*((uint16_t*)valueToCheck->data);
                   BOOST_CHECK(value == 0);
                   // cout << "Wert: " << std::to_string(value) << endl;
                   //  set new value
@@ -516,7 +516,7 @@ void ProcessVariableTest::testClientSide() {
                     // get value from server
                     UA_Variant_init(valueToCheck);
                     UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                    value = (uint16_t) * ((uint16_t*)valueToCheck->data);
+                    value = (uint16_t)*((uint16_t*)valueToCheck->data);
                     BOOST_CHECK(value == newValue);
                   }
                   else {
@@ -532,7 +532,7 @@ void ProcessVariableTest::testClientSide() {
                   UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)nameToCheck->data)), valName);
                   BOOST_CHECK(valName == "/Dein/Name/ist/int32Scalar");
                   // Check Value
-                  int32_t value = (int32_t) * ((int32_t*)valueToCheck->data);
+                  int32_t value = (int32_t)*((int32_t*)valueToCheck->data);
                   BOOST_CHECK(value == 0);
                   // cout << "Wert: " << std::to_string(value) << endl;
                   //  set new value
@@ -544,7 +544,7 @@ void ProcessVariableTest::testClientSide() {
                     // get value from server
                     UA_Variant_init(valueToCheck);
                     UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                    value = (int32_t) * ((int32_t*)valueToCheck->data);
+                    value = (int32_t)*((int32_t*)valueToCheck->data);
                     BOOST_CHECK(value == newValue);
                   }
                   else {
@@ -560,7 +560,7 @@ void ProcessVariableTest::testClientSide() {
                   UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)nameToCheck->data)), valName);
                   BOOST_CHECK(valName == "/Mein/Name/ist/uint32Scalar");
                   // Check Value
-                  uint32_t value = (uint32_t) * ((uint32_t*)valueToCheck->data);
+                  uint32_t value = (uint32_t)*((uint32_t*)valueToCheck->data);
                   BOOST_CHECK(value == 0);
                   // cout << "Wert: " << std::to_string(value) << endl;
                   //  set new value
@@ -572,7 +572,7 @@ void ProcessVariableTest::testClientSide() {
                     // get value from server
                     UA_Variant_init(valueToCheck);
                     UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                    value = (uint32_t) * ((uint32_t*)valueToCheck->data);
+                    value = (uint32_t)*((uint32_t*)valueToCheck->data);
                     BOOST_CHECK(value == newValue);
                   }
                   else {
@@ -588,7 +588,7 @@ void ProcessVariableTest::testClientSide() {
                   UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)nameToCheck->data)), valName);
                   BOOST_CHECK(valName == "/Mein/Name/ist/int64Scalar");
                   // Check Value
-                  int64_t value = (int64_t) * ((int64_t*)valueToCheck->data);
+                  int64_t value = (int64_t)*((int64_t*)valueToCheck->data);
                   BOOST_CHECK(value == 0);
                   // cout << "Wert: " << std::to_string(value) << endl;
                   //  set new value
@@ -600,7 +600,7 @@ void ProcessVariableTest::testClientSide() {
                     // get value from server
                     UA_Variant_init(valueToCheck);
                     UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                    value = (int64_t) * ((int64_t*)valueToCheck->data);
+                    value = (int64_t)*((int64_t*)valueToCheck->data);
                     BOOST_CHECK(value == newValue);
                   }
                   else {
@@ -616,7 +616,7 @@ void ProcessVariableTest::testClientSide() {
                   UASTRING_TO_CPPSTRING(((UA_String) * ((UA_String*)nameToCheck->data)), valName);
                   BOOST_CHECK(valName == "/Mein/Name/ist/uint64Scalar");
                   // Check Value
-                  uint64_t value = (uint64_t) * ((uint64_t*)valueToCheck->data);
+                  uint64_t value = (uint64_t)*((uint64_t*)valueToCheck->data);
                   BOOST_CHECK(value == 0);
                   // cout << "Wert: " << std::to_string(value) << endl;
                   //  set new value
@@ -628,7 +628,7 @@ void ProcessVariableTest::testClientSide() {
                     // get value from server
                     UA_Variant_init(valueToCheck);
                     UA_Client_readValueAttribute(client, valueNodeId, valueToCheck);
-                    value = (uint64_t) * ((uint64_t*)valueToCheck->data);
+                    value = (uint64_t)*((uint64_t*)valueToCheck->data);
                     BOOST_CHECK(value == newValue);
                   }
                   else {
