@@ -27,14 +27,15 @@
  * <th>Mode <th>Description <tr><td colspan="3">Code quality control options <tr><td>ENABLE_COVERAGE_REPORT 	<td> OFF
  * <td> Enable coverage statistics. After succsesfully generation you can see all the results in /build/coverage_html.
  * There are html-files, so you can view the statistics in any browser. <tr><td>BUILD_STATIC_ANALYSIS
- * <td> OFF <td> Instead of building a binary, perform a static code analysis using clangs analyzer. <tr><td>ENABLE_LINTING
- * <td> OFF <td> Enables the cppcheck static analyzer, the result will be stored in /build/static_analysis.
- * <tr><td>ENABLE_RUNTIME_ANALYSIS 	<td> OFF <td> Build Runtime analysis. This test check all testcases if there are
- * some mem leaks, heap corruptions. <tr><td>ENABLE_UNIT_TESTS 				<td> ON  <td> Compile all unit tests, this
- * tests are used by all above analysis. <tr><td>CHECK_CTK_STYLE          <td> OFF <td> Check ChimeraTK code style and
- * license information. <tr><td colspan="3"> Miscellaneous Options <tr><td>SUPPRESS_AUTO_DOC_BUILD	<td> OFF <td>
- * Suppress generating doxygen documentation, especially this one you read now... <tr><td>INSTALL_SAMPLE_ADAPTER   <td>
- * OFF <td> Install the sample application called ControlSystem-OPCUA_Sample_Adapter
+ * <td> OFF <td> Instead of building a binary, perform a static code analysis using clangs analyzer.
+ * <tr><td>ENABLE_LINTING <td> OFF <td> Enables the cppcheck static analyzer, the result will be stored in
+ * /build/static_analysis. <tr><td>ENABLE_RUNTIME_ANALYSIS 	<td> OFF <td> Build Runtime analysis. This test check
+ * all testcases if there are some mem leaks, heap corruptions. <tr><td>ENABLE_UNIT_TESTS
+ * <td> ON  <td> Compile all unit tests, this tests are used by all above analysis. <tr><td>CHECK_CTK_STYLE <td> OFF
+ * <td> Check ChimeraTK code style and license information. <tr><td colspan="3"> Miscellaneous Options
+ * <tr><td>SUPPRESS_AUTO_DOC_BUILD	<td> OFF <td> Suppress generating doxygen documentation, especially this one you
+ * read now... <tr><td>INSTALL_SAMPLE_ADAPTER   <td> OFF <td> Install the sample application called
+ * ControlSystem-OPCUA_Sample_Adapter
  *  * </table>
  *
  * @section Miscellaneous

@@ -19,6 +19,7 @@
  * Copyright (c) 2018-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
 #include "void_type.h"
+
 #include <open62541/plugin/historydata/history_data_backend_memory.h>
 #include <open62541/plugin/historydata/history_data_gathering_default.h>
 #include <open62541/plugin/historydata/history_database_default.h>

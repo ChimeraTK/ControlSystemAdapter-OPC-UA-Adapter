@@ -1,7 +1,7 @@
+#include <boost/test/included/unit_test.hpp>
+
 #include <csa_opcua_adapter.h>
 #include <test_sample_data.h>
-
-#include <boost/test/included/unit_test.hpp>
 
 #include <iostream>
 

@@ -21,13 +21,15 @@
 #include "runtime_value_generator.h"
 
 #include "csa_opcua_adapter.h"
-#include <sys/sysinfo.h>
 
 #include <ChimeraTK/ReadAnyGroup.h>
 
-#include <iostream>
+#include <sys/sysinfo.h>
+
 #include <math.h>
 #include <unistd.h>
+
+#include <iostream>
 
 using std::cout;
 using std::endl;

@@ -24,6 +24,7 @@
 #include "csa_processvariable.h"
 #include "ua_mapped_class.h"
 #include "xml_file_handler.h"
+
 #include <open62541/plugin/historydata/history_data_backend_memory.h>
 #include <open62541/plugin/historydata/history_data_gathering.h>
 #include <open62541/plugin/historydata/history_data_gathering_default.h>
