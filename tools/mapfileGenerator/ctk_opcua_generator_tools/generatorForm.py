@@ -322,7 +322,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
       unit = "{} (Orig.: {})".format(v.newUnit, v.unit)
     node = QTreeWidgetItem(parent, [name]+[""]*2 + [unit] + [description]+[v.newDestination])
     
-    if v.direction == 'control_system_to_application':
+    if 'control_system_to_application' in v.direction:
       node.setBackground(0,QBrush(QColor("#fee8c8")))
     else:
       node.setBackground(0,QBrush(QColor("#e5f5e0")))
@@ -565,7 +565,7 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     
   def addHistoryForInputs(self, isChecked:bool, node:QTreeWidgetItem):
     data = node.data(0, Qt.UserRole)
-    if isinstance(data, XMLVar) and data.direction == 'control_system_to_application':
+    if isinstance(data, XMLVar) and ('control_system_to_application' in data.direction):
       if isChecked:
         self.treeWidget.itemWidget(node, 2).setCurrentText(self.histories.currentText())
       else:
