@@ -156,7 +156,6 @@ namespace ChimeraTK {
     if(!this->serverConfig.enableSecurity) {
       UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, nullptr);
     }
-    config->eventLoop->logger = &logger;
     if(this->serverConfig.enableSecurity) {
       UA_ByteString certificate = UA_BYTESTRING_NULL;
       UA_ByteString privateKey = UA_BYTESTRING_NULL;
@@ -257,6 +256,7 @@ namespace ChimeraTK {
       UA_ByteString_clear(&privateKey);
       for(size_t i = 0; i < trustListSize; i++) UA_ByteString_clear(&trustList[i]);
     }
+    config->eventLoop->logger = &logger;
     fillBuildInfo(config);
     for(size_t i = 0; i < config->endpointsSize; ++i) {
       UA_ApplicationDescription_clear(&config->endpoints[i].server);
