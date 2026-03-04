@@ -24,7 +24,7 @@
 
 #include <string>
 
-/* Helpers for type converstion and such */
+/* Helpers for type conversion and such */
 #define UA_STRING_TO_CPPSTRING_COPY(_p_uastring, _p_cppstring)                                                         \
   do {                                                                                                                 \
     UA_String* ua_url = (UA_String*)_p_uastring;                                                                       \

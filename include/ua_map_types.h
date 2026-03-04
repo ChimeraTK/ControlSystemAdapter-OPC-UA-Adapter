@@ -44,7 +44,7 @@ namespace ChimeraTK {
 
   /**
    * @struct UA_DataSource_Map_Element_t
-   * @brief For generic callback use, this sturct contains the methode pointer and a NodeId of the model. Additinaly a
+   * @brief For generic callback use, this struct contains the method pointer and a NodeId of the model. Additionally a
    * description from controlSystemAdapter can be setted here.
    *
    */
@@ -68,7 +68,7 @@ namespace ChimeraTK {
    * @brief Node function and proxy mapping for new nodes
    *
    * @param objectId targetNodeId
-   * @param defintionId sourceNodeId
+   * @param definitionId sourceNodeId
    * @param handle read and write handel for the node
    *
    * @return UA_StatusCode

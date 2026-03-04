@@ -62,7 +62,7 @@ namespace ChimeraTK {
    * This assumes both lists have the same size.
    * Avoid multiple setups for one node.
    * Because first nodes from pv settings in the mapping file are added,
-   * those settings will be used instaed of a setting added by mapping
+   * those settings will be used instead of a setting added by mapping
    * a folder.
    *
    * @param historizing_nodes List of nodes with history.
