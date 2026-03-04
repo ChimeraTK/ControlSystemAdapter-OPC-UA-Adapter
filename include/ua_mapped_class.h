@@ -28,7 +28,7 @@ extern "C" {
 
 namespace ChimeraTK {
   /** @class ua_mapped_class
-   *	@brief This class mapped all inforamtion into the opca server
+   *	@brief This class mapped all information into the opca server
    */
   class ua_mapped_class {
    protected:
@@ -42,8 +42,6 @@ namespace ChimeraTK {
      *
      * @param server opcua server
      * @param baseNodeId Node id from the parent node
-     *
-     * @return Returns a element pointer if some was found, in other cases it will return NULL
      */
     ua_mapped_class(UA_Server* server, UA_NodeId baseNodeId);
 
@@ -53,20 +51,20 @@ namespace ChimeraTK {
     /** @brief Destructor of the class */
     virtual ~ua_mapped_class();
 
-    /** @brief This methode mapped all own nodes into the opcua server
+    /** @brief This method mapped all own nodes into the opcua server
      *
      * @return UA_StatusCode
      */
     UA_StatusCode ua_mapSelfToNamespace();
 
-    /** @brief This methode unmapped all nodes
+    /** @brief This method unmapped all nodes
      *
      * @return UA_StatusCode
      */
     UA_StatusCode ua_unmapSelfFromNamespace();
 
     /** @brief Get the SourceTimeStamp from node in the OPC UA server
-     * Virtual methode which returned Timestamp is setted into the node with the help of the proxy_callback.h
+     * Virtual method which returned Timestamp is setted into the node with the help of the proxy_callback.h
      *
      * @return Returns a UA_DateTime
      */

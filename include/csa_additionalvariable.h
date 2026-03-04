@@ -27,7 +27,7 @@ using namespace std;
 
 namespace ChimeraTK {
   /** @class ua_additionalvariable
-   *	@brief This class represent a additional variable from <variableMap.xml> in the information model of a OPC UA Server
+   *	@brief This class represent a additional variable from <variableMap.xml> in the information model of a OPC UA  Server
    *
    *  @author Chris Iatrou, Julian Rahm
    *  @date 22.11.2016
@@ -45,20 +45,20 @@ namespace ChimeraTK {
      */
     UA_NodeId ownNodeId{};
 
-    /** @brief  This methode mapped all own nodes into the opcua server
+    /** @brief  This method mapped all own nodes into the opcua server
      *
      * @return <UA_StatusCode>
      */
     UA_StatusCode mapSelfToNamespace();
 
    public:
-    /** @brief Constructor from <ua_additionalvariable> for generic creation
+    /** @brief Constructor from "<ua_additionalvariable>" for generic creation
      *
      * @param server A UA_Server type, with all server specific information from the used server
      * @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
-     * @param name Name of the additinal node
-     * @param value Value of the additinal node
-     * @param description Descripption of the additinal node
+     * @param name Name of the additional node
+     * @param value Value of the additional node
+     * @param description Description of the additional node
      */
     ua_additionalvariable(UA_Server* server, UA_NodeId basenodeid, string name, string value, string description);
 

@@ -77,7 +77,7 @@ namespace ChimeraTK {
   };
 
   /** @struct ServerConfig
-   *	@brief This struct represents a server config. If the hole config file is prased, all information will be stored
+   *	@brief This struct represents a server config. If the hole config file is parsed, all information will be stored
    *in die struct. Additionally for every necessary variable a default value is set.
    *
    *  @author Chris Iatrou, Julian Rahm
@@ -110,7 +110,7 @@ namespace ChimeraTK {
     vector<FolderInfo> folderVector;
     UA_NodeId ownNodeId;
     UA_NodeId configNodeId;
-    string pvSeperator;
+    string pvSeparator;
     UA_Boolean mappingExceptions;
 
     ServerConfig serverConfig;
@@ -122,11 +122,11 @@ namespace ChimeraTK {
 
     std::shared_ptr<xml_file_handler> fileHandler;
 
-    /** @brief This methode construct the parameter for the opcua server, depending of the <serverConfig> struct
+    /** @brief This method construct the parameter for the opcua server, depending of the <serverConfig> struct
      */
     void constructServer();
 
-    /** @brief This methode mapped all own nodes into the opcua server
+    /** @brief This method mapped all own nodes into the opcua server
      *
      * @return <UA_StatusCode>
      */
@@ -147,14 +147,14 @@ namespace ChimeraTK {
      * If mappingExceptions=true raise std::runtime_error. Else print Warning that includes the error
      * message and the consequence of that warning, e.g. folder will not be mapped.
      *
-     * @param errorMesssage The message raised in the exception.
+     * @param errorMessage The message raised in the exception.
      * @param consequenceMessage Message explaining the consequence of the error in case no exception is raised.
      * @param line The line number in the mapping file that resulted in raising the error. If negative no line number
      *             is printed.
      *
      * @exception std::runtime_error if mappingExceptions=true.
      */
-    void raiseError(std::string errorMesssage, std::string consequenceMessage, const int& line = -1);
+    void raiseError(std::string errorMessage, std::string consequenceMessage, const int& line = -1);
 
    public:
     bool running = false;
@@ -165,14 +165,14 @@ namespace ChimeraTK {
     /** @brief Constructor of the class.
      *
      * During the construction of the class it instanciate a xml_file_handler and read the config, after that the server
-     * will be sonstructed and the namespace ist added to them. Concluding all additional nodes which are defined in the
+     * will be constructed and the namespace is added to them. Concluding all additional nodes which are defined in the
      * configFile are mapped into the server.
      *
      * @param configFile This file provide the configuration and the mapping of the server
      */
-    ua_uaadapter(const string& configPath);
+    ua_uaadapter(const string& configFile);
 
-    /** @brief Destrructor of the class.
+    /** @brief Destructor of the class.
      *
      * It stop the server and delete the managed object.
      *
@@ -194,13 +194,13 @@ namespace ChimeraTK {
     /** @brief Create a path of folders in the given parent node
      *
      * @param basenodeid Node id of the parent node
-     * @param folderPathVector Every single string is a folder name, the path ist createt in the given order
+     * @param folderPath Every single string is a folder name, the path is created in the given order
      */
-    UA_NodeId createFolderPath(UA_NodeId basenodeid, vector<string> folderPathVector);
+    UA_NodeId createFolderPath(UA_NodeId basenodeid, vector<string> folderPath);
 
     /** @brief Creates a folder in the given parent node
      *
-     * @param basenodeId Node id of the parent node
+     * @param basenodeid Node id of the parent node
      * @param folderName Name of the new folder
      * @param description A short description of the folder
      */
@@ -208,14 +208,14 @@ namespace ChimeraTK {
 
     /** @brief Check if a folder path exist in opcua server
      *
-     * @param basenodeId Node id of the parent node
-     * @param folderPathVector Every single string is a folder name, the path ist checked in the given order
+     * @param basenodeid Node id of the parent node
+     * @param folderPath Every single string is a folder name, the path is checked in the given order
      */
     UA_NodeId existFolderPath(UA_NodeId basenodeid, const vector<string>& folderPath);
 
     /** @brief Check if a folder exist in opcua server
      *
-     * @param basenodeId Node id of the parent node
+     * @param basenodeid Node id of the parent node
      * @param folderName The name of folder, that be checked
      */
     UA_NodeId existFolder(UA_NodeId basenodeid, const string& folderName);
@@ -223,16 +223,16 @@ namespace ChimeraTK {
     /** @brief Create folder structure based on the given path.
      *
      * @param path The complete path
-     * @param seperator Delimiters with are used to split the path
+     * @param separator Delimiters with are used to split the path
      *
      * @return nodeId of the last created folder (last part of path)
      */
-    UA_NodeId enrollFolderPathFromString(const string& path, const string& seperator);
+    UA_NodeId enrollFolderPathFromString(const string& path, const string& separator);
 
     /** @brief Start implicit mapping process
      *
-     * @param basenodeId Node id of the parent node
-     * @param folderPathVector Every single string is a folder name, the path ist checked in the given order
+     * @param varName Node id of the parent node
+     * @param csManager control system manager
      */
     void implicitVarMapping(const std::string& varName, const boost::shared_ptr<ControlSystemPVManager>& csManager);
 
@@ -273,15 +273,15 @@ namespace ChimeraTK {
     void deepCopyHierarchicalLayer(
         const boost::shared_ptr<ControlSystemPVManager>& csManager, UA_NodeId layer, UA_NodeId target);
 
-    /** @brief Methode that returns the node id of the instanced class
+    /** @brief Method that returns the node id of the instanced class
      *
      * @return UA_NodeId
      */
     UA_NodeId getOwnNodeId();
 
-    /** @brief Methode that returns all <ua_processvariable> of the class.
+    /** @brief Method that returns all "<ua_processvariable>" of the class.
      *
-     * @return A vector of all <ua_processvariable>
+     * @return A vector of all "<ua_processvariable>"
      */
     vector<ua_processvariable*> getVariables();
 
@@ -291,14 +291,14 @@ namespace ChimeraTK {
 
     void workerThread();
 
-    /** @brief This Methode reads the config-tag form the given <variableMap.xml>.
+    /** @brief This Method reads the config-tag form the given <variableMap.xml>.
      *
      */
     void readConfig();
 
-    /** @brief Methode to get all names from all potential VarableNodes from XML-Mappingfile which could not allocated.
+    /** @brief Method to get all names from all potential VariableNodes from XML-Mappingfile which could not allocated.
      *
-     * @return vector<string> notMappableVariablesNames List with all VariableNodes which could not allocated a Varaible
+     * @return vector<string> notMappableVariablesNames List with all VariableNodes which could not allocated a Variable
      * in PV-Manager.
      */
     vector<string> getAllNotMappableVariablesNames();
@@ -314,7 +314,7 @@ namespace ChimeraTK {
 
     /** @brief get ServerConfig.
      *
-     * @param returns the serveConfig.
+     * @return the serveConfig.
      */
     ServerConfig get_server_config();
 

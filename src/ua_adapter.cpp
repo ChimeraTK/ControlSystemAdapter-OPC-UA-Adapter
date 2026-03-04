@@ -306,7 +306,7 @@ namespace ChimeraTK {
       string unrollSepEnabled = xml_file_handler::getContentFromNode(nodeUnrollPath);
       transform(unrollSepEnabled.begin(), unrollSepEnabled.end(), unrollSepEnabled.begin(), ::toupper);
       if(unrollSepEnabled == "TRUE") {
-        this->pvSeperator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
+        this->pvSeparator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
       }
     }
        */
@@ -612,7 +612,7 @@ namespace ChimeraTK {
         string unrollSepEnabled = xml_file_handler::getContentFromNode(nodeUnrollPath);
         transform(unrollSepEnabled.begin(), unrollSepEnabled.end(), unrollSepEnabled.begin(), ::toupper);
         if(unrollSepEnabled == "TRUE") {
-          this->pvSeperator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
+          this->pvSeparator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
         }
       }
       xmlXPathFreeObject(result);
@@ -620,7 +620,7 @@ namespace ChimeraTK {
     else {
       UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
           "No <process_variable_hierarchy>-Tag in config file. Use default hierarchical mapping with '/'.");
-      this->pvSeperator = "/";
+      this->pvSeparator = "/";
     }
 
     xmlXPathObjectPtr result_exclude = this->fileHandler->getNodeSet("//exclude");
@@ -694,10 +694,10 @@ namespace ChimeraTK {
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Stopped the server worker thread");
   }
 
-  UA_NodeId ua_uaadapter::enrollFolderPathFromString(const string& path, const string& seperator) {
+  UA_NodeId ua_uaadapter::enrollFolderPathFromString(const string& path, const string& separator) {
     vector<string> varPathVector;
-    if(!seperator.empty()) {
-      vector<string> newPathVector = xml_file_handler::parseVariablePath(path, seperator);
+    if(!separator.empty()) {
+      vector<string> newPathVector = xml_file_handler::parseVariablePath(path, separator);
       varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
     }
     if(!varPathVector.empty()) { // last element is the variable name itself
@@ -709,12 +709,12 @@ namespace ChimeraTK {
 
   void ua_uaadapter::implicitVarMapping(
       const std::string& varName, const boost::shared_ptr<ControlSystemPVManager>& csManager) {
-    UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeperator);
+    UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeparator);
     ua_processvariable* processvariable;
     if(!UA_NodeId_isNull(&folderPathNodeId)) {
       processvariable =
           new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1), csManager,
-              server_config->logging, xml_file_handler::parseVariablePath(varName, this->pvSeperator).back());
+              server_config->logging, xml_file_handler::parseVariablePath(varName, this->pvSeparator).back());
     }
     else {
       processvariable = new ua_processvariable(this->mappedServer, this->ownNodeId,
@@ -724,7 +724,7 @@ namespace ChimeraTK {
     UA_NodeId tmpNodeId = processvariable->getOwnNodeId();
     UA_Server_writeDisplayName(this->mappedServer, tmpNodeId,
         UA_LOCALIZEDTEXT(const_cast<char*>("en_US"),
-            const_cast<char*>(xml_file_handler::parseVariablePath(varName, this->pvSeperator).back().c_str())));
+            const_cast<char*>(xml_file_handler::parseVariablePath(varName, this->pvSeparator).back().c_str())));
     UA_NodeId_clear(&tmpNodeId);
   }
 
@@ -1463,28 +1463,28 @@ namespace ChimeraTK {
     return createdNodeId;
   }
 
-  void ua_uaadapter::raiseError(std::string errorMesssage, std::string consequenceMessage, const int& line) {
+  void ua_uaadapter::raiseError(std::string errorMessage, std::string consequenceMessage, const int& line) {
     std::string lineMessage("");
     if(line > 0) {
       lineMessage = std::string(" Mapping line number: ") + std::to_string(line) + ".";
     }
-    std::string tmp[2] = {errorMesssage, consequenceMessage};
-    if(errorMesssage.back() != '.') {
-      errorMesssage += ".";
+    std::string tmp[2] = {errorMessage, consequenceMessage};
+    if(errorMessage.back() != '.') {
+      errorMessage += ".";
     }
     if(consequenceMessage.back() != '.') {
       consequenceMessage += ".";
     }
     if(this->mappingExceptions) {
-      throw std::runtime_error(std::string("Error! ") + errorMesssage + lineMessage);
+      throw std::runtime_error(std::string("Error! ") + errorMessage + lineMessage);
     }
     if(server_config) {
-      UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND, "%s %s", errorMesssage.c_str(),
+      UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND, "%s %s", errorMessage.c_str(),
           (consequenceMessage + lineMessage).c_str());
     }
     else {
       UA_LOG_WARNING(
-          &logger, UA_LOGCATEGORY_USERLAND, "%s %s", errorMesssage.c_str(), (consequenceMessage + lineMessage).c_str());
+          &logger, UA_LOGCATEGORY_USERLAND, "%s %s", errorMessage.c_str(), (consequenceMessage + lineMessage).c_str());
     }
   }
 

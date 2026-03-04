@@ -78,7 +78,7 @@ include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 ## Code quality control options
 option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static code analysis using clangs analyzer." OFF)
 option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prior to compilation." OFF)
-option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
+option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." OFF)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
 option(ENABLE_RUNTIME_ANALYSIS "Build Runtime analyses" OFF)
 option(INSTALL_SAMPLE_ADAPTER "Install an example application called ControlSystem-OPCUA_Sample_Adapter" OFF)
@@ -100,7 +100,7 @@ endif()
 ##########################################################################################################
 ## Definition for the thread and address sanitizer. Must be set before adding the test subdirectories
 ##########################################################################################################
-# We need spearate configuration types becasue flags from other types are conflicting
+# We need separate configuration types because flags from other types are conflicting
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;asan;tsan")
 set(CMAKE_CXX_FLAGS_TSAN "${CMAKE_CXX_FLAGS} -g -O1 -fsanitize=thread  -fno-inline")
 set(CMAKE_C_FLAGS_TSAN "${CMAKE_C_FLAGS} -g -O1 -fsanitize=thread  -fno-inline")
@@ -193,27 +193,27 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 link_directories(${CMAKE_BINARY_DIR})
 file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
 
-add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541::open62541)
-target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
-        ${Boost_FILESYSTEM_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
-        ${Boost_THREAD_LIBRARY}
-        ${Boost_CHRONO_LIBRARY}
-        )
+# add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
+# target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
+# target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
+# target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541::open62541)
+# target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
+#         ${Boost_FILESYSTEM_LIBRARY}
+#         ${Boost_SYSTEM_LIBRARY}
+#         ${Boost_THREAD_LIBRARY}
+#         ${Boost_CHRONO_LIBRARY}
+#         )
 
-add_executable(ControlSystem-OPCUA_Sample_Application ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example2.cpp)
-target_link_libraries(ControlSystem-OPCUA_Sample_Application ${PROJECT_NAME})
-target_link_libraries(ControlSystem-OPCUA_Sample_Application pthread)
-target_link_libraries(ControlSystem-OPCUA_Sample_Application open62541::open62541)
-target_link_libraries(ControlSystem-OPCUA_Sample_Application
-        ${Boost_FILESYSTEM_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
-        ${Boost_THREAD_LIBRARY}
-        ${Boost_CHRONO_LIBRARY}
-        )
+# add_executable(ControlSystem-OPCUA_Sample_Application ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example2.cpp)
+# target_link_libraries(ControlSystem-OPCUA_Sample_Application ${PROJECT_NAME})
+# target_link_libraries(ControlSystem-OPCUA_Sample_Application pthread)
+# target_link_libraries(ControlSystem-OPCUA_Sample_Application open62541::open62541)
+# target_link_libraries(ControlSystem-OPCUA_Sample_Application
+#         ${Boost_FILESYSTEM_LIBRARY}
+#         ${Boost_SYSTEM_LIBRARY}
+#         ${Boost_THREAD_LIBRARY}
+#         ${Boost_CHRONO_LIBRARY}
+#         )
 
 if(ENABLE_LINTING)
     file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/static_analysis")

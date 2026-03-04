@@ -40,7 +40,7 @@ namespace ChimeraTK {
       TypesMap;
 
   /** @class ua_processvariable
-   *	@brief This class represent a processvariable of the controlsystemadapter in the information model of a OPC UA Server
+   *	@brief This class represent a processvariable of the controlsystemadapter in the information model of a OPC UA  Server
    *
    *  @author Chris Iatrou, Julian Rahm
    *  @date 22.11.2016
@@ -67,21 +67,23 @@ namespace ChimeraTK {
     boost::shared_ptr<ControlSystemPVManager> csManager;
     UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, const string& baseNodePath, UA_DataSource_Map& map);
 
-    /** @brief  This methode mapped all own nodes into the opcua server
+    /** @brief  This method mapped all own nodes into the opcua server
      *
      * @return <UA_StatusCode>
      */
     UA_StatusCode mapSelfToNamespace(const UA_Logger* logger);
 
    public:
-    /** @brief Constructor from ua_processvaribale for generic creation
+    /** @brief Constructor from ua_processvariable for generic creation
      *
      * @param server A UA_Server type, with all server specific information from the used server
      * @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
-     * @param namePV Name of the process variable from control-system-adapter, is needed to fetch the rigth process
-     * varibale from PV-Manager
+     * @param namePV Name of the process variable from control-system-adapter, is needed to fetch the right process
+     * variable from PV-Manager
      * @param csManager Provide the hole PVManager from control-system-adapter to map all processvariable to the OPC
      * UA-Model
+     * @param logger Global logger used to send log messages
+     * @param overwriteNodeString New node name
      */
     ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
         boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, string overwriteNodeString = "");
@@ -102,7 +104,7 @@ namespace ChimeraTK {
 
     /** @brief  Get name of processvariable
      *
-     * @return <String> of the name of processvariable
+     * @return "string of the name of processvariable
      */
     string getName();
 
@@ -112,7 +114,7 @@ namespace ChimeraTK {
 
     /** @brief  Get type of processvariable
      *
-     * @return <String> of the type
+     * @return string of the type
      */
     string getType();
 
@@ -126,12 +128,12 @@ namespace ChimeraTK {
 
     /** @brief  Set engineering unit of processvariable
      *
-     * @param type Define the engineering unit of the processvariable
+     * @param engineeringUnit Define the engineering unit of the processvariable
      */
     void setEngineeringUnit(string engineeringUnit);
     /** @brief  Get engineering unit of processvariable
      *
-     * @return <String> of engineering unit
+     * @return string of engineering unit
      */
     string getEngineeringUnit();
 
@@ -143,25 +145,23 @@ namespace ChimeraTK {
         void* sessionContext, const UA_NodeId* nodeId, void* nodeContext, UA_Boolean includeSourceTimeStamp,
         const UA_NumericRange* range, UA_DataValue* value);
 
-    /** @brief  Get vadility  of processvariable*/
+    /** @brief  Get validity  of processvariable*/
     static UA_StatusCode ua_readproxy_ua_processvariable_getValidity(UA_Server* server, const UA_NodeId* sessionId,
         void* sessionContext, const UA_NodeId* nodeId, void* nodeContext, UA_Boolean includeSourceTimeStamp,
         const UA_NumericRange* range, UA_DataValue* value);
 
-    /** @brief  Get description unit of processvariable
-     *
-     * @return <String> of description
+    /** @brief  Set description unit of processvariable
      */
     void setDescription(string description);
     /** @brief  Get description unit of processvariable
      *
-     * @return <String> of description
+     * @return string of description
      */
     string getDescription();
 
     /** @brief  Get node id of this processvariable instance
      *
-     * @return <UA_NodeId> of this processvariable
+     * @return UA_NodeId of this processvariable
      */
     UA_NodeId getOwnNodeId();
 
