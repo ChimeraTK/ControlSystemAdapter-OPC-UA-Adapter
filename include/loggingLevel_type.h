@@ -84,6 +84,7 @@ static const UA_DataType LoggingLevelType = {
     UA_TYPENAME("LoggingLevels")                                            /* .typeName */
     {1, UA_NODEIDTYPE_STRING, {.string = {13, (UA_Byte*)"LoggingLevels"}}}, /* .typeId */
     {0, UA_NODEIDTYPE_NUMERIC, {0}},                                        /* .binaryEncodingId */
+    {0, UA_NODEIDTYPE_NUMERIC, {0}},                                        /* .xmlEncodingId */
     sizeof(UA_LoggingLevel),                                                /* .memSize */
     UA_DATATYPEKIND_ENUM,                                                   /* .typeKind */
     true,                                                                   /* .pointerFree */
