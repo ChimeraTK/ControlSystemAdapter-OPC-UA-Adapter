@@ -20,11 +20,9 @@
 
 #pragma once
 
-extern "C" {
-#include <open62541/server.h>
-}
-
 #include "ua_map_types.h"
+
+#include <open62541/server.h>
 
 namespace ChimeraTK {
   /** @class ua_mapped_class
