@@ -19,11 +19,15 @@
 
 #pragma once
 
-#include "ChimeraTK/ReadAnyGroup.h"
 #include "csa_opcua_adapter.h"
-#include "csa_processvariable.h"
-#include "open62541/plugin/log_stdout.h"
-#include "ua_mapped_class.h"
+
+#include <ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h>
+
+#include <open62541/plugin/log.h>
+#include <open62541/types.h>
+#include <open62541/util.h>
+
+#include <vector>
 
 namespace ChimeraTK {
   typedef struct {
