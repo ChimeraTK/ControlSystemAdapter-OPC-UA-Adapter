@@ -17,8 +17,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framework REQUIRED)
 find_package(LibXml2 REQUIRED)
-find_package(PythonInterp REQUIRED)
-find_package(open62541 1.4 REQUIRED)
+# find_package(PythonInterp REQUIRED)
+find_package(open62541 1.5 REQUIRED)
 
 find_package(ChimeraTK-ControlSystemAdapter 02.05 REQUIRED)
 
@@ -78,13 +78,13 @@ include_directories(${PROJECT_BINARY_DIR}/src_generated/)
 ## Code quality control options
 option(BUILD_STATIC_ANALYSIS  "Instead of building a binary, perform a static code analysis using clangs analyzer." OFF)
 option(ENABLE_LINTING         "Enables running the cppcheck static analyzer prior to compilation." OFF)
-option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." OFF)
+option(ENABLE_UNIT_TESTS 			"Compile and run unit tests." ON)
 option(ENABLE_DOCUMENTATION		"Generate Doxygen documentation" OFF)
 option(ENABLE_RUNTIME_ANALYSIS "Build Runtime analyses" OFF)
 option(INSTALL_SAMPLE_ADAPTER "Install an example application called ControlSystem-OPCUA_Sample_Adapter" OFF)
 # TODO: As soon if the test passes enable it per default. 
 #       If removing the option add info in csa_opcua_application.cpp doxygen docu.
-option(CHECK_CTK_STYLE        "Check ChimeraTK code style and license information." OFF)
+option(CHECK_CTK_STYLE        "Check ChimeraTK code style and license information." ON)
 
 include(cmake/enable_code_coverage_report.cmake)
 
@@ -133,8 +133,9 @@ if(ENABLE_RUNTIME_ANALYSIS)
             COMMENT "Generating valgrind runtime test" VERBATIM
             )
 endif()
-
-include(cmake/enable_doxygen_documentation.cmake)
+if(ENABLE_DOCUMENTATION)
+    include(cmake/enable_doxygen_documentation.cmake)
+endif()
 
 ##########################################################################################################
 ## Object and shared library compilation required by tests and examples
@@ -193,27 +194,27 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 link_directories(${CMAKE_BINARY_DIR})
 file(COPY ${PROJECT_SOURCE_DIR}/opcuaAdapter_mapping.xml DESTINATION ${CMAKE_BINARY_DIR}/)
 
-# add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
-# target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
-# target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
-# target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541::open62541)
-# target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
-#         ${Boost_FILESYSTEM_LIBRARY}
-#         ${Boost_SYSTEM_LIBRARY}
-#         ${Boost_THREAD_LIBRARY}
-#         ${Boost_CHRONO_LIBRARY}
-#         )
+add_executable(ControlSystem-OPCUA_Sample_Adapter ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example.cpp ${CMAKE_SOURCE_DIR}/examples/runtime_value_generator.cpp)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter ${PROJECT_NAME})
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter pthread)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter open62541::open62541)
+target_link_libraries(ControlSystem-OPCUA_Sample_Adapter
+        ${Boost_FILESYSTEM_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_THREAD_LIBRARY}
+        ${Boost_CHRONO_LIBRARY}
+        )
 
-# add_executable(ControlSystem-OPCUA_Sample_Application ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example2.cpp)
-# target_link_libraries(ControlSystem-OPCUA_Sample_Application ${PROJECT_NAME})
-# target_link_libraries(ControlSystem-OPCUA_Sample_Application pthread)
-# target_link_libraries(ControlSystem-OPCUA_Sample_Application open62541::open62541)
-# target_link_libraries(ControlSystem-OPCUA_Sample_Application
-#         ${Boost_FILESYSTEM_LIBRARY}
-#         ${Boost_SYSTEM_LIBRARY}
-#         ${Boost_THREAD_LIBRARY}
-#         ${Boost_CHRONO_LIBRARY}
-#         )
+add_executable(ControlSystem-OPCUA_Sample_Application ${CMAKE_SOURCE_DIR}/examples/csa_opcua_adapter_example2.cpp)
+target_link_libraries(ControlSystem-OPCUA_Sample_Application ${PROJECT_NAME})
+target_link_libraries(ControlSystem-OPCUA_Sample_Application pthread)
+target_link_libraries(ControlSystem-OPCUA_Sample_Application open62541::open62541)
+target_link_libraries(ControlSystem-OPCUA_Sample_Application
+        ${Boost_FILESYSTEM_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_THREAD_LIBRARY}
+        ${Boost_CHRONO_LIBRARY}
+        )
 
 if(ENABLE_LINTING)
     file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/static_analysis")
