@@ -19,18 +19,15 @@
  * Copyright (c) 2018-2019 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
  */
 
-extern "C" {
 #include "csa_namespace.h"
-
-#include <signal.h>
-#include <unistd.h>
-}
 
 #include <ChimeraTK/ControlSystemAdapter/ApplicationBase.h>
 #include <ChimeraTK/ControlSystemAdapter/DevicePVManager.h>
 
 #include <errno.h>
+#include <signal.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <chrono>
 #include <iostream>
