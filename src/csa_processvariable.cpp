@@ -441,8 +441,8 @@ namespace ChimeraTK {
         &attr.value, &opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Description").c_str())), pvNodeId,
-        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("Description")), UA_NODEID_NUMERIC(0, 63), attr,
-        this, &createdNodeId);
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Description")), UA_NS0ID(BASEDATAVARIABLETYPE),
+        attr, this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId descVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
       NODE_PAIR_PUSH(this->ownedNodes, descVariable, createdNodeId)
@@ -475,8 +475,8 @@ namespace ChimeraTK {
     UA_Variant_setScalar(&attr.value, &defaultEngineeringUnit, &UA_TYPES[UA_TYPES_STRING]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/EngineeringUnit").c_str())),
-        pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("EngineeringUnit")),
-        UA_NODEID_NUMERIC(0, 63), attr, this, &createdNodeId);
+        pvNodeId, UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("EngineeringUnit")),
+        UA_NS0ID(BASEDATAVARIABLETYPE), attr, this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId engineeringunitVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
       NODE_PAIR_PUSH(this->ownedNodes, engineeringunitVariable, createdNodeId)
@@ -509,12 +509,12 @@ namespace ChimeraTK {
     UA_Variant_setScalar(
         &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6012);
-    UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
+    UA_NodeId typeDefinition = UA_NS0ID(BASEDATAVARIABLETYPE);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
     addResult = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Type").c_str())), pvNodeId,
-        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("Type")), UA_NODEID_NUMERIC(0, 63), attr, this,
-        &createdNodeId);
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Type")), UA_NS0ID(BASEDATAVARIABLETYPE), attr,
+        this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId typeVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
       NODE_PAIR_PUSH(this->ownedNodes, typeVariable, createdNodeId)
@@ -548,8 +548,8 @@ namespace ChimeraTK {
     UA_Variant_setScalar(&attr.value, &defaultValidity, &UA_TYPES[UA_TYPES_INT32]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Validity").c_str())), pvNodeId,
-        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("Validity")), UA_NODEID_NUMERIC(0, 63), attr,
-        this, &createdNodeId);
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Validity")), UA_NS0ID(BASEDATAVARIABLETYPE),
+        attr, this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId vadilityVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
       NODE_PAIR_PUSH(this->ownedNodes, vadilityVariable, createdNodeId)

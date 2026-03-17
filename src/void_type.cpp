@@ -187,8 +187,8 @@ namespace ChimeraTK {
       error_message.append(UA_StatusCode_name(retval));
       throw std::logic_error(error_message);
     }
-    retval = UA_Server_addReference(server, propertyNodeId, UA_NS0ID(HASMODELLINGRULE),
-        UA_EXPANDEDNODEID_NUMERIC(0, UA_NS0ID_MODELLINGRULE_MANDATORY), true);
+    retval = UA_Server_addReference(
+        server, propertyNodeId, UA_NS0ID(HASMODELLINGRULE), UA_NS0EXID(MODELLINGRULE_MANDATORY), true);
     if(retval != UA_STATUSCODE_GOOD) {
       string error_message = "Failed to set the reference to property ";
       error_message.append(property_name);
