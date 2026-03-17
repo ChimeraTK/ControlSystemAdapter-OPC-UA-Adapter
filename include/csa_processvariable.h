@@ -40,7 +40,7 @@ namespace ChimeraTK {
       TypesMap;
 
   /** @class ua_processvariable
-   *	@brief This class represent a processvariable of the controlsystemadapter in the information model of a OPC UA  Server
+   *	@brief This class represent a processvariable of the controlsystemadapter in the information model of a OPC UA Server
    *
    *  @author Chris Iatrou, Julian Rahm
    *  @date 22.11.2016

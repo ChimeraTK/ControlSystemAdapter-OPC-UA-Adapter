@@ -27,7 +27,7 @@ using namespace std;
 
 namespace ChimeraTK {
   /** @class ua_additionalvariable
-   *	@brief This class represent a additional variable from <variableMap.xml> in the information model of a OPC UA  Server
+   *	@brief This class represent a additional variable from <variableMap.xml> in the information model of a OPC UA Server
    *
    *  @author Chris Iatrou, Julian Rahm
    *  @date 22.11.2016
