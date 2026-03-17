@@ -104,7 +104,7 @@ struct TestFixtureServerSet {
     server_config = UA_Server_getConfig(mappedServer);
 
     runUAServer = UA_TRUE;
-    baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+    baseNodeId = UA_NS0ID(OBJECTSFOLDER);
 
     csa_namespace_init(mappedServer);
   }

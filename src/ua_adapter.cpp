@@ -278,7 +278,7 @@ namespace ChimeraTK {
         &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
         usernamePasswordLogins);
 
-    this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+    this->baseNodeId = UA_NS0ID(OBJECTSFOLDER);
     csa_namespace_init(this->mappedServer);
     UA_free(config);
     UA_String_clear(&usernamePasswordLogins->password);
@@ -734,7 +734,7 @@ namespace ChimeraTK {
     UA_BrowseDescription bd;
     bd.includeSubtypes = false;
     bd.nodeId = layer;
-    bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
+    bd.referenceTypeId = UA_NS0ID(HASCOMPONENT);
     bd.resultMask = UA_BROWSERESULTMASK_NONE;
     bd.nodeClassMask = UA_NODECLASS_VARIABLE;
     bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
@@ -767,7 +767,7 @@ namespace ChimeraTK {
     // copy folders of current layer
     bd.includeSubtypes = false;
     bd.nodeId = layer;
-    bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
+    bd.referenceTypeId = UA_NS0ID(ORGANIZES);
     bd.resultMask = UA_BROWSERESULTMASK_NONE;
     bd.nodeClassMask = UA_NODECLASS_OBJECT;
     bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
@@ -927,14 +927,14 @@ namespace ChimeraTK {
           UA_BrowseDescription bd;
           bd.includeSubtypes = false;
           bd.nodeId = sourceFolderId;
-          bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASTYPEDEFINITION);
+          bd.referenceTypeId = UA_NS0ID(HASTYPEDEFINITION);
           bd.resultMask = UA_BROWSERESULTMASK_ALL;
           bd.nodeClassMask = UA_NODECLASS_OBJECTTYPE;
           bd.browseDirection = UA_BROWSEDIRECTION_BOTH;
           UA_BrowseResult br = UA_Server_browse(this->mappedServer, 1000, &bd);
           for(size_t j = 0; j < br.referencesSize; ++j) {
             UA_ReferenceDescription rd = br.references[j];
-            UA_NodeId folderType = UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE);
+            UA_NodeId folderType = UA_NS0ID(FOLDERTYPE);
             if(UA_NodeId_equal(&rd.nodeId.nodeId, &folderType)) {
               isFolderType = true;
             }
@@ -1001,7 +1001,7 @@ namespace ChimeraTK {
             UA_BrowseDescription bd;
             bd.includeSubtypes = false;
             bd.nodeId = sourceFolderId;
-            bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
+            bd.referenceTypeId = UA_NS0ID(ORGANIZES);
             bd.resultMask = UA_BROWSERESULTMASK_ALL;
             bd.nodeClassMask = UA_NODECLASS_OBJECT;
             bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
@@ -1011,12 +1011,11 @@ namespace ChimeraTK {
               enid.serverIndex = 0;
               enid.namespaceUri = UA_STRING_NULL;
               enid.nodeId = br.references[j].nodeId.nodeId;
-              UA_Server_addReference(
-                  this->mappedServer, copyRoot, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), enid, UA_TRUE);
+              UA_Server_addReference(this->mappedServer, copyRoot, UA_NS0ID(ORGANIZES), enid, UA_TRUE);
             }
             UA_BrowseResult_clear(&br);
             bd.nodeId = sourceFolderId;
-            bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
+            bd.referenceTypeId = UA_NS0ID(HASCOMPONENT);
             bd.resultMask = UA_BROWSERESULTMASK_ALL;
             bd.nodeClassMask = UA_NODECLASS_VARIABLE;
             bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
@@ -1026,8 +1025,7 @@ namespace ChimeraTK {
               enid.serverIndex = 0;
               enid.namespaceUri = UA_STRING_NULL;
               enid.nodeId = br.references[j].nodeId.nodeId;
-              UA_Server_addReference(
-                  this->mappedServer, copyRoot, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, UA_TRUE);
+              UA_Server_addReference(this->mappedServer, copyRoot, UA_NS0ID(HASCOMPONENT), enid, UA_TRUE);
             }
             UA_BrowseResult_clear(&br);
           }
@@ -1131,7 +1129,7 @@ namespace ChimeraTK {
           UA_BrowseDescription bd;
           bd.includeSubtypes = false;
           bd.nodeId = parentSourceFolderId;
-          bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
+          bd.referenceTypeId = UA_NS0ID(HASCOMPONENT);
           bd.resultMask = UA_BROWSERESULTMASK_ALL;
           bd.nodeClassMask = UA_NODECLASS_VARIABLE;
           bd.browseDirection = UA_BROWSEDIRECTION_BOTH;
@@ -1289,8 +1287,8 @@ namespace ChimeraTK {
           enid.namespaceUri = UA_STRING_NULL;
           enid.nodeId = parentSourceId;
           // add reference to the source node
-          UA_StatusCode addRef = UA_Server_addReference(
-              this->mappedServer, destinationFolder, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, true);
+          UA_StatusCode addRef =
+              UA_Server_addReference(this->mappedServer, destinationFolder, UA_NS0ID(HASCOMPONENT), enid, true);
           if(sourceVarName != name) {
             raiseError("PV mapping failed. Can't create reference to original pv.",
                 std::string("Skipping PV mapping of pv ") + name);
@@ -1455,11 +1453,10 @@ namespace ChimeraTK {
 
     UA_Server_addObjectNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>(parentNodeIdString.c_str())), // UA_NODEID_NUMERIC(1,0)
-        basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-        UA_QUALIFIEDNAME(1, const_cast<char*>(folderName.c_str())), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr,
-        &this->ownedNodes, &createdNodeId);
+        basenodeid, UA_NS0ID(ORGANIZES), UA_QUALIFIEDNAME(1, const_cast<char*>(folderName.c_str())),
+        UA_NS0ID(FOLDERTYPE), oAttr, &this->ownedNodes, &createdNodeId);
 
-    ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), &this->ownedNodes);
+    ua_mapInstantiatedNodes(createdNodeId, UA_NS0ID(FOLDERTYPE), &this->ownedNodes);
     return createdNodeId;
   }
 
@@ -1508,7 +1505,7 @@ namespace ChimeraTK {
 
       UA_Server_addObjectNode(this->mappedServer,
           UA_NODEID_STRING(1, (const_cast<char*>((this->serverConfig.rootFolder + "Dir").c_str()))),
-          UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
+          UA_NS0ID(OBJECTSFOLDER), UA_NS0ID(ORGANIZES),
           UA_QUALIFIEDNAME(1, const_cast<char*>(this->serverConfig.rootFolder.c_str())),
           UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &ownedNodes, &createdNodeId);
 
@@ -1524,8 +1521,7 @@ namespace ChimeraTK {
       oAttr.description =
           UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("Here adapter configurations are placed."));
       UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, const_cast<char*>("ServerConfigurationDir")),
-          UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-          UA_QUALIFIEDNAME(1, const_cast<char*>("ServerConfiguration")),
+          UA_NS0ID(OBJECTSFOLDER), UA_NS0ID(ORGANIZES), UA_QUALIFIEDNAME(1, const_cast<char*>("ServerConfiguration")),
           UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &ownedNodes, &createdNodeId);
       configNodeId = createdNodeId;
       ua_mapInstantiatedNodes(configNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &ownedNodes);
@@ -1541,8 +1537,8 @@ namespace ChimeraTK {
 
       UA_NodeId currentNodeId = UA_NODEID_STRING(1, const_cast<char*>("logLevel"));
       UA_QualifiedName currentName = UA_QUALIFIEDNAME(1, const_cast<char*>("logLevel"));
-      UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
-      UA_NodeId variableTypeNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE);
+      UA_NodeId parentReferenceNodeId = UA_NS0ID(ORGANIZES);
+      UA_NodeId variableTypeNodeId = UA_NS0ID(BASEDATAVARIABLETYPE);
 
       UA_DataSource logLevelDataSource;
       logLevelDataSource.read = readLogLevel;

@@ -43,7 +43,7 @@ void UAMappingTest::testExampleSet() {
   UA_BrowseDescription bd;
   bd.includeSubtypes = false;
   bd.nodeId = UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/linkWithSourceTestDir");
-  bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
+  bd.referenceTypeId = UA_NS0ID(ORGANIZES);
   bd.resultMask = UA_BROWSERESULTMASK_BROWSENAME;
   bd.nodeClassMask = UA_NODECLASS_OBJECT;
   bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
@@ -56,7 +56,7 @@ void UAMappingTest::testExampleSet() {
   UA_BrowseResult_clear(&br);
 
   bd.nodeId = UA_NODEID_STRING(1, (char*)"llrfCtrl_hzdr/2/FOLDERDir");
-  bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
+  bd.referenceTypeId = UA_NS0ID(HASCOMPONENT);
   bd.resultMask = UA_BROWSERESULTMASK_BROWSENAME;
   bd.nodeClassMask = UA_NODECLASS_VARIABLE;
   bd.browseDirection = UA_BROWSEDIRECTION_BOTH;

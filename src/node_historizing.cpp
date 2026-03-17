@@ -32,7 +32,7 @@ namespace ChimeraTK {
   UA_StatusCode get_child_variables(UA_NodeId childId, UA_Boolean isInverse, UA_NodeId referenceTypeId, void* handle) {
     if(isInverse) return UA_STATUSCODE_GOOD;
     auto* handler = (HandleFolderVariables*)handle;
-    UA_NodeId organizes = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
+    UA_NodeId organizes = UA_NS0ID(ORGANIZES);
     // get variables of nested folders
     if(UA_NodeId_equal(&referenceTypeId, &organizes)) {
       UA_Server_forEachChildNodeCall(handler->server, childId, get_child_variables, handler);

@@ -111,8 +111,8 @@ namespace ChimeraTK {
     UA_LocalizedText eventMessage =
         UA_LOCALIZEDTEXT(const_cast<char*>("en-US"), const_cast<char*>("ChimeraTK::Void written."));
     // Create the event
-    retval = UA_Server_createEvent(data->mappedServer, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER), void_event_NodeId,
-        eventSeverity, eventMessage, &eventFields, nullptr, nullptr);
+    retval = UA_Server_createEvent(data->mappedServer, UA_NS0ID(SERVER), void_event_NodeId, eventSeverity, eventMessage,
+        &eventFields, nullptr, nullptr);
     UA_KeyValueMap_clear(&eventFields);
     if(retval != UA_STATUSCODE_GOOD) {
       string error_message = "Creation/triggering of the void Event failed with StatusCode ";
@@ -178,10 +178,8 @@ namespace ChimeraTK {
     vattr.dataType = dtype;
     vattr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en-us"), property_name);
     vattr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
-    //\ToDo: Use UA_NS0ID(BASEEVENTTYPE) instead of UA_NODEID_NUMERIC(0, UA_NS0ID_BASEEVENTTYPE)
-    UA_StatusCode retval = UA_Server_addVariableNode(server, UA_NODEID_NULL, eventNodeId,
-        UA_NODEID_NUMERIC(0, UA_NS0ID_HASPROPERTY), UA_QUALIFIEDNAME(0, property_name),
-        UA_NODEID_NUMERIC(0, UA_NS0ID_PROPERTYTYPE), vattr, nullptr, &propertyNodeId);
+    UA_StatusCode retval = UA_Server_addVariableNode(server, UA_NODEID_NULL, eventNodeId, UA_NS0ID(HASPROPERTY),
+        UA_QUALIFIEDNAME(0, property_name), UA_NS0ID(PROPERTYTYPE), vattr, nullptr, &propertyNodeId);
     if(retval != UA_STATUSCODE_GOOD) {
       string error_message = "Failed to add the property ";
       error_message.append(property_name);
@@ -189,7 +187,7 @@ namespace ChimeraTK {
       error_message.append(UA_StatusCode_name(retval));
       throw std::logic_error(error_message);
     }
-    retval = UA_Server_addReference(server, propertyNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASMODELLINGRULE),
+    retval = UA_Server_addReference(server, propertyNodeId, UA_NS0ID(HASMODELLINGRULE),
         UA_EXPANDEDNODEID_NUMERIC(0, UA_NS0ID_MODELLINGRULE_MANDATORY), true);
     if(retval != UA_STATUSCODE_GOOD) {
       string error_message = "Failed to set the reference to property ";

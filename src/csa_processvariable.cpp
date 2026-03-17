@@ -256,7 +256,7 @@ namespace ChimeraTK {
     attr.minimumSamplingInterval = -1.;
     attr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(this->nameNew.c_str()));
     attr.description = description;
-    attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
+    attr.dataType = UA_NS0ID(BASEDATATYPE);
 
     if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
       attr.writeMask = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE;
@@ -282,7 +282,7 @@ namespace ChimeraTK {
     }
     retval = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodeIdName + "/" + this->nameNew).c_str())), this->baseNodeId,
-        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>(this->nameNew.c_str())),
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>(this->nameNew.c_str())),
         UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, (void*)this, &createdNodeId);
     UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
     ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, 1001), &this->ownedNodes);
@@ -406,8 +406,8 @@ namespace ChimeraTK {
         &attr.value, &opcua_node_variable_t_ns_2_i_6004_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Name").c_str())), pvNodeId,
-        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Name")),
-        UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, this, &createdNodeId);
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Name")), UA_NS0ID(BASEDATAVARIABLETYPE), attr,
+        this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId nameVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
       NODE_PAIR_PUSH(this->ownedNodes, nameVariable, createdNodeId)
