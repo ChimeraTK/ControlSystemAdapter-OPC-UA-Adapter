@@ -209,31 +209,17 @@ namespace ChimeraTK {
       closedir(dp);
 
       // setup encrypted endpoints
-      UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(config, this->serverConfig.opcuaPort,
-          &certificate, &privateKey, trustList, trustListSize, issuerList, issuerListSize, blockList, blockListSize);
-
+      UA_StatusCode retval = UA_STATUSCODE_GOOD;
+      if(!this->serverConfig.unsecure) {
+        retval = UA_ServerConfig_setDefaultWithSecureSecurityPolicies(config, this->serverConfig.opcuaPort,
+            &certificate, &privateKey, trustList, trustListSize, issuerList, issuerListSize, blockList, blockListSize);
+      }
+      else {
+        retval = UA_ServerConfig_setDefaultWithSecurityPolicies(config, this->serverConfig.opcuaPort, &certificate,
+            &privateKey, trustList, trustListSize, issuerList, issuerListSize, blockList, blockListSize);
+      }
       if(retval != UA_STATUSCODE_GOOD) {
         throw std::runtime_error("Failed setting up server endpoints.");
-      }
-
-      if(!this->serverConfig.unsecure) {
-        for(size_t i = 0; i < config->endpointsSize; i++) {
-          UA_EndpointDescription* ep = &config->endpoints[i];
-          if(ep->securityMode != UA_MESSAGESECURITYMODE_NONE) continue;
-
-          UA_EndpointDescription_clear(ep);
-          // Move the last to this position
-          if(i + 1 < config->endpointsSize) {
-            config->endpoints[i] = config->endpoints[config->endpointsSize - 1];
-            i--;
-          }
-          config->endpointsSize--;
-        }
-        // Delete the entire array if the last Endpoint was removed
-        if(config->endpointsSize == 0) {
-          UA_free(config->endpoints);
-          config->endpoints = nullptr;
-        }
       }
 
       UA_ByteString_clear(&certificate);
