@@ -1,24 +1,8 @@
-/*
- * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
- * redistribute it and/or modify it under the terms of the Lesser GNU
- * General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the Lesser GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
- *
- * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
- * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- * Copyright (c) 2018-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
- */
-#include "void_type.h"
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-FileCopyrightText: 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
+// SPDX-FileCopyrightText: 2016 Julian Rahm <Julian.Rahm@tu-dresden.de>
+// SPDX-FileCopyrightText: 2018-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
+// SPDX-License-Identifier: LGPL-3.0-or-later
 
 #include <open62541/plugin/historydata/history_data_backend_memory.h>
 #include <open62541/plugin/historydata/history_data_gathering_default.h>
@@ -133,7 +117,7 @@ namespace ChimeraTK {
     std::string
         versionString =
             "open62541: " xstr(UA_OPEN62541_VER_MAJOR) "." xstr(UA_OPEN62541_VER_MINOR) "." xstr(UA_OPEN62541_VER_PATCH) ", ControlSystemAdapter-OPC-UA-Adapter: " xstr(
-                PROJECT_VER_MAJOR) "." xstr(PROJECT_VER_MINOR) "." xstr(PTOJECT_VER_PATCH) "";
+                PROJECT_VER_PATCH) "." xstr(PROJECT_VER_MINOR) "." xstr(PROJECT_VER_PATCH) "";
     UA_String_clear(&config->buildInfo.softwareVersion);
     config->buildInfo.softwareVersion = UA_STRING_ALLOC(const_cast<char*>(versionString.c_str()));
     config->buildInfo.buildDate = UA_DateTime_now();
@@ -225,31 +209,17 @@ namespace ChimeraTK {
       closedir(dp);
 
       // setup encrypted endpoints
-      UA_StatusCode retval = UA_ServerConfig_setDefaultWithSecurityPolicies(config, this->serverConfig.opcuaPort,
-          &certificate, &privateKey, trustList, trustListSize, issuerList, issuerListSize, blockList, blockListSize);
-
+      UA_StatusCode retval = UA_STATUSCODE_GOOD;
+      if(!this->serverConfig.unsecure) {
+        retval = UA_ServerConfig_setDefaultWithSecureSecurityPolicies(config, this->serverConfig.opcuaPort,
+            &certificate, &privateKey, trustList, trustListSize, issuerList, issuerListSize, blockList, blockListSize);
+      }
+      else {
+        retval = UA_ServerConfig_setDefaultWithSecurityPolicies(config, this->serverConfig.opcuaPort, &certificate,
+            &privateKey, trustList, trustListSize, issuerList, issuerListSize, blockList, blockListSize);
+      }
       if(retval != UA_STATUSCODE_GOOD) {
         throw std::runtime_error("Failed setting up server endpoints.");
-      }
-
-      if(!this->serverConfig.unsecure) {
-        for(size_t i = 0; i < config->endpointsSize; i++) {
-          UA_EndpointDescription* ep = &config->endpoints[i];
-          if(ep->securityMode != UA_MESSAGESECURITYMODE_NONE) continue;
-
-          UA_EndpointDescription_clear(ep);
-          // Move the last to this position
-          if(i + 1 < config->endpointsSize) {
-            config->endpoints[i] = config->endpoints[config->endpointsSize - 1];
-            i--;
-          }
-          config->endpointsSize--;
-        }
-        // Delete the entire array if the last Endpoint was removed
-        if(config->endpointsSize == 0) {
-          UA_free(config->endpoints);
-          config->endpoints = nullptr;
-        }
       }
 
       UA_ByteString_clear(&certificate);
@@ -278,7 +248,7 @@ namespace ChimeraTK {
         &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
         usernamePasswordLogins);
 
-    this->baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+    this->baseNodeId = UA_NS0ID(OBJECTSFOLDER);
     csa_namespace_init(this->mappedServer);
     UA_free(config);
     UA_String_clear(&usernamePasswordLogins->password);
@@ -306,7 +276,7 @@ namespace ChimeraTK {
       string unrollSepEnabled = xml_file_handler::getContentFromNode(nodeUnrollPath);
       transform(unrollSepEnabled.begin(), unrollSepEnabled.end(), unrollSepEnabled.begin(), ::toupper);
       if(unrollSepEnabled == "TRUE") {
-        this->pvSeperator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
+        this->pvSeparator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
       }
     }
        */
@@ -612,7 +582,7 @@ namespace ChimeraTK {
         string unrollSepEnabled = xml_file_handler::getContentFromNode(nodeUnrollPath);
         transform(unrollSepEnabled.begin(), unrollSepEnabled.end(), unrollSepEnabled.begin(), ::toupper);
         if(unrollSepEnabled == "TRUE") {
-          this->pvSeperator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
+          this->pvSeparator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
         }
       }
       xmlXPathFreeObject(result);
@@ -620,7 +590,7 @@ namespace ChimeraTK {
     else {
       UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
           "No <process_variable_hierarchy>-Tag in config file. Use default hierarchical mapping with '/'.");
-      this->pvSeperator = "/";
+      this->pvSeparator = "/";
     }
 
     xmlXPathObjectPtr result_exclude = this->fileHandler->getNodeSet("//exclude");
@@ -694,10 +664,10 @@ namespace ChimeraTK {
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Stopped the server worker thread");
   }
 
-  UA_NodeId ua_uaadapter::enrollFolderPathFromString(const string& path, const string& seperator) {
+  UA_NodeId ua_uaadapter::enrollFolderPathFromString(const string& path, const string& separator) {
     vector<string> varPathVector;
-    if(!seperator.empty()) {
-      vector<string> newPathVector = xml_file_handler::parseVariablePath(path, seperator);
+    if(!separator.empty()) {
+      vector<string> newPathVector = xml_file_handler::parseVariablePath(path, separator);
       varPathVector.insert(varPathVector.end(), newPathVector.begin(), newPathVector.end());
     }
     if(!varPathVector.empty()) { // last element is the variable name itself
@@ -709,12 +679,12 @@ namespace ChimeraTK {
 
   void ua_uaadapter::implicitVarMapping(
       const std::string& varName, const boost::shared_ptr<ControlSystemPVManager>& csManager) {
-    UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeperator);
+    UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeparator);
     ua_processvariable* processvariable;
     if(!UA_NodeId_isNull(&folderPathNodeId)) {
       processvariable =
           new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1), csManager,
-              server_config->logging, xml_file_handler::parseVariablePath(varName, this->pvSeperator).back());
+              server_config->logging, xml_file_handler::parseVariablePath(varName, this->pvSeparator).back());
     }
     else {
       processvariable = new ua_processvariable(this->mappedServer, this->ownNodeId,
@@ -724,7 +694,7 @@ namespace ChimeraTK {
     UA_NodeId tmpNodeId = processvariable->getOwnNodeId();
     UA_Server_writeDisplayName(this->mappedServer, tmpNodeId,
         UA_LOCALIZEDTEXT(const_cast<char*>("en_US"),
-            const_cast<char*>(xml_file_handler::parseVariablePath(varName, this->pvSeperator).back().c_str())));
+            const_cast<char*>(xml_file_handler::parseVariablePath(varName, this->pvSeparator).back().c_str())));
     UA_NodeId_clear(&tmpNodeId);
   }
 
@@ -734,7 +704,7 @@ namespace ChimeraTK {
     UA_BrowseDescription bd;
     bd.includeSubtypes = false;
     bd.nodeId = layer;
-    bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
+    bd.referenceTypeId = UA_NS0ID(HASCOMPONENT);
     bd.resultMask = UA_BROWSERESULTMASK_NONE;
     bd.nodeClassMask = UA_NODECLASS_VARIABLE;
     bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
@@ -767,7 +737,7 @@ namespace ChimeraTK {
     // copy folders of current layer
     bd.includeSubtypes = false;
     bd.nodeId = layer;
-    bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
+    bd.referenceTypeId = UA_NS0ID(ORGANIZES);
     bd.resultMask = UA_BROWSERESULTMASK_NONE;
     bd.nodeClassMask = UA_NODECLASS_OBJECT;
     bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
@@ -927,14 +897,14 @@ namespace ChimeraTK {
           UA_BrowseDescription bd;
           bd.includeSubtypes = false;
           bd.nodeId = sourceFolderId;
-          bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASTYPEDEFINITION);
+          bd.referenceTypeId = UA_NS0ID(HASTYPEDEFINITION);
           bd.resultMask = UA_BROWSERESULTMASK_ALL;
           bd.nodeClassMask = UA_NODECLASS_OBJECTTYPE;
           bd.browseDirection = UA_BROWSEDIRECTION_BOTH;
           UA_BrowseResult br = UA_Server_browse(this->mappedServer, 1000, &bd);
           for(size_t j = 0; j < br.referencesSize; ++j) {
             UA_ReferenceDescription rd = br.references[j];
-            UA_NodeId folderType = UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE);
+            UA_NodeId folderType = UA_NS0ID(FOLDERTYPE);
             if(UA_NodeId_equal(&rd.nodeId.nodeId, &folderType)) {
               isFolderType = true;
             }
@@ -1001,7 +971,7 @@ namespace ChimeraTK {
             UA_BrowseDescription bd;
             bd.includeSubtypes = false;
             bd.nodeId = sourceFolderId;
-            bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
+            bd.referenceTypeId = UA_NS0ID(ORGANIZES);
             bd.resultMask = UA_BROWSERESULTMASK_ALL;
             bd.nodeClassMask = UA_NODECLASS_OBJECT;
             bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
@@ -1011,12 +981,11 @@ namespace ChimeraTK {
               enid.serverIndex = 0;
               enid.namespaceUri = UA_STRING_NULL;
               enid.nodeId = br.references[j].nodeId.nodeId;
-              UA_Server_addReference(
-                  this->mappedServer, copyRoot, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), enid, UA_TRUE);
+              UA_Server_addReference(this->mappedServer, copyRoot, UA_NS0ID(ORGANIZES), enid, UA_TRUE);
             }
             UA_BrowseResult_clear(&br);
             bd.nodeId = sourceFolderId;
-            bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
+            bd.referenceTypeId = UA_NS0ID(HASCOMPONENT);
             bd.resultMask = UA_BROWSERESULTMASK_ALL;
             bd.nodeClassMask = UA_NODECLASS_VARIABLE;
             bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
@@ -1026,8 +995,7 @@ namespace ChimeraTK {
               enid.serverIndex = 0;
               enid.namespaceUri = UA_STRING_NULL;
               enid.nodeId = br.references[j].nodeId.nodeId;
-              UA_Server_addReference(
-                  this->mappedServer, copyRoot, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, UA_TRUE);
+              UA_Server_addReference(this->mappedServer, copyRoot, UA_NS0ID(HASCOMPONENT), enid, UA_TRUE);
             }
             UA_BrowseResult_clear(&br);
           }
@@ -1131,7 +1099,7 @@ namespace ChimeraTK {
           UA_BrowseDescription bd;
           bd.includeSubtypes = false;
           bd.nodeId = parentSourceFolderId;
-          bd.referenceTypeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT);
+          bd.referenceTypeId = UA_NS0ID(HASCOMPONENT);
           bd.resultMask = UA_BROWSERESULTMASK_ALL;
           bd.nodeClassMask = UA_NODECLASS_VARIABLE;
           bd.browseDirection = UA_BROWSEDIRECTION_BOTH;
@@ -1289,8 +1257,8 @@ namespace ChimeraTK {
           enid.namespaceUri = UA_STRING_NULL;
           enid.nodeId = parentSourceId;
           // add reference to the source node
-          UA_StatusCode addRef = UA_Server_addReference(
-              this->mappedServer, destinationFolder, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), enid, true);
+          UA_StatusCode addRef =
+              UA_Server_addReference(this->mappedServer, destinationFolder, UA_NS0ID(HASCOMPONENT), enid, true);
           if(sourceVarName != name) {
             raiseError("PV mapping failed. Can't create reference to original pv.",
                 std::string("Skipping PV mapping of pv ") + name);
@@ -1455,36 +1423,35 @@ namespace ChimeraTK {
 
     UA_Server_addObjectNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>(parentNodeIdString.c_str())), // UA_NODEID_NUMERIC(1,0)
-        basenodeid, UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-        UA_QUALIFIEDNAME(1, const_cast<char*>(folderName.c_str())), UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), oAttr,
-        &this->ownedNodes, &createdNodeId);
+        basenodeid, UA_NS0ID(ORGANIZES), UA_QUALIFIEDNAME(1, const_cast<char*>(folderName.c_str())),
+        UA_NS0ID(FOLDERTYPE), oAttr, &this->ownedNodes, &createdNodeId);
 
-    ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE), &this->ownedNodes);
+    ua_mapInstantiatedNodes(createdNodeId, UA_NS0ID(FOLDERTYPE), &this->ownedNodes);
     return createdNodeId;
   }
 
-  void ua_uaadapter::raiseError(std::string errorMesssage, std::string consequenceMessage, const int& line) {
+  void ua_uaadapter::raiseError(std::string errorMessage, std::string consequenceMessage, const int& line) {
     std::string lineMessage("");
     if(line > 0) {
       lineMessage = std::string(" Mapping line number: ") + std::to_string(line) + ".";
     }
-    std::string tmp[2] = {errorMesssage, consequenceMessage};
-    if(errorMesssage.back() != '.') {
-      errorMesssage += ".";
+    std::string tmp[2] = {errorMessage, consequenceMessage};
+    if(errorMessage.back() != '.') {
+      errorMessage += ".";
     }
     if(consequenceMessage.back() != '.') {
       consequenceMessage += ".";
     }
     if(this->mappingExceptions) {
-      throw std::runtime_error(std::string("Error! ") + errorMesssage + lineMessage);
+      throw std::runtime_error(std::string("Error! ") + errorMessage + lineMessage);
     }
     if(server_config) {
-      UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND, "%s %s", errorMesssage.c_str(),
+      UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND, "%s %s", errorMessage.c_str(),
           (consequenceMessage + lineMessage).c_str());
     }
     else {
       UA_LOG_WARNING(
-          &logger, UA_LOGCATEGORY_USERLAND, "%s %s", errorMesssage.c_str(), (consequenceMessage + lineMessage).c_str());
+          &logger, UA_LOGCATEGORY_USERLAND, "%s %s", errorMessage.c_str(), (consequenceMessage + lineMessage).c_str());
     }
   }
 
@@ -1508,7 +1475,7 @@ namespace ChimeraTK {
 
       UA_Server_addObjectNode(this->mappedServer,
           UA_NODEID_STRING(1, (const_cast<char*>((this->serverConfig.rootFolder + "Dir").c_str()))),
-          UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
+          UA_NS0ID(OBJECTSFOLDER), UA_NS0ID(ORGANIZES),
           UA_QUALIFIEDNAME(1, const_cast<char*>(this->serverConfig.rootFolder.c_str())),
           UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &ownedNodes, &createdNodeId);
 
@@ -1524,8 +1491,7 @@ namespace ChimeraTK {
       oAttr.description =
           UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>("Here adapter configurations are placed."));
       UA_Server_addObjectNode(this->mappedServer, UA_NODEID_STRING(1, const_cast<char*>("ServerConfigurationDir")),
-          UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-          UA_QUALIFIEDNAME(1, const_cast<char*>("ServerConfiguration")),
+          UA_NS0ID(OBJECTSFOLDER), UA_NS0ID(ORGANIZES), UA_QUALIFIEDNAME(1, const_cast<char*>("ServerConfiguration")),
           UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), oAttr, &ownedNodes, &createdNodeId);
       configNodeId = createdNodeId;
       ua_mapInstantiatedNodes(configNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKMODULE), &ownedNodes);
@@ -1541,8 +1507,8 @@ namespace ChimeraTK {
 
       UA_NodeId currentNodeId = UA_NODEID_STRING(1, const_cast<char*>("logLevel"));
       UA_QualifiedName currentName = UA_QUALIFIEDNAME(1, const_cast<char*>("logLevel"));
-      UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
-      UA_NodeId variableTypeNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE);
+      UA_NodeId parentReferenceNodeId = UA_NS0ID(ORGANIZES);
+      UA_NodeId variableTypeNodeId = UA_NS0ID(BASEDATAVARIABLETYPE);
 
       UA_DataSource logLevelDataSource;
       logLevelDataSource.read = readLogLevel;

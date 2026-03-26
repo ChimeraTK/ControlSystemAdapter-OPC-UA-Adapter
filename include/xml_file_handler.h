@@ -1,23 +1,7 @@
-/*
- * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
- * redistribute it and/or modify it under the terms of the Lesser GNU
- * General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the Lesser GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
- *
- * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
- * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- */
-
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-FileCopyrightText: 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
+// SPDX-FileCopyrightText: 2016 Julian Rahm <Julian.Rahm@tu-dresden.de>
+// SPDX-License-Identifier: LGPL-3.0-or-later
 #pragma once
 
 #include <libxml2/libxml/tree.h>
@@ -33,7 +17,7 @@ namespace ChimeraTK {
   /** @class xml_file_handler
    *	@brief This class support any file interaction with a xml file.
    *
-   * 	To use all config/mapping xml-files in a confortable way this class provides some useful methodes to read specal
+   * 	To use all config/mapping xml-files in a confortable way this class provides some useful methods to read special
    *nodes, get attributes and so one
    *
    *  @author Chris Iatrou
@@ -49,7 +33,7 @@ namespace ChimeraTK {
      */
     xml_file_handler(const std::string& filePath);
 
-    /** @brief This methode set a document pointer to the file it ist given by the file path
+    /** @brief This method set a document pointer to the file it is given by the file path
      *
      * @param filePath Path to a xml file which you want to read
      *
@@ -57,13 +41,13 @@ namespace ChimeraTK {
      */
     bool createDoc(const std::string& filePath);
 
-    /** @brief This Methode check if a document is currently setted
+    /** @brief This Method check if a document is currently setted
      *
      * @return True or false depending if a document is set or not
      */
     bool isDocSetted();
 
-    /** @brief This methode return a pointer of a xPath element depending of the given xPathString
+    /** @brief This method return a pointer of a xPath element depending of the given xPathString
      *
      * @param xPathString A xPath string we seaching for
      *
@@ -71,7 +55,7 @@ namespace ChimeraTK {
      */
     xmlXPathObjectPtr getNodeSet(const std::string& xPathString);
 
-    /** @brief This methode return a list of all nodes with the given name nodeName starting by the given startNode
+    /** @brief This method return a list of all nodes with the given name nodeName starting by the given startNode
      *
      * @param startNode Start node, all child nodes will be searched by the given nodeName
      * @param nodeName Is the name of the xml tag, we use to search for
@@ -79,18 +63,18 @@ namespace ChimeraTK {
      * @return Returns a list of all pointer from founded child nodes with nodeName
      */
     static std::vector<xmlNodePtr> getNodesByName(xmlNodePtr startNode, const std::string& nodeName);
-    /** @brief This methode splitt a given string bey the given seperators. You can use the seperator as string of
-     * seperators like "_/&" all characters will be used as single seperator
+    /** @brief This method split a given string bey the given separators. You can use the separator as string of
+     * separators like "_/&" all characters will be used as single separator
      *
-     * @param variablePath String which you want to seperate by the seperator
-     * @param seperator String of, if you want different, seperators, whicht this methode use to split the string
+     * @param variablePath String which you want to separate by the separator
+     * @param separator String of, if you want different, separators, which this method use to split the string
      *
-     * @return Returns a vector of every single splitet word
+     * @return Returns a vector of every single split word
      */
     static std::vector<std::string> parseVariablePath(
-        const std::string& variablePath, const std::string& seperator = "/");
+        const std::string& variablePath, const std::string& separator = "/");
 
-    /** @brief This methode returns a value of the given attribute from the given node you want to know
+    /** @brief This method returns a value of the given attribute from the given node you want to know
      *
      * @param node Node with the attribute of interest
      * @param attributeName Name of the wanted attribute
@@ -99,8 +83,8 @@ namespace ChimeraTK {
      */
     static std::string getAttributeValueFromNode(xmlNode* node, const std::string& attributeName);
 
-    /** @brief This methode returns the value between a xml tag. For example \<tagelement>content\</tagelement> the
-     * returned value ist "content".
+    /** @brief This method returns the value between a xml tag. For example \<tagelement>content\</tagelement> the
+     * returned value is "content".
      *
      * @param node Node with the content of interest
      *

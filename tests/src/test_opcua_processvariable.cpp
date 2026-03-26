@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-License-Identifier: LGPL-3.0-or-later
 #include "open62541/plugin/log_stdout.h"
 
 #include <boost/fusion/container/map.hpp>
@@ -248,7 +250,7 @@ void ProcessVariableTest::testClientSide() {
   bReq.requestedMaxReferencesPerNode = 0;
   bReq.nodesToBrowse = UA_BrowseDescription_new();
   bReq.nodesToBrowseSize = 1;
-  bReq.nodesToBrowse[0].nodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+  bReq.nodesToBrowse[0].nodeId = UA_NS0ID(OBJECTSFOLDER);
   bReq.nodesToBrowse[0].resultMask = UA_BROWSERESULTMASK_ALL; // return everything
   UA_BrowseResponse bResp = UA_Client_Service_browse(client, bReq);
 

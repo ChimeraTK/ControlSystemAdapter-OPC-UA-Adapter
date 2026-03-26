@@ -17,8 +17,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framework REQUIRED)
 find_package(LibXml2 REQUIRED)
-find_package(PythonInterp REQUIRED)
-find_package(open62541 1.4 REQUIRED)
+# find_package(PythonInterp REQUIRED)
+find_package(open62541 1.5 REQUIRED)
 
 find_package(ChimeraTK-ControlSystemAdapter 02.05 REQUIRED)
 
@@ -84,7 +84,7 @@ option(ENABLE_RUNTIME_ANALYSIS "Build Runtime analyses" OFF)
 option(INSTALL_SAMPLE_ADAPTER "Install an example application called ControlSystem-OPCUA_Sample_Adapter" OFF)
 # TODO: As soon if the test passes enable it per default. 
 #       If removing the option add info in csa_opcua_application.cpp doxygen docu.
-option(CHECK_CTK_STYLE        "Check ChimeraTK code style and license information." OFF)
+option(CHECK_CTK_STYLE        "Check ChimeraTK code style and license information." ON)
 
 include(cmake/enable_code_coverage_report.cmake)
 
@@ -100,7 +100,7 @@ endif()
 ##########################################################################################################
 ## Definition for the thread and address sanitizer. Must be set before adding the test subdirectories
 ##########################################################################################################
-# We need spearate configuration types becasue flags from other types are conflicting
+# We need separate configuration types because flags from other types are conflicting
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;asan;tsan")
 set(CMAKE_CXX_FLAGS_TSAN "${CMAKE_CXX_FLAGS} -g -O1 -fsanitize=thread  -fno-inline")
 set(CMAKE_C_FLAGS_TSAN "${CMAKE_C_FLAGS} -g -O1 -fsanitize=thread  -fno-inline")
@@ -133,8 +133,9 @@ if(ENABLE_RUNTIME_ANALYSIS)
             COMMENT "Generating valgrind runtime test" VERBATIM
             )
 endif()
-
-include(cmake/enable_doxygen_documentation.cmake)
+if(ENABLE_DOCUMENTATION)
+    include(cmake/enable_doxygen_documentation.cmake)
+endif()
 
 ##########################################################################################################
 ## Object and shared library compilation required by tests and examples

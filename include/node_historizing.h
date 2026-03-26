@@ -1,22 +1,6 @@
-/*
- * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
- * redistribute it and/or modify it under the terms of the Lesser GNU
- * General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the Lesser GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
- *
- * Copyright (c) 2023-2024 Fraunhofer IOSB (Author: Florian Düwel)
- */
-
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-FileCopyrightText: 2023-2024 Fraunhofer IOSB (Author: Florian Düwel)
+// SPDX-License-Identifier: LGPL-3.0-or-later
 #pragma once
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
@@ -62,7 +46,7 @@ namespace ChimeraTK {
    * This assumes both lists have the same size.
    * Avoid multiple setups for one node.
    * Because first nodes from pv settings in the mapping file are added,
-   * those settings will be used instaed of a setting added by mapping
+   * those settings will be used instead of a setting added by mapping
    * a folder.
    *
    * @param historizing_nodes List of nodes with history.

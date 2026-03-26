@@ -1,5 +1,6 @@
-#ifndef _TEST_SAMPLE_DATA_H_
-#define _TEST_SAMPLE_DATA_H_
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-License-Identifier: LGPL-3.0-or-later
+#pragma once
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "ChimeraTK/ControlSystemAdapter/DevicePVManager.h"
@@ -104,7 +105,7 @@ struct TestFixtureServerSet {
     server_config = UA_Server_getConfig(mappedServer);
 
     runUAServer = UA_TRUE;
-    baseNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+    baseNodeId = UA_NS0ID(OBJECTSFOLDER);
 
     csa_namespace_init(mappedServer);
   }
@@ -113,5 +114,3 @@ struct TestFixtureServerSet {
     if(mappedServer != nullptr) UA_Server_delete(mappedServer);
   }
 };
-
-#endif // _TEST_SAMPLE_DATA_H_

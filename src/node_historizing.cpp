@@ -1,22 +1,6 @@
-/*
- * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
- * redistribute it and/or modify it under the terms of the Lesser GNU
- * General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the Lesser GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
- *
- * Copyright (c) 2023-2024 Fraunhofer IOSB (Author: Florian Düwel)
- */
-
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-FileCopyrightText: 2023-2024 Fraunhofer IOSB (Author: Florian Düwel)
+// SPDX-License-Identifier: LGPL-3.0-or-later
 #include "node_historizing.h"
 
 #include "open62541/plugin/log_stdout.h"
@@ -32,7 +16,7 @@ namespace ChimeraTK {
   UA_StatusCode get_child_variables(UA_NodeId childId, UA_Boolean isInverse, UA_NodeId referenceTypeId, void* handle) {
     if(isInverse) return UA_STATUSCODE_GOOD;
     auto* handler = (HandleFolderVariables*)handle;
-    UA_NodeId organizes = UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES);
+    UA_NodeId organizes = UA_NS0ID(ORGANIZES);
     // get variables of nested folders
     if(UA_NodeId_equal(&referenceTypeId, &organizes)) {
       UA_Server_forEachChildNodeCall(handler->server, childId, get_child_variables, handler);

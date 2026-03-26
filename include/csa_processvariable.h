@@ -1,24 +1,8 @@
-/*
- * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
- * redistribute it and/or modify it under the terms of the Lesser GNU
- * General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the Lesser GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
- *
- * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
- * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- * Copyright (c) 2019-2021 Andreas Ebner  <Andreas.Ebner@iosb.fraunhofer.de>
- */
-
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-FileCopyrightText: 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
+// SPDX-FileCopyrightText: 2016 Julian Rahm <Julian.Rahm@tu-dresden.de>
+// SPDX-FileCopyrightText: 2019-2021 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
+// SPDX-License-Identifier: LGPL-3.0-or-later
 #pragma once
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
@@ -67,21 +51,23 @@ namespace ChimeraTK {
     boost::shared_ptr<ControlSystemPVManager> csManager;
     UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, const string& baseNodePath, UA_DataSource_Map& map);
 
-    /** @brief  This methode mapped all own nodes into the opcua server
+    /** @brief  This method mapped all own nodes into the opcua server
      *
      * @return <UA_StatusCode>
      */
     UA_StatusCode mapSelfToNamespace(const UA_Logger* logger);
 
    public:
-    /** @brief Constructor from ua_processvaribale for generic creation
+    /** @brief Constructor from ua_processvariable for generic creation
      *
      * @param server A UA_Server type, with all server specific information from the used server
      * @param basenodeid Parent NodeId from OPC UA information model to add a new UA_ObjectNode
-     * @param namePV Name of the process variable from control-system-adapter, is needed to fetch the rigth process
-     * varibale from PV-Manager
+     * @param namePV Name of the process variable from control-system-adapter, is needed to fetch the right process
+     * variable from PV-Manager
      * @param csManager Provide the hole PVManager from control-system-adapter to map all processvariable to the OPC
      * UA-Model
+     * @param logger Global logger used to send log messages
+     * @param overwriteNodeString New node name
      */
     ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
         boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, string overwriteNodeString = "");
@@ -102,7 +88,7 @@ namespace ChimeraTK {
 
     /** @brief  Get name of processvariable
      *
-     * @return <String> of the name of processvariable
+     * @return "string of the name of processvariable
      */
     string getName();
 
@@ -112,7 +98,7 @@ namespace ChimeraTK {
 
     /** @brief  Get type of processvariable
      *
-     * @return <String> of the type
+     * @return string of the type
      */
     string getType();
 
@@ -126,12 +112,12 @@ namespace ChimeraTK {
 
     /** @brief  Set engineering unit of processvariable
      *
-     * @param type Define the engineering unit of the processvariable
+     * @param engineeringUnit Define the engineering unit of the processvariable
      */
     void setEngineeringUnit(string engineeringUnit);
     /** @brief  Get engineering unit of processvariable
      *
-     * @return <String> of engineering unit
+     * @return string of engineering unit
      */
     string getEngineeringUnit();
 
@@ -143,25 +129,23 @@ namespace ChimeraTK {
         void* sessionContext, const UA_NodeId* nodeId, void* nodeContext, UA_Boolean includeSourceTimeStamp,
         const UA_NumericRange* range, UA_DataValue* value);
 
-    /** @brief  Get vadility  of processvariable*/
+    /** @brief  Get validity  of processvariable*/
     static UA_StatusCode ua_readproxy_ua_processvariable_getValidity(UA_Server* server, const UA_NodeId* sessionId,
         void* sessionContext, const UA_NodeId* nodeId, void* nodeContext, UA_Boolean includeSourceTimeStamp,
         const UA_NumericRange* range, UA_DataValue* value);
 
-    /** @brief  Get description unit of processvariable
-     *
-     * @return <String> of description
+    /** @brief  Set description unit of processvariable
      */
     void setDescription(string description);
     /** @brief  Get description unit of processvariable
      *
-     * @return <String> of description
+     * @return string of description
      */
     string getDescription();
 
     /** @brief  Get node id of this processvariable instance
      *
-     * @return <UA_NodeId> of this processvariable
+     * @return UA_NodeId of this processvariable
      */
     UA_NodeId getOwnNodeId();
 

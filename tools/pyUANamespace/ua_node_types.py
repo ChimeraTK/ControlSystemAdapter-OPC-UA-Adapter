@@ -831,7 +831,7 @@ class opcua_node_referenceType_t(opcua_node_t):
       if myTypeRef==None:
         logger.warn(str(self) + " failed to locate a type definition, assuming BaseDataType.")
         code.append("       // No valid typeDefinition found; assuming BaseDataType")
-        code.append("       UA_EXPANDEDNODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE),")
+        code.append("       UA_NS0EXID(BASEDATATYPE),")
       else:
         code.append("       " + codegen.getCreateExpandedNodeIDMacro(myTypeRef.target()) + ",")
         while myTypeRef in unPrintedReferences:
@@ -898,7 +898,7 @@ class opcua_node_object_t(opcua_node_t):
       if myTypeRef==None:
         logger.warn(str(self) + " failed to locate a type definition, assuming BaseObjectType.")
         code.append("       // No valid typeDefinition found; assuming BaseObjectType")
-        code.append("       UA_EXPANDEDNODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE),")
+        code.append("       UA_NS0EXID(BASEOBJECTTYPE),")
       else:
         code.append("       " + codegen.getCreateExpandedNodeIDMacro(myTypeRef.target()) + ",")
         while myTypeRef in unPrintedReferences:

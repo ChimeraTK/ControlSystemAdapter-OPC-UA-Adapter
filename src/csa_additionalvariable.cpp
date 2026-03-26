@@ -1,24 +1,8 @@
-/*
- * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
- * redistribute it and/or modify it under the terms of the Lesser GNU
- * General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the Lesser GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
- *
- * Copyright (c) 2016 Chris Iatrou   <Chris_Paul.Iatrou@tu-dresden.de>
- * Copyright (c) 2016 Julian Rahm    <Julian.Rahm@tu-dresden.de>
- * Copyright (c) 2019-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
- */
-
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-FileCopyrightText: 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
+// SPDX-FileCopyrightText: 2016 Julian Rahm <Julian.Rahm@tu-dresden.de>
+// SPDX-FileCopyrightText: 2019-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
+// SPDX-License-Identifier: LGPL-3.0-or-later
 #include "csa_additionalvariable.h"
 
 #include "csa_config.h"
@@ -100,15 +84,15 @@ namespace ChimeraTK {
     vAttr.displayName = UA_LOCALIZEDTEXT_ALLOC(const_cast<char*>("en_US"), const_cast<char*>(this->name.c_str()));
     vAttr.description =
         UA_LOCALIZEDTEXT_ALLOC(const_cast<char*>("en_US"), const_cast<char*>(this->description.c_str()));
-    vAttr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
+    vAttr.dataType = UA_NS0ID(STRING);
     vAttr.valueRank = UA_VALUERANK_SCALAR;
     UA_Variant_setScalar(&vAttr.value, opcua_node_variable_t_ns_2_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
 
     UA_QualifiedName qualName = UA_QUALIFIEDNAME_ALLOC(1, this->name.c_str());
     retval |= UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodeIdStringCPP + "/" + name + "AdditionalVariable").c_str())),
-        this->baseNodeId, UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName,
-        UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), vAttr, (void*)this, &createdNodeId);
+        this->baseNodeId, UA_NS0ID(HASCOMPONENT), qualName, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE),
+        vAttr, (void*)this, &createdNodeId);
     UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
     ua_mapInstantiatedNodes(
         createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE), &this->ownedNodes);
@@ -122,7 +106,7 @@ namespace ChimeraTK {
     vAttr2.displayName = UA_LOCALIZEDTEXT_ALLOC(const_cast<char*>("en_US"), const_cast<char*>("Description"));
     vAttr2.description =
         UA_LOCALIZEDTEXT_ALLOC(const_cast<char*>("en_US"), const_cast<char*>(this->description.c_str()));
-    vAttr2.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_STRING);
+    vAttr2.dataType = UA_NS0ID(STRING);
     vAttr.valueRank = UA_VALUERANK_SCALAR;
     UA_String addVarDescription = UA_STRING_ALLOC(description.c_str());
     UA_Variant_setScalarCopy(&vAttr2.value, &addVarDescription, &UA_TYPES[UA_TYPES_STRING]);
@@ -131,8 +115,7 @@ namespace ChimeraTK {
     string parentNodeStringDescription = baseNodeIdStringCPP + "/" + name + "/Description";
     retval |= UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>(parentNodeStringDescription.c_str())), this->ownNodeId,
-        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), qualName2, UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-        vAttr2, nullptr, nullptr);
+        UA_NS0ID(HASCOMPONENT), qualName2, UA_NS0ID(BASEDATAVARIABLETYPE), vAttr2, nullptr, nullptr);
 
     UA_QualifiedName_clear(&qualName2);
 

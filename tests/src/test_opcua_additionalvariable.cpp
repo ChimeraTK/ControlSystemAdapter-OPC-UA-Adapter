@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-License-Identifier: LGPL-3.0-or-later
 #include "ua_typeconversion.h"
 
 #include <boost/test/included/unit_test.hpp>
@@ -34,9 +36,8 @@ void AdditionalVariableTest::testClassSide() {
   UA_ObjectAttributes oAttr;
   memset(&oAttr, 0, sizeof(UA_ObjectAttributes));
   UA_Server_addObjectNode(serverSet->mappedServer, UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()),
-      UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-      UA_QUALIFIEDNAME(0, (char*)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL,
-      NULL);
+      UA_NS0ID(OBJECTSFOLDER), UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(0, (char*)"AdditionalVarsFolder"),
+      UA_NS0ID(BASEOBJECTTYPE), oAttr, NULL, NULL);
 
   ua_additionalvariable addVar1(serverSet->mappedServer,
       UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()), "Name", "Value", "Description");
@@ -73,9 +74,8 @@ void AdditionalVariableTest::testClientSide() {
   UA_ObjectAttributes oAttr;
   memset(&oAttr, 0, sizeof(UA_ObjectAttributes));
   UA_Server_addObjectNode(serverSet->mappedServer, UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()),
-      UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER), UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-      UA_QUALIFIEDNAME(0, (char*)"AdditionalVarsFolder"), UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), oAttr, NULL,
-      NULL);
+      UA_NS0ID(OBJECTSFOLDER), UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(0, (char*)"AdditionalVarsFolder"),
+      UA_NS0ID(BASEOBJECTTYPE), oAttr, NULL, NULL);
   // add set
   ua_additionalvariable addVar1(serverSet->mappedServer,
       UA_NODEID_STRING(1, (char*)additionalVariableRootFolder.c_str()), "Name", "Value", "Description");
@@ -105,7 +105,7 @@ void AdditionalVariableTest::testClientSide() {
   bReq.requestedMaxReferencesPerNode = 0;
   bReq.nodesToBrowse = UA_BrowseDescription_new();
   bReq.nodesToBrowseSize = 1;
-  bReq.nodesToBrowse[0].nodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+  bReq.nodesToBrowse[0].nodeId = UA_NS0ID(OBJECTSFOLDER);
   bReq.nodesToBrowse[0].resultMask = UA_BROWSERESULTMASK_ALL; // return everything
   UA_BrowseResponse bResp = UA_Client_Service_browse(client, bReq);
 

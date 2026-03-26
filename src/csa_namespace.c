@@ -27,11 +27,11 @@ UA_INLINE UA_StatusCode csa_namespace_add_additional_variable(UA_Server* server)
   attr.displayName = UA_LOCALIZEDTEXT("en-US", "ctkAdditionalVariable");
   attr.description = UA_LOCALIZEDTEXT("en-US", "ctkAdditionalVariable");
   attr.valueRank = UA_VALUERANK_ANY;
-  attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
+  attr.dataType = UA_NS0ID(BASEDATATYPE);
   UA_NodeId nodeId = UA_NODEID_NUMERIC(CSA_NSID, UA_NS2ID_CTKADDITIONALVARIABLE);
-  UA_NodeId parentNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE);
-  // UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEVARIABLETYPE);
-  UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASSUBTYPE);
+  UA_NodeId parentNodeId = UA_NS0ID(BASEDATAVARIABLETYPE);
+  // UA_NodeId typeDefinition = UA_NS0ID(BASEVARIABLETYPE);
+  UA_NodeId parentReferenceNodeId = UA_NS0ID(HASSUBTYPE);
   UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "ctkAdditionalVariable");
   return UA_Server_addVariableTypeNode(
       server, nodeId, parentNodeId, parentReferenceNodeId, nodeName, UA_NODEID_NULL, attr, NULL, NULL);
@@ -52,7 +52,7 @@ UA_INLINE UA_StatusCode csa_namespace_add_LoggingLevelValues(UA_Server* server) 
     return UA_STATUSCODE_BADOUTOFMEMORY;
   }
   attr.arrayDimensions[0] = 6;
-  attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_LOCALIZEDTEXT);
+  attr.dataType = UA_NS0ID(LOCALIZEDTEXT);
 
   UA_LocalizedText enumValues[6] = {UA_LOCALIZEDTEXT("", "Trace"), UA_LOCALIZEDTEXT("", "Debug"),
       UA_LOCALIZEDTEXT("", "Info"), UA_LOCALIZEDTEXT("", "Warning"), UA_LOCALIZEDTEXT("", "Error"),
@@ -65,9 +65,8 @@ UA_INLINE UA_StatusCode csa_namespace_add_LoggingLevelValues(UA_Server* server) 
   attr.userWriteMask = 0;
 
   UA_Server_addNode_begin(server, UA_NODECLASS_VARIABLE, UA_NODEID_STRING(1, "EnumStrings"),
-      UA_NODEID_STRING(1, "LoggingLevels"), UA_NODEID_NUMERIC(0, UA_NS0ID_HASPROPERTY),
-      UA_QUALIFIEDNAME(0, "EnumStrings"), UA_NODEID_NUMERIC(0, UA_NS0ID_PROPERTYTYPE), (const UA_NodeAttributes*)&attr,
-      &UA_TYPES[UA_TYPES_VARIABLEATTRIBUTES], NULL, NULL);
+      UA_NODEID_STRING(1, "LoggingLevels"), UA_NS0ID(HASPROPERTY), UA_QUALIFIEDNAME(0, "EnumStrings"),
+      UA_NS0ID(PROPERTYTYPE), (const UA_NodeAttributes*)&attr, &UA_TYPES[UA_TYPES_VARIABLEATTRIBUTES], NULL, NULL);
   // cleanup
   UA_Array_delete(attr.arrayDimensions, 1, &UA_TYPES[UA_TYPES_UINT32]);
   if(retVal != UA_STATUSCODE_GOOD) {
@@ -82,9 +81,8 @@ UA_INLINE void csa_namespace_add_LoggingLevelEnumType(UA_Server* server, char* e
   UA_DataTypeAttributes attr = UA_DataTypeAttributes_default;
   attr.description = UA_LOCALIZEDTEXT("", enumName);
   attr.displayName = UA_LOCALIZEDTEXT("", enumName);
-  UA_StatusCode st =
-      UA_Server_addDataTypeNode(server, UA_NODEID_STRING(1, enumName), UA_NODEID_NUMERIC(0, UA_NS0ID_ENUMERATION),
-          UA_NODEID_NUMERIC(0, UA_NS0ID_HASSUBTYPE), UA_QUALIFIEDNAME(1, enumName), attr, NULL, NULL);
+  UA_StatusCode st = UA_Server_addDataTypeNode(server, UA_NODEID_STRING(1, enumName), UA_NS0ID(ENUMERATION),
+      UA_NS0ID(HASSUBTYPE), UA_QUALIFIEDNAME(1, enumName), attr, NULL, NULL);
   if(st != UA_STATUSCODE_GOOD) {
     UA_ServerConfig* config = UA_Server_getConfig(server);
     UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_USERLAND, "Failed adding type node. %s", UA_StatusCode_name(st));
@@ -112,8 +110,8 @@ UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
     attr.displayName = UA_LOCALIZEDTEXT("", "ctkModule");
     attr.description = UA_LOCALIZEDTEXT("", "");
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 1002);
-    UA_NodeId parentNodeId = UA_NODEID_NUMERIC(0, 58);
-    UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 45);
+    UA_NodeId parentNodeId = UA_NS0ID(BASEOBJECTTYPE);
+    UA_NodeId parentReferenceNodeId = UA_NS0ID(HASSUBTYPE);
     UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "ctkModule");
     UA_Server_addObjectTypeNode(server, nodeId, parentNodeId, parentReferenceNodeId, nodeName, attr, NULL, NULL);
   } while(0);
@@ -126,16 +124,16 @@ UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
     attr.description = UA_LOCALIZEDTEXT("", "");
     attr.valueRank = UA_VALUERANK_ANY;
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 1001);
-    UA_NodeId parentNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE);
-    // UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEVARIABLETYPE);
-    UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, UA_NS0ID_HASSUBTYPE);
+    UA_NodeId parentNodeId = UA_NS0ID(BASEDATAVARIABLETYPE);
+    // UA_NodeId typeDefinition = UA_NS0ID(BASEVARIABLETYPE);
+    UA_NodeId parentReferenceNodeId = UA_NS0ID(HASSUBTYPE);
     UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "ctkProcessVariable");
     UA_Server_addVariableTypeNode(
         server, nodeId, parentNodeId, parentReferenceNodeId, nodeName, UA_NODEID_NULL, attr, NULL, NULL);
     // UA_Server_addObjectTypeNode(server, nodeId, parentNodeId, parentReferenceNodeId, nodeName, attr, NULL, NULL);
-    // UA_Server_deleteReference(server, nodeId, UA_NODEID_NUMERIC(0, 40), true, UA_EXPANDEDNODEID_NUMERIC(0, 62), true);
+    // UA_Server_deleteReference(server, nodeId, UA_NS0ID(HASTYPEDEFINITION), true, UA_NS0EXID(BASEVARIABLETYPE), true);
     // //remove HasTypeDefinition refs generated by addVariableNode UA_Server_addReference(server, UA_NODEID_NUMERIC(2,
-    // 1001), UA_NODEID_NUMERIC(0, UA_NS0ID_HASTYPEDEFINITION), UA_EXPANDEDNODEID_NUMERIC(0, 63), true);
+    // 1001), UA_NS0ID(HASTYPEDEFINITION), UA_NS0EXID(BASEDATAVARIABLETYPE), true);
   } while(0);
 
   do {
@@ -146,17 +144,17 @@ UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
     attr.displayName = UA_LOCALIZEDTEXT("", "Variables");
     attr.description = UA_LOCALIZEDTEXT("", "");
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 5001);
-    UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 61);
+    UA_NodeId typeDefinition = UA_NS0ID(FOLDERTYPE);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1002);
-    UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 47);
+    UA_NodeId parentReferenceNodeId = UA_NS0ID(HASCOMPONENT);
     UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "Variables");
     UA_Server_addObjectNode(
         server, nodeId, parentNodeId, parentReferenceNodeId, nodeName, typeDefinition, attr, NULL, NULL);
-    UA_Server_deleteReference(server, nodeId, UA_NODEID_NUMERIC(0, 40), true, UA_EXPANDEDNODEID_NUMERIC(0, 58),
+    UA_Server_deleteReference(server, nodeId, UA_NS0ID(HASTYPEDEFINITION), true, UA_NS0EXID(BASEOBJECTTYPE),
         true); // remove HasTypeDefinition refs generated by addObjectNode
     // This node has the following references that can be created:
     UA_Server_addReference(
-        server, UA_NODEID_NUMERIC(2, 5001), UA_NODEID_NUMERIC(0, 40), UA_EXPANDEDNODEID_NUMERIC(0, 61), true);
+        server, UA_NODEID_NUMERIC(2, 5001), UA_NS0ID(HASTYPEDEFINITION), UA_NS0EXID(FOLDERTYPE), true);
   } while(0);
 
   do {
@@ -175,17 +173,17 @@ UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
     UA_Variant_setScalar(
         &attr.value, &opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6001);
-    UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
+    UA_NodeId typeDefinition = UA_NS0ID(BASEDATAVARIABLETYPE);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
-    UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 47);
+    UA_NodeId parentReferenceNodeId = UA_NS0ID(HASCOMPONENT);
     UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "Description");
     UA_Server_addVariableNode(
         server, nodeId, parentNodeId, parentReferenceNodeId, nodeName, typeDefinition, attr, NULL, NULL);
-    UA_Server_deleteReference(server, nodeId, UA_NODEID_NUMERIC(0, 40), true, UA_EXPANDEDNODEID_NUMERIC(0, 62),
+    UA_Server_deleteReference(server, nodeId, UA_NS0ID(HASTYPEDEFINITION), true, UA_NS0EXID(BASEVARIABLETYPE),
         true); // remove HasTypeDefinition refs generated by addVariableNode
     // This node has the following references that can be created:
     UA_Server_addReference(
-        server, UA_NODEID_NUMERIC(2, 6001), UA_NODEID_NUMERIC(0, 40), UA_EXPANDEDNODEID_NUMERIC(0, 63), true);
+        server, UA_NODEID_NUMERIC(2, 6001), UA_NS0ID(HASTYPEDEFINITION), UA_NS0EXID(BASEDATAVARIABLETYPE), true);
   } while(0);
 
   do {
@@ -204,17 +202,17 @@ UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
     UA_Variant_setScalar(
         &attr.value, &opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6006);
-    UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
+    UA_NodeId typeDefinition = UA_NS0ID(BASEDATAVARIABLETYPE);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
-    UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 47);
+    UA_NodeId parentReferenceNodeId = UA_NS0ID(HASCOMPONENT);
     UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "EngineeringUnit");
     UA_Server_addVariableNode(
         server, nodeId, parentNodeId, parentReferenceNodeId, nodeName, typeDefinition, attr, NULL, NULL);
-    UA_Server_deleteReference(server, nodeId, UA_NODEID_NUMERIC(0, 40), true, UA_EXPANDEDNODEID_NUMERIC(0, 62),
+    UA_Server_deleteReference(server, nodeId, UA_NS0ID(HASTYPEDEFINITION), true, UA_NS0EXID(BASEVARIABLETYPE),
         true); // remove HasTypeDefinition refs generated by addVariableNode
     // This node has the following references that can be created:
     UA_Server_addReference(
-        server, UA_NODEID_NUMERIC(2, 6006), UA_NODEID_NUMERIC(0, 40), UA_EXPANDEDNODEID_NUMERIC(0, 63), true);
+        server, UA_NODEID_NUMERIC(2, 6006), UA_NS0ID(HASTYPEDEFINITION), UA_NS0EXID(BASEDATAVARIABLETYPE), true);
   } while(0);
 
   do {
@@ -233,17 +231,17 @@ UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
     UA_Variant_setScalar(
         &attr.value, &opcua_node_variable_t_ns_2_i_6004_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6004);
-    UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
+    UA_NodeId typeDefinition = UA_NS0ID(BASEDATAVARIABLETYPE);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
-    UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 47);
+    UA_NodeId parentReferenceNodeId = UA_NS0ID(HASCOMPONENT);
     UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "Name");
     UA_Server_addVariableNode(
         server, nodeId, parentNodeId, parentReferenceNodeId, nodeName, typeDefinition, attr, NULL, NULL);
-    UA_Server_deleteReference(server, nodeId, UA_NODEID_NUMERIC(0, 40), true, UA_EXPANDEDNODEID_NUMERIC(0, 62),
+    UA_Server_deleteReference(server, nodeId, UA_NS0ID(HASTYPEDEFINITION), true, UA_NS0EXID(BASEVARIABLETYPE),
         true); // remove HasTypeDefinition refs generated by addVariableNode
     // This node has the following references that can be created:
     UA_Server_addReference(
-        server, UA_NODEID_NUMERIC(2, 6004), UA_NODEID_NUMERIC(0, 40), UA_EXPANDEDNODEID_NUMERIC(0, 63), true);
+        server, UA_NODEID_NUMERIC(2, 6004), UA_NS0ID(HASTYPEDEFINITION), UA_NS0EXID(BASEDATAVARIABLETYPE), true);
   } while(0);
 
   do {
@@ -262,17 +260,17 @@ UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
     UA_Variant_setScalar(
         &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6012);
-    UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
+    UA_NodeId typeDefinition = UA_NS0ID(BASEDATAVARIABLETYPE);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
-    UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 47);
+    UA_NodeId parentReferenceNodeId = UA_NS0ID(HASCOMPONENT);
     UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "Type");
     UA_Server_addVariableNode(
         server, nodeId, parentNodeId, parentReferenceNodeId, nodeName, typeDefinition, attr, NULL, NULL);
-    UA_Server_deleteReference(server, nodeId, UA_NODEID_NUMERIC(0, 40), true, UA_EXPANDEDNODEID_NUMERIC(0, 62),
+    UA_Server_deleteReference(server, nodeId, UA_NS0ID(HASTYPEDEFINITION), true, UA_NS0EXID(BASEVARIABLETYPE),
         true); // remove HasTypeDefinition refs generated by addVariableNode
     // This node has the following references that can be created:
     UA_Server_addReference(
-        server, UA_NODEID_NUMERIC(2, 6012), UA_NODEID_NUMERIC(0, 40), UA_EXPANDEDNODEID_NUMERIC(0, 63), true);
+        server, UA_NODEID_NUMERIC(2, 6012), UA_NS0ID(HASTYPEDEFINITION), UA_NS0EXID(BASEDATAVARIABLETYPE), true);
   } while(0);
 
   do {
@@ -291,17 +289,17 @@ UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
     UA_Variant_setScalar(
         &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_INT32]);
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6018);
-    UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
+    UA_NodeId typeDefinition = UA_NS0ID(BASEDATAVARIABLETYPE);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
-    UA_NodeId parentReferenceNodeId = UA_NODEID_NUMERIC(0, 47);
+    UA_NodeId parentReferenceNodeId = UA_NS0ID(HASCOMPONENT);
     UA_QualifiedName nodeName = UA_QUALIFIEDNAME(1, "Validity");
     UA_Server_addVariableNode(
         server, nodeId, parentNodeId, parentReferenceNodeId, nodeName, typeDefinition, attr, NULL, NULL);
-    UA_Server_deleteReference(server, nodeId, UA_NODEID_NUMERIC(0, 40), true, UA_EXPANDEDNODEID_NUMERIC(0, 62),
+    UA_Server_deleteReference(server, nodeId, UA_NS0ID(HASTYPEDEFINITION), true, UA_NS0EXID(BASEVARIABLETYPE),
         true); // remove HasTypeDefinition refs generated by addVariableNode
     // This node has the following references that can be created:
     UA_Server_addReference(
-        server, UA_NODEID_NUMERIC(2, 6018), UA_NODEID_NUMERIC(0, 40), UA_EXPANDEDNODEID_NUMERIC(0, 63), true);
+        server, UA_NODEID_NUMERIC(2, 6018), UA_NS0ID(HASTYPEDEFINITION), UA_NS0EXID(BASEDATAVARIABLETYPE), true);
   } while(0);
 
   csa_namespace_add_LoggingLevelEnumType(server, (char*)"LoggingLevels");

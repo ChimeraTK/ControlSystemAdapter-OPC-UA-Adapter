@@ -1,34 +1,16 @@
-/*
- * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
- * redistribute it and/or modify it under the terms of the Lesser GNU
- * General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the Lesser GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
- *
- * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
- * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- */
-
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-FileCopyrightText: 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
+// SPDX-FileCopyrightText: 2016 Julian Rahm <Julian.Rahm@tu-dresden.de>
+// SPDX-License-Identifier: LGPL-3.0-or-later
 #pragma once
-
-extern "C" {
-#include <open62541/server.h>
-}
 
 #include "ua_map_types.h"
 
+#include <open62541/server.h>
+
 namespace ChimeraTK {
   /** @class ua_mapped_class
-   *	@brief This class mapped all inforamtion into the opca server
+   *	@brief This class mapped all information into the opca server
    */
   class ua_mapped_class {
    protected:
@@ -42,8 +24,6 @@ namespace ChimeraTK {
      *
      * @param server opcua server
      * @param baseNodeId Node id from the parent node
-     *
-     * @return Returns a element pointer if some was found, in other cases it will return NULL
      */
     ua_mapped_class(UA_Server* server, UA_NodeId baseNodeId);
 
@@ -53,20 +33,20 @@ namespace ChimeraTK {
     /** @brief Destructor of the class */
     virtual ~ua_mapped_class();
 
-    /** @brief This methode mapped all own nodes into the opcua server
+    /** @brief This method mapped all own nodes into the opcua server
      *
      * @return UA_StatusCode
      */
     UA_StatusCode ua_mapSelfToNamespace();
 
-    /** @brief This methode unmapped all nodes
+    /** @brief This method unmapped all nodes
      *
      * @return UA_StatusCode
      */
     UA_StatusCode ua_unmapSelfFromNamespace();
 
     /** @brief Get the SourceTimeStamp from node in the OPC UA server
-     * Virtual methode which returned Timestamp is setted into the node with the help of the proxy_callback.h
+     * Virtual method which returned Timestamp is setted into the node with the help of the proxy_callback.h
      *
      * @return Returns a UA_DateTime
      */

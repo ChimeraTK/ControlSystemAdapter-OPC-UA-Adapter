@@ -1,24 +1,8 @@
-/*
- * This file is part of ChimeraTKs ControlSystem-OPC-UA-Adapter.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is free software: you can
- * redistribute it and/or modify it under the terms of the Lesser GNU
- * General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * ChimeraTKs ControlSystem-OPC-UA-Adapter is distributed in the hope
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty ofMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the Lesser GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see https://www.gnu.org/licenses/lgpl.html
- *
- * Copyright (c) 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
- * Copyright (c) 2016 Julian Rahm  <Julian.Rahm@tu-dresden.de>
- * Copyright (c) 2018-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
- */
-
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-FileCopyrightText: 2016 Chris Iatrou <Chris_Paul.Iatrou@tu-dresden.de>
+// SPDX-FileCopyrightText: 2016 Julian Rahm <Julian.Rahm@tu-dresden.de>
+// SPDX-FileCopyrightText: 2018-2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
+// SPDX-License-Identifier: LGPL-3.0-or-later
 #include "csa_processvariable.h"
 
 #include "csa_config.h"
@@ -256,7 +240,7 @@ namespace ChimeraTK {
     attr.minimumSamplingInterval = -1.;
     attr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(this->nameNew.c_str()));
     attr.description = description;
-    attr.dataType = UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATATYPE);
+    attr.dataType = UA_NS0ID(BASEDATATYPE);
 
     if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
       attr.writeMask = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE;
@@ -282,7 +266,7 @@ namespace ChimeraTK {
     }
     retval = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodeIdName + "/" + this->nameNew).c_str())), this->baseNodeId,
-        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>(this->nameNew.c_str())),
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>(this->nameNew.c_str())),
         UA_NODEID_NUMERIC(CSA_NSID, 1001), attr, (void*)this, &createdNodeId);
     UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
     ua_mapInstantiatedNodes(createdNodeId, UA_NODEID_NUMERIC(CSA_NSID, 1001), &this->ownedNodes);
@@ -406,8 +390,8 @@ namespace ChimeraTK {
         &attr.value, &opcua_node_variable_t_ns_2_i_6004_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Name").c_str())), pvNodeId,
-        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Name")),
-        UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE), attr, this, &createdNodeId);
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Name")), UA_NS0ID(BASEDATAVARIABLETYPE), attr,
+        this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId nameVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_NAME);
       NODE_PAIR_PUSH(this->ownedNodes, nameVariable, createdNodeId)
@@ -441,8 +425,8 @@ namespace ChimeraTK {
         &attr.value, &opcua_node_variable_t_ns_2_i_6001_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Description").c_str())), pvNodeId,
-        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("Description")), UA_NODEID_NUMERIC(0, 63), attr,
-        this, &createdNodeId);
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Description")), UA_NS0ID(BASEDATAVARIABLETYPE),
+        attr, this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId descVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_DESC);
       NODE_PAIR_PUSH(this->ownedNodes, descVariable, createdNodeId)
@@ -475,8 +459,8 @@ namespace ChimeraTK {
     UA_Variant_setScalar(&attr.value, &defaultEngineeringUnit, &UA_TYPES[UA_TYPES_STRING]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/EngineeringUnit").c_str())),
-        pvNodeId, UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("EngineeringUnit")),
-        UA_NODEID_NUMERIC(0, 63), attr, this, &createdNodeId);
+        pvNodeId, UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("EngineeringUnit")),
+        UA_NS0ID(BASEDATAVARIABLETYPE), attr, this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId engineeringunitVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_UNIT);
       NODE_PAIR_PUSH(this->ownedNodes, engineeringunitVariable, createdNodeId)
@@ -509,12 +493,12 @@ namespace ChimeraTK {
     UA_Variant_setScalar(
         &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
     UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6012);
-    UA_NodeId typeDefinition = UA_NODEID_NUMERIC(0, 63);
+    UA_NodeId typeDefinition = UA_NS0ID(BASEDATAVARIABLETYPE);
     UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
     addResult = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Type").c_str())), pvNodeId,
-        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("Type")), UA_NODEID_NUMERIC(0, 63), attr, this,
-        &createdNodeId);
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Type")), UA_NS0ID(BASEDATAVARIABLETYPE), attr,
+        this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId typeVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_TYPE);
       NODE_PAIR_PUSH(this->ownedNodes, typeVariable, createdNodeId)
@@ -548,8 +532,8 @@ namespace ChimeraTK {
     UA_Variant_setScalar(&attr.value, &defaultValidity, &UA_TYPES[UA_TYPES_INT32]);
     addResult = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Validity").c_str())), pvNodeId,
-        UA_NODEID_NUMERIC(0, 47), UA_QUALIFIEDNAME(1, const_cast<char*>("Validity")), UA_NODEID_NUMERIC(0, 63), attr,
-        this, &createdNodeId);
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Validity")), UA_NS0ID(BASEDATAVARIABLETYPE),
+        attr, this, &createdNodeId);
     if(addResult == UA_STATUSCODE_GOOD) {
       UA_NodeId vadilityVariable = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE_VALIDITY);
       NODE_PAIR_PUSH(this->ownedNodes, vadilityVariable, createdNodeId)
