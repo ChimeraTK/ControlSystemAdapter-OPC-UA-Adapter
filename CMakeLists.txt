@@ -5,8 +5,8 @@ cmake_minimum_required(VERSION 3.16)
 ##########################################################################################################
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
 SET(${PROJECT_NAME}_MAJOR_VERSION 04)
-SET(${PROJECT_NAME}_MINOR_VERSION 00)
-SET(${PROJECT_NAME}_PATCH_VERSION 05)
+SET(${PROJECT_NAME}_MINOR_VERSION 01)
+SET(${PROJECT_NAME}_PATCH_VERSION 00)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
