@@ -161,9 +161,12 @@ namespace ChimeraTK {
     UA_VariableAttributes vattr = UA_VariableAttributes_default;
     vattr.dataType = dtype;
     vattr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en-us"), property_name);
-    vattr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
-    UA_StatusCode retval = UA_Server_addVariableNode(server, UA_NODEID_NULL, eventNodeId, UA_NS0ID(HASPROPERTY),
-        UA_QUALIFIEDNAME(0, property_name), UA_NS0ID(PROPERTYTYPE), vattr, nullptr, &propertyNodeId);
+    vattr.accessLevel = UA_ACCESSLEVELMASK_READ;
+    std::string nodeName = std::string("VoidEventType_") + property_name;
+    UA_NodeId void_event_property_NodeId = UA_NODEID_STRING(1, const_cast<char*>(nodeName.c_str()));
+    UA_StatusCode retval =
+        UA_Server_addVariableNode(server, void_event_property_NodeId, eventNodeId, UA_NS0ID(HASPROPERTY),
+            UA_QUALIFIEDNAME(0, property_name), UA_NS0ID(PROPERTYTYPE), vattr, nullptr, &propertyNodeId);
     if(retval != UA_STATUSCODE_GOOD) {
       string error_message = "Failed to add the property ";
       error_message.append(property_name);
