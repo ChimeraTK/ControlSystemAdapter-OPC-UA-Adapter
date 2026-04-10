@@ -10,6 +10,8 @@
 #include <open62541/plugin/historydatabase.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
+#include <open62541/client.h>
+#include <open62541/client_config_default.h>
 
 extern "C" {
 #include "csa_namespace.h"
@@ -112,6 +114,8 @@ namespace ChimeraTK {
     config->applicationDescription.discoveryUrlsSize = 1;
     UA_String_clear(&config->applicationDescription.applicationUri);
     config->applicationDescription.applicationUri = UA_STRING_ALLOC(const_cast<char*>(cleanUri(hostname_uri).c_str()));
+    config->mdnsConfig.mdnsServerName = UA_String_fromChars(this->serverConfig.applicationName.c_str());
+
     UA_String_clear(&config->buildInfo.manufacturerName);
     config->buildInfo.manufacturerName = UA_STRING_ALLOC(const_cast<char*>("ChimeraTK Team"));
     std::string
@@ -657,12 +661,42 @@ namespace ChimeraTK {
             this->serverConfig.history, this->serverConfig.historyfolders, this->serverConfig.historyvariables);
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Starting the server worker thread");
     UA_Server_run_startup(this->mappedServer);
+
+    // register server
+    UA_ClientConfig cc;
+    memset(&cc, 0, sizeof(UA_ClientConfig));
+    UA_ClientConfig_setDefault(&cc);
+    cc.securityMode = UA_MESSAGESECURITYMODE_NONE;
+
+    // cc is cleared by this call internally by calling memset(cc, 0, sizeof(UA_ClientConfig));
+    UA_StatusCode retval =
+        UA_Server_registerDiscovery( this->mappedServer, &cc,
+                                    UA_STRING(DISCOVERY_SERVER_ENDPOINT), UA_STRING_NULL);
+
     this->running = true;
     while(this->running) {
       UA_Server_run_iterate(this->mappedServer, true);
     }
     clear_history(gathering, historizing_nodes, historizing_setup, this->mappedServer,
         this->serverConfig.historyfolders, this->serverConfig.historyvariables, this->server_config);
+
+    memset(&cc, 0, sizeof(UA_ClientConfig));
+    UA_ClientConfig_setDefault(&cc);
+    cc.securityMode = UA_MESSAGESECURITYMODE_NONE;
+    retval = UA_Server_deregisterDiscovery(this->mappedServer, &cc,
+                                           UA_STRING(DISCOVERY_SERVER_ENDPOINT));
+    // \ToDo: Find a more reliable solution
+    //  It is not possible to know exactly when the async deregistration is finished.
+    //  Wait for 2s
+    UA_DateTime start = UA_DateTime_now();
+    UA_DateTime timeout = 2 * UA_DATETIME_SEC;
+    while(UA_DateTime_now() - start < timeout){
+      UA_Server_run_iterate(this->mappedServer, false);
+    }
+    if(retval != UA_STATUSCODE_GOOD)
+        UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
+                     "Could not unregister server from discovery server. StatusCode %s",
+                     UA_StatusCode_name(retval));
 
     UA_Server_run_shutdown(this->mappedServer);
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Stopped the server worker thread");
