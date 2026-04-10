@@ -15,6 +15,8 @@
 
 #include <memory>
 
+#define DISCOVERY_SERVER_ENDPOINT "opc.tcp://localhost:4840"
+
 using namespace std;
 
 namespace ChimeraTK {
