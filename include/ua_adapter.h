@@ -15,8 +15,6 @@
 
 #include <memory>
 
-#define DISCOVERY_SERVER_ENDPOINT "opc.tcp://localhost:4840"
-
 using namespace std;
 
 namespace ChimeraTK {
@@ -30,6 +28,8 @@ namespace ChimeraTK {
     uint16_t opcuaPort = 16664;
     bool enableSecurity = false;
     bool unsecure = false;
+    bool registerLDS = false;
+    string ldsAddress = "opc.tcp://localhost:4840";
     UA_LogLevel logLevel = UA_LOGLEVEL_INFO;
     string certPath;
     string keyPath;
