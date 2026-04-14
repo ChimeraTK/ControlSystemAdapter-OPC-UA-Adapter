@@ -114,7 +114,9 @@ namespace ChimeraTK {
     config->applicationDescription.discoveryUrlsSize = 1;
     UA_String_clear(&config->applicationDescription.applicationUri);
     config->applicationDescription.applicationUri = UA_STRING_ALLOC(const_cast<char*>(cleanUri(hostname_uri).c_str()));
-    config->mdnsConfig.mdnsServerName = UA_String_fromChars(this->serverConfig.applicationName.c_str());
+    if(this->serverConfig.registerLDS){
+      config->mdnsConfig.mdnsServerName = UA_String_fromChars(this->serverConfig.applicationName.c_str());
+    }
 
     UA_String_clear(&config->buildInfo.manufacturerName);
     config->buildInfo.manufacturerName = UA_STRING_ALLOC(const_cast<char*>("ChimeraTK Team"));
@@ -299,8 +301,42 @@ namespace ChimeraTK {
           this->mappingExceptions = UA_FALSE;
         }
       }
+      xmlXPathObjectPtr sub_result = this->fileHandler->getNodeSet(xpath + "//lds");
+      if(result) {
+        xmlNodeSetPtr nodeset = sub_result->nodesetval;
+        if(nodeset->nodeNr > 1) {
+          throw std::runtime_error("To many <lds>-Tags in config file");
+        }
 
-      xmlXPathObjectPtr sub_result = this->fileHandler->getNodeSet(xpath + "//server");
+        placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "register");
+        std::string ldsAddress = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "address");
+        if(!ldsAddress.empty()) {
+          this->serverConfig.ldsAddress = ldsAddress;
+        }
+        else {
+          UA_LOG_WARNING(
+              &logger, UA_LOGCATEGORY_USERLAND, "No lds 'address'-Attribute in config file is set. Using default address: %s", this->serverConfig.ldsAddress.c_str());
+        }
+        string registerLDS = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "register");
+        if(!registerLDS.empty()) {
+          transform(registerLDS.begin(), registerLDS.end(), registerLDS.begin(), ::toupper);
+          if(registerLDS.compare("TRUE") == 0) {
+            this->serverConfig.registerLDS = true;
+          }
+          else {
+            this->serverConfig.registerLDS = false;
+          }
+        }
+        else {
+          this->serverConfig.registerLDS = false;
+          UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+              "No LDS 'register'-Attribute in config file is set. LDS registration is disabled.");
+        }
+
+      }
+
+
+      sub_result = this->fileHandler->getNodeSet(xpath + "//server");
       if(result) {
         xmlNodeSetPtr nodeset = sub_result->nodesetval;
         if(nodeset->nodeNr > 1) {
@@ -658,17 +694,18 @@ namespace ChimeraTK {
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Starting the server worker thread");
     UA_Server_run_startup(this->mappedServer);
 
-    // register server
-    UA_ClientConfig cc;
-    memset(&cc, 0, sizeof(UA_ClientConfig));
-    UA_ClientConfig_setDefault(&cc);
-    cc.securityMode = UA_MESSAGESECURITYMODE_NONE;
 
-    // cc is cleared by this call internally by calling memset(cc, 0, sizeof(UA_ClientConfig));
-    UA_StatusCode retval =
-        UA_Server_registerDiscovery( this->mappedServer, &cc,
-                                    UA_STRING(DISCOVERY_SERVER_ENDPOINT), UA_STRING_NULL);
-
+    if(this->serverConfig.registerLDS){
+      // register with lds server
+      UA_ClientConfig cc;
+      memset(&cc, 0, sizeof(UA_ClientConfig));
+      UA_ClientConfig_setDefault(&cc);
+      cc.securityMode = UA_MESSAGESECURITYMODE_NONE;
+      UA_StatusCode retval =
+          UA_Server_registerDiscovery( this->mappedServer, &cc,
+                                      UA_STRING(const_cast<char*>(this->serverConfig.ldsAddress.c_str())), UA_STRING_NULL);
+      UA_ClientConfig_clear(&cc);
+    }
     this->running = true;
     while(this->running) {
       UA_Server_run_iterate(this->mappedServer, true);
@@ -676,24 +713,28 @@ namespace ChimeraTK {
     clear_history(gathering, historizing_nodes, historizing_setup, this->mappedServer,
         this->serverConfig.historyfolders, this->serverConfig.historyvariables, this->server_config);
 
-    memset(&cc, 0, sizeof(UA_ClientConfig));
-    UA_ClientConfig_setDefault(&cc);
-    cc.securityMode = UA_MESSAGESECURITYMODE_NONE;
-    retval = UA_Server_deregisterDiscovery(this->mappedServer, &cc,
-                                           UA_STRING(DISCOVERY_SERVER_ENDPOINT));
-    // \ToDo: Find a more reliable solution
-    //  It is not possible to know exactly when the async deregistration is finished.
-    //  Wait for 2s
-    UA_DateTime start = UA_DateTime_now();
-    UA_DateTime timeout = 2 * UA_DATETIME_SEC;
-    while(UA_DateTime_now() - start < timeout){
-      UA_Server_run_iterate(this->mappedServer, false);
+    if(this->serverConfig.registerLDS){
+      UA_ClientConfig cc;
+      memset(&cc, 0, sizeof(UA_ClientConfig));
+      UA_ClientConfig_setDefault(&cc);
+      cc.securityMode = UA_MESSAGESECURITYMODE_NONE;
+      UA_StatusCode retval = UA_Server_deregisterDiscovery(this->mappedServer, &cc,
+          UA_STRING(const_cast<char*>(this->serverConfig.ldsAddress.c_str())));
+      // \ToDo: Find a more reliable solution
+      //  It is not possible to know exactly when the async deregistration is finished.
+      //  Wait for 2s
+      UA_DateTime start = UA_DateTime_now();
+      UA_DateTime timeout = 2 * UA_DATETIME_SEC;
+      while(UA_DateTime_now() - start < timeout){
+        UA_Server_run_iterate(this->mappedServer, false);
+      }
+      if(retval != UA_STATUSCODE_GOOD){
+          UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
+                       "Could not unregister server from discovery server. StatusCode %s",
+                       UA_StatusCode_name(retval));
+      }
+      UA_ClientConfig_clear(&cc);
     }
-    if(retval != UA_STATUSCODE_GOOD)
-        UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
-                     "Could not unregister server from discovery server. StatusCode %s",
-                     UA_StatusCode_name(retval));
-
     UA_Server_run_shutdown(this->mappedServer);
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Stopped the server worker thread");
   }
