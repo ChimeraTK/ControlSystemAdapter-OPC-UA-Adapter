@@ -31,6 +31,8 @@ The generator can be started without any input files. It allows to create map fi
      * username
      * password
 * Set logging level (can be changes also at runtime)
+* Enable LDS registration
+     * Set LDS address
    
 Each ChimeraTK application should include an XML generator that allows to create an XML file that includes the address space of the application. 
 If using the map file generator with such an application specific XML fie the generaotr allows to:
