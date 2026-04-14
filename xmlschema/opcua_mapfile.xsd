@@ -83,6 +83,15 @@
   </xsd:complexType>
   <xsd:complexType name="configType">
     <xsd:sequence>
+      <xsd:element name="lds" type="csa:ldsType"
+        minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Local discovery related settings.
+            If not given the server will not register to any LDS server.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>      
       <xsd:element name="server" type="csa:serverType"
         minOccurs="0" maxOccurs="1">
         <xsd:annotation>
@@ -170,6 +179,30 @@
     </xsd:attribute>
     <xsd:attribute name="description"
       type="csa:nonEmptyString" />
+  </xsd:complexType>
+  <xsd:complexType name="ldsType">
+    <xsd:attribute name="register" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          If set true the server wil register itself to the LDS.
+          When the server is stopped it will unregister from the 
+          LDS. This addes an additional delay of 2 seconds in
+          order to make sure the unregister process finished.
+          If not given the default is false.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="address" type="csa:nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation>
+          LDS address. Default is not given is:
+          opc.tcp://localhost:4840
+          For now the endpoint with no security will be used to connect to.
+          If that endpoint is not provided by the LDS server the registration 
+          will fail.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
   <xsd:complexType name="serverType">
     <xsd:attribute name="logLevel" type="csa:nonEmptyString">
