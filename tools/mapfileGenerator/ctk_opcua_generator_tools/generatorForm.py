@@ -172,6 +172,8 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.password.setEnabled(self.MapGenerator.enableLogin)
     self._blockAndSetTextBox(self.MapGenerator.username, self.userName)
     self._blockAndSetTextBox(self.MapGenerator.password, self.password)
+    self._blockAndSetCheckbox(self.MapGenerator.registerLDS, self.registerLDS)
+    self._blockAndSetTextBox(self.MapGenerator.ldsAddress, self.ldsAddress)
     # Attention the following fields are set in the GUI but not set in the mapping file as long as they 
     # are not changed by the user!
     # Simply show what will be used, because root folder and application name default to the
@@ -463,6 +465,8 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.MapGenerator.applicationDescription = self.applicationDescription.text()
     self.MapGenerator.port = self.port.value()
     self.MapGenerator.logLevel = self.logLevelComboBox.currentText()
+    self.MapGenerator.ldsAddress = self.ldsAddress.text()
+    self.MapGenerator.registerLDS = self.registerLDS.isChecked()
     
     
   def dropEvent(self, event):
@@ -675,6 +679,8 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.editHistorySettingButton.clicked.connect(self.editHistorySetting)
     self.addHistorySettingButton.clicked.connect(self.prepareNewHistorySetting)
     self.setHistoryForInputsButton.clicked.connect(lambda isChecked: self.addHistoryForInputs(isChecked, self.treeWidget.itemAt(0,0)))
+    self.registerLDS.stateChanged.connect(self.updateConfig)
+    self.ldsAddress.textChanged.connect(self.updateConfig)
 
     
     # Allow to move items 
