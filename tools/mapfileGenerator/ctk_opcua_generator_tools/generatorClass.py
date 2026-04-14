@@ -138,6 +138,13 @@ class Config(EncryptionSettings):
       
     server.set("logLevel", self.logLevel)
     
+    if self.registerLDS == True:
+      lds = ET.SubElement(config,"lds")
+      lds.set("register", "True")
+      if self.ldsAddress:
+        lds.set("address", self.ldsAddress)
+      else:
+        raise RuntimeError("No lds address set but LDS  registration is enabled!")
     if self.enableLogin == True:
       login = ET.SubElement(config, "login")
       if self.username:
@@ -184,6 +191,15 @@ class Config(EncryptionSettings):
           else:
             logging.warning("Failed to read log level. {} is not a valid logLevel. Using INFO instead.".format(tmp))
         # security
+      lds = config.find('lds')
+      if lds is not None:
+        if 'register' in lds.attrib:
+          if lds.attrib["register"].upper() == 'TRUE':
+            self.registerLDS = True
+          else:
+            self.registerLDS = False
+        if 'address' in lds.attrib:
+          self.ldsAddress = lds.attrib['address']
       login = config.find('login')
       if login is not None:
         self.enableLogin = True
@@ -433,6 +449,8 @@ class MapGenerator(Config):
     self.applicationName: str|None = None
     self.nsmap: Dict|None = None
     self.dir: XMLDirectory|None = None
+    self.registerLDS: bool|None = None
+    self.ldsAddress: str|None = None
     if self.inputFile:
       self.parseChimeraTK()
     
@@ -531,7 +549,7 @@ class MapGenerator(Config):
       # read process_variable information
       for pv in data.findall('process_variable', namespaces=data.nsmap):
         if "sourceName" in  pv.attrib:
-          var = self.dir.findVar("/root/" + str(pv.attrib["sourceName"]))
+          var = self.dir.findVar("/root/" + str(pv.attrib["sourceName"]).strip('/'))
           if var != None:
             if 'history' in pv.attrib:
               var.historizing = str(pv.attrib["history"])

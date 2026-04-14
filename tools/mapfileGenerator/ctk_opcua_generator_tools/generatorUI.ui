@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1147</width>
+    <width>1616</width>
     <height>856</height>
    </rect>
   </property>
@@ -81,7 +81,7 @@
       <item>
        <widget class="QComboBox" name="logLevelComboBox">
         <property name="currentText">
-         <string>INFO</string>
+         <string>TRACE</string>
         </property>
         <item>
          <property name="text">
@@ -318,6 +318,27 @@
        </spacer>
       </item>
       <item>
+       <widget class="QCheckBox" name="registerLDS">
+        <property name="text">
+         <string>Register at LDS</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>LDS:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="ldsAddress">
+        <property name="text">
+         <string>opc.tcp://localhost:4840</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="enableEncryptionButton">
         <property name="text">
          <string>Enable encryption</string>
@@ -402,8 +423,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1147</width>
-     <height>22</height>
+     <width>1616</width>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
