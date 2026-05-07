@@ -60,8 +60,8 @@ struct TestFixturePVSet {
         devManager->createProcessArray<float>(SynchronizationDirection::controlSystemToDevice, "floatScalar", 1);
     ProcessArray<double>::SharedPtr doubledevMap = devManager->createProcessArray<double>(
         SynchronizationDirection::controlSystemToDevice, "Dieser/Name/ist/doubleScalar", 1);
-    ProcessArray<string>::SharedPtr stringAddev2 =
-        devManager->createProcessArray<string>(SynchronizationDirection::deviceToControlSystem,
+    ProcessArray<string>::SharedPtr strAstrdevMap =
+        devManager->createProcessArray<string>(SynchronizationDirection::controlSystemToDevice,
             "1/FOLDER/defaultSep/stringScalar", 1, "my description", "desc");
 
     ProcessArray<int8_t>::SharedPtr intB15A8devMap =
@@ -86,6 +86,8 @@ struct TestFixturePVSet {
         devManager->createProcessArray<double>(SynchronizationDirection::controlSystemToDevice, "doubleArray_s15", 15);
     ProcessArray<float>::SharedPtr intB10Addev = devManager->createProcessArray<float>(
         SynchronizationDirection::controlSystemToDevice, "floatArray_s101234", 10);
+    ProcessArray<string>::SharedPtr strB10Astrdev =
+        devManager->createProcessArray<string>(SynchronizationDirection::controlSystemToDevice, "stringArray_s10", 10);
 
     std::cout << "TestFixturePVSet END" << std::endl;
   }

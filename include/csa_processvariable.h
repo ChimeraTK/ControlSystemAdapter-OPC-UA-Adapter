@@ -12,6 +12,8 @@
 #include <boost/fusion/container/map.hpp>
 
 #include <string>
+#include <vector>
+
 using namespace std;
 namespace fusion = boost::fusion;
 
@@ -224,7 +226,7 @@ namespace ChimeraTK {
   }
 
   template<>
-  inline UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v, const UA_NumericRange* /*range*/) {
+  inline UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v, const UA_NumericRange* range) {
     UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
     if(this->csManager->getProcessVariable(this->namePV)->isReadable()) {
       this->csManager->getProcessArray<string>(this->namePV)->readLatest();
@@ -237,12 +239,21 @@ namespace ChimeraTK {
     }
     else {
       std::vector<string> sarr = this->csManager->getProcessArray<string>(this->namePV)->accessChannel(0);
-      auto* sarrayval = new UA_String[sarr.size()];
+      std::vector<UA_String> ua_sarr(sarr.size());
       for(size_t i = 0; i < sarr.size(); i++) {
-        sarrayval[i] = UA_String_fromChars((char*)sarr[i].c_str());
+        ua_sarr.at(i) = UA_String_fromChars((char*)sarr[i].c_str());
       }
-      rv = UA_Variant_setArrayCopy(v, sarrayval, sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
-      delete[] sarrayval;
+      if(range != nullptr) {
+        UA_Variant tmpVariant;
+        UA_Variant_setArray(&tmpVariant, ua_sarr.data(), ua_sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
+        rv = UA_Variant_copyRange(&tmpVariant, v, *range);
+      }
+      else {
+        rv = UA_Variant_setArrayCopy(v, ua_sarr.data(), ua_sarr.size(), &UA_TYPES[UA_TYPES_STRING]);
+      }
+      for(auto& i : ua_sarr) {
+        UA_String_clear(&i);
+      }
     }
     return rv;
   }
