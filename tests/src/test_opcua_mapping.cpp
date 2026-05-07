@@ -33,7 +33,7 @@ void UAMappingTest::testExampleSet() {
   };
   BOOST_CHECK(csaOPCUA.getUAAdapter()->running);
   // is csManager init
-  BOOST_CHECK(csaOPCUA.getControlSystemManager()->getAllProcessVariables().size() == 21);
+  BOOST_CHECK(csaOPCUA.getControlSystemManager()->getAllProcessVariables().size() == 22);
 
   std::shared_ptr<ua_uaadapter> uaadapter = csaOPCUA.getUAAdapter();
 

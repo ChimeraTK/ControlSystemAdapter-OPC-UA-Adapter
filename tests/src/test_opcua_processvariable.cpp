@@ -22,7 +22,7 @@ namespace fusion = boost::fusion;
 typedef fusion::map<fusion::pair<uint8_t, UA_DataType>, fusion::pair<int8_t, UA_DataType>,
     fusion::pair<uint16_t, UA_DataType>, fusion::pair<int16_t, UA_DataType>, fusion::pair<uint32_t, UA_DataType>,
     fusion::pair<int32_t, UA_DataType>, fusion::pair<uint64_t, UA_DataType>, fusion::pair<int64_t, UA_DataType>,
-    fusion::pair<float, UA_DataType>, fusion::pair<double, UA_DataType>>
+    fusion::pair<float, UA_DataType>, fusion::pair<double, UA_DataType>, fusion::pair<string, UA_DataType>>
     TestTypesMap;
 
 static TestTypesMap tMap{fusion::make_pair<uint8_t>(UA_TYPES[UA_TYPES_SBYTE]),
@@ -30,7 +30,7 @@ static TestTypesMap tMap{fusion::make_pair<uint8_t>(UA_TYPES[UA_TYPES_SBYTE]),
     fusion::make_pair<int16_t>(UA_TYPES[UA_TYPES_INT16]), fusion::make_pair<uint32_t>(UA_TYPES[UA_TYPES_UINT32]),
     fusion::make_pair<int32_t>(UA_TYPES[UA_TYPES_INT32]), fusion::make_pair<uint64_t>(UA_TYPES[UA_TYPES_UINT64]),
     fusion::make_pair<int64_t>(UA_TYPES[UA_TYPES_INT64]), fusion::make_pair<float>(UA_TYPES[UA_TYPES_FLOAT]),
-    fusion::make_pair<double>(UA_TYPES[UA_TYPES_DOUBLE])};
+    fusion::make_pair<double>(UA_TYPES[UA_TYPES_DOUBLE]), fusion::make_pair<string>(UA_TYPES[UA_TYPES_STRING])};
 
 /*
  * ProcessVariableTest
@@ -55,11 +55,23 @@ void ProcessVariableTest::testData(
   UA_Variant* var = UA_Variant_new();
   test->getValue<CTK_TYPE>(var, nullptr);
   if(valueArray.size() == 1) {
-    CTK_TYPE newValue;
-    BOOST_CHECK(*(CTK_TYPE*)(var->data) == 0);
-    newValue = 100;
-    UA_Variant_clear(var);
-    UA_Variant_setScalarCopy(var, &newValue, &fusion::at_key<CTK_TYPE>(tMap));
+    if constexpr(std::is_same_v<CTK_TYPE, string>) {
+      std::string valueStr;
+      UA_STRING_TO_CPPSTRING_COPY(((UA_String*)(var->data)), &valueStr);
+      BOOST_CHECK(valueStr == "");
+      auto newValue = UA_String_fromChars("test");
+      UA_Variant_clear(var);
+      UA_Variant_setScalarCopy(var, &newValue, &fusion::at_key<CTK_TYPE>(tMap));
+      UA_String_clear(&newValue);
+    }
+    else {
+      CTK_TYPE newValue;
+      BOOST_CHECK(*(CTK_TYPE*)(var->data) == 0);
+      newValue = 100;
+      UA_Variant_clear(var);
+      UA_Variant_setScalarCopy(var, &newValue, &fusion::at_key<CTK_TYPE>(tMap));
+    }
+
     test->setValue<CTK_TYPE>(var);
 
     auto time = oneProcessVariable->getVersionNumber().getTime();
@@ -70,17 +82,40 @@ void ProcessVariableTest::testData(
     vector<CTK_TYPE> csValueArray =
         pvSet->csManager->getProcessArray<CTK_TYPE>(oneProcessVariable->getName())->accessChannel(0);
     BOOST_CHECK(csValueArray.size() == 1);
-    BOOST_CHECK(csValueArray.at(0) == 100);
+    if constexpr(std::is_same_v<CTK_TYPE, string>) {
+      BOOST_CHECK(csValueArray.at(0) == "test");
+    }
+    else {
+      BOOST_CHECK(csValueArray.at(0) == 100);
+    }
   }
   else {
     // if Array
-    std::vector<CTK_TYPE> newVector(var->arrayLength);
-    for(size_t i = 0; i < var->arrayLength; i++) {
-      BOOST_CHECK(((CTK_TYPE*)(var->data))[i] == 0);
-      newVector.at(i) = (100 - i);
+    if constexpr(std::is_same_v<CTK_TYPE, string>) {
+      std::vector<UA_String> newVector(var->arrayLength);
+      for(size_t i = 0; i < var->arrayLength; i++) {
+        std::string valueStr;
+        UA_STRING_TO_CPPSTRING_COPY(&(((UA_String*)(var->data))[i]), &valueStr);
+        BOOST_CHECK(valueStr == "");
+        std::string tmpStr = "test" + to_string(i);
+        newVector.at(i) = UA_String_fromChars((char*)tmpStr.c_str());
+      }
+      UA_Variant_clear(var);
+      UA_Variant_setArrayCopy(var, newVector.data(), newVector.size(), &fusion::at_key<CTK_TYPE>(tMap));
+      for(size_t i = 0; i < newVector.size(); i++) {
+        UA_String_clear(&newVector.at(i));
+      }
     }
-    UA_Variant_clear(var);
-    UA_Variant_setArrayCopy(var, newVector.data(), newVector.size(), &fusion::at_key<CTK_TYPE>(tMap));
+    else {
+      std::vector<CTK_TYPE> newVector(var->arrayLength);
+      for(size_t i = 0; i < var->arrayLength; i++) {
+        BOOST_CHECK(((CTK_TYPE*)(var->data))[i] == 0);
+        newVector.at(i) = (CTK_TYPE)(100 - i);
+      }
+      UA_Variant_clear(var);
+      UA_Variant_setArrayCopy(var, newVector.data(), newVector.size(), &fusion::at_key<CTK_TYPE>(tMap));
+    }
+
     test->setValue<CTK_TYPE>(var);
 
     // Check value on controlsystemmanager side
@@ -88,19 +123,32 @@ void ProcessVariableTest::testData(
         pvSet->csManager->getProcessArray<CTK_TYPE>(oneProcessVariable->getName())->accessChannel(0);
     size_t i = 0;
     for(auto value : valueArray) {
-      BOOST_CHECK(value == (CTK_TYPE)(100 - i));
+      if constexpr(std::is_same_v<CTK_TYPE, string>) {
+        BOOST_CHECK(value == "test" + to_string(i));
+      }
+      else {
+        BOOST_CHECK(value == (CTK_TYPE)(100 - i));
+      }
       i++;
     }
 
     // now a certain range
-    UA_Variant_clear(var);
+    UA_Variant* varRange = UA_Variant_new();
     UA_NumericRange range = UA_NUMERICRANGE("0:5");
     //    UA_NumericRange_parse(&range, UA_String_fromChars("0:5"));
-    test->getValue<CTK_TYPE>(var, &range);
-    BOOST_CHECK(var->arrayLength == 6);
-    for(size_t i = 0; i < var->arrayLength; i++) {
-      BOOST_CHECK(((CTK_TYPE*)(var->data))[i] == (CTK_TYPE)(100 - i));
+    test->getValue<CTK_TYPE>(varRange, &range);
+    BOOST_CHECK(varRange->arrayLength == 6);
+    for(size_t i = 0; i < varRange->arrayLength; i++) {
+      if constexpr(std::is_same_v<CTK_TYPE, string>) {
+        std::string valueStr;
+        UA_STRING_TO_CPPSTRING_COPY(&(((UA_String*)(varRange->data))[i]), &valueStr);
+        BOOST_CHECK(valueStr == "test" + to_string(i));
+      }
+      else {
+        BOOST_CHECK(((CTK_TYPE*)(varRange->data))[i] == (CTK_TYPE)(100 - i));
+      }
     }
+    UA_Variant_delete(varRange);
     UA_free(range.dimensions);
   }
   UA_Variant_delete(var);
@@ -181,6 +229,8 @@ void ProcessVariableTest::testClassSide() {
       testData<double>(oneProcessVariable, &pvSet, &test);
     }
     else if(valueType == "string") {
+      BOOST_CHECK(valueType == "string");
+      testData<string>(oneProcessVariable, &pvSet, &test);
     }
     else
       BOOST_CHECK(false);

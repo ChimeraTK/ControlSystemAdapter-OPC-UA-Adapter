@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: Helmholtz-Zentrum Dresden-Rossendorf, FWKE, ChimeraTK Project <chimeratk-support@desy.de>
+// SPDX-License-Identifier: LGPL-3.0-or-later
 #pragma once
 
 // Namespace ID for UA Information Model
@@ -11,17 +13,25 @@
 #define UA_NS2ID_CTKPROCESSVARIABLE 1001
 
 // ... of ProcessVariable
-#define CSA_NSID_VARIABLE       1001
-#define CSA_NSID_VARIABLE_NAME  6004
-#define CSA_NSID_VARIABLE_DESC	6001
-#define CSA_NSID_VARIABLE_UNIT  6006
-#define CSA_NSID_VARIABLE_VALUE  6010
-#define CSA_NSID_VARIABLE_TYPE  6012
-#define CSA_NSID_VARIABLE_VALIDITY  6013
+#define CSA_NSID_VARIABLE 1001
+#define CSA_NSID_VARIABLE_NAME 6004
+#define CSA_NSID_VARIABLE_DESC 6001
+#define CSA_NSID_VARIABLE_UNIT 6006
+#define CSA_NSID_VARIABLE_VALUE 6010
+#define CSA_NSID_VARIABLE_TYPE 6012
+#define CSA_NSID_VARIABLE_VALIDITY 6013
 // .... of AdditionalVariable
 #define CSA_NSID_ADDITIONAL_VARIABLE_VALUE 6002
 
-#define PROJECT_VER_MAJOR ${${PROJECT_NAME}_MAJOR_VERSION}
-#define PROJECT_VER_MINOR ${${PROJECT_NAME}_MINOR_VERSION}
-#define PROJECT_VER_PATCH ${${PROJECT_NAME}_PATCH_VERSION}
-
+#define PROJECT_VER_MAJOR                                                                                              \
+  $ {                                                                                                                  \
+    ${PROJECT_NAME} _MAJOR_VERSION                                                                                     \
+  }
+#define PROJECT_VER_MINOR                                                                                              \
+  $ {                                                                                                                  \
+    ${PROJECT_NAME} _MINOR_VERSION                                                                                     \
+  }
+#define PROJECT_VER_PATCH                                                                                              \
+  $ {                                                                                                                  \
+    ${PROJECT_NAME} _PATCH_VERSION                                                                                     \
+  }
