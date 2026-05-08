@@ -45,9 +45,18 @@ namespace ChimeraTK {
       std::type_info const& valueType = oneProcessVariable->getValueType();
       if(valueType == typeid(Void)) {
         /*skip_var = true;*/
-        UA_LOG_DEBUG(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Skip Variable: Variable: %s has a void type",
-            oneProcessVariable->getName().c_str());
-        continue;
+        if(!oneProcessVariable->isWriteable()) {
+          // reading voids is handled in void_type.cpp, so we only need to skip unwritable voids here
+          continue;
+        }
+        if(this->csManager->getProcessArray<ChimeraTK::Void>(oneProcessVariable->getName())->accessChannel(0).size() >
+            1) {
+          UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
+              "Variable: %s has a void type and seems to be an array. Void arrays are not supported. Variable will be "
+              "skipped.",
+              oneProcessVariable->getName().c_str());
+          continue;
+        }
       }
       for(auto e : this->adapter->exclude) {
         string suffix_1 = "/*", suffix_2 = "*";

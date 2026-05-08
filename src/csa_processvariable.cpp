@@ -242,9 +242,18 @@ namespace ChimeraTK {
     attr.description = description;
     attr.dataType = UA_NS0ID(BASEDATATYPE);
 
+    std::type_info const& valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
+
     if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
+      // ToDo: If one wants to make Voids read only use the logic below
+      // if(valueType == typeid(Void)) {
+      // attr.writeMask = UA_ACCESSLEVELMASK_WRITE;
+      // attr.accessLevel = UA_ACCESSLEVELMASK_WRITE;
+      // }
+      // else {
       attr.writeMask = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE;
       attr.accessLevel = UA_ACCESSLEVELMASK_READ ^ UA_ACCESSLEVELMASK_WRITE;
+      // }
     }
 
     // Append the app and application folder names to the string nodeId, this is needed
@@ -277,8 +286,6 @@ namespace ChimeraTK {
 
     UA_Variant arrayDimensions;
     UA_Variant_init(&arrayDimensions);
-
-    std::type_info const& valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
 
     UA_DataSource_Map_Element mapElem;
     mapElem.typeTemplateId = UA_NODEID_NUMERIC(CSA_NSID, CSA_NSID_VARIABLE);
@@ -323,7 +330,10 @@ namespace ChimeraTK {
     else if(valueType == typeid(Boolean)) {
       arrayDims[0] = typeSpecificSetup<Boolean>(mapElem, createdNodeId);
     }
-    else if(valueType != typeid(Void)) {
+    else if(valueType == typeid(Void)) {
+      arrayDims[0] = typeSpecificSetup<Void>(mapElem, createdNodeId);
+    }
+    else {
       int status;
       auto* demangledName = abi::__cxa_demangle(valueType.name(), nullptr, nullptr, &status);
 

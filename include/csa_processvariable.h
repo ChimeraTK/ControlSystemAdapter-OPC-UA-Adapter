@@ -26,7 +26,7 @@ namespace ChimeraTK {
       TypesMap;
 
   /** @class ua_processvariable
-   *	@brief This class represent a processvariable of the controlsystemadapter in the information model of a OPC UA Server
+   *	@brief This class represent a processvariable of the controlsystemadapter in the information model of a OPC UA  Server
    *
    *  @author Chris Iatrou, Julian Rahm
    *  @date 22.11.2016
@@ -224,6 +224,14 @@ namespace ChimeraTK {
     }
     return rv;
   }
+  // ToDo: Not needed if one wants to make Voids read only remove the line below
+  template<>
+  inline UA_StatusCode ua_processvariable::getValue<ChimeraTK::Void>(UA_Variant* v, const UA_NumericRange* /*range*/) {
+    UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
+    UA_Boolean ival = UA_FALSE;
+    rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    return rv;
+  }
 
   template<>
   inline UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v, const UA_NumericRange* range) {
@@ -325,6 +333,14 @@ namespace ChimeraTK {
     return retval;
   }
 
+  template<>
+  inline UA_StatusCode ua_processvariable::setValue<ChimeraTK::Void>(const UA_Variant* /*data*/) {
+    if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
+      this->csManager->getProcessArray<ChimeraTK::Void>(this->namePV)->write();
+    }
+    return UA_STATUSCODE_GOOD;
+  }
+
   template<typename T>
   UA_UInt32 ua_processvariable::typeSpecificSetup(UA_DataSource_Map_Element& mapElem, const UA_NodeId nodeId) {
     UA_Int32 arrayDims;
@@ -340,6 +356,18 @@ namespace ChimeraTK {
       arrayDims = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).size();
     }
     UA_Server_writeDataType(this->mappedServer, nodeId, UA_TYPES[fusion::at_key<T>(typesMap)].typeId);
+    return arrayDims;
+  }
+
+  template<>
+  inline UA_UInt32 ua_processvariable::typeSpecificSetup<ChimeraTK::Void>(
+      UA_DataSource_Map_Element& mapElem, const UA_NodeId nodeId) {
+    UA_Int32 arrayDims;
+    // ToDo: If one wants to make Voids read only remove the line below
+    mapElem.dataSource.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue<ChimeraTK::Void>;
+    mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue<ChimeraTK::Void>;
+    this->array = false;
+    UA_Server_writeDataType(this->mappedServer, nodeId, UA_TYPES[UA_TYPES_BOOLEAN].typeId);
     return arrayDims;
   }
 
