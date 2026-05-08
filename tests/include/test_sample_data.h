@@ -60,6 +60,10 @@ struct TestFixturePVSet {
         devManager->createProcessArray<float>(SynchronizationDirection::controlSystemToDevice, "floatScalar", 1);
     ProcessArray<double>::SharedPtr doubledevMap = devManager->createProcessArray<double>(
         SynchronizationDirection::controlSystemToDevice, "Dieser/Name/ist/doubleScalar", 1);
+    ProcessArray<ChimeraTK::Boolean>::SharedPtr booldevMap = devManager->createProcessArray<ChimeraTK::Boolean>(
+        SynchronizationDirection::controlSystemToDevice, "Dieser/Name/ist/booleanScalar", 1);
+    ProcessArray<ChimeraTK::Void>::SharedPtr voiddevMap = devManager->createProcessArray<ChimeraTK::Void>(
+        SynchronizationDirection::controlSystemToDevice, "Dieser/Name/ist/voidScalar", 1);
     ProcessArray<string>::SharedPtr strAstrdevMap =
         devManager->createProcessArray<string>(SynchronizationDirection::controlSystemToDevice,
             "1/FOLDER/defaultSep/stringScalar", 1, "my description", "desc");
@@ -88,6 +92,8 @@ struct TestFixturePVSet {
         SynchronizationDirection::controlSystemToDevice, "floatArray_s101234", 10);
     ProcessArray<string>::SharedPtr strB10Astrdev =
         devManager->createProcessArray<string>(SynchronizationDirection::controlSystemToDevice, "stringArray_s10", 10);
+    ProcessArray<ChimeraTK::Boolean>::SharedPtr boolB10Abooldev = devManager->createProcessArray<ChimeraTK::Boolean>(
+        SynchronizationDirection::controlSystemToDevice, "booleanArray_s10", 10);
 
     std::cout << "TestFixturePVSet END" << std::endl;
   }
