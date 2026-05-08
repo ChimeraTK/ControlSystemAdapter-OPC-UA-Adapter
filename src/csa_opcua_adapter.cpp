@@ -189,10 +189,6 @@ namespace ChimeraTK {
           UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Adding variable %s to void thread.",
               oneProcessVariable->getName().c_str());
         }
-        else {
-          UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
-              "Ignoring Void input %s. Void inputs are not yet supported.", oneProcessVariable->getName().c_str());
-        }
       }
     }
     if(!data->pvs.empty()) {
