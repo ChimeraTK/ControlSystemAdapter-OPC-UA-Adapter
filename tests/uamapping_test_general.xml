@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<csa:uamapping  xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
-	<config rootFolder="llrfCtrl_hzdr" description="Test application for the digital LLRF system at ELBE / HZDR">
+<?xml version="1.0" encoding="UTF-8"?>
+<csa:uamapping xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
+	<config rootFolder="llrfCtrl_hzdr"
+		description="Test application for the digital LLRF system at ELBE / HZDR">
 		<server applicationName="LLRFServer" port="16660" />
 		<login username="test" password="test123" />
 		<process_variable_hierarchy>
@@ -9,7 +10,7 @@
 		<mapping_exceptions>false</mapping_exceptions>
 	</config>
 
-<!-- (1) Process variable options
+	<!-- (1) Process variable options
   Information:
 	- the path seperator for the destination tag is "/"
 	- the destination can include a folder hierachy that is created on the flight
@@ -39,20 +40,20 @@
 	<process_variable sourceName="testDoubleArray_11000">
 		<destination>B</destination>
 		<name>testDoubleArray_11000</name>
-    <unit>U1.1</unit>
+		<unit>U1.1</unit>
 		<description>Test Desc D1.1</description>
 	</process_variable>
-  <!-- D2 [x]-->
-  <process_variable sourceName="testDoubleArray_12000" copy="false">
-      <destination>D</destination>
-      <name>testDoubleArray_12000</name>
-      <unit>U2</unit>
-  </process_variable>
-  <process_variable sourceName="testDoubleArray_13000" copy="false">
-      <destination>E</destination>
-      <name>testDoubleArray_13000</name>
-      <unit>U2.1</unit>
-  </process_variable>
+	<!-- D2 [x]-->
+	<process_variable sourceName="testDoubleArray_12000" copy="false">
+		<destination>D</destination>
+		<name>testDoubleArray_12000</name>
+		<unit>U2</unit>
+	</process_variable>
+	<process_variable sourceName="testDoubleArray_13000" copy="false">
+		<destination>E</destination>
+		<name>testDoubleArray_13000</name>
+		<unit>U2.1</unit>
+	</process_variable>
 	<!-- D3 [x]-->
 	<process_variable sourceName="testDoubleArray_14000" copy="false">
 		<destination>F</destination>
@@ -183,18 +184,18 @@
         D2. Destination -> variable is created in the root folder
         D3. Value -> empty string
    -->
-  <folder sourceName="1/FOLDER" copy="true">
-    <name>copyWithSourceTest</name>
-    <description>Folder description</description>
-  </folder>
-  <folder sourceName="1/FOLDER" copy="false">
-    <name>linkWithSourceTest</name>
-    <description>Folder description</description>
-  </folder>
-  <folder sourceName="1/FOLDER/defaultSep" copy="false">
-    <name>2/FOLDER</name>
-    <description>Folder description</description>
-  </folder>
+	<folder sourceName="1/FOLDER" copy="true">
+		<name>copyWithSourceTest</name>
+		<description>Folder description</description>
+	</folder>
+	<folder sourceName="1/FOLDER" copy="false">
+		<name>linkWithSourceTest</name>
+		<description>Folder description</description>
+	</folder>
+	<folder sourceName="1/FOLDER/defaultSep" copy="false">
+		<name>2/FOLDER</name>
+		<description>Folder description</description>
+	</folder>
 	<!-- D1 [x]-->
 	<additional_variable>
 		<name>av_d1</name>
@@ -266,7 +267,7 @@
 		<value>1</value>
 	</additional_variable>
 
-<!-- (3) Folder without source
+	<!-- (3) Folder without source
  	Information:
    - the path seperator for the destination tag is "/"
    - the destination can include a folder hierachy that is created on the fligth
@@ -342,7 +343,8 @@
     - the path seperator for the destination tag is "/"
     - the destination can include a folder hierachy that is created on the flight
     - allows to show folder content at another location
-    - folder content can be copied to the new location (copy="True") or simply linked to the new location
+    - folder content can be copied to the new location (copy="True") or simply linked to the new
+	location
 
    Error cases:
     1. name is missing or is empty
@@ -371,29 +373,29 @@
 		<description>Desc f3</description>
 	</folder>
 	<folder sourceName="folder/f4" copy="false">
-        <destination></destination>
-        <name>f4</name>
+		<destination></destination>
+		<name>f4</name>
 		<description>Desc f4</description>
 	</folder>
 	<!-- D3 [x]-->
 	<folder sourceName="folder/f5">
-        <destination>A</destination>
-        <name>f5</name>
-        <description>Desc f5</description>
+		<destination>A</destination>
+		<name>f5</name>
+		<description>Desc f5</description>
 	</folder>
 	<folder sourceName="folder/f6" copy="">
-        <destination>A</destination>
-        <name>f6</name>
-        <description>Desc f6</description>
+		<destination>A</destination>
+		<name>f6</name>
+		<description>Desc f6</description>
 	</folder>
 	<!-- D1, D2, D3 [x]-->
 	<folder sourceName="folder/f7">
 		<name>f7</name>
 	</folder>
 	<folder sourceName="folder/f8" copy="">
-        <destination></destination>
-        <name>f8</name>
-        <description></description>
+		<destination></destination>
+		<name>f8</name>
+		<description></description>
 	</folder>
 
 	<!-- E1 [x]-->

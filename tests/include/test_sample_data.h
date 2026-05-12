@@ -37,8 +37,6 @@ struct TestFixturePVSet {
   boost::shared_ptr<DevicePVManager> devManager;
 
   TestFixturePVSet() : pvManagers(createPVManager()), csManager(pvManagers.first), devManager(pvManagers.second) {
-    std::cout << "TestFixturePVSet BEGIN" << std::endl;
-
     // Testset
     ProcessArray<int8_t>::SharedPtr intA8dev = devManager->createProcessArray<int8_t>(
         SynchronizationDirection::controlSystemToDevice, "int8Scalar", 1, "Einheit", "Beschreibung der Variable");
@@ -94,8 +92,6 @@ struct TestFixturePVSet {
         devManager->createProcessArray<string>(SynchronizationDirection::controlSystemToDevice, "stringArray_s10", 10);
     ProcessArray<ChimeraTK::Boolean>::SharedPtr boolB10Abooldev = devManager->createProcessArray<ChimeraTK::Boolean>(
         SynchronizationDirection::controlSystemToDevice, "booleanArray_s10", 10);
-
-    std::cout << "TestFixturePVSet END" << std::endl;
   }
 };
 

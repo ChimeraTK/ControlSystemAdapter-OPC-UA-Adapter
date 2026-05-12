@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csa:uamapping xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
+  <config rootFolder="test_void" description="Test void mapping">
+    <server applicationName="LLRFServer" port="16660" logLevel="Error" />
+    <mapping_exceptions>false</mapping_exceptions>
+    <voidHandling useBool="True" />
+    <process_variable_hierarchy>
+      <unroll pathSep="/">true</unroll>
+    </process_variable_hierarchy>
+  </config>
+
+  <process_variable sourceName="Dieser/Name/ist/voidScalar" copy="false">
+    <destination>Mapped</destination>
+  </process_variable>
+  <process_variable sourceName="Dieser/Name/ist/voidScalar" copy="true">
+    <destination>MappedCopy</destination>
+    <name>voidScalarCopy</name>
+  </process_variable>
+
+  <folder sourceName="Dieser/Name/ist" copy="false">
+    <name>MappedFolder</name>
+  </folder>
+  <folder sourceName="Dieser/Name/ist" copy="true">
+    <name>MappedFolderCopy</name>
+  </folder>
+
+</csa:uamapping>
