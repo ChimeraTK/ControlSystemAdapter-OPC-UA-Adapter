@@ -7,6 +7,8 @@
 
 #include "csa_config.h"
 
+#include <open62541/types.h>
+
 extern "C" {
 #include "csa_namespace.h"
 }
@@ -19,10 +21,18 @@ extern "C" {
 #include <vector>
 namespace ChimeraTK {
   ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
-      boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, string overwriteNodeString)
+      boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, bool useBoolAsVoid,
+      string overwriteNodeString)
   : namePV(namePV), nameNew(namePV), csManager(std::move(csManager)),
     nodeStringIdOverwrite(std::move(overwriteNodeString)), array(false), ua_mapped_class(server, basenodeid) {
-    this->mapSelfToNamespace(logger);
+    std::type_info const& valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
+    // Check here if OPC UA method should be used - if not use default mapSelfToNamespace method
+    if(valueType == typeid(Void) && !useBoolAsVoid) {
+      this->mapVoidInput(logger);
+    }
+    else {
+      this->mapSelfToNamespace(logger);
+    }
   }
 
   ua_processvariable::~ua_processvariable() {
@@ -371,6 +381,51 @@ namespace ChimeraTK {
       retval |= UA_Server_setVariableNode_dataSource(this->mappedServer, i.concreteNodeId, i.dataSource);
       UA_NodeId_clear(&i.concreteNodeId);
       UA_NodeId_clear(&i.typeTemplateId);
+    }
+    UA_NodeId_clear(&createdNodeId);
+    return retval;
+  }
+
+  UA_StatusCode ua_processvariable::mapVoidInput(const UA_Logger* logger) {
+    UA_StatusCode retval = UA_STATUSCODE_GOOD;
+    UA_NodeId createdNodeId = UA_NODEID_NULL;
+    if(!nodeStringIdOverwrite.empty()) this->nameNew = nodeStringIdOverwrite;
+
+    if(UA_NodeId_equal(&this->baseNodeId, &createdNodeId)) {
+      return UA_STATUSCODE_GOOD; // initializer should have set this!
+    }
+    // Append the app and application folder names to the string nodeId, this is needed
+    // because the mapping allows one pv linked in more folder -> only pv path is not unique
+    string baseNodeIdName;
+    if(this->baseNodeId.identifierType == UA_NODEIDTYPE_STRING) {
+      UA_STRING_TO_CPPSTRING_COPY(&this->baseNodeId.identifier.string, &baseNodeIdName)
+    }
+    if(!baseNodeIdName.empty()) {
+      baseNodeIdName.resize(baseNodeIdName.size() - 3);
+    }
+    UA_LocalizedText description;
+    description = UA_LOCALIZEDTEXT(const_cast<char*>("en_US"),
+        const_cast<char*>(this->csManager->getProcessVariable(this->namePV)->getDescription().c_str()));
+
+    UA_MethodAttributes attr = UA_MethodAttributes_default;
+    attr.description = description;
+    attr.displayName = attr.displayName =
+        UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(this->nameNew.c_str()));
+    attr.executable = true;
+    attr.userExecutable = true;
+    retval = UA_Server_addMethodNode(this->mappedServer,
+        UA_NODEID_STRING(1, const_cast<char*>((baseNodeIdName + "/" + this->nameNew).c_str())), this->baseNodeId,
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>(this->nameNew.c_str())), attr,
+        &ua_processvariable::voidMethodCallback, 0, NULL, 0, NULL, this, &createdNodeId);
+    UA_NodeId_copy(&createdNodeId, &this->ownNodeId);
+
+    if(retval != UA_STATUSCODE_GOOD) {
+      UA_LOG_WARNING(
+          logger, UA_LOGCATEGORY_USERLAND, "Failed to map void method for variable %s", this->namePV.c_str());
+    }
+    else {
+      UA_LOG_DEBUG(
+          logger, UA_LOGCATEGORY_USERLAND, "Successfully mapped void method for variable %s", this->namePV.c_str());
     }
     UA_NodeId_clear(&createdNodeId);
     return retval;

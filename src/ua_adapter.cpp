@@ -12,6 +12,7 @@
 #include <open62541/plugin/historydatabase.h>
 #include <open62541/plugin/log_stdout.h>
 #include <open62541/server.h>
+#include <open62541/types.h>
 
 extern "C" {
 #include "csa_namespace.h"
@@ -327,6 +328,21 @@ namespace ChimeraTK {
           this->serverConfig.registerLDS = false;
           UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
               "No LDS 'register'-Attribute in config file is set. LDS registration is disabled.");
+        }
+      }
+
+      sub_result = this->fileHandler->getNodeSet(xpath + "//voidHandling");
+      if(sub_result) {
+        xmlNodeSetPtr nodeset = sub_result->nodesetval;
+        if(nodeset->nodeNr > 1) {
+          throw std::runtime_error("To many <voidHandling>-Tags in config file");
+        }
+        string useBoolAsVoid = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "useBool");
+        if(!useBoolAsVoid.empty()) {
+          transform(useBoolAsVoid.begin(), useBoolAsVoid.end(), useBoolAsVoid.begin(), ::toupper);
+          this->serverConfig.useBoolAsVoid = useBoolAsVoid == "TRUE";
+          UA_LOG_INFO(&logger, UA_LOGCATEGORY_USERLAND,
+              "Bool process variables will be used forChimeraTK::Void input as set in the config file.");
         }
       }
 
@@ -748,13 +764,13 @@ namespace ChimeraTK {
     UA_NodeId folderPathNodeId = enrollFolderPathFromString(varName, this->pvSeparator);
     ua_processvariable* processvariable;
     if(!UA_NodeId_isNull(&folderPathNodeId)) {
-      processvariable =
-          new ua_processvariable(this->mappedServer, folderPathNodeId, varName.substr(1, varName.size() - 1), csManager,
-              server_config->logging, xml_file_handler::parseVariablePath(varName, this->pvSeparator).back());
+      processvariable = new ua_processvariable(this->mappedServer, folderPathNodeId,
+          varName.substr(1, varName.size() - 1), csManager, server_config->logging, this->serverConfig.useBoolAsVoid,
+          xml_file_handler::parseVariablePath(varName, this->pvSeparator).back());
     }
     else {
       processvariable = new ua_processvariable(this->mappedServer, this->ownNodeId,
-          varName.substr(1, varName.size() - 1), csManager, server_config->logging);
+          varName.substr(1, varName.size() - 1), csManager, server_config->logging, this->serverConfig.useBoolAsVoid);
     }
     this->variables.push_back(processvariable);
     UA_NodeId tmpNodeId = processvariable->getOwnNodeId();
@@ -764,40 +780,44 @@ namespace ChimeraTK {
     UA_NodeId_clear(&tmpNodeId);
   }
 
-  void ua_uaadapter::deepCopyHierarchicalLayer(
+  bool ua_uaadapter::deepCopyHierarchicalLayer(
       const boost::shared_ptr<ControlSystemPVManager>& csManager, UA_NodeId layer, UA_NodeId target) {
+    bool foundMethod = false;
     // copy pv's of current layer
     UA_BrowseDescription bd;
     bd.includeSubtypes = false;
     bd.nodeId = layer;
     bd.referenceTypeId = UA_NS0ID(HASCOMPONENT);
-    bd.resultMask = UA_BROWSERESULTMASK_NONE;
-    bd.nodeClassMask = UA_NODECLASS_VARIABLE;
+    bd.resultMask = UA_BROWSERESULTMASK_NODECLASS | UA_BROWSERESULTMASK_DISPLAYNAME;
+    bd.nodeClassMask = UA_NODECLASS_VARIABLE | UA_NODECLASS_METHOD;
     bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
     UA_BrowseResult br = UA_Server_browse(this->mappedServer, UA_UINT32_MAX, &bd);
     for(size_t j = 0; j < br.referencesSize; ++j) {
       UA_ReferenceDescription rd = br.references[j];
       // get unit, desc, ..
-      UA_LocalizedText foundPVName;
       string foundPVNameCPP;
-      UA_Server_readDisplayName(this->mappedServer, rd.nodeId.nodeId, &foundPVName);
-      UASTRING_TO_CPPSTRING(foundPVName.text, foundPVNameCPP)
+      UASTRING_TO_CPPSTRING(rd.displayName.text, foundPVNameCPP)
 
-      string pvSourceNameid;
-      UA_String foundPVSourceName;
       string foundPVSourceNameCPP;
-      UA_Variant value;
-      UA_STRING_TO_CPPSTRING_COPY(&rd.nodeId.nodeId.identifier.string, &pvSourceNameid)
-      UA_Server_readValue(
-          this->mappedServer, UA_NODEID_STRING(1, const_cast<char*>((pvSourceNameid + "/Name").c_str())), &value);
-      foundPVSourceName = *((UA_String*)value.data);
-      UASTRING_TO_CPPSTRING(foundPVSourceName, foundPVSourceNameCPP)
+      if(rd.nodeClass == UA_NODECLASS_VARIABLE) {
+        string pvSourceNameid;
+        UA_String foundPVSourceName;
+        UA_Variant value;
+        UA_STRING_TO_CPPSTRING_COPY(&rd.nodeId.nodeId.identifier.string, &pvSourceNameid)
+        UA_Server_readValue(
+            this->mappedServer, UA_NODEID_STRING(1, const_cast<char*>((pvSourceNameid + "/Name").c_str())), &value);
+        foundPVSourceName = *((UA_String*)value.data);
+        UASTRING_TO_CPPSTRING(foundPVSourceName, foundPVSourceNameCPP);
+        UA_Variant_clear(&value);
+      }
+      else if(rd.nodeClass == UA_NODECLASS_METHOD) {
+        foundMethod = true;
+        continue;
+      }
       string varName = xml_file_handler::parseVariablePath(foundPVNameCPP, "/").back();
-      auto* processvariable = new ua_processvariable(
-          this->mappedServer, target, foundPVSourceNameCPP, csManager, server_config->logging, foundPVNameCPP);
+      auto* processvariable = new ua_processvariable(this->mappedServer, target, foundPVSourceNameCPP, csManager,
+          server_config->logging, this->serverConfig.useBoolAsVoid, foundPVNameCPP);
       this->variables.push_back(processvariable);
-      UA_Variant_clear(&value);
-      UA_LocalizedText_clear(&foundPVName);
     }
     UA_BrowseResult_clear(&br);
     // copy folders of current layer
@@ -824,11 +844,12 @@ namespace ChimeraTK {
       UA_NodeId newRootFolder = createFolder(target, foundFolderNameCPP);
       if(foundFolderDescription.text.length > 0)
         UA_Server_writeDescription(this->mappedServer, newRootFolder, foundFolderDescription);
-      deepCopyHierarchicalLayer(csManager, rd.nodeId.nodeId, newRootFolder);
+      foundMethod = deepCopyHierarchicalLayer(csManager, rd.nodeId.nodeId, newRootFolder) || foundMethod;
       UA_LocalizedText_clear(&foundFolderName);
       UA_LocalizedText_clear(&foundFolderDescription);
     }
     UA_BrowseResult_clear(&br);
+    return foundMethod;
   }
 
   void ua_uaadapter::buildFolderStructure(const boost::shared_ptr<ControlSystemPVManager>& csManager) {
@@ -981,6 +1002,8 @@ namespace ChimeraTK {
                 "Skipping Folder.", nodeset->nodeTab[i]->line);
             continue;
           }
+          // Store if during during deepCopyHierarchy a method is found -> if true add reference in next step
+          bool foundMethod = false;
           // enroll path destination -> copy / link the complete tree to this place
           if(copy == "TRUE") {
             bool sourceAndDestinationEqual = false;
@@ -1010,15 +1033,30 @@ namespace ChimeraTK {
               }
               copyRoot = UA_NODEID_STRING(1, const_cast<char*>(existingDestinationFolderString.c_str()));
             }
-            deepCopyHierarchicalLayer(csManager, sourceFolderId, copyRoot);
+            // @Remark: deepCopyHierarchicalLayer will not copy method nodes because it can not resolve the source node,
+            // which is taken from the Name subnode for non method pvs
+            //          But it will tell that methods where found and thus reference will be added in the next step
+            //          If a copy is needed use explicit variable mapping instead of folder mapping
+            foundMethod = deepCopyHierarchicalLayer(csManager, sourceFolderId, copyRoot);
             if(!description.empty()) {
               UA_Server_writeDescription(this->mappedServer, copyRoot,
                   UA_LOCALIZEDTEXT(const_cast<char*>("en_US"), const_cast<char*>(description.c_str())));
             }
           }
-          else {
+          if(copy != "TRUE" || foundMethod) {
             string existingDestinationFolderString;
-            UA_NodeId copyRoot = createFolder(folderPathNodeId, folder);
+            UA_NodeId copyRoot = UA_NODEID_NULL;
+            if(foundMethod) {
+              // Folder was already created above in case it included also non methods
+              copyRoot = existFolder(folderPathNodeId, folder);
+            }
+            if(UA_NodeId_isNull(&copyRoot)) {
+              // This is the case if:
+              // 1) copy is not true -> then we only want to add references to the existing folder
+              // 2) copy is true but no method was found -> then we only want to
+              copyRoot = createFolder(folderPathNodeId, folder);
+            }
+            // UA_NodeId copyRoot = createFolder(folderPathNodeId, folder);
             if(UA_NodeId_isNull(&copyRoot)) {
               if(destination.empty()) {
                 existingDestinationFolderString = this->serverConfig.rootFolder + "/" + folder;
@@ -1053,7 +1091,12 @@ namespace ChimeraTK {
             bd.nodeId = sourceFolderId;
             bd.referenceTypeId = UA_NS0ID(HASCOMPONENT);
             bd.resultMask = UA_BROWSERESULTMASK_ALL;
-            bd.nodeClassMask = UA_NODECLASS_VARIABLE;
+            if(foundMethod) {
+              bd.nodeClassMask = UA_NODECLASS_METHOD;
+            }
+            else {
+              bd.nodeClassMask = UA_NODECLASS_VARIABLE | UA_NODECLASS_METHOD;
+            }
             bd.browseDirection = UA_BROWSEDIRECTION_FORWARD;
             br = UA_Server_browse(this->mappedServer, 1000, &bd);
             for(size_t j = 0; j < br.referencesSize; ++j) {
@@ -1061,7 +1104,19 @@ namespace ChimeraTK {
               enid.serverIndex = 0;
               enid.namespaceUri = UA_STRING_NULL;
               enid.nodeId = br.references[j].nodeId.nodeId;
-              UA_Server_addReference(this->mappedServer, copyRoot, UA_NS0ID(HASCOMPONENT), enid, UA_TRUE);
+              auto ret = UA_Server_addReference(this->mappedServer, copyRoot, UA_NS0ID(HASCOMPONENT), enid, UA_TRUE);
+              if(ret != UA_STATUSCODE_GOOD) {
+                UA_LOG_ERROR(server_config->logging, UA_LOGCATEGORY_USERLAND,
+                    "Could not add reference %.*s from copied folder to component %.*s . StatusCode: %s",
+                    (int)enid.nodeId.identifier.string.length, enid.nodeId.identifier.string.data,
+                    (int)copyRoot.identifier.string.length, copyRoot.identifier.string.data, UA_StatusCode_name(ret));
+              }
+              else {
+                UA_LOG_DEBUG(server_config->logging, UA_LOGCATEGORY_USERLAND,
+                    "Added reference %.*s from copied folder to component %.*s",
+                    (int)enid.nodeId.identifier.string.length, enid.nodeId.identifier.string.data,
+                    (int)copyRoot.identifier.string.length, copyRoot.identifier.string.data);
+              }
             }
             UA_BrowseResult_clear(&br);
           }
@@ -1167,7 +1222,7 @@ namespace ChimeraTK {
           bd.nodeId = parentSourceFolderId;
           bd.referenceTypeId = UA_NS0ID(HASCOMPONENT);
           bd.resultMask = UA_BROWSERESULTMASK_ALL;
-          bd.nodeClassMask = UA_NODECLASS_VARIABLE;
+          bd.nodeClassMask = UA_NODECLASS_VARIABLE | UA_NODECLASS_METHOD;
           bd.browseDirection = UA_BROWSEDIRECTION_BOTH;
           UA_BrowseResult br = UA_Server_browse(this->mappedServer, 20, &bd);
           for(size_t j = 0; j < br.referencesSize; ++j) {
@@ -1282,8 +1337,8 @@ namespace ChimeraTK {
           }
           ua_processvariable* processvariable;
           if(!UA_NodeId_isNull(&destinationFolderNodeId)) {
-            processvariable = new ua_processvariable(
-                this->mappedServer, destinationFolderNodeId, sourceName, csManager, server_config->logging, name);
+            processvariable = new ua_processvariable(this->mappedServer, destinationFolderNodeId, sourceName, csManager,
+                server_config->logging, this->serverConfig.useBoolAsVoid, name);
             UA_NodeId tmpProcessVariableNodeId = processvariable->getOwnNodeId();
             if(UA_NodeId_isNull(&tmpProcessVariableNodeId)) {
               raiseError("PV creation failed. PV with same name mapped.", std::string("Skipping PV ") + sourceName,

@@ -26,7 +26,7 @@ namespace ChimeraTK {
       TypesMap;
 
   /** @class ua_processvariable
-   *	@brief This class represent a processvariable of the controlsystemadapter in the information model of a OPC UA  Server
+   *	@brief This class represent a processvariable of the controlsystemadapter in the information model of a OPC UA Server
    *
    *  @author Chris Iatrou, Julian Rahm
    *  @date 22.11.2016
@@ -40,6 +40,8 @@ namespace ChimeraTK {
     string engineeringUnit;
     string description;
     UA_NodeId ownNodeId = UA_NODEID_NULL;
+    bool array;
+    boost::shared_ptr<ControlSystemPVManager> csManager;
 
     TypesMap typesMap{fusion::make_pair<int8_t>(UA_TYPES_SBYTE), fusion::make_pair<uint8_t>(UA_TYPES_BYTE),
         fusion::make_pair<int16_t>(UA_TYPES_INT16), fusion::make_pair<uint16_t>(UA_TYPES_UINT16),
@@ -47,10 +49,13 @@ namespace ChimeraTK {
         fusion::make_pair<int64_t>(UA_TYPES_INT64), fusion::make_pair<uint64_t>(UA_TYPES_UINT64),
         fusion::make_pair<float>(UA_TYPES_FLOAT), fusion::make_pair<double>(UA_TYPES_DOUBLE),
         fusion::make_pair<string>(UA_TYPES_STRING), fusion::make_pair<Boolean>(UA_TYPES_BOOLEAN)};
+    /** @brief Callback function for ChimeraTK void inputs that are used with OPC UA method calls.
+     */
+    static UA_StatusCode voidMethodCallback(UA_Server* /*server*/, const UA_NodeId* /*sessionId*/,
+        void* /*sessionHandle*/, const UA_NodeId* /*methodId*/, void* methodContext, const UA_NodeId* /*objectId*/,
+        void* /*objectContext*/, size_t /*inputSize*/, const UA_Variant* /*input*/, size_t /*outputSize*/,
+        UA_Variant* /*output*/);
 
-   private:
-    bool array;
-    boost::shared_ptr<ControlSystemPVManager> csManager;
     UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, const string& baseNodePath, UA_DataSource_Map& map);
 
     /** @brief  This method mapped all own nodes into the opcua server
@@ -58,6 +63,12 @@ namespace ChimeraTK {
      * @return <UA_StatusCode>
      */
     UA_StatusCode mapSelfToNamespace(const UA_Logger* logger);
+
+    /** @brief  This method maps the process variable as a OPC UA method
+     *
+     * @return <UA_StatusCode>
+     */
+    UA_StatusCode mapVoidInput(const UA_Logger* logger);
 
    public:
     /** @brief Constructor from ua_processvariable for generic creation
@@ -72,7 +83,8 @@ namespace ChimeraTK {
      * @param overwriteNodeString New node name
      */
     ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
-        boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, string overwriteNodeString = "");
+        boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, bool useBoolAsVoid,
+        string overwriteNodeString = "");
 
     /** @brief Destructor for ua_processvariable
      *
@@ -339,6 +351,20 @@ namespace ChimeraTK {
       this->csManager->getProcessArray<ChimeraTK::Void>(this->namePV)->write();
     }
     return UA_STATUSCODE_GOOD;
+  }
+
+  inline UA_StatusCode ua_processvariable::voidMethodCallback(UA_Server* /*server*/, const UA_NodeId* /*sessionId*/,
+      void* /*sessionHandle*/, const UA_NodeId* /*methodId*/, void* methodContext, const UA_NodeId* /*objectId*/,
+      void* /*objectContext*/, size_t /*inputSize*/, const UA_Variant* /*input*/, size_t /*outputSize*/,
+      UA_Variant* /*output*/) {
+    auto* base = reinterpret_cast<ua_processvariable*>(methodContext);
+    if(base) {
+      base->setValue<ChimeraTK::Void>(nullptr);
+      return UA_STATUSCODE_GOOD;
+    }
+    else {
+      return UA_STATUSCODE_BADINTERNALERROR;
+    }
   }
 
   template<typename T>
