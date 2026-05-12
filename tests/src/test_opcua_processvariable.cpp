@@ -237,8 +237,8 @@ void ProcessVariableTest::testClassSide() {
 
   // ua_processvariable *test;
   for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-    ua_processvariable test(
-        serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(), pvSet.csManager, UA_Log_Stdout);
+    ua_processvariable test(serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(),
+        pvSet.csManager, UA_Log_Stdout, true);
 
     BOOST_CHECK(test.getName() == oneProcessVariable->getName());
 
@@ -347,8 +347,8 @@ void ProcessVariableTest::testClientSide() {
   // add set
   vector<ua_processvariable*> varList;
   for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-    varList.push_back(new ua_processvariable(
-        serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(), pvSet.csManager, UA_Log_Stdout));
+    varList.push_back(new ua_processvariable(serverSet.mappedServer, serverSet.baseNodeId,
+        oneProcessVariable->getName(), pvSet.csManager, UA_Log_Stdout, true));
   }
 
   // Create client to connect to server
