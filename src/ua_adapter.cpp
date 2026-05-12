@@ -302,52 +302,9 @@ namespace ChimeraTK {
           this->mappingExceptions = UA_FALSE;
         }
       }
-      xmlXPathObjectPtr sub_result = this->fileHandler->getNodeSet(xpath + "//lds");
+
+      xmlXPathObjectPtr sub_result = this->fileHandler->getNodeSet(xpath + "//server");
       if(sub_result) {
-        xmlNodeSetPtr nodeset = sub_result->nodesetval;
-        if(nodeset->nodeNr > 1) {
-          throw std::runtime_error("To many <lds>-Tags in config file");
-        }
-
-        placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "register");
-        std::string ldsAddress = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "address");
-        if(!ldsAddress.empty()) {
-          this->serverConfig.ldsAddress = ldsAddress;
-        }
-        else {
-          UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
-              "No lds 'address'-Attribute in config file is set. Using default address: %s",
-              this->serverConfig.ldsAddress.c_str());
-        }
-        string registerLDS = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "register");
-        if(!registerLDS.empty()) {
-          transform(registerLDS.begin(), registerLDS.end(), registerLDS.begin(), ::toupper);
-          this->serverConfig.registerLDS = registerLDS == "TRUE";
-        }
-        else {
-          this->serverConfig.registerLDS = false;
-          UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
-              "No LDS 'register'-Attribute in config file is set. LDS registration is disabled.");
-        }
-      }
-
-      sub_result = this->fileHandler->getNodeSet(xpath + "//voidHandling");
-      if(sub_result) {
-        xmlNodeSetPtr nodeset = sub_result->nodesetval;
-        if(nodeset->nodeNr > 1) {
-          throw std::runtime_error("To many <voidHandling>-Tags in config file");
-        }
-        string useBoolAsVoid = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "useBool");
-        if(!useBoolAsVoid.empty()) {
-          transform(useBoolAsVoid.begin(), useBoolAsVoid.end(), useBoolAsVoid.begin(), ::toupper);
-          this->serverConfig.useBoolAsVoid = useBoolAsVoid == "TRUE";
-          UA_LOG_INFO(&logger, UA_LOGCATEGORY_USERLAND,
-              "Bool process variables will be used forChimeraTK::Void input as set in the config file.");
-        }
-      }
-
-      sub_result = this->fileHandler->getNodeSet(xpath + "//server");
-      if(result) {
         xmlNodeSetPtr nodeset = sub_result->nodesetval;
         if(nodeset->nodeNr > 1) {
           throw std::runtime_error("To many <server>-Tags in config file");
@@ -429,6 +386,50 @@ namespace ChimeraTK {
         UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
             "No <server>-Tag in config file. Use default port 16664 and application name configuration.");
         this->serverConfig.rootFolder = this->serverConfig.applicationName;
+      }
+
+      sub_result = this->fileHandler->getNodeSet(xpath + "//lds");
+      if(sub_result) {
+        xmlNodeSetPtr nodeset = sub_result->nodesetval;
+        if(nodeset->nodeNr > 1) {
+          throw std::runtime_error("To many <lds>-Tags in config file");
+        }
+
+        placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "register");
+        std::string ldsAddress = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "address");
+        if(!ldsAddress.empty()) {
+          this->serverConfig.ldsAddress = ldsAddress;
+        }
+        else {
+          UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+              "No lds 'address'-Attribute in config file is set. Using default address: %s",
+              this->serverConfig.ldsAddress.c_str());
+        }
+        string registerLDS = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "register");
+        if(!registerLDS.empty()) {
+          transform(registerLDS.begin(), registerLDS.end(), registerLDS.begin(), ::toupper);
+          this->serverConfig.registerLDS = registerLDS == "TRUE";
+        }
+        else {
+          this->serverConfig.registerLDS = false;
+          UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+              "No LDS 'register'-Attribute in config file is set. LDS registration is disabled.");
+        }
+      }
+
+      sub_result = this->fileHandler->getNodeSet(xpath + "//voidHandling");
+      if(sub_result) {
+        xmlNodeSetPtr nodeset = sub_result->nodesetval;
+        if(nodeset->nodeNr > 1) {
+          throw std::runtime_error("To many <voidHandling>-Tags in config file");
+        }
+        string useBoolAsVoid = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "useBool");
+        if(!useBoolAsVoid.empty()) {
+          transform(useBoolAsVoid.begin(), useBoolAsVoid.end(), useBoolAsVoid.begin(), ::toupper);
+          this->serverConfig.useBoolAsVoid = useBoolAsVoid == "TRUE";
+          UA_LOG_INFO(&logger, UA_LOGCATEGORY_USERLAND,
+              "Bool process variables will be used forChimeraTK::Void input as set in the config file.");
+        }
       }
 
       // check if historizing is configured
