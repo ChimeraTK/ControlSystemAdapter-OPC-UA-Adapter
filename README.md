@@ -9,6 +9,25 @@
 Welcome to the ControlSystem-OPCUA_Adapter project. 
 This project add an control system adapter to [ChimeraTK](https://github.com/ChimeraTK), that is based on the OPC UA stack [open62541](https://open62541.org/).
 
+## Void handling
+
+The control system adapter supports all Void types used in ChimeraTK.
+
+`ChimeraTK::VoidOutput`:
+* Outputs are implemented as OPC UA events
+* The events are registered with the `Server` node (`Root/Objects/Server`)
+* They are of type `VoidEventType` and include addition information like validity or control system path of the triggering `ChimeraTK::VoidOutput`
+
+`ChimeraTK::VoidInput`:
+* It can be decided in the mapping if an `UA_Boolean` or an OPC UA method based implementation is used for Void inputs 
+* `UA_Boolean` based implementation is meant to be used in case clients do not support OPC UA method calls
+* `UA_Boolean` implementation:
+  * Value will always be `UA_FALSE`
+  * To trigger writing the `ChimeraTK::VoidInput` write `UA_TRUE` to the PV
+  * After writing `UA_TRUE` the value of the PV is still `UA_FALSE`
+* OPC UA method
+  * Call the corresponding method to trigger writing the `ChimeraTK::VoidInput`
+
 # Mapping 
 
 In order to use the control system adapter a dedicated map file is required. The name of the map file is expected to be _ApplicationName_\_mapping.xml, where _ApplicationName_ is the name of the ChiemraTK application.
@@ -33,6 +52,8 @@ The generator can be started without any input files. It allows to create map fi
 * Set logging level (can be changes also at runtime)
 * Enable LDS registration
      * Set LDS address
+* Set handling of Void inputs
+     * Decide if Void inputs should be implemented as `UA_Boolean` or as OPC UA method
    
 Each ChimeraTK application should include an XML generator that allows to create an XML file that includes the address space of the application. 
 If using the map file generator with such an application specific XML fie the generaotr allows to:
