@@ -318,6 +318,16 @@
        </spacer>
       </item>
       <item>
+       <widget class="QCheckBox" name="useBoolAsVoid">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If true boolean process variables are used for ChimeraTK Void inputs. Else OPC UA methods are used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Use Bool for Void inputs</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="registerLDS">
         <property name="text">
          <string>Register at LDS</string>
@@ -424,7 +434,7 @@
      <x>0</x>
      <y>0</y>
      <width>1616</width>
-     <height>24</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

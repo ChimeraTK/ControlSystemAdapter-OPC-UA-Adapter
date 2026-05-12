@@ -110,11 +110,12 @@ class Config(EncryptionSettings):
     self.password: str|None = None
     self.applicationName: str|None = None
     self.rootFolder: str|None = None
-    self.applicationDescription = ""
-    self.enableLogin = False
+    self.applicationDescription: str = ""
+    self.enableLogin: bool = False
     self.port: int|None = None
     self.historySettings: List[HistorySetting] = []
     self.logLevel: str = "INFO"
+    self.useBoolAsVoid: bool = False
   
   def createConfig(self, root:ET._Element):
     '''
@@ -160,6 +161,10 @@ class Config(EncryptionSettings):
       # raises in case of problems
       self.checkEncryptionSettings()
       self.createEncryption(ET.SubElement(config, "security"))
+
+    if self.useBoolAsVoid:
+      voidHandling = ET.SubElement(config, "voidHandling")
+      voidHandling.set("useBool", "True")
       
     if len(self.historySettings) > 0:
       logging.info("Writing {} history settings.".format(len(self.historySettings)))
@@ -200,6 +205,11 @@ class Config(EncryptionSettings):
             self.registerLDS = False
         if 'address' in lds.attrib:
           self.ldsAddress = lds.attrib['address']
+      useBoolAsVoid = config.find('voidHandling')
+      if useBoolAsVoid is not None:
+        if 'useBool' in useBoolAsVoid.attrib:
+          if useBoolAsVoid.attrib["useBool"].upper() == 'TRUE':
+            self.useBoolAsVoid = True
       login = config.find('login')
       if login is not None:
         self.enableLogin = True
