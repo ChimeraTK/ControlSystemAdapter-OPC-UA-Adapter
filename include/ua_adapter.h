@@ -5,7 +5,10 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #pragma once
 
+#include "csa_additionalvariable.h"
+#include "csa_processvariable.h"
 #include "node_historizing.h"
+#include "xml_file_handler.h"
 
 #include <open62541/config.h>
 #include <open62541/plugin/accesscontrol.h>

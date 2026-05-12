@@ -6,8 +6,8 @@
 #pragma once
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
-#include "ChimeraTK/SupportedUserTypes.h"
 #include "ua_mapped_class.h"
+#include "ua_typeconversion.h"
 
 #include <boost/fusion/container/map.hpp>
 

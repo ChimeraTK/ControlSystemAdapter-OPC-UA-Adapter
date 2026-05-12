@@ -70,10 +70,7 @@ namespace ChimeraTK {
   }
 
   bool xml_file_handler::isDocSetted() {
-    if(this->doc != nullptr) {
-      return true;
-    }
-    return false;
+    return this->doc != nullptr;
   }
 
   bool xml_file_handler::createDoc(const std::string& filePath) {

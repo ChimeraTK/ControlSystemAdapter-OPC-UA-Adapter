@@ -3,12 +3,8 @@
 // SPDX-FileCopyrightText: 2016 Julian Rahm <Julian.Rahm@tu-dresden.de>
 // SPDX-FileCopyrightText: 2023 Andreas Ebner <Andreas.Ebner@iosb.fraunhofer.de>
 // SPDX-License-Identifier: LGPL-3.0-or-later
-extern "C" {
-#include "unistd.h"
-}
-
 #include "csa_opcua_adapter.h"
-#include "csa_processvariable.h"
+
 #include "ua_adapter.h"
 #include "void_type.h"
 
@@ -16,7 +12,8 @@ extern "C" {
 #include <utility>
 
 namespace ChimeraTK {
-  csa_opcua_adapter::csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile) {
+  csa_opcua_adapter::csa_opcua_adapter(
+      boost::shared_ptr<ControlSystemPVManager> csManager, const std::string& configFile) {
     this->csManager = std::move(csManager);
 
     // Create new server adapter
@@ -59,7 +56,7 @@ namespace ChimeraTK {
         }
       }
       for(auto e : this->adapter->exclude) {
-        string suffix_1 = "/*", suffix_2 = "*";
+        std::string suffix_1 = "/*", suffix_2 = "*";
         if(e.rfind(suffix_1) == e.size() - suffix_1.size()) {
           if(oneProcessVariable->getName().rfind(e.substr(0, e.size() - 1)) == 0) {
             bool pv_used = false;
@@ -149,10 +146,10 @@ namespace ChimeraTK {
     }
 
     adapter->applyMapping(this->csManager);
-    vector<string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
+    vector<std::string> allNotMappedVariables = adapter->getAllNotMappableVariablesNames();
     if(!allNotMappedVariables.empty()) {
       std::stringstream ss;
-      for(const string& var : allNotMappedVariables) {
+      for(const std::string& var : allNotMappedVariables) {
         ss << "\t" << var << endl;
       }
       UA_LOG_WARNING(this->getLogger(), UA_LOGCATEGORY_USERLAND,
@@ -219,7 +216,7 @@ namespace ChimeraTK {
   bool csa_opcua_adapter::isRunning() {
     return this->adapter_thread.joinable();
   }
-  const set<string>& csa_opcua_adapter::getUnusedVariables() const {
+  const std::set<std::string>& csa_opcua_adapter::getUnusedVariables() const {
     return unusedVariables;
   }
 

@@ -10,7 +10,6 @@
 
 #include <boost/tokenizer.hpp>
 
-#include <iostream>
 #include <vector>
 
 namespace ChimeraTK {

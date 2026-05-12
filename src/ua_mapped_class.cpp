@@ -5,8 +5,6 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #include "ua_mapped_class.h"
 
-#include <iostream>
-
 using namespace std;
 
 namespace ChimeraTK {

@@ -35,7 +35,6 @@ extern "C" {
 
 #include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
 #include "csa_opcua_adapter.h"
-#include "open62541/plugin/log_stdout.h"
 
 #include <atomic>
 #include <iostream>
@@ -94,7 +93,9 @@ int main() {
   /* Unblock SIGINT */
   sigprocmask(SIG_UNBLOCK, &intmask, nullptr);
 
-  while(!terminateMain) sleep(3600); // sleep will be interrupted when signal is received
+  while(!terminateMain) {
+    sleep(3600); // sleep will be interrupted when signal is received
+  }
   csManager.reset();
 
   std::cout << "Application terminated." << std::endl;

@@ -19,7 +19,6 @@
 #include "csa_namespace.h"
 
 #include "csa_config.h"
-#include "loggingLevel_type.h"
 
 UA_INLINE UA_StatusCode csa_namespace_add_additional_variable(UA_Server* server) {
   UA_VariableTypeAttributes attr;
@@ -98,7 +97,9 @@ UA_INLINE void csa_namespace_add_LoggingLevelEnumType(UA_Server* server, char* e
 
 UA_INLINE UA_StatusCode csa_namespace_init(UA_Server* server) {
   UA_StatusCode retval = UA_STATUSCODE_GOOD;
-  if(UA_Server_addNamespace(server, "http://adapterIM/") != 2) return UA_STATUSCODE_BADUNEXPECTEDERROR;
+  if(UA_Server_addNamespace(server, "http://adapterIM/") != 2) {
+    return UA_STATUSCODE_BADUNEXPECTEDERROR;
+  }
 
   retval = csa_namespace_add_additional_variable(server);
 

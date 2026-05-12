@@ -6,19 +6,13 @@
 #include "csa_processvariable.h"
 
 #include "csa_config.h"
+#include "ua_map_types.h"
 
 #include <open62541/types.h>
 
-extern "C" {
-#include "csa_namespace.h"
-}
-
-#include "open62541/plugin/log_stdout.h"
-#include "ua_map_types.h"
-
-#include <iostream>
+#include <cstdlib>
+#include <cstring>
 #include <utility>
-#include <vector>
 namespace ChimeraTK {
   ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
       boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, bool useBoolAsVoid,
@@ -174,10 +168,8 @@ namespace ChimeraTK {
     if(!this->description.empty()) {
       return this->description;
     }
-    else {
-      this->description = this->csManager->getProcessVariable(this->namePV)->getDescription();
-      return this->description;
-    }
+    this->description = this->csManager->getProcessVariable(this->namePV)->getDescription();
+    return this->description;
   }
 
   // Type
@@ -200,34 +192,48 @@ namespace ChimeraTK {
   string ua_processvariable::getType() {
     // Note: typeid().name() may return the name; may as well return the symbol's name from the binary though...
     std::type_info const& valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
-    if(valueType == typeid(int8_t))
+    if(valueType == typeid(int8_t)) {
       return "int8_t";
-    else if(valueType == typeid(uint8_t))
+    }
+    else if(valueType == typeid(uint8_t)) {
       return "uint8_t";
-    else if(valueType == typeid(int16_t))
+    }
+    else if(valueType == typeid(int16_t)) {
       return "int16_t";
-    else if(valueType == typeid(uint16_t))
+    }
+    else if(valueType == typeid(uint16_t)) {
       return "uint16_t";
-    else if(valueType == typeid(int32_t))
+    }
+    else if(valueType == typeid(int32_t)) {
       return "int32_t";
-    else if(valueType == typeid(uint32_t))
+    }
+    else if(valueType == typeid(uint32_t)) {
       return "uint32_t";
-    else if(valueType == typeid(int64_t))
+    }
+    else if(valueType == typeid(int64_t)) {
       return "int64_t";
-    else if(valueType == typeid(uint64_t))
+    }
+    else if(valueType == typeid(uint64_t)) {
       return "uint64_t";
-    else if(valueType == typeid(float))
+    }
+    else if(valueType == typeid(float)) {
       return "float";
-    else if(valueType == typeid(double))
+    }
+    else if(valueType == typeid(double)) {
       return "double";
-    else if(valueType == typeid(string))
+    }
+    else if(valueType == typeid(string)) {
       return "string";
-    else if(valueType == typeid(Boolean))
+    }
+    else if(valueType == typeid(Boolean)) {
       return "Boolean";
-    else if(valueType == typeid(Void))
+    }
+    else if(valueType == typeid(Void)) {
       return "Void";
-    else
+    }
+    else {
       return "Unsupported type";
+    }
   }
 
   UA_StatusCode ua_processvariable::mapSelfToNamespace(const UA_Logger* logger) {
