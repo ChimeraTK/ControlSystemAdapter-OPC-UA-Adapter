@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #include "open62541/plugin/log_stdout.h"
 
+#include <ChimeraTK/VersionNumber.h>
+
+#include <open62541/types.h>
+
 #include <boost/fusion/container/map.hpp>
 #include <boost/test/included/unit_test.hpp>
 
@@ -22,7 +26,8 @@ namespace fusion = boost::fusion;
 typedef fusion::map<fusion::pair<uint8_t, UA_DataType>, fusion::pair<int8_t, UA_DataType>,
     fusion::pair<uint16_t, UA_DataType>, fusion::pair<int16_t, UA_DataType>, fusion::pair<uint32_t, UA_DataType>,
     fusion::pair<int32_t, UA_DataType>, fusion::pair<uint64_t, UA_DataType>, fusion::pair<int64_t, UA_DataType>,
-    fusion::pair<float, UA_DataType>, fusion::pair<double, UA_DataType>, fusion::pair<string, UA_DataType>>
+    fusion::pair<float, UA_DataType>, fusion::pair<double, UA_DataType>, fusion::pair<string, UA_DataType>,
+    fusion::pair<ChimeraTK::Boolean, UA_DataType>, fusion::pair<ChimeraTK::Void, UA_DataType>>
     TestTypesMap;
 
 static TestTypesMap tMap{fusion::make_pair<uint8_t>(UA_TYPES[UA_TYPES_SBYTE]),
@@ -30,7 +35,9 @@ static TestTypesMap tMap{fusion::make_pair<uint8_t>(UA_TYPES[UA_TYPES_SBYTE]),
     fusion::make_pair<int16_t>(UA_TYPES[UA_TYPES_INT16]), fusion::make_pair<uint32_t>(UA_TYPES[UA_TYPES_UINT32]),
     fusion::make_pair<int32_t>(UA_TYPES[UA_TYPES_INT32]), fusion::make_pair<uint64_t>(UA_TYPES[UA_TYPES_UINT64]),
     fusion::make_pair<int64_t>(UA_TYPES[UA_TYPES_INT64]), fusion::make_pair<float>(UA_TYPES[UA_TYPES_FLOAT]),
-    fusion::make_pair<double>(UA_TYPES[UA_TYPES_DOUBLE]), fusion::make_pair<string>(UA_TYPES[UA_TYPES_STRING])};
+    fusion::make_pair<double>(UA_TYPES[UA_TYPES_DOUBLE]), fusion::make_pair<string>(UA_TYPES[UA_TYPES_STRING]),
+    fusion::make_pair<ChimeraTK::Boolean>(UA_TYPES[UA_TYPES_BOOLEAN]),
+    fusion::make_pair<ChimeraTK::Void>(UA_TYPES[UA_TYPES_BOOLEAN])};
 
 /*
  * ProcessVariableTest
@@ -52,6 +59,7 @@ void ProcessVariableTest::testData(
     ProcessVariable::SharedPtr oneProcessVariable, TestFixturePVSet* pvSet, ua_processvariable* test) {
   vector<CTK_TYPE> valueArray =
       pvSet->csManager->getProcessArray<CTK_TYPE>(oneProcessVariable->getName())->accessChannel(0);
+  auto initialVersionNumber = pvSet->csManager->getProcessVariable(oneProcessVariable->getName())->getVersionNumber();
   UA_Variant* var = UA_Variant_new();
   test->getValue<CTK_TYPE>(var, nullptr);
   if(valueArray.size() == 1) {
@@ -59,14 +67,31 @@ void ProcessVariableTest::testData(
       std::string valueStr;
       UA_STRING_TO_CPPSTRING_COPY(((UA_String*)(var->data)), &valueStr);
       BOOST_CHECK(valueStr == "");
+      BOOST_CHECK(initialVersionNumber == ChimeraTK::VersionNumber(0));
       auto newValue = UA_String_fromChars("test");
       UA_Variant_clear(var);
       UA_Variant_setScalarCopy(var, &newValue, &fusion::at_key<CTK_TYPE>(tMap));
       UA_String_clear(&newValue);
     }
+    else if constexpr(std::is_same_v<CTK_TYPE, ChimeraTK::Boolean>) {
+      BOOST_CHECK(*(UA_Boolean*)(var->data) == false);
+      UA_Boolean newValue = UA_TRUE;
+      BOOST_CHECK(initialVersionNumber == ChimeraTK::VersionNumber(0));
+      UA_Variant_clear(var);
+      UA_Variant_setScalarCopy(var, &newValue, &fusion::at_key<CTK_TYPE>(tMap));
+    }
+    else if constexpr(std::is_same_v<CTK_TYPE, ChimeraTK::Void>) {
+      // Void as  boolean
+      BOOST_CHECK(*(UA_Boolean*)(var->data) == false);
+      UA_Boolean newValue = UA_TRUE;
+      BOOST_CHECK(initialVersionNumber == ChimeraTK::VersionNumber(0));
+      UA_Variant_clear(var);
+      UA_Variant_setScalarCopy(var, &newValue, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    }
     else {
       CTK_TYPE newValue;
       BOOST_CHECK(*(CTK_TYPE*)(var->data) == 0);
+      BOOST_CHECK(initialVersionNumber == ChimeraTK::VersionNumber(0));
       newValue = 100;
       UA_Variant_clear(var);
       UA_Variant_setScalarCopy(var, &newValue, &fusion::at_key<CTK_TYPE>(tMap));
@@ -81,75 +106,119 @@ void ProcessVariableTest::testData(
     // Check value on controlsystemmanager side
     vector<CTK_TYPE> csValueArray =
         pvSet->csManager->getProcessArray<CTK_TYPE>(oneProcessVariable->getName())->accessChannel(0);
+    auto newVersionNumber = pvSet->csManager->getProcessVariable(oneProcessVariable->getName())->getVersionNumber();
     BOOST_CHECK(csValueArray.size() == 1);
     if constexpr(std::is_same_v<CTK_TYPE, string>) {
       BOOST_CHECK(csValueArray.at(0) == "test");
+      BOOST_CHECK(newVersionNumber > initialVersionNumber);
+    }
+    else if constexpr(std::is_same_v<CTK_TYPE, ChimeraTK::Boolean>) {
+      BOOST_CHECK(csValueArray.at(0) == true);
+      BOOST_CHECK(newVersionNumber > initialVersionNumber);
+    }
+    else if constexpr(std::is_same_v<CTK_TYPE, ChimeraTK::Void>) {
+      // Void as  boolean
+      // Version number should still increase
+      BOOST_CHECK(newVersionNumber > initialVersionNumber);
     }
     else {
       BOOST_CHECK(csValueArray.at(0) == 100);
+      BOOST_CHECK(newVersionNumber > initialVersionNumber);
     }
   }
   else {
-    // if Array
-    if constexpr(std::is_same_v<CTK_TYPE, string>) {
-      std::vector<UA_String> newVector(var->arrayLength);
-      for(size_t i = 0; i < var->arrayLength; i++) {
-        std::string valueStr;
-        UA_STRING_TO_CPPSTRING_COPY(&(((UA_String*)(var->data))[i]), &valueStr);
-        BOOST_CHECK(valueStr == "");
-        std::string tmpStr = "test" + to_string(i);
-        newVector.at(i) = UA_String_fromChars((char*)tmpStr.c_str());
-      }
-      UA_Variant_clear(var);
-      UA_Variant_setArrayCopy(var, newVector.data(), newVector.size(), &fusion::at_key<CTK_TYPE>(tMap));
-      for(size_t i = 0; i < newVector.size(); i++) {
-        UA_String_clear(&newVector.at(i));
-      }
-    }
-    else {
-      std::vector<CTK_TYPE> newVector(var->arrayLength);
-      for(size_t i = 0; i < var->arrayLength; i++) {
-        BOOST_CHECK(((CTK_TYPE*)(var->data))[i] == 0);
-        newVector.at(i) = (CTK_TYPE)(100 - i);
-      }
-      UA_Variant_clear(var);
-      UA_Variant_setArrayCopy(var, newVector.data(), newVector.size(), &fusion::at_key<CTK_TYPE>(tMap));
-    }
-
-    test->setValue<CTK_TYPE>(var);
-
-    // Check value on controlsystemmanager side
-    vector<CTK_TYPE> valueArray =
-        pvSet->csManager->getProcessArray<CTK_TYPE>(oneProcessVariable->getName())->accessChannel(0);
-    size_t i = 0;
-    for(auto value : valueArray) {
+    if constexpr(!std::is_same_v<CTK_TYPE, ChimeraTK::Void>) {
+      // if Array
       if constexpr(std::is_same_v<CTK_TYPE, string>) {
-        BOOST_CHECK(value == "test" + to_string(i));
+        std::vector<UA_String> newVector(var->arrayLength);
+        for(size_t i = 0; i < var->arrayLength; i++) {
+          std::string valueStr;
+          UA_STRING_TO_CPPSTRING_COPY(&(((UA_String*)(var->data))[i]), &valueStr);
+          BOOST_CHECK(valueStr == "");
+          std::string tmpStr = "test" + to_string(i);
+          newVector.at(i) = UA_String_fromChars((char*)tmpStr.c_str());
+        }
+        UA_Variant_clear(var);
+        UA_Variant_setArrayCopy(var, newVector.data(), newVector.size(), &fusion::at_key<CTK_TYPE>(tMap));
+        for(size_t i = 0; i < newVector.size(); i++) {
+          UA_String_clear(&newVector.at(i));
+        }
+      }
+      else if constexpr(std::is_same_v<CTK_TYPE, ChimeraTK::Boolean>) {
+        std::array<UA_Boolean, 10> newVector;
+        for(size_t i = 0; i < var->arrayLength; i++) {
+          BOOST_CHECK(((UA_Boolean*)(var->data))[i] == false);
+          if(i % 2 == 0) {
+            newVector.at(i) = UA_TRUE;
+          }
+          else {
+            newVector.at(i) = UA_FALSE;
+          }
+        }
+        UA_Variant_clear(var);
+        UA_Variant_setArrayCopy(var, newVector.data(), newVector.size(), &fusion::at_key<CTK_TYPE>(tMap));
       }
       else {
-        BOOST_CHECK(value == (CTK_TYPE)(100 - i));
+        std::vector<CTK_TYPE> newVector(var->arrayLength);
+        for(size_t i = 0; i < var->arrayLength; i++) {
+          BOOST_CHECK(((CTK_TYPE*)(var->data))[i] == 0);
+          newVector.at(i) = (CTK_TYPE)(100 - i);
+        }
+        UA_Variant_clear(var);
+        UA_Variant_setArrayCopy(var, newVector.data(), newVector.size(), &fusion::at_key<CTK_TYPE>(tMap));
       }
-      i++;
-    }
 
-    // now a certain range
-    UA_Variant* varRange = UA_Variant_new();
-    UA_NumericRange range = UA_NUMERICRANGE("0:5");
-    //    UA_NumericRange_parse(&range, UA_String_fromChars("0:5"));
-    test->getValue<CTK_TYPE>(varRange, &range);
-    BOOST_CHECK(varRange->arrayLength == 6);
-    for(size_t i = 0; i < varRange->arrayLength; i++) {
-      if constexpr(std::is_same_v<CTK_TYPE, string>) {
-        std::string valueStr;
-        UA_STRING_TO_CPPSTRING_COPY(&(((UA_String*)(varRange->data))[i]), &valueStr);
-        BOOST_CHECK(valueStr == "test" + to_string(i));
+      test->setValue<CTK_TYPE>(var);
+
+      // Check value on controlsystemmanager side
+      vector<CTK_TYPE> valueArray =
+          pvSet->csManager->getProcessArray<CTK_TYPE>(oneProcessVariable->getName())->accessChannel(0);
+      size_t i = 0;
+      for(auto value : valueArray) {
+        if constexpr(std::is_same_v<CTK_TYPE, string>) {
+          BOOST_CHECK(value == "test" + to_string(i));
+        }
+        else if constexpr(std::is_same_v<CTK_TYPE, ChimeraTK::Boolean>) {
+          if(i % 2 == 0) {
+            BOOST_CHECK(value == true);
+          }
+          else {
+            BOOST_CHECK(value == false);
+          }
+        }
+        else {
+          BOOST_CHECK(value == (CTK_TYPE)(100 - i));
+        }
+        i++;
       }
-      else {
-        BOOST_CHECK(((CTK_TYPE*)(varRange->data))[i] == (CTK_TYPE)(100 - i));
+
+      // now a certain range
+      UA_Variant* varRange = UA_Variant_new();
+      UA_NumericRange range = UA_NUMERICRANGE("0:5");
+      //    UA_NumericRange_parse(&range, UA_String_fromChars("0:5"));
+      test->getValue<CTK_TYPE>(varRange, &range);
+      BOOST_CHECK(varRange->arrayLength == 6);
+      for(size_t i = 0; i < varRange->arrayLength; i++) {
+        if constexpr(std::is_same_v<CTK_TYPE, string>) {
+          std::string valueStr;
+          UA_STRING_TO_CPPSTRING_COPY(&(((UA_String*)(varRange->data))[i]), &valueStr);
+          BOOST_CHECK(valueStr == "test" + to_string(i));
+        }
+        else if constexpr(std::is_same_v<CTK_TYPE, ChimeraTK::Boolean>) {
+          if(i % 2 == 0) {
+            BOOST_CHECK(((UA_Boolean*)(varRange->data))[i] == true);
+          }
+          else {
+            BOOST_CHECK(((UA_Boolean*)(varRange->data))[i] == false);
+          }
+        }
+        else {
+          BOOST_CHECK(((CTK_TYPE*)(varRange->data))[i] == (CTK_TYPE)(100 - i));
+        }
       }
+      UA_Variant_delete(varRange);
+      UA_free(range.dimensions);
     }
-    UA_Variant_delete(varRange);
-    UA_free(range.dimensions);
   }
   UA_Variant_delete(var);
 }
@@ -168,8 +237,8 @@ void ProcessVariableTest::testClassSide() {
 
   // ua_processvariable *test;
   for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-    ua_processvariable test(
-        serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(), pvSet.csManager, UA_Log_Stdout);
+    ua_processvariable test(serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(),
+        pvSet.csManager, UA_Log_Stdout, true);
 
     BOOST_CHECK(test.getName() == oneProcessVariable->getName());
 
@@ -232,9 +301,17 @@ void ProcessVariableTest::testClassSide() {
       BOOST_CHECK(valueType == "string");
       testData<string>(oneProcessVariable, &pvSet, &test);
     }
-    else
+    else if(valueType == "Boolean") {
+      BOOST_CHECK(valueType == "Boolean");
+      testData<ChimeraTK::Boolean>(oneProcessVariable, &pvSet, &test);
+    }
+    else if(valueType == "Void") {
+      BOOST_CHECK(valueType == "Void");
+      testData<ChimeraTK::Void>(oneProcessVariable, &pvSet, &test);
+    }
+    else {
       BOOST_CHECK(false);
-
+    }
     UA_NodeId nodeId = test.getOwnNodeId();
     BOOST_CHECK(!UA_NodeId_isNull(&nodeId));
     UA_NodeId_clear(&nodeId);
@@ -270,8 +347,8 @@ void ProcessVariableTest::testClientSide() {
   // add set
   vector<ua_processvariable*> varList;
   for(ProcessVariable::SharedPtr oneProcessVariable : pvSet.csManager->getAllProcessVariables()) {
-    varList.push_back(new ua_processvariable(
-        serverSet.mappedServer, serverSet.baseNodeId, oneProcessVariable->getName(), pvSet.csManager, UA_Log_Stdout));
+    varList.push_back(new ua_processvariable(serverSet.mappedServer, serverSet.baseNodeId,
+        oneProcessVariable->getName(), pvSet.csManager, UA_Log_Stdout, true));
   }
 
   // Create client to connect to server

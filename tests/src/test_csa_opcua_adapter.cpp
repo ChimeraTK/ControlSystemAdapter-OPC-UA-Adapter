@@ -50,7 +50,7 @@ void CSAOPCUATest::testWithPVSet() {
   }
   BOOST_CHECK(csaOPCUA.getUAAdapter()->running);
   // is csManager init
-  BOOST_CHECK(csaOPCUA.getControlSystemManager()->getAllProcessVariables().size() == 22);
+  BOOST_CHECK(csaOPCUA.getControlSystemManager()->getAllProcessVariables().size() == 25);
 
   BOOST_CHECK(csaOPCUA.getUAAdapter() != NULL);
 

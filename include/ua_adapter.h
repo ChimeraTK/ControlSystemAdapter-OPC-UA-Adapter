@@ -29,6 +29,7 @@ namespace ChimeraTK {
     bool enableSecurity = false;
     bool unsecure = false;
     bool registerLDS = false;
+    bool useBoolAsVoid = false;
     string ldsAddress = "opc.tcp://localhost:4840";
     UA_LogLevel logLevel = UA_LOGLEVEL_INFO;
     string certPath;
@@ -250,13 +251,15 @@ namespace ChimeraTK {
     void buildFolderStructure(const boost::shared_ptr<ControlSystemPVManager>& csManager);
 
     /**
-     * @brief Copy (recursively) the content of a folder to a new location
+     * @brief Copy (recursively) the content of a folder to a new location - without copying methods
      *
      * @param csManager control system manager
      * @param layer source folder
      * @param target destination folder
+     * @return true if a method was found during the copy process - in that case a reference will be added in
+     * buildFolderStructure
      */
-    void deepCopyHierarchicalLayer(
+    bool deepCopyHierarchicalLayer(
         const boost::shared_ptr<ControlSystemPVManager>& csManager, UA_NodeId layer, UA_NodeId target);
 
     /** @brief Method that returns the node id of the instanced class

@@ -40,6 +40,8 @@ namespace ChimeraTK {
     string engineeringUnit;
     string description;
     UA_NodeId ownNodeId = UA_NODEID_NULL;
+    bool array;
+    boost::shared_ptr<ControlSystemPVManager> csManager;
 
     TypesMap typesMap{fusion::make_pair<int8_t>(UA_TYPES_SBYTE), fusion::make_pair<uint8_t>(UA_TYPES_BYTE),
         fusion::make_pair<int16_t>(UA_TYPES_INT16), fusion::make_pair<uint16_t>(UA_TYPES_UINT16),
@@ -47,10 +49,13 @@ namespace ChimeraTK {
         fusion::make_pair<int64_t>(UA_TYPES_INT64), fusion::make_pair<uint64_t>(UA_TYPES_UINT64),
         fusion::make_pair<float>(UA_TYPES_FLOAT), fusion::make_pair<double>(UA_TYPES_DOUBLE),
         fusion::make_pair<string>(UA_TYPES_STRING), fusion::make_pair<Boolean>(UA_TYPES_BOOLEAN)};
+    /** @brief Callback function for ChimeraTK void inputs that are used with OPC UA method calls.
+     */
+    static UA_StatusCode voidMethodCallback(UA_Server* /*server*/, const UA_NodeId* /*sessionId*/,
+        void* /*sessionHandle*/, const UA_NodeId* /*methodId*/, void* methodContext, const UA_NodeId* /*objectId*/,
+        void* /*objectContext*/, size_t /*inputSize*/, const UA_Variant* /*input*/, size_t /*outputSize*/,
+        UA_Variant* /*output*/);
 
-   private:
-    bool array;
-    boost::shared_ptr<ControlSystemPVManager> csManager;
     UA_StatusCode addPVChildNodes(UA_NodeId pvNodeId, const string& baseNodePath, UA_DataSource_Map& map);
 
     /** @brief  This method mapped all own nodes into the opcua server
@@ -58,6 +63,12 @@ namespace ChimeraTK {
      * @return <UA_StatusCode>
      */
     UA_StatusCode mapSelfToNamespace(const UA_Logger* logger);
+
+    /** @brief  This method maps the process variable as a OPC UA method
+     *
+     * @return <UA_StatusCode>
+     */
+    UA_StatusCode mapVoidInput(const UA_Logger* logger);
 
    public:
     /** @brief Constructor from ua_processvariable for generic creation
@@ -72,7 +83,8 @@ namespace ChimeraTK {
      * @param overwriteNodeString New node name
      */
     ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
-        boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, string overwriteNodeString = "");
+        boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, bool useBoolAsVoid,
+        string overwriteNodeString = "");
 
     /** @brief Destructor for ua_processvariable
      *
@@ -224,6 +236,14 @@ namespace ChimeraTK {
     }
     return rv;
   }
+  // ToDo: Not needed if one wants to make Voids read only remove the line below
+  template<>
+  inline UA_StatusCode ua_processvariable::getValue<ChimeraTK::Void>(UA_Variant* v, const UA_NumericRange* /*range*/) {
+    UA_StatusCode rv = UA_STATUSCODE_BADINTERNALERROR;
+    UA_Boolean ival = UA_FALSE;
+    rv = UA_Variant_setScalarCopy(v, &ival, &UA_TYPES[UA_TYPES_BOOLEAN]);
+    return rv;
+  }
 
   template<>
   inline UA_StatusCode ua_processvariable::getValue<string>(UA_Variant* v, const UA_NumericRange* range) {
@@ -325,6 +345,28 @@ namespace ChimeraTK {
     return retval;
   }
 
+  template<>
+  inline UA_StatusCode ua_processvariable::setValue<ChimeraTK::Void>(const UA_Variant* /*data*/) {
+    if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
+      this->csManager->getProcessArray<ChimeraTK::Void>(this->namePV)->write();
+    }
+    return UA_STATUSCODE_GOOD;
+  }
+
+  inline UA_StatusCode ua_processvariable::voidMethodCallback(UA_Server* /*server*/, const UA_NodeId* /*sessionId*/,
+      void* /*sessionHandle*/, const UA_NodeId* /*methodId*/, void* methodContext, const UA_NodeId* /*objectId*/,
+      void* /*objectContext*/, size_t /*inputSize*/, const UA_Variant* /*input*/, size_t /*outputSize*/,
+      UA_Variant* /*output*/) {
+    auto* base = reinterpret_cast<ua_processvariable*>(methodContext);
+    if(base) {
+      base->setValue<ChimeraTK::Void>(nullptr);
+      return UA_STATUSCODE_GOOD;
+    }
+    else {
+      return UA_STATUSCODE_BADINTERNALERROR;
+    }
+  }
+
   template<typename T>
   UA_UInt32 ua_processvariable::typeSpecificSetup(UA_DataSource_Map_Element& mapElem, const UA_NodeId nodeId) {
     UA_Int32 arrayDims;
@@ -340,6 +382,18 @@ namespace ChimeraTK {
       arrayDims = this->csManager->getProcessArray<T>(this->namePV)->accessChannel(0).size();
     }
     UA_Server_writeDataType(this->mappedServer, nodeId, UA_TYPES[fusion::at_key<T>(typesMap)].typeId);
+    return arrayDims;
+  }
+
+  template<>
+  inline UA_UInt32 ua_processvariable::typeSpecificSetup<ChimeraTK::Void>(
+      UA_DataSource_Map_Element& mapElem, const UA_NodeId nodeId) {
+    UA_Int32 arrayDims;
+    // ToDo: If one wants to make Voids read only remove the line below
+    mapElem.dataSource.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue<ChimeraTK::Void>;
+    mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue<ChimeraTK::Void>;
+    this->array = false;
+    UA_Server_writeDataType(this->mappedServer, nodeId, UA_TYPES[UA_TYPES_BOOLEAN].typeId);
     return arrayDims;
   }
 

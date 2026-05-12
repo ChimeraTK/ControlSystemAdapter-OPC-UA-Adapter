@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'generatorUI.ui'
+# Form implementation generated from reading ui file 'ctk_opcua_generator_tools/generatorUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.10
 #
@@ -138,6 +138,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.addWidget(self.horizontalFrame)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_4.addItem(spacerItem1)
+        self.useBoolAsVoid = QtWidgets.QCheckBox(self.centralwidget)
+        self.useBoolAsVoid.setObjectName("useBoolAsVoid")
+        self.horizontalLayout_4.addWidget(self.useBoolAsVoid)
         self.registerLDS = QtWidgets.QCheckBox(self.centralwidget)
         self.registerLDS.setObjectName("registerLDS")
         self.horizontalLayout_4.addWidget(self.registerLDS)
@@ -170,7 +173,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.treeWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1616, 24))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1616, 23))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setToolTipsVisible(False)
@@ -226,6 +229,8 @@ class Ui_MainWindow(object):
         self.label_9.setText(_translate("MainWindow", "Color legend:"))
         self.label_7.setText(_translate("MainWindow", "Controlsystem to Application"))
         self.label_8.setText(_translate("MainWindow", "Application to Controlsystem"))
+        self.useBoolAsVoid.setToolTip(_translate("MainWindow", "<html><head/><body><p>If true boolean process variables are used for ChimeraTK Void inputs. Else OPC UA methods are used.</p></body></html>"))
+        self.useBoolAsVoid.setText(_translate("MainWindow", "Use Bool for Void inputs"))
         self.registerLDS.setText(_translate("MainWindow", "Register at LDS"))
         self.label_11.setText(_translate("MainWindow", "LDS:"))
         self.ldsAddress.setText(_translate("MainWindow", "opc.tcp://localhost:4840"))
