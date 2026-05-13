@@ -16,6 +16,7 @@
 #include <open62541/plugin/historydata/history_data_gathering.h>
 #include <open62541/server_config_default.h>
 
+#include <atomic>
 #include <memory>
 
 using namespace std;
@@ -147,7 +148,7 @@ namespace ChimeraTK {
     void raiseError(std::string errorMessage, std::string consequenceMessage, const int& line = -1);
 
    public:
-    bool running = false;
+    std::atomic<bool> running = false;
     // TODO move this field to private and add getter and setter
     vector<string> exclude;
     vector<string> folder_with_history;
