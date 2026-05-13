@@ -6,14 +6,9 @@
 #include "csa_additionalvariable.h"
 
 #include "csa_config.h"
-
-extern "C" {
-#include "csa_namespace.h"
-}
-
 #include "ua_map_types.h"
+#include "ua_typeconversion.h"
 
-#include <iostream>
 #include <utility>
 
 using namespace std;

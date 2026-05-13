@@ -7,6 +7,8 @@
 
 #include "ua_mapped_class.h"
 
+#include <string>
+
 using namespace std;
 
 namespace ChimeraTK {

@@ -4,14 +4,13 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #pragma once
 
-#include "ChimeraTK/ControlSystemAdapter/ApplicationBase.h"
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
-#include "csa_processvariable.h"
 #include "ua_adapter.h"
 
+#include <memory>
+#include <set>
+#include <string>
 #include <thread>
-#include <vector>
-
 namespace ChimeraTK {
   /** @class csa_opcua_adapter
    *	@brief This class provide the two parts of the OPCUA Adapter.
@@ -31,7 +30,7 @@ namespace ChimeraTK {
     std::thread observer_thread;
     std::shared_ptr<ua_uaadapter> adapter;
     boost::shared_ptr<ControlSystemPVManager> csManager;
-    set<string> unusedVariables;
+    std::set<std::string> unusedVariables;
 
    public:
     /**
@@ -40,7 +39,7 @@ namespace ChimeraTK {
      * @param csManager Provide the hole PVManager from control-system-adapter to map all processvariable to the OPC UA-Model
      * @param configFile Define the path to the mapping-file with config and mapping information
      */
-    csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, string configFile);
+    csa_opcua_adapter(boost::shared_ptr<ControlSystemPVManager> csManager, const std::string& configFile);
 
     /**
      * @brief Destructor to stop the running thread, hence it stops the OPC UA server
@@ -61,7 +60,7 @@ namespace ChimeraTK {
      */
     std::shared_ptr<ua_uaadapter> getUAAdapter();
 
-    const set<string>& getUnusedVariables() const;
+    const std::set<std::string>& getUnusedVariables() const;
 
     /**
      * @brief Start all objects in single threads for this case only the opc ua server

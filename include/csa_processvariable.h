@@ -6,8 +6,8 @@
 #pragma once
 
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
-#include "ChimeraTK/SupportedUserTypes.h"
 #include "ua_mapped_class.h"
+#include "ua_typeconversion.h"
 
 #include <boost/fusion/container/map.hpp>
 
@@ -369,7 +369,7 @@ namespace ChimeraTK {
 
   template<typename T>
   UA_UInt32 ua_processvariable::typeSpecificSetup(UA_DataSource_Map_Element& mapElem, const UA_NodeId nodeId) {
-    UA_Int32 arrayDims;
+    UA_Int32 arrayDims{0};
     mapElem.dataSource.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue<T>;
     if(this->csManager->getProcessVariable(this->namePV)->isWriteable()) {
       mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue<T>;
@@ -388,13 +388,12 @@ namespace ChimeraTK {
   template<>
   inline UA_UInt32 ua_processvariable::typeSpecificSetup<ChimeraTK::Void>(
       UA_DataSource_Map_Element& mapElem, const UA_NodeId nodeId) {
-    UA_Int32 arrayDims;
     // ToDo: If one wants to make Voids read only remove the line below
     mapElem.dataSource.read = ua_processvariable::ua_readproxy_ua_processvariable_getValue<ChimeraTK::Void>;
     mapElem.dataSource.write = ua_processvariable::ua_writeproxy_ua_processvariable_setValue<ChimeraTK::Void>;
     this->array = false;
     UA_Server_writeDataType(this->mappedServer, nodeId, UA_TYPES[UA_TYPES_BOOLEAN].typeId);
-    return arrayDims;
+    return 0;
   }
 
 } // namespace ChimeraTK

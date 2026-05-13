@@ -31,7 +31,6 @@ extern "C" {
 #include "ua_map_types.h"
 #include "xml_file_handler.h"
 
-#include <functional>
 #include <regex>
 #include <string>
 
@@ -313,22 +312,22 @@ namespace ChimeraTK {
         placeHolder = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "logLevel");
         if(!placeHolder.empty()) {
           transform(placeHolder.begin(), placeHolder.end(), placeHolder.begin(), ::toupper);
-          if(placeHolder.compare("TRACE") == 0) {
+          if(placeHolder == "TRACE") {
             this->serverConfig.logLevel = UA_LOGLEVEL_TRACE;
           }
-          else if(placeHolder.compare("DEBUG") == 0) {
+          else if(placeHolder == "DEBUG") {
             this->serverConfig.logLevel = UA_LOGLEVEL_DEBUG;
           }
-          else if(placeHolder.compare("INFO") == 0) {
+          else if(placeHolder == "INFO") {
             this->serverConfig.logLevel = UA_LOGLEVEL_INFO;
           }
-          else if(placeHolder.compare("WARNING") == 0) {
+          else if(placeHolder == "WARNING") {
             this->serverConfig.logLevel = UA_LOGLEVEL_WARNING;
           }
-          else if(placeHolder.compare("ERROR") == 0) {
+          else if(placeHolder == "ERROR") {
             this->serverConfig.logLevel = UA_LOGLEVEL_ERROR;
           }
-          else if(placeHolder.compare("FATAL") == 0) {
+          else if(placeHolder == "FATAL") {
             this->serverConfig.logLevel = UA_LOGLEVEL_FATAL;
           }
           else {
@@ -364,7 +363,6 @@ namespace ChimeraTK {
           }
         }
         else {
-          string applicationName;
           try {
             string applicationName = ApplicationBase::getInstance().getName();
             this->serverConfig.applicationName = applicationName;
@@ -494,8 +492,8 @@ namespace ChimeraTK {
 
               // check if a configuration is redefined
               bool existing = false;
-              for(size_t j = 0; j < this->serverConfig.history.size(); j++) {
-                if(history_name == this->serverConfig.history[j].name) {
+              for(const auto& confEntry : this->serverConfig.history) {
+                if(history_name == confEntry.name) {
                   existing = true;
                 }
               }
@@ -566,13 +564,8 @@ namespace ChimeraTK {
       this->serverConfig.enableSecurity = true;
       string unsecure = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "unsecure");
       if(!unsecure.empty()) {
-        transform(unsecure.begin(), unsecure.end(), unsecure.begin(), ::toupper);
-        if(unsecure.compare("TRUE") == 0) {
-          this->serverConfig.unsecure = true;
-        }
-        else {
-          this->serverConfig.unsecure = false;
-        }
+        std::ranges::transform(unsecure, unsecure.begin(), ::toupper);
+        this->serverConfig.unsecure = (unsecure == "TRUE");
       }
       else {
         this->serverConfig.unsecure = false;
@@ -631,7 +624,7 @@ namespace ChimeraTK {
           xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "unroll");
       for(auto nodeUnrollPath : nodeVectorUnrollPathPV) {
         string unrollSepEnabled = xml_file_handler::getContentFromNode(nodeUnrollPath);
-        transform(unrollSepEnabled.begin(), unrollSepEnabled.end(), unrollSepEnabled.begin(), ::toupper);
+        std::ranges::transform(unrollSepEnabled, unrollSepEnabled.begin(), ::toupper);
         if(unrollSepEnabled == "TRUE") {
           this->pvSeparator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
         }
@@ -843,8 +836,9 @@ namespace ChimeraTK {
         continue;
       }
       UA_NodeId newRootFolder = createFolder(target, foundFolderNameCPP);
-      if(foundFolderDescription.text.length > 0)
+      if(foundFolderDescription.text.length > 0) {
         UA_Server_writeDescription(this->mappedServer, newRootFolder, foundFolderDescription);
+      }
       foundMethod = deepCopyHierarchicalLayer(csManager, rd.nodeId.nodeId, newRootFolder) || foundMethod;
       UA_LocalizedText_clear(&foundFolderName);
       UA_LocalizedText_clear(&foundFolderDescription);
@@ -1009,10 +1003,14 @@ namespace ChimeraTK {
           if(copy == "TRUE") {
             bool sourceAndDestinationEqual = false;
             if(!destination.empty()) {
-              if(sourceName == destination + "/" + folder) sourceAndDestinationEqual = true;
+              if(sourceName == destination + "/" + folder) {
+                sourceAndDestinationEqual = true;
+              }
             }
             else {
-              if(sourceName == folder) sourceAndDestinationEqual = true;
+              if(sourceName == folder) {
+                sourceAndDestinationEqual = true;
+              }
             }
             if(sourceAndDestinationEqual) {
               raiseError(std::string("Folder creation failed. Source and destination must be different for '") +
@@ -1694,7 +1692,9 @@ namespace ChimeraTK {
             break;
           }
         }
-        if(!setted) break;
+        if(!setted) {
+          break;
+        }
         setted = false;
       }
     }
@@ -1759,11 +1759,11 @@ namespace ChimeraTK {
           }
         }
         if(!mapped) {
-          for(auto histVar : this->serverConfig.historyvariables) {
+          for(const auto& histVar : this->serverConfig.historyvariables) {
             string mappedVarHist = serverConfig.rootFolder + "/" + mappedVar;
             std::string tmp;
             UASTRING_TO_CPPSTRING(histVar.variable_id.identifier.string, tmp);
-            if(tmp.compare(mappedVarHist) == 0) {
+            if(tmp == mappedVarHist) {
               mapped = true;
               break;
             }

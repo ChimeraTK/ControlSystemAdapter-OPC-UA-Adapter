@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #include "node_historizing.h"
 
-#include "open62541/plugin/log_stdout.h"
+using namespace std;
 
 namespace ChimeraTK {
   typedef struct {
@@ -34,18 +34,19 @@ namespace ChimeraTK {
   }
 
   void add_folder_historizing(vector<UA_NodeId>* historizing_nodes, vector<string>* historizing_setup,
-      vector<AdapterFolderHistorySetup> historyfolders, UA_Server* mappedServer, UA_ServerConfig* server_config) {
-    for(size_t i = 0; i < historyfolders.size(); i++) {
+      const vector<AdapterFolderHistorySetup>& historyfolders, UA_Server* mappedServer,
+      UA_ServerConfig* server_config) {
+    for(const auto& folder : historyfolders) {
       UA_NodeId* temp = UA_NodeId_new();
-      UA_StatusCode retval = UA_Server_readNodeId(mappedServer, historyfolders[i].folder_id, temp);
+      UA_StatusCode retval = UA_Server_readNodeId(mappedServer, folder.folder_id, temp);
       UA_NodeId_clear(temp);
       if(retval == UA_STATUSCODE_GOOD) {
         HandleFolderVariables handle;
         handle.server = mappedServer;
-        handle.history = historyfolders[i].folder_historizing;
+        handle.history = folder.folder_historizing;
         handle.historizing_nodes = historizing_nodes;
         handle.historizing_setup = historizing_setup;
-        UA_Server_forEachChildNodeCall(mappedServer, historyfolders[i].folder_id, get_child_variables, &handle);
+        UA_Server_forEachChildNodeCall(mappedServer, folder.folder_id, get_child_variables, &handle);
       }
       else {
         UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
@@ -55,10 +56,10 @@ namespace ChimeraTK {
   }
 
   void add_variable_historizing(vector<UA_NodeId>* historizing_nodes, vector<string>* historizing_setup,
-      vector<AdapterPVHistorySetup> historyvariables, UA_Server* mappedServer, UA_ServerConfig* server_config) {
-    for(size_t i = 0; i < historyvariables.size(); i++) {
+      const vector<AdapterPVHistorySetup>& historyvariables, UA_Server* mappedServer, UA_ServerConfig* server_config) {
+    for(const auto& histVar : historyvariables) {
       UA_NodeId* temp = UA_NodeId_new();
-      UA_NodeId id = historyvariables[i].variable_id;
+      UA_NodeId id = histVar.variable_id;
       UA_StatusCode retval = UA_Server_readNodeId(mappedServer, id, temp);
       if(retval == UA_STATUSCODE_GOOD) {
         UA_String out = UA_STRING_NULL;
@@ -66,8 +67,8 @@ namespace ChimeraTK {
         UA_LOG_DEBUG(
             server_config->logging, UA_LOGCATEGORY_USERLAND, "Add history for node %.*s ", (int)out.length, out.data);
         UA_String_clear(&out);
-        historizing_nodes->insert(historizing_nodes->end(), historyvariables[i].variable_id);
-        historizing_setup->insert(historizing_setup->end(), historyvariables[i].variable_historizing);
+        historizing_nodes->insert(historizing_nodes->end(), histVar.variable_id);
+        historizing_setup->insert(historizing_setup->end(), histVar.variable_historizing);
       }
       else {
         UA_String out = UA_STRING_NULL;
@@ -159,7 +160,7 @@ namespace ChimeraTK {
 
   UA_HistoryDataGathering add_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup,
       UA_Server* mappedServer, UA_ServerConfig* server_config, vector<AdapterHistorySetup> history,
-      vector<AdapterFolderHistorySetup> historyfolders, vector<AdapterPVHistorySetup> historyvariables) {
+      const vector<AdapterFolderHistorySetup>& historyfolders, const vector<AdapterPVHistorySetup>& historyvariables) {
     add_variable_historizing(&historizing_nodes, &historizing_setup, historyvariables, mappedServer, server_config);
     add_folder_historizing(&historizing_nodes, &historizing_setup, historyfolders, mappedServer, server_config);
     check_historizing_nodes(historizing_nodes, historizing_setup, server_config);

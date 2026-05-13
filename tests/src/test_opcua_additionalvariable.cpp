@@ -10,6 +10,14 @@
 
 using namespace boost::unit_test_framework;
 
+extern "C" const char* __tsan_default_suppressions() {
+  // open62541 can trigger lock-order-inversion reports in TSAN under thread mode.
+  // Suppress deadlock and timezone-offset race reports from that external dependency.
+  return "deadlock:libopen62541.so\n"
+         "race:UA_DateTime_localTimeUtcOffset\n"
+         "race:tzset_internal\n";
+}
+
 /*
  * ProcessVariableTest
  *

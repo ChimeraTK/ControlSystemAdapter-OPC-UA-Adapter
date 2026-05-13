@@ -5,11 +5,8 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #pragma once
 
-#include "ua_typeconversion.h"
-
 #include <open62541/server.h>
 
-#include <iostream>
 #include <list>
 
 using namespace std;

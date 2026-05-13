@@ -23,6 +23,14 @@ using namespace boost::unit_test_framework;
 using namespace std;
 namespace fusion = boost::fusion;
 
+extern "C" const char* __tsan_default_suppressions() {
+  // open62541 can trigger lock-order-inversion reports in TSAN under thread mode.
+  // Suppress deadlock and timezone-offset race reports from that external dependency.
+  return "deadlock:libopen62541.so\n"
+         "race:UA_DateTime_localTimeUtcOffset\n"
+         "race:tzset_internal\n";
+}
+
 typedef fusion::map<fusion::pair<uint8_t, UA_DataType>, fusion::pair<int8_t, UA_DataType>,
     fusion::pair<uint16_t, UA_DataType>, fusion::pair<int16_t, UA_DataType>, fusion::pair<uint32_t, UA_DataType>,
     fusion::pair<int32_t, UA_DataType>, fusion::pair<uint64_t, UA_DataType>, fusion::pair<int64_t, UA_DataType>,
@@ -337,7 +345,6 @@ void ProcessVariableTest::testClientSide() {
 
   TestFixtureServerSet serverSet;
   TestFixturePVSet pvSet;
-  thread* serverThread = new std::thread(UA_Server_run, serverSet.mappedServer, &serverSet.runUAServer);
 
   // check server
   if(serverSet.mappedServer == nullptr) {
@@ -350,6 +357,8 @@ void ProcessVariableTest::testClientSide() {
     varList.push_back(new ua_processvariable(serverSet.mappedServer, serverSet.baseNodeId,
         oneProcessVariable->getName(), pvSet.csManager, UA_Log_Stdout, true));
   }
+
+  thread* serverThread = new std::thread(UA_Server_run, serverSet.mappedServer, &serverSet.runUAServer);
 
   // Create client to connect to server
   UA_Client* client = UA_Client_new();
