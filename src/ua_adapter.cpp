@@ -128,7 +128,7 @@ namespace ChimeraTK {
     std::string
         versionString =
             "open62541: " xstr(UA_OPEN62541_VER_MAJOR) "." xstr(UA_OPEN62541_VER_MINOR) "." xstr(UA_OPEN62541_VER_PATCH) ", ControlSystemAdapter-OPC-UA-Adapter: " xstr(
-                PROJECT_VER_PATCH) "." xstr(PROJECT_VER_MINOR) "." xstr(PROJECT_VER_PATCH) "";
+                PROJECT_VER_MAJOR) "." xstr(PROJECT_VER_MINOR) "." xstr(PROJECT_VER_PATCH) "";
     UA_String_clear(&config->buildInfo.softwareVersion);
     config->buildInfo.softwareVersion = UA_STRING_ALLOC(const_cast<char*>(versionString.c_str()));
     config->buildInfo.buildDate = UA_DateTime_now();
