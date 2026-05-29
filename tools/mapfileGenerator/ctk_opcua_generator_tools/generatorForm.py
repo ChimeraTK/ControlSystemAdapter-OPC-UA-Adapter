@@ -5,7 +5,8 @@ import os
 from ctk_opcua_generator_tools.generatorUI import Ui_MainWindow
 from ctk_opcua_generator_tools.encryptionUI import Ui_EncryptionDialog
 from ctk_opcua_generator_tools.historyUI import Ui_HistoryDialog
-from ctk_opcua_generator_tools.generatorClass import MapGenerator, XMLDirectory, XMLVar, EncryptionSettings, HistorySetting
+from ctk_opcua_generator_tools.LDSUI import Ui_LDSDialog
+from ctk_opcua_generator_tools.generatorClass import MapGenerator, XMLDirectory, XMLVar, EncryptionSettings, HistorySetting, Config
 import logging
 from typing import Optional, List
 
@@ -122,6 +123,22 @@ class HistorySettingsDialog(QDialog, Ui_HistoryDialog):
     self.data.entriesPerResponse = self.entriesPerResponse.value()
     self.data.interval = self.samplingInterval.value()
     self.data.bufferLength = self.bufferLength.value()
+
+class LDSSettingsDialog(QDialog, Ui_LDSDialog):
+  def __init__(self, data:Config, parent=None):
+    super(LDSSettingsDialog,self).__init__(parent)
+    self.setupUi(self)
+    self.data = data
+    self.ldsAddress.setText(self.data.ldsAddress)
+    self.ldsRegistryName.setText(self.data.ldsRegistryName)
+    self.registerLDS.setChecked(self.data.registerLDS)
+    self.ldsAddress.textChanged.connect(self.updateData)
+    self.ldsRegistryName.textChanged.connect(self.updateData)
+    self.registerLDS.stateChanged.connect(self.updateData)
+  def updateData(self):
+    self.data.ldsAddress = self.ldsAddress.text()
+    self.data.ldsRegistryName = self.ldsRegistryName.text()
+    self.data.registerLDS = self.registerLDS.isChecked()
       
 class MapGeneratorForm(QMainWindow, Ui_MainWindow):
   def _createMapGenerator(self, fileName: str|None):
@@ -172,8 +189,6 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.password.setEnabled(self.MapGenerator.enableLogin)
     self._blockAndSetTextBox(self.MapGenerator.username, self.userName)
     self._blockAndSetTextBox(self.MapGenerator.password, self.password)
-    self._blockAndSetCheckbox(self.MapGenerator.registerLDS, self.registerLDS)
-    self._blockAndSetTextBox(self.MapGenerator.ldsAddress, self.ldsAddress)
     self._blockAndSetCheckbox(self.MapGenerator.useBoolAsVoid, self.useBoolAsVoid)
     # Attention the following fields are set in the GUI but not set in the mapping file as long as they 
     # are not changed by the user!
@@ -466,8 +481,6 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.MapGenerator.applicationDescription = self.applicationDescription.text()
     self.MapGenerator.port = self.port.value()
     self.MapGenerator.logLevel = self.logLevelComboBox.currentText()
-    self.MapGenerator.ldsAddress = self.ldsAddress.text()
-    self.MapGenerator.registerLDS = self.registerLDS.isChecked()
     self.MapGenerator.useBoolAsVoid = self.useBoolAsVoid.isChecked()
     
     
@@ -521,6 +534,10 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     dlg = HistorySettingsDialog(parent=self, data=self.histories, histories=self.MapGenerator.historySettings, edit=False)
     dlg.exec()
     self.addHistorySetting(setting)
+
+  def configureLDSSettings(self):
+    dlg = LDSSettingsDialog(data=self.MapGenerator)
+    dlg.exec()
   
   def addHistorySetting(self, setting: HistorySetting, updateMapGenerator: bool = True):
     '''
@@ -681,9 +698,8 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.editHistorySettingButton.clicked.connect(self.editHistorySetting)
     self.addHistorySettingButton.clicked.connect(self.prepareNewHistorySetting)
     self.setHistoryForInputsButton.clicked.connect(lambda isChecked: self.addHistoryForInputs(isChecked, self.treeWidget.itemAt(0,0)))
-    self.registerLDS.stateChanged.connect(self.updateConfig)
-    self.ldsAddress.textChanged.connect(self.updateConfig)
     self.useBoolAsVoid.stateChanged.connect(self.updateConfig)
+    self.LDSSettingsButton.clicked.connect(self.configureLDSSettings)
 
     
     # Allow to move items 

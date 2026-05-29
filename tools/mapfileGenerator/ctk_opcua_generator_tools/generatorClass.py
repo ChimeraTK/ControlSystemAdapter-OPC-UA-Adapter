@@ -116,6 +116,9 @@ class Config(EncryptionSettings):
     self.historySettings: List[HistorySetting] = []
     self.logLevel: str = "INFO"
     self.useBoolAsVoid: bool = False
+    self.registerLDS: bool = False
+    self.ldsAddress: str|None = None
+    self.ldsRegistryName: str|None = None
   
   def createConfig(self, root:ET._Element):
     '''
@@ -146,6 +149,8 @@ class Config(EncryptionSettings):
         lds.set("address", self.ldsAddress)
       else:
         raise RuntimeError("No lds address set but LDS  registration is enabled!")
+      if self.ldsRegistryName:
+        lds.set("registryName", self.ldsRegistryName)
     if self.enableLogin == True:
       login = ET.SubElement(config, "login")
       if self.username:
@@ -205,6 +210,8 @@ class Config(EncryptionSettings):
             self.registerLDS = False
         if 'address' in lds.attrib:
           self.ldsAddress = lds.attrib['address']
+        if 'registryName' in lds.attrib:
+          self.ldsRegistryName = lds.attrib['registryName']
       useBoolAsVoid = config.find('voidHandling')
       if useBoolAsVoid is not None:
         if 'useBool' in useBoolAsVoid.attrib:
@@ -459,8 +466,6 @@ class MapGenerator(Config):
     self.applicationName: str|None = None
     self.nsmap: Dict|None = None
     self.dir: XMLDirectory|None = None
-    self.registerLDS: bool|None = None
-    self.ldsAddress: str|None = None
     if self.inputFile:
       self.parseChimeraTK()
     

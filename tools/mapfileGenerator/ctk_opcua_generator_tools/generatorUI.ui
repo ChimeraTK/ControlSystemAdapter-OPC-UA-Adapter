@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1616</width>
+    <width>1638</width>
     <height>856</height>
    </rect>
   </property>
@@ -318,33 +318,19 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="LDSSettingsButton">
+        <property name="text">
+         <string>LDS settings</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="useBoolAsVoid">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If true boolean process variables are used for ChimeraTK Void inputs. Else OPC UA methods are used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Use Bool for Void inputs</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="registerLDS">
-        <property name="text">
-         <string>Register at LDS</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>LDS:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="ldsAddress">
-        <property name="text">
-         <string>opc.tcp://localhost:4840</string>
         </property>
        </widget>
       </item>
@@ -433,7 +419,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1616</width>
+     <width>1638</width>
      <height>23</height>
     </rect>
    </property>

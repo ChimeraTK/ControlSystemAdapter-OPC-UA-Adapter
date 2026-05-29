@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ctk_opcua_generator_tools/generatorUI.ui'
+# Form implementation generated from reading ui file 'generatorUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.10
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1616, 856)
+        MainWindow.resize(1638, 856)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -138,18 +138,12 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.addWidget(self.horizontalFrame)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_4.addItem(spacerItem1)
+        self.LDSSettingsButton = QtWidgets.QPushButton(self.centralwidget)
+        self.LDSSettingsButton.setObjectName("LDSSettingsButton")
+        self.horizontalLayout_4.addWidget(self.LDSSettingsButton)
         self.useBoolAsVoid = QtWidgets.QCheckBox(self.centralwidget)
         self.useBoolAsVoid.setObjectName("useBoolAsVoid")
         self.horizontalLayout_4.addWidget(self.useBoolAsVoid)
-        self.registerLDS = QtWidgets.QCheckBox(self.centralwidget)
-        self.registerLDS.setObjectName("registerLDS")
-        self.horizontalLayout_4.addWidget(self.registerLDS)
-        self.label_11 = QtWidgets.QLabel(self.centralwidget)
-        self.label_11.setObjectName("label_11")
-        self.horizontalLayout_4.addWidget(self.label_11)
-        self.ldsAddress = QtWidgets.QLineEdit(self.centralwidget)
-        self.ldsAddress.setObjectName("ldsAddress")
-        self.horizontalLayout_4.addWidget(self.ldsAddress)
         self.enableEncryptionButton = QtWidgets.QCheckBox(self.centralwidget)
         self.enableEncryptionButton.setObjectName("enableEncryptionButton")
         self.horizontalLayout_4.addWidget(self.enableEncryptionButton)
@@ -173,7 +167,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.treeWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1616, 23))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1638, 23))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setToolTipsVisible(False)
@@ -229,11 +223,9 @@ class Ui_MainWindow(object):
         self.label_9.setText(_translate("MainWindow", "Color legend:"))
         self.label_7.setText(_translate("MainWindow", "Controlsystem to Application"))
         self.label_8.setText(_translate("MainWindow", "Application to Controlsystem"))
+        self.LDSSettingsButton.setText(_translate("MainWindow", "LDS settings"))
         self.useBoolAsVoid.setToolTip(_translate("MainWindow", "<html><head/><body><p>If true boolean process variables are used for ChimeraTK Void inputs. Else OPC UA methods are used.</p></body></html>"))
         self.useBoolAsVoid.setText(_translate("MainWindow", "Use Bool for Void inputs"))
-        self.registerLDS.setText(_translate("MainWindow", "Register at LDS"))
-        self.label_11.setText(_translate("MainWindow", "LDS:"))
-        self.ldsAddress.setText(_translate("MainWindow", "opc.tcp://localhost:4840"))
         self.enableEncryptionButton.setText(_translate("MainWindow", "Enable encryption"))
         self.addUnsecureEndpoint.setText(_translate("MainWindow", "Add non-encrypted Endpoint"))
         self.configureEncryptionButton.setText(_translate("MainWindow", "Configure..."))

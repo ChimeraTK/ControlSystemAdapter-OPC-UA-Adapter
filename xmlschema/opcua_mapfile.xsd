@@ -153,6 +153,12 @@
           by the LDS server the registration will fail. </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="registryName" type="csa:nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation> LDS registry name that will be shown in the LDS. Default if not given
+          is: ApplicationName </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
   <xsd:complexType name="voidType">
     <xsd:attribute name="useBool" type="xsd:boolean">
