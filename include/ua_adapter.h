@@ -35,6 +35,7 @@ namespace ChimeraTK {
     bool registerLDS = false;
     bool useBoolAsVoid = false;
     string ldsAddress = "opc.tcp://localhost:4840";
+    string ldsRegistryName;
     UA_LogLevel logLevel = UA_LOGLEVEL_INFO;
     string certPath;
     string keyPath;

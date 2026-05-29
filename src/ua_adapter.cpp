@@ -115,7 +115,12 @@ namespace ChimeraTK {
     UA_String_clear(&config->applicationDescription.applicationUri);
     config->applicationDescription.applicationUri = UA_STRING_ALLOC(const_cast<char*>(cleanUri(hostname_uri).c_str()));
     if(this->serverConfig.registerLDS) {
-      config->mdnsConfig.mdnsServerName = UA_String_fromChars(this->serverConfig.applicationName.c_str());
+      if(this->serverConfig.ldsRegistryName.empty()) {
+        config->mdnsConfig.mdnsServerName = UA_String_fromChars(this->serverConfig.applicationName.c_str());
+      }
+      else {
+        config->mdnsConfig.mdnsServerName = UA_String_fromChars(this->serverConfig.ldsRegistryName.c_str());
+      }
     }
 
     UA_String_clear(&config->buildInfo.manufacturerName);
@@ -402,6 +407,15 @@ namespace ChimeraTK {
           UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
               "No lds 'address'-Attribute in config file is set. Using default address: %s",
               this->serverConfig.ldsAddress.c_str());
+        }
+        std::string ldsRegistryName = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "registryName");
+        if(!ldsRegistryName.empty()) {
+          this->serverConfig.ldsRegistryName = ldsRegistryName;
+        }
+        else {
+          UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+              "No lds 'registryName'-Attribute in config file is set. Will use application name '%s' to register.",
+              this->serverConfig.applicationName.c_str());
         }
         string registerLDS = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "register");
         if(!registerLDS.empty()) {
@@ -1032,8 +1046,8 @@ namespace ChimeraTK {
               }
               copyRoot = UA_NODEID_STRING(1, const_cast<char*>(existingDestinationFolderString.c_str()));
             }
-            // @Remark: deepCopyHierarchicalLayer will not copy method nodes because it can not resolve the source node,
-            // which is taken from the Name subnode for non method pvs
+            // @Remark: deepCopyHierarchicalLayer will not copy method nodes because it can not resolve the source
+            // node, which is taken from the Name subnode for non method pvs
             //          But it will tell that methods where found and thus reference will be added in the next step
             //          If a copy is needed use explicit variable mapping instead of folder mapping
             foundMethod = deepCopyHierarchicalLayer(csManager, sourceFolderId, copyRoot);
