@@ -578,7 +578,7 @@ namespace ChimeraTK {
       this->serverConfig.enableSecurity = true;
       string unsecure = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "unsecure");
       if(!unsecure.empty()) {
-        std::ranges::transform(unsecure, unsecure.begin(), ::toupper);
+        transform(unsecure.begin(), unsecure.end(), unsecure.begin(), ::toupper);
         this->serverConfig.unsecure = (unsecure == "TRUE");
       }
       else {
@@ -638,7 +638,7 @@ namespace ChimeraTK {
           xml_file_handler::getNodesByName(nodeset->nodeTab[0]->children, "unroll");
       for(auto nodeUnrollPath : nodeVectorUnrollPathPV) {
         string unrollSepEnabled = xml_file_handler::getContentFromNode(nodeUnrollPath);
-        std::ranges::transform(unrollSepEnabled, unrollSepEnabled.begin(), ::toupper);
+        transform(unrollSepEnabled.begin(), unrollSepEnabled.end(), unrollSepEnabled.begin(), ::toupper);
         if(unrollSepEnabled == "TRUE") {
           this->pvSeparator += xml_file_handler::getAttributeValueFromNode(nodeUnrollPath, "pathSep");
         }
