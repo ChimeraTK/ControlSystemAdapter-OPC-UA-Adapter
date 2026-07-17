@@ -28,6 +28,40 @@ The control system adapter supports all Void types used in ChimeraTK.
 * OPC UA method
   * Call the corresponding method to trigger writing the `ChimeraTK::VoidInput`
 
+# Supported history backends
+
+Two history backend types are supported:
+* Circular buffer backend (provided by open62541)
+* InfluxDB backend
+
+## Circular backend
+
+* Stores data in memory
+* Fixed buffer length
+* Different buffer lengths are possible by defining different history setups in the mapping
+
+## InfluxDB backend
+
+* Backend is based on InfluxDB 2
+* Data is directly send to InfluxDB
+* If history data is requested by a client the data is retrieved from InfluxDB and provided via the OPC UA interface
+* Configuration of the InfluxDB needs to be provided by `influx_config.xml`
+* Example configuration:
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<influxdb>
+  <url>https://influx.de</url>
+  <token>INFLUX_TOKEN</token>
+  <org>Organization</org>
+  <bucket>testing</bucket>
+  <measurement>demo_measurement</measurement>
+  <precision>ns</precision>
+  <extra_tags>
+    <tag>mytag</tag>
+  <extra_tags>
+</influxdb>
+```
+
 # Mapping 
 
 In order to use the control system adapter a dedicated map file is required. The name of the map file is expected to be _ApplicationName_\_mapping.xml, where _ApplicationName_ is the name of the ChiemraTK application.
@@ -67,6 +101,7 @@ If using the map file generator with such an application specific XML fie the ge
 * Change process variable unit and description
 * Assign a history to process variables or folders (add history setting first and use folder/process variable drop down after)
      * Multiple history settings can be created
+     * Each history setting can use a different history backend (circular or InfluxDB)
      * A history can be assigned to all application input variables with one single switch
 
 Below is a screenshot of the map file generator illustrating the features discussed above.
