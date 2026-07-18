@@ -18,6 +18,7 @@ class HistorySetting():
     self.entriesPerResponse:int = 1000
     self.bufferLength:int = 100
     self.interval:int = 1000
+    self.backendType:str = "circular buffer"
     
   def checkSettings(self):
     if self.entriesPerResponse == None:
@@ -32,6 +33,7 @@ class HistorySetting():
     history.set("entries_per_response", str(self.entriesPerResponse))
     history.set("buffer_length", str(self.bufferLength))
     history.set("interval", str(self.interval))
+    history.set("useInfluxBackend", "True" if self.backendType == 'influxDB' else "False")
     
   def readHistory(self, data: ET._Element):
     if 'name' in data.attrib:
@@ -42,13 +44,18 @@ class HistorySetting():
       self.bufferLength = int(data.attrib['buffer_length'])
     if 'interval' in data.attrib:
       self.interval = int(data.attrib['interval'])
+    if 'useInfluxBackend' in data.attrib and data.attrib['useInfluxBackend'] == 'True':
+      self.backendType = 'influxDB'
+    else:
+      self.backendType = 'circular buffer'
       
   def writeSetting(self, element:ET._Element):
     element.set("name", self.name)
     element.set("entries_per_response",str(self.entriesPerResponse))
-    element.set("buffer_length",str(self.bufferLength))
     element.set("interval",str(self.interval))
-    
+    element.set("useInfluxBackend", "True" if self.backendType == 'influxDB' else "False")
+    if self.backendType != 'influxDB':
+      element.set("buffer_length",str(self.bufferLength))    
       
 class EncryptionSettings():
   def __init__(self):

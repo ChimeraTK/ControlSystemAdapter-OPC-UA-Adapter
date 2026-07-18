@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>678</width>
-    <height>178</height>
+    <height>291</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -204,6 +204,50 @@
        <property name="text">
         <string>ms</string>
        </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,0">
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Backend type:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QComboBox" name="backendComboBox">
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>0</height>
+        </size>
+       </property>
+       <item>
+        <property name="text">
+         <string>circular buffer</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>influxDB</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>
