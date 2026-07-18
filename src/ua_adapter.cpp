@@ -468,17 +468,45 @@ namespace ChimeraTK {
                     nodeHistorizingPath->line);
                 incomplete = true;
               }
-              string history_buffer_length =
-                  xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "buffer_length");
-              if(!history_buffer_length.empty()) {
-                sscanf(history_buffer_length.c_str(), "%zu", &temp.buffer_length);
+
+              // default backend is circular buffer
+              temp.backend = HistorizingBackend::Circular;
+              string useInfluxBackendXML =
+                  xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "useInfluxBackend");
+              if(!useInfluxBackendXML.empty()) {
+                transform(
+                    useInfluxBackendXML.begin(), useInfluxBackendXML.end(), useInfluxBackendXML.begin(), ::toupper);
+                if(useInfluxBackendXML == "TRUE") {
+                  temp.backend = HistorizingBackend::InfluxDB;
+                  UA_LOG_INFO(&logger, UA_LOGCATEGORY_USERLAND,
+                      "Using InfluxDB as historizing backend for history configuration '%s'.", history_name.c_str());
+                  try {
+                    const InfluxConfig influxConfig = ConfigLoader::loadFromXmlFile("influx_config.xml");
+                    influxClient = std::make_unique<InfluxClient>(influxConfig);
+                  }
+                  catch(const std::exception& e) {
+                    raiseError("Failed to initialize InfluxDB client from file 'influx_config.xml' with error: " +
+                            std::string(e.what()),
+                        "History configuration " + history_name +
+                            " is not added to the list of available history configurations",
+                        nodeHistorizingPath->line);
+                    incomplete = true;
+                  }
+                }
               }
-              else {
-                raiseError("Missing history parameter 'buffer_length'.",
-                    "History configuration " + history_name +
-                        " is not added to the list of available history configurations",
-                    nodeHistorizingPath->line);
-                incomplete = true;
+              if(temp.backend == HistorizingBackend::Circular) {
+                string history_buffer_length =
+                    xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "buffer_length");
+                if(!history_buffer_length.empty()) {
+                  sscanf(history_buffer_length.c_str(), "%zu", &temp.buffer_length);
+                }
+                else {
+                  raiseError("Missing history parameter 'buffer_length'.",
+                      "History configuration " + history_name +
+                          " is not added to the list of available history configurations",
+                      nodeHistorizingPath->line);
+                  incomplete = true;
+                }
               }
               string history_entries_per_response =
                   xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "entries_per_response");
@@ -706,9 +734,8 @@ namespace ChimeraTK {
 
     vector<UA_NodeId> historizing_nodes;
     vector<string> historizing_setup;
-    UA_HistoryDataGathering gathering =
-        add_historizing_nodes(historizing_nodes, historizing_setup, this->mappedServer, this->server_config,
-            this->serverConfig.history, this->serverConfig.historyfolders, this->serverConfig.historyvariables);
+    UA_HistoryDataGathering gathering = add_historizing_nodes(historizing_nodes, historizing_setup, this->mappedServer,
+        this->server_config, this->serverConfig, this->influxClient);
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Starting the server worker thread");
     UA_Server_run_startup(this->mappedServer);
 

@@ -7,6 +7,8 @@
 
 #include "csa_additionalvariable.h"
 #include "csa_processvariable.h"
+#include "data_structs.h"
+#include "history_backend/InfluxClient.h"
 #include "node_historizing.h"
 #include "xml_file_handler.h"
 
@@ -22,30 +24,6 @@
 using namespace std;
 
 namespace ChimeraTK {
-  struct ServerConfig {
-    string rootFolder;
-    string descriptionFolder;
-    UA_Boolean UsernamePasswordLogin = UA_FALSE;
-    string password;
-    string username;
-    string applicationName = "OPCUA-Adapter";
-    uint16_t opcuaPort = 16664;
-    bool enableSecurity = false;
-    bool unsecure = false;
-    bool registerLDS = false;
-    bool useBoolAsVoid = false;
-    string ldsAddress = "opc.tcp://localhost:4840";
-    string ldsRegistryName;
-    UA_LogLevel logLevel = UA_LOGLEVEL_INFO;
-    string certPath;
-    string keyPath;
-    string allowListFolder;
-    string blockListFolder;
-    string issuerListFolder;
-    vector<AdapterHistorySetup> history{};
-    vector<AdapterFolderHistorySetup> historyfolders{};
-    vector<AdapterPVHistorySetup> historyvariables{};
-  };
 
   /** @struct FolderInfo
    *	@brief This struct represents a folder in OPCUA with its own node id and with his parent and child node id. For
@@ -113,6 +91,14 @@ namespace ChimeraTK {
     vector<ua_processvariable*> mappedVariables;
 
     std::shared_ptr<xml_file_handler> fileHandler;
+
+    /**
+     * @brief Unique pointer to the InfluxDB client
+     *
+     *  Will be initialized if HistorizingBackend::InfluxDB is used in the configuration.
+     *  The InfluxDB client is used to store historical data in an InfluxDB
+     */
+    std::unique_ptr<InfluxClient> influxClient{nullptr};
 
     /** @brief This method construct the parameter for the opcua server, depending of the <serverConfig> struct
      */

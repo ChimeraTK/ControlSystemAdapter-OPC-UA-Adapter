@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #include "node_historizing.h"
 
+#include "history_backend/InfluxHistoryBackend.h"
+
 using namespace std;
 
 namespace ChimeraTK {
@@ -159,26 +161,34 @@ namespace ChimeraTK {
   }
 
   UA_HistoryDataGathering add_historizing_nodes(vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup,
-      UA_Server* mappedServer, UA_ServerConfig* server_config, vector<AdapterHistorySetup> history,
-      const vector<AdapterFolderHistorySetup>& historyfolders, const vector<AdapterPVHistorySetup>& historyvariables) {
-    add_variable_historizing(&historizing_nodes, &historizing_setup, historyvariables, mappedServer, server_config);
-    add_folder_historizing(&historizing_nodes, &historizing_setup, historyfolders, mappedServer, server_config);
+      UA_Server* mappedServer, UA_ServerConfig* server_config, const ServerConfig& config,
+      std::unique_ptr<InfluxClient>& influxClient) {
+    add_variable_historizing(
+        &historizing_nodes, &historizing_setup, config.historyvariables, mappedServer, server_config);
+    add_folder_historizing(&historizing_nodes, &historizing_setup, config.historyfolders, mappedServer, server_config);
     check_historizing_nodes(historizing_nodes, historizing_setup, server_config);
     // search nodes with incomplete history config
-    remove_nodes_with_incomplete_historizing_setup(historizing_nodes, historizing_setup, server_config, history);
+    remove_nodes_with_incomplete_historizing_setup(historizing_nodes, historizing_setup, server_config, config.history);
     UA_HistoryDataGathering gathering = UA_HistoryDataGathering_Default(historizing_nodes.size());
     server_config->historyDatabase = UA_HistoryDatabase_default(gathering);
     for(size_t i = 0; i < historizing_nodes.size(); i++) {
       UA_HistorizingNodeIdSettings setting;
       setting.historizingUpdateStrategy = UA_HISTORIZINGUPDATESTRATEGY_POLL;
       AdapterHistorySetup hist;
-      for(auto& j : history) {
+      for(auto& j : config.history) {
         if(historizing_setup[i] == j.name) {
           hist = j;
         }
       }
       set_variable_access_level_historizing(historizing_nodes[i], mappedServer);
-      setting.historizingBackend = UA_HistoryDataBackend_Memory_Circular(historizing_nodes.size(), hist.buffer_length);
+      if(hist.backend == HistorizingBackend::Circular) {
+        setting.historizingBackend =
+            UA_HistoryDataBackend_Memory_Circular(historizing_nodes.size(), hist.buffer_length);
+      }
+      else if(hist.backend == HistorizingBackend::InfluxDB) {
+        setting.historizingBackend = UA_HistoryDataBackend_Influx(
+            influxClient.get(), "value", "nodeId", config.hostname, config.applicationName, config.opcuaPort);
+      }
       setting.maxHistoryDataResponseSize = hist.entries_per_response;
       setting.pollingInterval = hist.interval;
       UA_StatusCode retval = gathering.registerNodeId(mappedServer, gathering.context, &historizing_nodes[i], setting);
