@@ -98,6 +98,5 @@ namespace ChimeraTK {
 
    private:
     xmlDocPtr doc{};
-    xmlNodePtr cur{};
   };
 } // namespace ChimeraTK

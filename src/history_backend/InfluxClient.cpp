@@ -665,7 +665,6 @@ void InfluxClient::addHealthMonitoringNodes(UA_Server* server) {
 }
 
 void InfluxClient::removeHealthNodesCallback(UA_Server* server) {
-  auto config = UA_ServerConfig(server);
   if(healthNodesAdded_) {
     UA_Server_removeRepeatedCallback(server, healthCallbackId);
     healthNodesAdded_ = false;
