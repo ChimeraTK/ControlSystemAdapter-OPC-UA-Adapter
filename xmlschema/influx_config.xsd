@@ -56,6 +56,50 @@
     </xs:sequence>
   </xs:complexType>
 
+  <xs:complexType name="writeBatchingType">
+    <xs:annotation>
+      <xs:documentation> Write batching behavior. When enabled, points are buffered and flushed in
+        batches to reduce HTTP overhead. </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="enabled" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Enables asynchronous buffered writes when true. Defaults to true. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="max_batch_points" type="xs:positiveInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Maximum number of points per write request. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="max_queue_points" type="xs:positiveInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Maximum number of queued points waiting to be flushed. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="flush_interval_ms" type="xs:positiveInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Maximum wait time before flushing a partially filled batch. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="max_retries" type="xs:nonNegativeInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Number of retry attempts after a failed batch write. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="retry_backoff_ms" type="xs:positiveInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Base retry backoff in milliseconds. Exponential backoff is applied. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="fail_fast_on_async_error" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> If true, new writes are rejected after an asynchronous write failure
+            until the async error is cleared. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="influxdbConfigType">
     <xs:annotation>
       <xs:documentation> Venetian blind design: the document structure is defined with locally
@@ -100,6 +144,11 @@
       <xs:element name="extra_tags" type="csa:extraTagsType" minOccurs="0">
         <xs:annotation>
           <xs:documentation> Optional extra tags that are included on all write operations. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="write_batching" type="csa:writeBatchingType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Optional batching configuration for write throughput optimization. </xs:documentation>
         </xs:annotation>
       </xs:element>
     </xs:sequence>

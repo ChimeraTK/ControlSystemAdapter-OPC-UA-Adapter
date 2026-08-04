@@ -42,25 +42,79 @@ Two history backend types are supported:
 
 ## InfluxDB backend
 
-* Backend is based on InfluxDB 2
+* Backend is based on InfluxDB v2
 * Data is directly send to InfluxDB
+* In case of arrays an index tag is added to distinguish different array elements
 * If history data is requested by a client the data is retrieved from InfluxDB and provided via the OPC UA interface
+* If history data of an array is requested the data of all array elements will be returned 
+  * Currently there is no way for the client to specify a certain index
+  * If individual data is needed the client is supposed to get it directly from the database using the index tag
 * Configuration of the InfluxDB needs to be provided by `influx_config.xml`
 * Example configuration:
 ```
 <?xml version="1.0" encoding="UTF-8"?>
-<influxdb>
-  <url>https://influx.de</url>
-  <token>INFLUX_TOKEN</token>
-  <org>Organization</org>
-  <bucket>testing</bucket>
-  <measurement>demo_measurement</measurement>
-  <precision>ns</precision>
-  <extra_tags>
-    <tag>mytag</tag>
-  <extra_tags>
-</influxdb>
+<csa:influxdb xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
+  xsi:schemaLocation="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter influx_config.xsd">
+  <csa:url>https://influx.de</csa:url>
+  <csa:token>TOKEN</csa:token>
+  <csa:org>Organization</csa:org>
+  <csa:bucket>testing</csa:bucket>
+  <csa:measurement>demo_measurement</csa:measurement>
+  <csa:precision>ns</csa:precision>
+  <csa:extra_tags>
+    <csa:tag name="extra_tag">mytag</csa:tag>
+  </csa:extra_tags>
+  <csa:write_batching>
+    <csa:enabled>true</csa:enabled>
+    <csa:max_batch_points>250</csa:max_batch_points>
+    <csa:max_queue_points>10000</csa:max_queue_points>
+    <csa:flush_interval_ms>5000</csa:flush_interval_ms>
+    <csa:max_retries>3</csa:max_retries>
+    <csa:retry_backoff_ms>200</csa:retry_backoff_ms>
+    <csa:fail_fast_on_async_error>false</csa:fail_fast_on_async_error>
+  </csa:write_batching>
+</csa:influxdb>
 ```
+### Write Batching (Current Implementation)
+
+The Influx client supports asynchronous write batching to reduce HTTP overhead. 
+Use OPC UA health nodes (`ns=1;s=InfluxHealth.*`) to monitor queue growth, retries, failures, and last async error.
+
+#### Configuration
+
+Batching is configured in `config/influx_config.xml` inside `write_batching` (see above).
+
+Meaning of settings:
+
+- `enabled`: turns async batching on or off.
+- `max_batch_points`: maximum number of points sent in one HTTP write request.
+- `max_queue_points`: maximum buffered points waiting to be sent.
+- `flush_interval_ms`: maximum time to wait before flushing a partial batch.
+- `max_retries`: retry attempts after a failed batch write.
+- `retry_backoff_ms`: base retry wait time. Retries use exponential backoff.
+- `fail_fast_on_async_error`: when `true`, new writes are rejected while an async error is active.
+
+
+#### Runtime Behavior
+
+- If batching is disabled, `writePoint` performs a direct HTTP write.
+- If batching is enabled, `writePoint` enqueues points and returns immediately.
+- A background worker flushes points when:
+    - queued points reach `max_batch_points`, or
+    - `flush_interval_ms` expires.
+
+#### Failure Handling
+
+- Failed batch writes are retried with exponential backoff.
+- If retries still fail:
+    - the batch is requeued at the front when queue capacity allows,
+    - otherwise points are dropped and accounted in health counters.
+- If `fail_fast_on_async_error` is enabled, new writes fail until the async error is cleared.
+
+#### Notes
+
+- In async mode, successful enqueue does not guarantee the batch has already been written to InfluxDB.
 
 # Mapping 
 
