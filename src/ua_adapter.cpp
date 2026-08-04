@@ -27,6 +27,7 @@ extern "C" {
 #include "csa_additionalvariable.h"
 #include "csa_config.h"
 #include "csa_processvariable.h"
+#include "history_backend/InfluxHealthMonitoring.h"
 #include "ua_adapter.h"
 #include "ua_map_types.h"
 #include "xml_file_handler.h"
@@ -736,6 +737,12 @@ namespace ChimeraTK {
     vector<string> historizing_setup;
     UA_HistoryDataGathering gathering = add_historizing_nodes(historizing_nodes, historizing_setup, this->mappedServer,
         this->server_config, this->serverConfig, this->influxClient);
+    if(this->influxClient) {
+      // this add the health monitoring nodes to the server, which are used to monitor the health of the server and the
+      // variables if the health monitoring is enabled in the config file
+      this->influxClient->addHealthMonitoringNodes(this->mappedServer);
+    }
+
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Starting the server worker thread");
     UA_Server_run_startup(this->mappedServer);
 
@@ -755,6 +762,9 @@ namespace ChimeraTK {
     }
     clear_history(gathering, historizing_nodes, historizing_setup, this->mappedServer,
         this->serverConfig.historyfolders, this->serverConfig.historyvariables, this->server_config);
+    if(this->influxClient) {
+      this->influxClient->removeHealthNodesCallback(this->mappedServer);
+    }
 
     if(this->serverConfig.registerLDS) {
       UA_ClientConfig cc;

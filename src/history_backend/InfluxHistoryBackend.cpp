@@ -92,7 +92,7 @@ namespace {
     return result;
   }
 
-  bool variantToDouble(const UA_Variant* variant, double* outValue) {
+  bool variantToScalarDouble(const UA_Variant* variant, double* outValue) {
     if(variant == nullptr || outValue == nullptr || !UA_Variant_isScalar(variant)) {
       return false;
     }
@@ -125,27 +125,57 @@ namespace {
     return false;
   }
 
-  UA_Boolean boundSupportedInflux(
-      UA_Server* server, void* hdbContext, const UA_NodeId* sessionId, void* sessionContext, const UA_NodeId* nodeId) {
-    (void)server;
-    (void)hdbContext;
-    (void)sessionId;
-    (void)sessionContext;
-    (void)nodeId;
+  bool variantToArrayDouble(const UA_Variant* variant, std::vector<double>& outValue) {
+    if(variant == nullptr || variant->arrayLength == 0) {
+      return false;
+    }
+    outValue.resize(variant->arrayLength);
+    for(size_t i = 0; i < variant->arrayLength; ++i) {
+      if(variant->type == &UA_TYPES[UA_TYPES_DOUBLE]) {
+        const auto* tmp = static_cast<const UA_Double*>(variant->data);
+        outValue[i] = tmp[i];
+        continue;
+      }
+      if(variant->type == &UA_TYPES[UA_TYPES_FLOAT]) {
+        const auto* tmp = static_cast<const UA_Float*>(variant->data);
+        outValue[i] = static_cast<double>(tmp[i]);
+        continue;
+      }
+      if(variant->type == &UA_TYPES[UA_TYPES_INT64]) {
+        const auto* tmp = static_cast<const UA_Int64*>(variant->data);
+        outValue[i] = static_cast<double>(tmp[i]);
+        continue;
+      }
+      if(variant->type == &UA_TYPES[UA_TYPES_UINT64]) {
+        const auto* tmp = static_cast<const UA_UInt64*>(variant->data);
+        outValue[i] = static_cast<double>(tmp[i]);
+        continue;
+      }
+      if(variant->type == &UA_TYPES[UA_TYPES_INT32]) {
+        const auto* tmp = static_cast<const UA_Int32*>(variant->data);
+        outValue[i] = static_cast<double>(tmp[i]);
+        continue;
+      }
+      if(variant->type == &UA_TYPES[UA_TYPES_UINT32]) {
+        const auto* tmp = static_cast<const UA_UInt32*>(variant->data);
+        outValue[i] = static_cast<double>(tmp[i]);
+        continue;
+      }
+      return false;
+    }
+    return true;
+  }
 
+  UA_Boolean boundSupportedInflux(UA_Server* /*server*/, void* /*hdbContext*/, const UA_NodeId* /*sessionId*/,
+      void* /*sessionContext*/, const UA_NodeId* /*nodeId*/) {
     /* Accept returnBounds requests so clients like UAExpert can still read data.
      */
     return UA_TRUE;
   }
 
-  UA_Boolean timestampsToReturnSupportedInflux(UA_Server* server, void* hdbContext, const UA_NodeId* sessionId,
-      void* sessionContext, const UA_NodeId* nodeId, const UA_TimestampsToReturn timestampsToReturn) {
-    (void)server;
-    (void)hdbContext;
-    (void)sessionId;
-    (void)sessionContext;
-    (void)nodeId;
-
+  UA_Boolean timestampsToReturnSupportedInflux(UA_Server* /*server*/, void* /*hdbContext*/,
+      const UA_NodeId* /*sessionId*/, void* /*sessionContext*/, const UA_NodeId* /*nodeId*/,
+      const UA_TimestampsToReturn timestampsToReturn) {
     return timestampsToReturn == UA_TIMESTAMPSTORETURN_SOURCE || timestampsToReturn == UA_TIMESTAMPSTORETURN_SERVER ||
         timestampsToReturn == UA_TIMESTAMPSTORETURN_BOTH || timestampsToReturn == UA_TIMESTAMPSTORETURN_NEITHER;
   }
@@ -159,22 +189,13 @@ namespace {
     backend->context = nullptr;
   }
 
-  UA_StatusCode serverSetHistoryDataInflux(UA_Server* server, void* hdbContext, const UA_NodeId* sessionId,
-      void* sessionContext, const UA_NodeId* nodeId, UA_Boolean historizing, const UA_DataValue* value) {
-    (void)server;
-    (void)sessionId;
-    (void)sessionContext;
-
+  UA_StatusCode serverSetHistoryDataInflux(UA_Server* /*server*/, void* hdbContext, const UA_NodeId* /*sessionId*/,
+      void* /*sessionContext*/, const UA_NodeId* nodeId, UA_Boolean historizing, const UA_DataValue* value) {
     if(!historizing || hdbContext == nullptr || nodeId == nullptr || value == nullptr || !value->hasValue) {
       return UA_STATUSCODE_GOOD;
     }
 
     auto* ctx = static_cast<InfluxHistoryBackendContext*>(hdbContext);
-
-    double numericValue = 0.0;
-    if(!variantToDouble(&value->value, &numericValue)) {
-      return UA_STATUSCODE_BADTYPEMISMATCH;
-    }
 
     UA_DateTime ts = UA_DateTime_now();
     if(value->hasSourceTimestamp) {
@@ -192,27 +213,44 @@ namespace {
     tags["application"] = ctx->applicationName;
     tags["port"] = std::to_string(ctx->port);
 
-    std::string writeError;
-    const bool ok = ctx->client->writePoint(ctx->fieldKey, numericValue, tags, timestampNanoseconds, &writeError);
-    if(!ok) {
-      UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
-      return UA_STATUSCODE_BADINTERNALERROR;
+    double numericValue = 0.0;
+    if(variantToScalarDouble(&value->value, &numericValue)) {
+      std::string writeError;
+      const bool ok = ctx->client->writePoint(ctx->fieldKey, numericValue, tags, timestampNanoseconds, &writeError);
+      if(!ok) {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
+        return UA_STATUSCODE_BADINTERNALERROR;
+      }
+    }
+    else {
+      std::vector<double> numericArray;
+      if(variantToArrayDouble(&value->value, numericArray)) {
+        for(size_t i = 0; i < numericArray.size(); ++i) {
+          std::string writeError;
+          tags["index"] = std::to_string(i);
+          const bool ok =
+              ctx->client->writePoint(ctx->fieldKey, numericArray[i], tags, timestampNanoseconds, &writeError);
+          if(!ok) {
+            UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
+            return UA_STATUSCODE_BADINTERNALERROR;
+          }
+        }
+      }
+      else {
+        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
+            "Influx history write failed: Unsupported data type for node %s", nodeIdToString(nodeId).c_str());
+        return UA_STATUSCODE_BADTYPEMISMATCH;
+      }
     }
 
     return UA_STATUSCODE_GOOD;
   }
 
-  UA_StatusCode getHistoryDataInflux(UA_Server* server, const UA_NodeId* sessionId, void* sessionContext,
+  UA_StatusCode getHistoryDataInflux(UA_Server* /*server*/, const UA_NodeId* /*sessionId*/, void* /*sessionContext*/,
       const UA_HistoryDataBackend* backend, const UA_DateTime start, const UA_DateTime end, const UA_NodeId* nodeId,
-      size_t maxSizePerResponse, UA_UInt32 numValuesPerNode, UA_Boolean returnBounds,
-      UA_TimestampsToReturn timestampsToReturn, UA_NumericRange range, UA_Boolean releaseContinuationPoints,
+      size_t maxSizePerResponse, UA_UInt32 numValuesPerNode, UA_Boolean /*returnBounds*/,
+      UA_TimestampsToReturn /*timestampsToReturn*/, UA_NumericRange /*range*/, UA_Boolean releaseContinuationPoints,
       const UA_ByteString* continuationPoint, UA_ByteString* outContinuationPoint, UA_HistoryData* result) {
-    (void)server;
-    (void)sessionId;
-    (void)sessionContext;
-    (void)returnBounds;
-    (void)timestampsToReturn;
-    (void)range;
     if(backend == nullptr || backend->context == nullptr || nodeId == nullptr || result == nullptr) {
       return UA_STATUSCODE_BADINVALIDARGUMENT;
     }

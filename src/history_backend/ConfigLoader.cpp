@@ -5,6 +5,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#include <algorithm>
 #include <stdexcept>
 
 namespace {
@@ -32,6 +33,27 @@ namespace {
     }
 
     throw std::runtime_error(std::string("Missing required XML element: ") + elementName);
+  }
+
+  std::string optionalChildContent(xmlNodePtr root, const char* elementName) {
+    for(xmlNodePtr child = root->children; child != nullptr; child = child->next) {
+      if(child->type != XML_ELEMENT_NODE) {
+        continue;
+      }
+
+      if(xmlStrcmp(child->name, BAD_CAST elementName) == 0) {
+        xmlChar* content = xmlNodeGetContent(child);
+        if(content == nullptr) {
+          return "";
+        }
+
+        const std::string value(reinterpret_cast<const char*>(content));
+        xmlFree(content);
+        return value;
+      }
+    }
+
+    return "";
   }
 
   std::map<std::string, std::string> parseExtraTags(xmlNodePtr root) {
@@ -79,6 +101,83 @@ namespace {
 
     return {};
   }
+
+  std::size_t parseSizeValue(const std::string& value, std::size_t defaultValue, std::size_t minValue) {
+    if(value.empty()) {
+      return defaultValue;
+    }
+    char* end = nullptr;
+    const unsigned long parsed = std::strtoul(value.c_str(), &end, 10);
+    if(end == value.c_str() || *end != '\0') {
+      return defaultValue;
+    }
+    const std::size_t casted = static_cast<std::size_t>(parsed);
+    return casted < minValue ? minValue : casted;
+  }
+
+  int parseIntValue(const std::string& value, int defaultValue, int minValue) {
+    if(value.empty()) {
+      return defaultValue;
+    }
+    char* end = nullptr;
+    const long parsed = std::strtol(value.c_str(), &end, 10);
+    if(end == value.c_str() || *end != '\0') {
+      return defaultValue;
+    }
+    const int casted = static_cast<int>(parsed);
+    return casted < minValue ? minValue : casted;
+  }
+
+  bool parseBooleanValue(const std::string& value, bool defaultValue) {
+    if(value.empty()) {
+      return defaultValue;
+    }
+
+    std::string normalized = value;
+    std::transform(normalized.begin(), normalized.end(), normalized.begin(),
+        [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    if(normalized == "true" || normalized == "1") {
+      return true;
+    }
+    if(normalized == "false" || normalized == "0") {
+      return false;
+    }
+    return defaultValue;
+  }
+
+  InfluxWriteBatchingConfig parseWriteBatching(xmlNodePtr root) {
+    InfluxWriteBatchingConfig batching;
+
+    for(xmlNodePtr child = root->children; child != nullptr; child = child->next) {
+      if(child->type != XML_ELEMENT_NODE) {
+        continue;
+      }
+
+      if(xmlStrcmp(child->name, BAD_CAST "write_batching") != 0) {
+        continue;
+      }
+
+      const std::string enabled = optionalChildContent(child, "enabled");
+      const std::string maxBatch = optionalChildContent(child, "max_batch_points");
+      const std::string maxQueue = optionalChildContent(child, "max_queue_points");
+      const std::string flushMs = optionalChildContent(child, "flush_interval_ms");
+      const std::string maxRetries = optionalChildContent(child, "max_retries");
+      const std::string retryBackoffMs = optionalChildContent(child, "retry_backoff_ms");
+      const std::string failFast = optionalChildContent(child, "fail_fast_on_async_error");
+
+      batching.enabled = parseBooleanValue(enabled, batching.enabled);
+      batching.maxBatchPoints = parseSizeValue(maxBatch, batching.maxBatchPoints, 1);
+      batching.maxQueuePoints = parseSizeValue(maxQueue, batching.maxQueuePoints, 1);
+      batching.flushIntervalMs = parseIntValue(flushMs, batching.flushIntervalMs, 1);
+      batching.maxRetries = parseSizeValue(maxRetries, batching.maxRetries, 0);
+      batching.retryBackoffMs = parseIntValue(retryBackoffMs, batching.retryBackoffMs, 1);
+      batching.failFastOnAsyncError = parseBooleanValue(failFast, batching.failFastOnAsyncError);
+
+      return batching;
+    }
+
+    return batching;
+  }
 } // namespace
 
 InfluxConfig ConfigLoader::loadFromXmlFile(const std::string& path) {
@@ -101,6 +200,7 @@ InfluxConfig ConfigLoader::loadFromXmlFile(const std::string& path) {
   config.measurement = requireChildContent(root, "measurement");
   config.precision = requireChildContent(root, "precision");
   config.extraTags = parseExtraTags(root);
+  config.writeBatching = parseWriteBatching(root);
 
   xmlFreeDoc(document);
 

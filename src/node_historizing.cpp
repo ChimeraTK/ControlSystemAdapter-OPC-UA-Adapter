@@ -188,6 +188,7 @@ namespace ChimeraTK {
       else if(hist.backend == HistorizingBackend::InfluxDB) {
         setting.historizingBackend = UA_HistoryDataBackend_Influx(
             influxClient.get(), "value", "nodeId", config.hostname, config.applicationName, config.opcuaPort);
+        influxClient->addHealthMonitoringNodes(mappedServer);
       }
       setting.maxHistoryDataResponseSize = hist.entries_per_response;
       setting.pollingInterval = hist.interval;

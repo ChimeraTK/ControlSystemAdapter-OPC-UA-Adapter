@@ -69,6 +69,7 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
         ${CMAKE_SOURCE_DIR}/src/history_backend/ConfigLoader.cpp
         ${CMAKE_SOURCE_DIR}/src/history_backend/InfluxClient.cpp
         ${CMAKE_SOURCE_DIR}/src/history_backend/InfluxHistoryBackend.cpp
+        ${CMAKE_SOURCE_DIR}/src/history_backend/InfluxHealthMonitoring.cpp
         #${CMAKE_SOURCE_DIR}/src/csa_namespace.c -> see comment in the Object building section
         )
 
