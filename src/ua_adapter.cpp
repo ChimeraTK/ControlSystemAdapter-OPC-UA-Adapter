@@ -27,6 +27,7 @@ extern "C" {
 #include "csa_additionalvariable.h"
 #include "csa_config.h"
 #include "csa_processvariable.h"
+#include "history_backend/InfluxHealthMonitoring.h"
 #include "ua_adapter.h"
 #include "ua_map_types.h"
 #include "xml_file_handler.h"
@@ -372,7 +373,13 @@ namespace ChimeraTK {
             string applicationName = ApplicationBase::getInstance().getName();
             this->serverConfig.applicationName = applicationName;
           }
-          catch(ChimeraTK::logic_error) {
+          catch(ChimeraTK::logic_error& e) {
+            UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+                "No 'applicationName'-Attribute is set in config file and reading the application name set in the "
+                "ChimeraTK "
+                "application failed with error: %s. Use default application-name.",
+                e.what());
+            this->serverConfig.applicationName = "ChimeraTK-OPC-UA-Adapter";
           }
           UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
               "No 'applicationName'-Attribute is set in config file. Use default application-name.");
@@ -453,11 +460,9 @@ namespace ChimeraTK {
           for(int32_t i = 0; i < node_set->nodeNr; i++) {
             vector<xmlNodePtr> nodeVectorhistorizingSetUp =
                 xml_file_handler::getNodesByName(node_set->nodeTab[i]->children, "setup");
-            string val;
             for(auto& nodeHistorizingPath : nodeVectorhistorizingSetUp) {
               string history_name = xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "name");
               AdapterHistorySetup temp;
-              char* c;
               bool incomplete = false;
               if(!history_name.empty()) {
                 temp.name = history_name;
@@ -468,17 +473,45 @@ namespace ChimeraTK {
                     nodeHistorizingPath->line);
                 incomplete = true;
               }
-              string history_buffer_length =
-                  xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "buffer_length");
-              if(!history_buffer_length.empty()) {
-                sscanf(history_buffer_length.c_str(), "%zu", &temp.buffer_length);
+
+              // default backend is circular buffer
+              temp.backend = HistorizingBackend::Circular;
+              string useInfluxBackendXML =
+                  xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "useInfluxBackend");
+              if(!useInfluxBackendXML.empty()) {
+                transform(
+                    useInfluxBackendXML.begin(), useInfluxBackendXML.end(), useInfluxBackendXML.begin(), ::toupper);
+                if(useInfluxBackendXML == "TRUE") {
+                  temp.backend = HistorizingBackend::InfluxDB;
+                  UA_LOG_INFO(&logger, UA_LOGCATEGORY_USERLAND,
+                      "Using InfluxDB as historizing backend for history configuration '%s'.", history_name.c_str());
+                  try {
+                    const InfluxConfig influxConfig = ConfigLoader::loadFromXmlFile("influx_config.xml");
+                    influxClient = std::make_unique<InfluxClient>(influxConfig);
+                  }
+                  catch(const std::exception& e) {
+                    raiseError("Failed to initialize InfluxDB client from file 'influx_config.xml' with error: " +
+                            std::string(e.what()),
+                        "History configuration " + history_name +
+                            " is not added to the list of available history configurations",
+                        nodeHistorizingPath->line);
+                    incomplete = true;
+                  }
+                }
               }
-              else {
-                raiseError("Missing history parameter 'buffer_length'.",
-                    "History configuration " + history_name +
-                        " is not added to the list of available history configurations",
-                    nodeHistorizingPath->line);
-                incomplete = true;
+              if(temp.backend == HistorizingBackend::Circular) {
+                string history_buffer_length =
+                    xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "buffer_length");
+                if(!history_buffer_length.empty()) {
+                  sscanf(history_buffer_length.c_str(), "%zu", &temp.buffer_length);
+                }
+                else {
+                  raiseError("Missing history parameter 'buffer_length'.",
+                      "History configuration " + history_name +
+                          " is not added to the list of available history configurations",
+                      nodeHistorizingPath->line);
+                  incomplete = true;
+                }
               }
               string history_entries_per_response =
                   xml_file_handler::getAttributeValueFromNode(nodeHistorizingPath, "entries_per_response");
@@ -706,9 +739,14 @@ namespace ChimeraTK {
 
     vector<UA_NodeId> historizing_nodes;
     vector<string> historizing_setup;
-    UA_HistoryDataGathering gathering =
-        add_historizing_nodes(historizing_nodes, historizing_setup, this->mappedServer, this->server_config,
-            this->serverConfig.history, this->serverConfig.historyfolders, this->serverConfig.historyvariables);
+    UA_HistoryDataGathering gathering = add_historizing_nodes(historizing_nodes, historizing_setup, this->mappedServer,
+        this->server_config, this->serverConfig, this->influxClient);
+    if(this->influxClient) {
+      // this add the health monitoring nodes to the server, which are used to monitor the health of the server and the
+      // variables if the health monitoring is enabled in the config file
+      this->influxClient->addHealthMonitoringNodes(this->mappedServer);
+    }
+
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Starting the server worker thread");
     UA_Server_run_startup(this->mappedServer);
 
@@ -720,6 +758,10 @@ namespace ChimeraTK {
       cc.securityMode = UA_MESSAGESECURITYMODE_NONE;
       UA_StatusCode retval = UA_Server_registerDiscovery(
           this->mappedServer, &cc, UA_STRING(const_cast<char*>(this->serverConfig.ldsAddress.c_str())), UA_STRING_NULL);
+      if(retval != UA_STATUSCODE_GOOD) {
+        UA_LOG_ERROR(server_config->logging, UA_LOGCATEGORY_SERVER,
+            "Could not register server with discovery server. StatusCode %s", UA_StatusCode_name(retval));
+      }
       UA_ClientConfig_clear(&cc);
     }
     this->running = true;
@@ -728,6 +770,9 @@ namespace ChimeraTK {
     }
     clear_history(gathering, historizing_nodes, historizing_setup, this->mappedServer,
         this->serverConfig.historyfolders, this->serverConfig.historyvariables, this->server_config);
+    if(this->influxClient) {
+      this->influxClient->removeHealthNodesCallback(this->mappedServer);
+    }
 
     if(this->serverConfig.registerLDS) {
       UA_ClientConfig cc;
@@ -838,7 +883,6 @@ namespace ChimeraTK {
     br = UA_Server_browse(this->mappedServer, UA_UINT32_MAX, &bd);
     for(size_t j = 0; j < br.referencesSize; ++j) {
       UA_ReferenceDescription rd = br.references[j];
-      UA_String folderName, description;
       UA_LocalizedText foundFolderName, foundFolderDescription;
       UA_LocalizedText_init(&foundFolderDescription);
       string foundFolderNameCPP;
@@ -1033,7 +1077,6 @@ namespace ChimeraTK {
               continue;
             }
             // folder structure must be copied, pv nodes must be added
-            UA_LocalizedText foundFolderName;
             UA_NodeId copyRoot = createFolder(folderPathNodeId, folder);
             if(UA_NodeId_isNull(&copyRoot)) {
               string existingDestinationFolderString;
@@ -1391,8 +1434,7 @@ namespace ChimeraTK {
           enid.namespaceUri = UA_STRING_NULL;
           enid.nodeId = parentSourceId;
           // add reference to the source node
-          UA_StatusCode addRef =
-              UA_Server_addReference(this->mappedServer, destinationFolder, UA_NS0ID(HASCOMPONENT), enid, true);
+          UA_Server_addReference(this->mappedServer, destinationFolder, UA_NS0ID(HASCOMPONENT), enid, true);
           if(sourceVarName != name) {
             raiseError("PV mapping failed. Can't create reference to original pv.",
                 std::string("Skipping PV mapping of pv ") + name);
@@ -1529,7 +1571,6 @@ namespace ChimeraTK {
   UA_NodeId ua_uaadapter::createUAFolder(
       UA_NodeId basenodeid, const std::string& folderName, const std::string& description) {
     // FIXME: Check if folder name a possible name or should it be escaped (?!"§%-:, etc)
-    UA_StatusCode retval = UA_STATUSCODE_GOOD;
     UA_NodeId createdNodeId = UA_NODEID_NULL;
 
     if(UA_NodeId_equal(&baseNodeId, &createdNodeId) == UA_TRUE) {
@@ -1590,7 +1631,6 @@ namespace ChimeraTK {
   }
 
   UA_StatusCode ua_uaadapter::mapSelfToNamespace() {
-    UA_StatusCode retval = UA_STATUSCODE_GOOD;
     UA_NodeId createdNodeId = UA_NODEID_NULL;
 
     if(UA_NodeId_equal(&this->baseNodeId, &createdNodeId) == UA_TRUE) {
@@ -1637,7 +1677,7 @@ namespace ChimeraTK {
       attr.valueRank = -1;
       attr.dataType = LoggingLevelType.typeId;
       UA_LoggingLevel l = UA_LOGGINGLEVEL_INFO;
-      auto status = UA_Variant_setScalarCopy(&attr.value, &l, &LoggingLevelType);
+      UA_Variant_setScalarCopy(&attr.value, &l, &LoggingLevelType);
 
       UA_NodeId currentNodeId = UA_NODEID_STRING(1, const_cast<char*>("logLevel"));
       UA_QualifiedName currentName = UA_QUALIFIEDNAME(1, const_cast<char*>("logLevel"));
@@ -1671,7 +1711,6 @@ namespace ChimeraTK {
   }
 
   UA_NodeId ua_uaadapter::existFolder(UA_NodeId basenodeid, const string& folder) {
-    UA_NodeId lastNodeId = UA_NODEID_NULL;
     for(auto& i : this->folderVector) {
       if((i.folderName == folder) && (UA_NodeId_equal(&i.prevFolderNodeId, &basenodeid))) {
         return i.folderNodeId;
@@ -1688,7 +1727,6 @@ namespace ChimeraTK {
     UA_NodeId toCheckNodeId = existFolderPath(basenodeid, folderPath);
     int32_t starter4Folder = 0;
     UA_NodeId nextNodeId = basenodeid;
-    UA_NodeId startNodeId = basenodeid;
     if(UA_NodeId_isNull(&toCheckNodeId)) {
       bool setted = false;
       // Check if path exist partly

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
+  xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified">
+  <xs:simpleType name="nonEmptyUriType">
+    <xs:annotation>
+      <xs:documentation> Non-empty URI value used for the InfluxDB server base URL. </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:anyURI">
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="nonEmptyStringType">
+    <xs:annotation>
+      <xs:documentation> Non-empty string value used for required textual configuration items. </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="precisionType">
+    <xs:annotation>
+      <xs:documentation> Allowed timestamp precision values for InfluxDB write requests. </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="s" />
+      <xs:enumeration value="ms" />
+      <xs:enumeration value="us" />
+      <xs:enumeration value="ns" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="extraTagsType">
+    <xs:annotation>
+      <xs:documentation> Optional list of additional tag key/value pairs that are appended to each
+        write operation. </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="tag" minOccurs="1" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation> Additional InfluxDB tag. The name attribute is the tag key and the
+            element text is the tag value. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="csa:nonEmptyStringType">
+              <xs:attribute name="name" type="csa:nonEmptyStringType" use="required" />
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="writeBatchingType">
+    <xs:annotation>
+      <xs:documentation> Write batching behavior. When enabled, points are buffered and flushed in
+        batches to reduce HTTP overhead. </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="enabled" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Enables asynchronous buffered writes when true. Defaults to true. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="max_batch_points" type="xs:positiveInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Maximum number of points per write request. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="max_queue_points" type="xs:positiveInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Maximum number of queued points waiting to be flushed. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="flush_interval_ms" type="xs:positiveInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Maximum wait time before flushing a partially filled batch. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="max_retries" type="xs:nonNegativeInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Number of retry attempts after a failed batch write. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="retry_backoff_ms" type="xs:positiveInteger" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Base retry backoff in milliseconds. Exponential backoff is applied. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="fail_fast_on_async_error" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> If true, new writes are rejected after an asynchronous write failure
+            until the async error is cleared. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="influxdbConfigType">
+    <xs:annotation>
+      <xs:documentation> Venetian blind design: the document structure is defined with locally
+        declared elements that reference globally named types. </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="url" type="csa:nonEmptyUriType">
+        <xs:annotation>
+          <xs:documentation> Base URL of the InfluxDB 2 server, including protocol and optional
+            port, for example http://localhost:8086. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="token" type="csa:nonEmptyStringType">
+        <xs:annotation>
+          <xs:documentation> Authentication token used for requests to the InfluxDB API. This value
+            should be kept secret and must not be empty. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="org" type="csa:nonEmptyStringType">
+        <xs:annotation>
+          <xs:documentation> InfluxDB organization name or identifier that owns the target bucket. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="bucket" type="csa:nonEmptyStringType">
+        <xs:annotation>
+          <xs:documentation> Bucket name that stores the time-series data written and queried by the
+            application. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="measurement" type="csa:nonEmptyStringType">
+        <xs:annotation>
+          <xs:documentation> Measurement name used when writing points and when filtering read
+            queries. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="precision" type="csa:precisionType">
+        <xs:annotation>
+          <xs:documentation> Timestamp precision used for write requests. Supported values in this
+            schema are s, ms, us, and ns. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="extra_tags" type="csa:extraTagsType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Optional extra tags that are included on all write operations. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="write_batching" type="csa:writeBatchingType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation> Optional batching configuration for write throughput optimization. </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="influxdb" type="csa:influxdbConfigType">
+    <xs:annotation>
+      <xs:documentation> Root element for the InfluxDB client configuration used by this project.
+        The schema uses Venetian blind design with local element declarations and globally named
+        types. </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+</xs:schema>

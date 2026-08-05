@@ -17,7 +17,7 @@ namespace ChimeraTK {
     this->csManager = std::move(csManager);
 
     // Create new server adapter
-    adapter = std::make_shared<ua_uaadapter>(std::move(configFile));
+    adapter = std::make_shared<ua_uaadapter>(configFile);
     UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Start the mapping of %s", configFile.c_str());
     UA_LOG_INFO(this->getLogger(), UA_LOGCATEGORY_USERLAND, "Create the adapter");
 

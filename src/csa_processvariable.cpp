@@ -17,8 +17,8 @@ namespace ChimeraTK {
   ua_processvariable::ua_processvariable(UA_Server* server, UA_NodeId basenodeid, const string& namePV,
       boost::shared_ptr<ControlSystemPVManager> csManager, const UA_Logger* logger, bool useBoolAsVoid,
       string overwriteNodeString)
-  : namePV(namePV), nameNew(namePV), csManager(std::move(csManager)),
-    nodeStringIdOverwrite(std::move(overwriteNodeString)), array(false), ua_mapped_class(server, basenodeid) {
+  : namePV(namePV), nameNew(namePV), nodeStringIdOverwrite(std::move(overwriteNodeString)), array(false),
+    csManager(std::move(csManager)), ua_mapped_class(server, basenodeid) {
     std::type_info const& valueType = this->csManager->getProcessVariable(this->namePV)->getValueType();
     // Check here if OPC UA method should be used - if not use default mapSelfToNamespace method
     if(valueType == typeid(Void) && !useBoolAsVoid) {
@@ -563,9 +563,6 @@ namespace ChimeraTK {
     UA_String opcua_node_variable_t_ns_2_i_6012_variant_DataContents = UA_STRING(const_cast<char*>(""));
     UA_Variant_setScalar(
         &attr.value, &opcua_node_variable_t_ns_2_i_6012_variant_DataContents, &UA_TYPES[UA_TYPES_STRING]);
-    UA_NodeId nodeId = UA_NODEID_NUMERIC(2, 6012);
-    UA_NodeId typeDefinition = UA_NS0ID(BASEDATAVARIABLETYPE);
-    UA_NodeId parentNodeId = UA_NODEID_NUMERIC(2, 1001);
     addResult = UA_Server_addVariableNode(this->mappedServer,
         UA_NODEID_STRING(1, const_cast<char*>((baseNodePath + "/" + this->nameNew + "/Type").c_str())), pvNodeId,
         UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Type")), UA_NS0ID(BASEDATAVARIABLETYPE), attr,

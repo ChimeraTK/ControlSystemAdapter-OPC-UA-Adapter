@@ -292,6 +292,12 @@
           the history attribute of process_variable or folder. </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="useInfluxBackend" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"> If true the InfluxDB backend is used to store historical
+          data. Else a circular buffer is used. </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="entries_per_response"
       type="xsd:positiveInteger">
       <xsd:annotation>
@@ -304,7 +310,8 @@
     <xsd:attribute name="buffer_length"
       type="xsd:positiveInteger">
       <xsd:annotation>
-        <xsd:documentation xml:lang="en"> Length of the circular buffer. Default: 100 </xsd:documentation>
+        <xsd:documentation xml:lang="en"> Only required if circular buffer is used. Length of the
+          circular buffer. Default: 100 </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="interval"

@@ -16,7 +16,7 @@ namespace ChimeraTK {
 
     UA_NodeId_copy(&definitionId, &thisNode->sourceNodeId);
     UA_NodeId_copy(&objectId, &thisNode->targetNodeId);
-    lst->push_back(std::move(thisNode));
+    lst->push_back(thisNode);
 
     return UA_STATUSCODE_GOOD;
   }

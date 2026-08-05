@@ -19,6 +19,8 @@ find_package(Boost COMPONENTS system filesystem thread chrono unit_test_framewor
 find_package(LibXml2 REQUIRED)
 # find_package(PythonInterp REQUIRED)
 find_package(open62541 1.5 REQUIRED)
+# Used for the InfluxDB history backend
+find_package(CURL REQUIRED)
 
 find_package(ChimeraTK-ControlSystemAdapter 02.05 REQUIRED)
 
@@ -64,6 +66,10 @@ set(objectSources  ${CMAKE_SOURCE_DIR}/src/ua_mapped_class.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_additionalvariable.cpp
         ${CMAKE_SOURCE_DIR}/src/ua_adapter.cpp
         ${CMAKE_SOURCE_DIR}/src/csa_opcua_application.cpp
+        ${CMAKE_SOURCE_DIR}/src/history_backend/ConfigLoader.cpp
+        ${CMAKE_SOURCE_DIR}/src/history_backend/InfluxClient.cpp
+        ${CMAKE_SOURCE_DIR}/src/history_backend/InfluxHistoryBackend.cpp
+        ${CMAKE_SOURCE_DIR}/src/history_backend/InfluxHealthMonitoring.cpp
         #${CMAKE_SOURCE_DIR}/src/csa_namespace.c -> see comment in the Object building section
         )
 
@@ -165,6 +171,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_FULL_
 target_link_libraries(${PROJECT_NAME} PUBLIC ChimeraTK::ChimeraTK-ControlSystemAdapter)
 target_link_libraries(${PROJECT_NAME} PRIVATE open62541::open62541)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBXML2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE CURL::libcurl)
 target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
 target_link_libraries(${PROJECT_NAME} PRIVATE dl)
 target_link_libraries(${PROJECT_NAME} PRIVATE 

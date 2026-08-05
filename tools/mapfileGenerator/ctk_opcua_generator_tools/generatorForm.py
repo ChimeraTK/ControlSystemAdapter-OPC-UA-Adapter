@@ -98,6 +98,14 @@ class HistorySettingsDialog(QDialog, Ui_HistoryDialog):
     self.entriesPerResponse.setValue(self.data.entriesPerResponse)
     self.bufferLength.setValue(self.data.bufferLength)
     self.samplingInterval.setValue(self.data.interval)
+    if not self.data.backendType:
+      self.backendComboBox.setCurrentText('circular buffer')
+    else:
+      self.backendComboBox.setCurrentText(self.data.backendType)
+    if self.data.backendType == 'influxDB':
+      self.bufferLength.setEnabled(False)
+    else:
+      self.bufferLength.setEnabled(True)
     self.histories = histories
     self.edit = edit
     # Save current text -> if edit is true and the name is changed we need to check again if it already exists
@@ -107,6 +115,7 @@ class HistorySettingsDialog(QDialog, Ui_HistoryDialog):
     self.samplingInterval.valueChanged.connect(self.updateData)
     self.entriesPerResponse.valueChanged.connect(self.updateData)
     self.bufferLength.valueChanged.connect(self.updateData)
+    self.backendComboBox.currentTextChanged.connect(self.updateData)
     
   def checkNameExists(self):
     # check if is new or name was changed
@@ -123,6 +132,11 @@ class HistorySettingsDialog(QDialog, Ui_HistoryDialog):
     self.data.entriesPerResponse = self.entriesPerResponse.value()
     self.data.interval = self.samplingInterval.value()
     self.data.bufferLength = self.bufferLength.value()
+    self.data.backendType = self.backendComboBox.currentText()
+    if self.data.backendType == 'influxDB':
+      self.bufferLength.setEnabled(False)
+    else:
+      self.bufferLength.setEnabled(True)
 
 class LDSSettingsDialog(QDialog, Ui_LDSDialog):
   def __init__(self, data:Config, parent=None):
