@@ -47,14 +47,7 @@ ChimeraTK::csa_opcua_adapter* csaOPCUA;
 std::atomic<bool> terminateMain;
 
 static void SigHandler_Int(int /*sign*/) {
-  UA_LOG_INFO(csaOPCUA->getLogger(), UA_LOGCATEGORY_USERLAND, "Received SIGINT... terminating");
   terminateMain = true;
-  if(csaOPCUA) {
-    csaOPCUA->stop();
-    csaOPCUA->~csa_opcua_adapter();
-  }
-  ChimeraTK::ApplicationBase::getInstance().shutdown();
-  std::cout << "OPC UA adapter terminated." << std::endl;
 }
 
 int main() {
@@ -96,6 +89,14 @@ int main() {
   while(!terminateMain) {
     sleep(3600); // sleep will be interrupted when signal is received
   }
+  UA_LOG_INFO(csaOPCUA->getLogger(), UA_LOGCATEGORY_USERLAND, "Received SIGINT... terminating");
+  if(csaOPCUA) {
+    csaOPCUA->stop();
+    csaOPCUA->~csa_opcua_adapter();
+  }
+  ChimeraTK::ApplicationBase::getInstance().shutdown();
+  std::cout << "OPC UA adapter terminated." << std::endl;
+
   csManager.reset();
 
   std::cout << "Application terminated." << std::endl;
