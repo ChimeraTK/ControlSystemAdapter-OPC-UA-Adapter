@@ -6,9 +6,19 @@
 #include <libxml/tree.h>
 
 #include <algorithm>
+#include <cctype>
+#include <ranges>
 #include <stdexcept>
 
 namespace {
+  std::string trim(std::string value) {
+    value.erase(value.begin(), std::ranges::find_if(value, [](unsigned char ch) { return !std::isspace(ch); }));
+    value.erase(
+        std::ranges::find_if(std::ranges::reverse_view(value), [](unsigned char ch) { return !std::isspace(ch); })
+            .base(),
+        value.end());
+    return value;
+  }
   std::string requireChildContent(xmlNodePtr root, const char* elementName) {
     for(xmlNodePtr child = root->children; child != nullptr; child = child->next) {
       if(child->type != XML_ELEMENT_NODE) {
@@ -21,7 +31,7 @@ namespace {
           throw std::runtime_error(std::string("Missing text content for XML element: ") + elementName);
         }
 
-        const std::string value(reinterpret_cast<const char*>(content));
+        const std::string value = trim(reinterpret_cast<const char*>(content));
         xmlFree(content);
 
         if(value.empty()) {
@@ -47,7 +57,7 @@ namespace {
           return "";
         }
 
-        const std::string value(reinterpret_cast<const char*>(content));
+        const std::string value = trim(reinterpret_cast<const char*>(content));
         xmlFree(content);
         return value;
       }
@@ -77,7 +87,7 @@ namespace {
           continue;
         }
 
-        const std::string name(reinterpret_cast<const char*>(nameAttr));
+        const std::string name = trim(reinterpret_cast<const char*>(nameAttr));
         xmlFree(nameAttr);
         if(name.empty()) {
           continue;
@@ -88,7 +98,7 @@ namespace {
           continue;
         }
 
-        const std::string tag(reinterpret_cast<const char*>(content));
+        const std::string tag = trim(reinterpret_cast<const char*>(content));
         xmlFree(content);
 
         if(!tag.empty()) {
