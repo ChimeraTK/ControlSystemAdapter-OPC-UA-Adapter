@@ -152,7 +152,7 @@ namespace ChimeraTK {
     if(!this->serverConfig.enableSecurity) {
       UA_ServerConfig_setMinimal(config, this->serverConfig.opcuaPort, nullptr);
     }
-    if(this->serverConfig.enableSecurity) {
+    else {
       UA_ByteString certificate = UA_BYTESTRING_NULL;
       UA_ByteString privateKey = UA_BYTESTRING_NULL;
       size_t trustListSize = 0;
@@ -225,6 +225,11 @@ namespace ChimeraTK {
       if(!this->serverConfig.unsecure) {
         retval = UA_ServerConfig_setDefaultWithSecureSecurityPolicies(config, this->serverConfig.opcuaPort,
             &certificate, &privateKey, trustList, trustListSize, issuerList, issuerListSize, blockList, blockListSize);
+        /* Adds the None policy to the security policy list, but does not provide a None endpoint.
+         * This enables a client to retrieve the server certificate and
+         * all endpoints offered by a server. */
+        UA_ServerConfig_addSecurityPolicyNone(config, &certificate);
+        config->securityPolicyNoneDiscoveryOnly = true;
       }
       else {
         retval = UA_ServerConfig_setDefaultWithSecurityPolicies(config, this->serverConfig.opcuaPort, &certificate,
@@ -253,12 +258,16 @@ namespace ChimeraTK {
     this->server_config->customDataTypes = customDataTypes.get();
 
     // Username/Password handling
+
     auto* usernamePasswordLogins = new UA_UsernamePasswordLogin; //!< Brief description after the member
     usernamePasswordLogins->password = UA_STRING_ALLOC(const_cast<char*>(this->serverConfig.password.c_str()));
     usernamePasswordLogins->username = UA_STRING_ALLOC(const_cast<char*>(this->serverConfig.username.c_str()));
-    UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
-        &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
-        usernamePasswordLogins);
+    if(!this->serverConfig.password.empty() && !this->serverConfig.username.empty()) {
+      // only set the access control if username and password are set
+      UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
+          &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
+          usernamePasswordLogins);
+    }
 
     this->baseNodeId = UA_NS0ID(OBJECTSFOLDER);
     csa_namespace_init(this->mappedServer);
