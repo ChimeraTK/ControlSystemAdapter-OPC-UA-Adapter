@@ -265,8 +265,7 @@ namespace ChimeraTK {
     if(!this->serverConfig.password.empty() && !this->serverConfig.username.empty()) {
       // only set the access control if username and password are set, use the first security policy for the user token policy
       UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
-          &this->server_config->securityPolicies[0].policyUri, 1,
-          usernamePasswordLogins);
+          &this->server_config->securityPolicies[0].policyUri, 1, usernamePasswordLogins);
     }
 
     this->baseNodeId = UA_NS0ID(OBJECTSFOLDER);
