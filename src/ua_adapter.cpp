@@ -263,9 +263,9 @@ namespace ChimeraTK {
     usernamePasswordLogins->password = UA_STRING_ALLOC(const_cast<char*>(this->serverConfig.password.c_str()));
     usernamePasswordLogins->username = UA_STRING_ALLOC(const_cast<char*>(this->serverConfig.username.c_str()));
     if(!this->serverConfig.password.empty() && !this->serverConfig.username.empty()) {
-      // only set the access control if username and password are set
+      // only set the access control if username and password are set, use the first security policy for the user token policy
       UA_AccessControl_default(this->server_config, !this->serverConfig.UsernamePasswordLogin,
-          &this->server_config->securityPolicies[this->server_config->securityPoliciesSize - 1].policyUri, 1,
+          &this->server_config->securityPolicies[0].policyUri, 1,
           usernamePasswordLogins);
     }
 
