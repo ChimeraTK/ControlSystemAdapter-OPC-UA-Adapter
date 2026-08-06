@@ -4,8 +4,8 @@ cmake_minimum_required(VERSION 3.16)
 ## Project specification
 ##########################################################################################################
 project(ChimeraTK-ControlSystemAdapter-OPCUAAdapter)
-set(${PROJECT_NAME}_MAJOR_VERSION 04)
-set(${PROJECT_NAME}_MINOR_VERSION 04)
+set(${PROJECT_NAME}_MAJOR_VERSION 05)
+set(${PROJECT_NAME}_MINOR_VERSION 00)
 set(${PROJECT_NAME}_PATCH_VERSION 00)
 include(${CMAKE_SOURCE_DIR}/cmake/set_version_numbers.cmake)
 
