@@ -186,8 +186,21 @@ namespace ChimeraTK {
             UA_HistoryDataBackend_Memory_Circular(historizing_nodes.size(), hist.buffer_length);
       }
       else if(hist.backend == HistorizingBackend::InfluxDB) {
+        std::string shortNodeName;
+        // there are only string node IDs used in the adapter. However for completeness, we also check for numeric node IDs here
+        if(historizing_nodes[i].identifierType == UA_NODEIDTYPE_STRING) {
+          shortNodeName = std::string(
+              (char*)historizing_nodes[i].identifier.string.data, historizing_nodes[i].identifier.string.length);
+        }
+        else {
+          shortNodeName = std::string("i") + std::to_string(historizing_nodes[i].identifier.numeric);
+        }
+        if(shortNodeName.find('/') != std::string::npos) {
+          shortNodeName = shortNodeName.substr(shortNodeName.find_last_of('/') + 1, shortNodeName.size() - 1);
+        }
+
         setting.historizingBackend = UA_HistoryDataBackend_Influx(
-            influxClient.get(), "value", "nodeId", config.hostname, config.applicationName, config.opcuaPort);
+            influxClient.get(), shortNodeName, "nodeId", config.hostname, config.applicationName, config.opcuaPort);
         influxClient->addHealthMonitoringNodes(mappedServer);
       }
       setting.maxHistoryDataResponseSize = hist.entries_per_response;
