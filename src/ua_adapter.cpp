@@ -993,7 +993,8 @@ namespace ChimeraTK {
         if(folder.empty()) {
           // only if no history is set raise error/warning
           if(history.empty()) {
-            raiseError("Folder creation failed. Name is missing.", "Skipping Folder.", nodeset->nodeTab[i]->line);
+            raiseError("Folder creation failed. Name or history assignment is missing.", "Skipping Folder.",
+                nodeset->nodeTab[i]->line);
           }
           continue;
         }
