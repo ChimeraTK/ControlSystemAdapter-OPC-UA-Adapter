@@ -146,7 +146,7 @@ namespace ChimeraTK {
           UA_String out = UA_STRING_NULL;
           UA_print(reinterpret_cast<UA_NodeId*>(&historizing_nodes[i]), &UA_TYPES[UA_TYPES_NODEID], &out);
           UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
-              "Warning! Remove node %.*s from historizing because the setup %s  is missing.", (int)out.length, out.data,
+              "Warning! Remove node %.*s from historizing because the setup %s is missing.", (int)out.length, out.data,
               historizing_setup[i].c_str());
           UA_String_clear(&out);
           // UA_NodeId_clear(&historizing_nodes[j]);
@@ -201,7 +201,6 @@ namespace ChimeraTK {
 
         setting.historizingBackend = UA_HistoryDataBackend_Influx(
             influxClient.get(), shortNodeName, "nodeId", config.hostname, config.applicationName, config.opcuaPort);
-        influxClient->addHealthMonitoringNodes(mappedServer);
       }
       setting.maxHistoryDataResponseSize = hist.entries_per_response;
       setting.pollingInterval = hist.interval;
