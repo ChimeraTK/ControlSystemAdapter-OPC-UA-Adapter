@@ -124,11 +124,11 @@ namespace {
       return defaultValue;
     }
     char* end = nullptr;
-    const unsigned long parsed = std::strtoul(value.c_str(), &end, 10);
+    const uint64_t parsed = std::strtoul(value.c_str(), &end, 10);
     if(end == value.c_str() || *end != '\0') {
       return defaultValue;
     }
-    const std::size_t casted = static_cast<std::size_t>(parsed);
+    const auto casted = static_cast<std::size_t>(parsed);
     return casted < minValue ? minValue : casted;
   }
 
@@ -137,7 +137,7 @@ namespace {
       return defaultValue;
     }
     char* end = nullptr;
-    const long parsed = std::strtol(value.c_str(), &end, 10);
+    const int64_t parsed = std::strtol(value.c_str(), &end, 10);
     if(end == value.c_str() || *end != '\0') {
       return defaultValue;
     }

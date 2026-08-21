@@ -4,13 +4,11 @@
 
 #include "history_backend/Config.h"
 #include "history_backend/InfluxHealthMonitoring.h"
-#include "open62541/server.h"
 
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
 #include <deque>
-#include <map>
 #include <mutex>
 #include <optional>
 #include <string>
@@ -21,7 +19,7 @@ namespace influxdb {
 
   struct InfluxRecord {
     std::string time;
-    long long timestampNanoseconds = 0;
+    int64_t timestampNanoseconds = 0;
     std::string measurement;
     std::string field;
     std::string value;
@@ -86,8 +84,8 @@ namespace influxdb {
     std::vector<InfluxRecord> executeFluxReadQuery(const std::string& fluxQuery, std::string* error);
 
     bool sendRequest(const std::string& endpoint, const std::string& queryParameters, const std::string& method,
-        const std::string& body, const std::string& contentType, const std::string& accept, long* httpStatus,
-        std::string* responseBody, std::string* error);
+        const std::string& body, const std::string& contentType, const std::string& accept, int64_t* httpStatus,
+        std::string* responseBody, std::string* error) const;
 
     // batch write support related struct
     struct PendingWritePoint {

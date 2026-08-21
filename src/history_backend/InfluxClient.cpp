@@ -140,7 +140,7 @@ namespace influxdb {
     return url;
   }
 
-  long long parseTimestampToNanoseconds(const std::string& timestamp) {
+  int64_t parseTimestampToNanoseconds(const std::string& timestamp) {
     std::tm tm{};
     std::istringstream timeStream(timestamp.substr(0, 19));
     timeStream >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%S");
@@ -148,7 +148,7 @@ namespace influxdb {
       return 0;
     }
 
-    long long fractionalNanoseconds = 0;
+    int64_t fractionalNanoseconds = 0;
     const size_t dotPos = timestamp.find('.');
     const size_t zPos = timestamp.find('Z');
     if(dotPos != std::string::npos && zPos != std::string::npos && zPos > dotPos + 1) {
@@ -163,9 +163,9 @@ namespace influxdb {
     }
 
 #ifdef _WIN32
-    const long long secondsSinceEpoch = static_cast<long long>(_mkgmtime(&tm));
+    const int64_t secondsSinceEpoch = static_cast<int64_t>(_mkgmtime(&tm));
 #else
-    const long long secondsSinceEpoch = static_cast<long long>(timegm(&tm));
+    const auto secondsSinceEpoch = static_cast<int64_t>(timegm(&tm));
 #endif
     if(secondsSinceEpoch < 0) {
       return 0;
@@ -193,18 +193,18 @@ namespace influxdb {
     return flux.str();
   }
 
-  std::string formatRfc3339FromNanoseconds(long long epochNanoseconds) {
+  std::string formatRfc3339FromNanoseconds(int64_t epochNanoseconds) {
     if(epochNanoseconds < 0) {
       epochNanoseconds = 0;
     }
 
-    const long long epochSeconds = epochNanoseconds / 1000000000LL;
-    long long nanosRemainder = epochNanoseconds % 1000000000LL;
+    const int64_t epochSeconds = epochNanoseconds / 1000000000LL;
+    int64_t nanosRemainder = epochNanoseconds % 1000000000LL;
     if(nanosRemainder < 0) {
       nanosRemainder += 1000000000LL;
     }
 
-    std::time_t timeValue = static_cast<std::time_t>(epochSeconds);
+    auto timeValue = static_cast<std::time_t>(epochSeconds);
     std::tm tm{};
 #ifdef _WIN32
     gmtime_s(&tm, &timeValue);
@@ -282,7 +282,7 @@ namespace influxdb {
   }
 
   bool InfluxClient::sendWritePayload(const std::string& payload, std::string* error) {
-    long status = 0;
+    int64_t status = 0;
     std::string response;
     std::string requestError;
 
@@ -329,7 +329,7 @@ namespace influxdb {
     std::ostringstream body;
     body << "{\"query\":\"" << escapeJson(fluxQuery) << "\",\"type\":\"flux\"}";
 
-    long status = 0;
+    int64_t status = 0;
     std::string response;
     std::string requestError;
 
@@ -428,7 +428,7 @@ namespace influxdb {
 
   bool InfluxClient::sendRequest(const std::string& endpoint, const std::string& queryParameters,
       const std::string& method, const std::string& body, const std::string& contentType, const std::string& accept,
-      long* httpStatus, std::string* responseBody, std::string* error) {
+      int64_t* httpStatus, std::string* responseBody, std::string* error) const {
     CURL* curl = curl_easy_init();
     if(curl == nullptr) {
       if(error != nullptr) {
@@ -465,7 +465,7 @@ namespace influxdb {
       return false;
     }
 
-    long status = 0;
+    int64_t status = 0;
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
 
     if(httpStatus != nullptr) {
