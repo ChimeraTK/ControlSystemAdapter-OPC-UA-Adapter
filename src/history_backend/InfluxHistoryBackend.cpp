@@ -11,19 +11,18 @@
 #include <cstring>
 #include <iomanip>
 #include <limits>
-#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
 
 namespace influxdb {
   struct InfluxHistoryBackendContext {
-    InfluxClient* client;
+    InfluxClient* client{nullptr};
     std::string influxFieldName;
     std::string nodeIdTagName;
     std::string host;
     std::string applicationName;
-    uint16_t port;
+    uint16_t port{0};
   };
 
   size_t parseContinuationPointOffset(const UA_ByteString* continuationPoint, UA_StatusCode* status) {
@@ -61,21 +60,21 @@ namespace influxdb {
     return UA_STATUSCODE_GOOD;
   }
 
-  long long uaDateTimeToUnixNanoseconds(UA_DateTime value) {
+  int64_t uaDateTimeToUnixNanoseconds(UA_DateTime value) {
     if(value <= UA_DATETIME_UNIX_EPOCH) {
       return 0;
     }
 
     const UA_DateTime delta100ns = value - UA_DATETIME_UNIX_EPOCH;
-    const UA_DateTime maxSafeDelta100ns = static_cast<UA_DateTime>(std::numeric_limits<long long>::max() / 100);
+    const UA_DateTime maxSafeDelta100ns = static_cast<UA_DateTime>(std::numeric_limits<int64_t>::max() / 100);
     if(delta100ns >= maxSafeDelta100ns) {
-      return std::numeric_limits<long long>::max();
+      return std::numeric_limits<int64_t>::max();
     }
 
-    return static_cast<long long>(delta100ns * 100);
+    return static_cast<int64_t>(delta100ns * 100);
   }
 
-  UA_DateTime unixNanosecondsToUaDateTime(long long value) {
+  UA_DateTime unixNanosecondsToUaDateTime(int64_t value) {
     if(value <= 0) {
       return UA_DATETIME_UNIX_EPOCH;
     }
@@ -227,7 +226,7 @@ namespace influxdb {
       ts = value->serverTimestamp;
     }
 
-    const long long timestampNanoseconds = uaDateTimeToUnixNanoseconds(ts);
+    const int64_t timestampNanoseconds = uaDateTimeToUnixNanoseconds(ts);
 
     std::vector<TagInformation> tags;
     tags.emplace_back(ctx->nodeIdTagName, nodeIdToString(nodeId));
@@ -332,8 +331,8 @@ namespace influxdb {
 
     const bool reverse = (end != LLONG_MIN && start != LLONG_MIN && end < start);
 
-    long long startNanoseconds = 0;
-    long long endNanoseconds = uaDateTimeToUnixNanoseconds(UA_DateTime_now());
+    int64_t startNanoseconds = 0;
+    int64_t endNanoseconds = uaDateTimeToUnixNanoseconds(UA_DateTime_now());
 
     if(start == LLONG_MIN && end == LLONG_MIN) {
       startNanoseconds = 0;
