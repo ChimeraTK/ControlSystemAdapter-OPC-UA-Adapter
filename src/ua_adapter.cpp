@@ -495,7 +495,7 @@ namespace ChimeraTK {
                       "Using InfluxDB as historizing backend for history configuration '%s'.", history_name.c_str());
                   try {
                     const InfluxConfig influxConfig = ConfigLoader::loadFromXmlFile("influx_config.xml");
-                    influxClient = std::make_unique<InfluxClient>(influxConfig);
+                    influxClient = std::make_unique<influxdb::InfluxClient>(influxConfig);
                   }
                   catch(const std::exception& e) {
                     raiseError("Failed to initialize InfluxDB client from file 'influx_config.xml' with error: " +

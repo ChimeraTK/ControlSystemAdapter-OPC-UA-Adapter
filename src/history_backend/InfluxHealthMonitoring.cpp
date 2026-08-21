@@ -3,7 +3,7 @@
 #include "history_backend/InfluxHealthMonitoring.h"
 
 #include "history_backend/InfluxClient.h"
-namespace HealthMonitoring {
+namespace influxdb::HealthMonitoring {
 
   void writeUInt64Node(UA_Server* server, const UA_NodeId& nodeId, UA_UInt64 value) {
     UA_Variant variant;
@@ -106,4 +106,4 @@ namespace HealthMonitoring {
     return rc == UA_STATUSCODE_GOOD;
   }
 
-} // namespace HealthMonitoring
+} // namespace influxdb::HealthMonitoring
