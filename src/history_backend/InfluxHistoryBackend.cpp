@@ -17,7 +17,7 @@
 namespace {
   struct InfluxHistoryBackendContext {
     InfluxClient* client;
-    std::string fieldKey;
+    std::string influxFieldName;
     std::string nodeIdTagName;
     std::string host;
     std::string applicationName;
@@ -207,16 +207,17 @@ namespace {
 
     const long long timestampNanoseconds = uaDateTimeToUnixNanoseconds(ts);
 
-    std::map<std::string, std::string> tags;
-    tags[ctx->nodeIdTagName] = nodeIdToString(nodeId);
-    tags["host"] = ctx->host;
-    tags["application"] = ctx->applicationName;
-    tags["port"] = std::to_string(ctx->port);
+    std::vector<TagInformation> tags;
+    tags.emplace_back(ctx->nodeIdTagName, nodeIdToString(nodeId));
+    tags.emplace_back("host", ctx->host);
+    tags.emplace_back("application", ctx->applicationName);
+    tags.emplace_back("port", std::to_string(ctx->port));
 
     double numericValue = 0.0;
     if(variantToScalarDouble(&value->value, &numericValue)) {
       std::string writeError;
-      const bool ok = ctx->client->writePoint(ctx->fieldKey, numericValue, tags, timestampNanoseconds, &writeError);
+      const bool ok =
+          ctx->client->writePoint(ctx->influxFieldName, numericValue, tags, timestampNanoseconds, &writeError);
       if(!ok) {
         UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
         return UA_STATUSCODE_BADINTERNALERROR;
@@ -225,11 +226,12 @@ namespace {
     else {
       std::vector<double> numericArray;
       if(variantToArrayDouble(&value->value, numericArray)) {
+        tags.emplace_back("index");
         for(size_t i = 0; i < numericArray.size(); ++i) {
           std::string writeError;
-          tags["index"] = std::to_string(i);
+          tags.back().tagValue = std::to_string(i);
           const bool ok =
-              ctx->client->writePoint(ctx->fieldKey, numericArray[i], tags, timestampNanoseconds, &writeError);
+              ctx->client->writePoint(ctx->influxFieldName, numericArray[i], tags, timestampNanoseconds, &writeError);
           if(!ok) {
             UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
             return UA_STATUSCODE_BADINTERNALERROR;
@@ -272,11 +274,11 @@ namespace {
     }
 
     auto* ctx = static_cast<InfluxHistoryBackendContext*>(backend->context);
-    std::map<std::string, std::string> tags;
-    tags[ctx->nodeIdTagName] = nodeIdToString(nodeId);
-    tags["host"] = ctx->host;
-    tags["application"] = ctx->applicationName;
-    tags["port"] = std::to_string(ctx->port);
+    std::vector<TagInformation> tags;
+    tags.emplace_back(ctx->nodeIdTagName, nodeIdToString(nodeId));
+    tags.emplace_back("host", ctx->host);
+    tags.emplace_back("application", ctx->applicationName);
+    tags.emplace_back("port", std::to_string(ctx->port));
 
     const bool reverse = (end != LLONG_MIN && start != LLONG_MIN && end < start);
 
@@ -304,7 +306,7 @@ namespace {
 
     std::string readError;
     std::vector<InfluxRecord> records =
-        ctx->client->readRangeUnixNanoseconds(startNanoseconds, endNanoseconds, ctx->fieldKey, tags, &readError);
+        ctx->client->readRangeUnixNanoseconds(startNanoseconds, endNanoseconds, ctx->influxFieldName, tags, &readError);
     if(!readError.empty()) {
       UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history read failed: %s", readError.c_str());
       return UA_STATUSCODE_BADINTERNALERROR;
@@ -371,14 +373,14 @@ namespace {
   }
 } // namespace
 
-UA_HistoryDataBackend UA_HistoryDataBackend_Influx(InfluxClient* client, const std::string& fieldKey,
+UA_HistoryDataBackend UA_HistoryDataBackend_Influx(InfluxClient* client, const std::string& influxFieldName,
     const std::string& nodeIdTagName, const std::string& hostname, const std::string& applicationName, uint16_t port) {
   UA_HistoryDataBackend backend;
   std::memset(&backend, 0, sizeof(UA_HistoryDataBackend));
 
   auto* ctx = new InfluxHistoryBackendContext();
   ctx->client = client;
-  ctx->fieldKey = fieldKey;
+  ctx->influxFieldName = influxFieldName;
   ctx->nodeIdTagName = nodeIdTagName;
   ctx->host = hostname;
   ctx->applicationName = applicationName;

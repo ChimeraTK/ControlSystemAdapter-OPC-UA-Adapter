@@ -48,7 +48,17 @@
         <xs:complexType>
           <xs:simpleContent>
             <xs:extension base="csa:nonEmptyStringType">
-              <xs:attribute name="name" type="csa:nonEmptyStringType" use="required" />
+              <xs:attribute name="name" type="csa:nonEmptyStringType" use="required">
+                <xs:annotation>
+                  <xs:documentation> Name of the tag to be used in the InfluxDB measurement. </xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+              <xs:attribute name="sourceName" type="csa:nonEmptyStringType" use="optional">
+                <xs:annotation>
+                  <xs:documentation> Optional source name used to apply this tag only to matching
+                    process variables. If omitted, the tag applies to all process variables. </xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
             </xs:extension>
           </xs:simpleContent>
         </xs:complexType>

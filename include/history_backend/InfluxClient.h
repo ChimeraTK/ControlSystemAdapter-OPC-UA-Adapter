@@ -42,13 +42,13 @@ class InfluxClient {
   explicit InfluxClient(InfluxConfig config);
   ~InfluxClient();
 
-  bool writePoint(const std::string& fieldKey, double fieldValue, const std::map<std::string, std::string>& tags = {},
+  bool writePoint(const std::string& influxFieldName, double fieldValue, const std::vector<TagInformation>& tags = {},
       std::optional<int64_t> timestampNanoseconds = std::nullopt, std::string* error = nullptr);
 
   std::vector<InfluxRecord> readRange(const std::string& start, const std::string& stop, std::string* error = nullptr);
 
   std::vector<InfluxRecord> readRangeUnixNanoseconds(int64_t startNanoseconds, int64_t stopNanoseconds,
-      const std::string& fieldKey = "", const std::map<std::string, std::string>& tags = {},
+      const std::string& influxFieldName = "", const std::vector<TagInformation>& tags = {},
       std::string* error = nullptr);
 
   // batch write support related publicmethods
@@ -75,9 +75,9 @@ class InfluxClient {
 
   // batch write support related struct
   struct PendingWritePoint {
-    std::string fieldKey;
+    std::string influxFieldName;
     double fieldValue = 0.0;
-    std::map<std::string, std::string> tags;
+    std::vector<TagInformation> tags;
     std::optional<int64_t> timestampNanoseconds;
   };
   // batch write support related members
@@ -110,14 +110,14 @@ class InfluxClient {
 
   /**
    * @brief Builds a line protocol string for a single point.
-   * @param fieldKey The key of the field to write.
+   * @param influxFieldName Field name used in the database. It is set to the short node name of the PV by default.
    * @param fieldValue The value of the field to write.
    * @param tags The tags for the point.
    * @param timestampNanoseconds The timestamp of the point in nanoseconds.
    * @return The line protocol string for the point.
    */
-  std::string buildLineProtocol(const std::string& fieldKey, double fieldValue,
-      const std::map<std::string, std::string>& tags, std::optional<int64_t> timestampNanoseconds) const;
+  std::string buildLineProtocol(const std::string& influxFieldName, double fieldValue,
+      const std::vector<TagInformation>& tags, std::optional<int64_t> timestampNanoseconds) const;
   void writeWorkerLoop();
   /**
    * @brief Attempts to send a batch of points to InfluxDB with retries.

@@ -148,7 +148,7 @@ namespace {
   }
 
   std::string buildFluxReadQuery(const InfluxConfig& config, const std::string& startExpression,
-      const std::string& stopExpression, const std::string& fieldKey, const std::map<std::string, std::string>& tags) {
+      const std::string& stopExpression, const std::string& fieldKey, const std::vector<TagInformation>& tags) {
     std::ostringstream flux;
     flux << "from(bucket: \"" << escapeJson(config.bucket) << "\")"
          << " |> range(start: " << startExpression << ", stop: " << stopExpression << ")"
@@ -159,7 +159,8 @@ namespace {
     }
 
     for(const auto& tag : tags) {
-      flux << " |> filter(fn: (r) => r[\"" << escapeJson(tag.first) << "\"] == \"" << escapeJson(tag.second) << "\")";
+      flux << " |> filter(fn: (r) => r[\"" << escapeJson(tag.tagName) << "\"] == \"" << escapeJson(tag.tagValue)
+           << "\")";
     }
 
     return flux.str();
@@ -212,23 +213,32 @@ InfluxClient::~InfluxClient() {
   curl_global_cleanup();
 }
 
-std::string InfluxClient::buildLineProtocol(const std::string& fieldKey, double fieldValue,
-    const std::map<std::string, std::string>& tags, std::optional<int64_t> timestampNanoseconds) const {
+std::string InfluxClient::buildLineProtocol(const std::string& influxFieldName, double fieldValue,
+    const std::vector<TagInformation>& tags, std::optional<int64_t> timestampNanoseconds) const {
   std::ostringstream lineProtocol;
   lineProtocol << escapeLineProtocolIdentifier(config_.measurement);
 
-  std::map<std::string, std::string> mergedTags = tags;
-  for(const auto& [configTagKey, configTagValue] : config_.extraTags) {
-    if(mergedTags.find(configTagKey) == mergedTags.end()) {
-      mergedTags.emplace(configTagKey, configTagValue);
+  std::vector<TagInformation> mergedTags = tags;
+  for(const auto& tagInfo : config_.extraTags) {
+    if(std::ranges::find(mergedTags, tagInfo) == mergedTags.end()) {
+      if(tagInfo.sourceName.empty()) {
+        mergedTags.emplace_back(tagInfo);
+      }
+      else {
+        auto sourceId = std::ranges::find_if(tags, [](const TagInformation& tag) { return tag.tagName == "nodeId"; });
+        if(sourceId != tags.end() && sourceId->tagValue.find(tagInfo.sourceName) != std::string::npos) {
+          mergedTags.emplace_back(tagInfo);
+        }
+      }
     }
   }
 
-  for(const auto& [tagKey, tagValue] : mergedTags) {
-    lineProtocol << "," << escapeLineProtocolIdentifier(tagKey) << "=" << escapeLineProtocolIdentifier(tagValue);
+  for(const auto& tagInfo : mergedTags) {
+    lineProtocol << "," << escapeLineProtocolIdentifier(tagInfo.tagName) << "="
+                 << escapeLineProtocolIdentifier(tagInfo.tagValue);
   }
 
-  lineProtocol << " " << escapeLineProtocolIdentifier(fieldKey) << "=";
+  lineProtocol << " " << escapeLineProtocolIdentifier(influxFieldName) << "=";
   lineProtocol << std::setprecision(10) << fieldValue;
 
   if(timestampNanoseconds.has_value()) {
@@ -367,7 +377,7 @@ std::vector<InfluxRecord> InfluxClient::executeFluxReadQuery(const std::string& 
 }
 
 std::vector<InfluxRecord> InfluxClient::readRangeUnixNanoseconds(int64_t startNanoseconds, int64_t stopNanoseconds,
-    const std::string& fieldKey, const std::map<std::string, std::string>& tags, std::string* error) {
+    const std::string& influxFieldName, const std::vector<TagInformation>& tags, std::string* error) {
   if(stopNanoseconds <= startNanoseconds) {
     if(error != nullptr) {
       *error = "Invalid range: stopNanoseconds must be greater than "
@@ -378,7 +388,7 @@ std::vector<InfluxRecord> InfluxClient::readRangeUnixNanoseconds(int64_t startNa
 
   const std::string startExpr = "time(v: \"" + formatRfc3339FromNanoseconds(startNanoseconds) + "\")";
   const std::string stopExpr = "time(v: \"" + formatRfc3339FromNanoseconds(stopNanoseconds) + "\")";
-  const std::string fluxQuery = buildFluxReadQuery(config_, startExpr, stopExpr, fieldKey, tags);
+  const std::string fluxQuery = buildFluxReadQuery(config_, startExpr, stopExpr, influxFieldName, tags);
 
   return executeFluxReadQuery(fluxQuery, error);
 }
@@ -525,7 +535,7 @@ void InfluxClient::writeWorkerLoop() {
     std::ostringstream payload;
     for(std::size_t i = 0; i < batch.size(); ++i) {
       payload << buildLineProtocol(
-          batch[i].fieldKey, batch[i].fieldValue, batch[i].tags, batch[i].timestampNanoseconds);
+          batch[i].influxFieldName, batch[i].fieldValue, batch[i].tags, batch[i].timestampNanoseconds);
       if(i + 1 < batch.size()) {
         payload << "\n";
       }
@@ -565,10 +575,10 @@ void InfluxClient::writeWorkerLoop() {
   }
 }
 
-bool InfluxClient::writePoint(const std::string& fieldKey, double fieldValue,
-    const std::map<std::string, std::string>& tags, std::optional<int64_t> timestampNanoseconds, std::string* error) {
+bool InfluxClient::writePoint(const std::string& influxFieldName, double fieldValue,
+    const std::vector<TagInformation>& tags, std::optional<int64_t> timestampNanoseconds, std::string* error) {
   if(!config_.writeBatching.enabled) {
-    const bool ok = attemptSendBatch(buildLineProtocol(fieldKey, fieldValue, tags, timestampNanoseconds), error);
+    const bool ok = attemptSendBatch(buildLineProtocol(influxFieldName, fieldValue, tags, timestampNanoseconds), error);
     if(ok) {
       pointsWritten_.fetch_add(1);
       batchesWritten_.fetch_add(1);
@@ -588,7 +598,7 @@ bool InfluxClient::writePoint(const std::string& fieldKey, double fieldValue,
   }
 
   PendingWritePoint point;
-  point.fieldKey = fieldKey;
+  point.influxFieldName = influxFieldName;
   point.fieldValue = fieldValue;
   point.tags = tags;
   point.timestampNanoseconds = timestampNanoseconds;
