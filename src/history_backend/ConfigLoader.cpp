@@ -66,7 +66,7 @@ namespace {
     return "";
   }
 
-  std::map<std::string, std::string> parseExtraTags(xmlNodePtr root) {
+  std::vector<TagInformation> parseExtraTags(xmlNodePtr root) {
     for(xmlNodePtr child = root->children; child != nullptr; child = child->next) {
       if(child->type != XML_ELEMENT_NODE) {
         continue;
@@ -76,7 +76,7 @@ namespace {
         continue;
       }
 
-      std::map<std::string, std::string> tags;
+      std::vector<TagInformation> tags;
       for(xmlNodePtr tagNode = child->children; tagNode != nullptr; tagNode = tagNode->next) {
         if(tagNode->type != XML_ELEMENT_NODE || xmlStrcmp(tagNode->name, BAD_CAST "tag") != 0) {
           continue;
@@ -93,6 +93,13 @@ namespace {
           continue;
         }
 
+        std::string sourceName;
+        xmlChar* sourceNameAttr = xmlGetProp(tagNode, BAD_CAST "sourceName");
+        if(sourceNameAttr != nullptr) {
+          sourceName = trim(reinterpret_cast<const char*>(sourceNameAttr));
+        }
+        xmlFree(sourceNameAttr);
+
         xmlChar* content = xmlNodeGetContent(tagNode);
         if(content == nullptr) {
           continue;
@@ -102,7 +109,7 @@ namespace {
         xmlFree(content);
 
         if(!tag.empty()) {
-          tags[name] = tag;
+          tags.push_back({name, tag, sourceName});
         }
       }
 

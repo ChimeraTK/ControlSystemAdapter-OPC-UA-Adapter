@@ -63,7 +63,8 @@ Two history backend types are supported:
   <csa:measurement>demo_measurement</csa:measurement>
   <csa:precision>ns</csa:precision>
   <csa:extra_tags>
-    <csa:tag name="extra_tag">mytag</csa:tag>
+    <csa:tag name="extra_tag">my_tag</csa:tag>
+    <csa:tag name="special_tag" sourceName="special_folder/pv_with_special_tag">my_other_tag</csa:tag>
   </csa:extra_tags>
   <csa:write_batching>
     <csa:enabled>true</csa:enabled>

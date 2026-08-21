@@ -3,8 +3,8 @@
 #pragma once
 
 #include <cstddef>
-#include <map>
 #include <string>
+#include <vector>
 
 struct InfluxWriteBatchingConfig {
   bool enabled = true;
@@ -16,6 +16,15 @@ struct InfluxWriteBatchingConfig {
   bool failFastOnAsyncError = false;
 };
 
+/**
+ * @brief Structure to hold information about tags to be added to InfluxDB measurements.
+ */
+struct TagInformation {
+  std::string tagName;    ///< Name of the tag.
+  std::string tagValue;   ///< Value of the tag.
+  std::string sourceName; ///< Source name of the PV which should get the tag. If empty, the tag is added to all PVs.
+  bool operator==(const TagInformation& other) const { return tagName == other.tagName && tagValue == other.tagValue; }
+};
 struct InfluxConfig {
   std::string url;
   std::string token;
@@ -23,7 +32,7 @@ struct InfluxConfig {
   std::string bucket;
   std::string measurement;
   std::string precision;
-  std::map<std::string, std::string> extraTags;
+  std::vector<TagInformation> extraTags;
   InfluxWriteBatchingConfig writeBatching;
 };
 
