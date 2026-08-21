@@ -9,12 +9,14 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>
 #include <limits>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
-namespace {
+namespace influxdb {
   struct InfluxHistoryBackendContext {
     InfluxClient* client;
     std::string influxFieldName;
@@ -87,81 +89,101 @@ namespace {
       return "unknown-node";
     }
 
-    const std::string result(reinterpret_cast<const char*>(encoded.data), encoded.length);
+    std::string result;
+    result.assign(encoded.data, encoded.data + encoded.length);
     UA_String_clear(&encoded);
     return result;
   }
 
-  bool variantToScalarDouble(const UA_Variant* variant, double* outValue) {
-    if(variant == nullptr || outValue == nullptr || !UA_Variant_isScalar(variant)) {
-      return false;
+  FieldValue uaValueToString(const void* value, const UA_DataType* type) {
+    if(value == nullptr || type == nullptr) {
+      return FieldValue({"", true});
     }
 
-    if(variant->type == &UA_TYPES[UA_TYPES_DOUBLE]) {
-      *outValue = *static_cast<const UA_Double*>(variant->data);
-      return true;
-    }
-    if(variant->type == &UA_TYPES[UA_TYPES_FLOAT]) {
-      *outValue = static_cast<double>(*static_cast<const UA_Float*>(variant->data));
-      return true;
-    }
-    if(variant->type == &UA_TYPES[UA_TYPES_INT64]) {
-      *outValue = static_cast<double>(*static_cast<const UA_Int64*>(variant->data));
-      return true;
-    }
-    if(variant->type == &UA_TYPES[UA_TYPES_UINT64]) {
-      *outValue = static_cast<double>(*static_cast<const UA_UInt64*>(variant->data));
-      return true;
-    }
-    if(variant->type == &UA_TYPES[UA_TYPES_INT32]) {
-      *outValue = static_cast<double>(*static_cast<const UA_Int32*>(variant->data));
-      return true;
-    }
-    if(variant->type == &UA_TYPES[UA_TYPES_UINT32]) {
-      *outValue = static_cast<double>(*static_cast<const UA_UInt32*>(variant->data));
-      return true;
+    if(type->typeKind == UA_DATATYPEKIND_STRING) {
+      const auto* stringValue = static_cast<const UA_String*>(value);
+      if(stringValue->data == nullptr || stringValue->length == 0) {
+        return FieldValue({"", true});
+      }
+      std::string result;
+      result.assign(stringValue->data, stringValue->data + stringValue->length);
+      return FieldValue({result, true});
     }
 
-    return false;
+    if(type->typeKind == UA_DATATYPEKIND_BOOLEAN) {
+      return FieldValue({*static_cast<const UA_Boolean*>(value) ? "true" : "false"});
+    }
+
+    if(type->typeKind == UA_DATATYPEKIND_SBYTE) {
+      return FieldValue({std::to_string(*static_cast<const UA_SByte*>(value))});
+    }
+    if(type->typeKind == UA_DATATYPEKIND_BYTE) {
+      return FieldValue({std::to_string(*static_cast<const UA_Byte*>(value))});
+    }
+    if(type->typeKind == UA_DATATYPEKIND_INT16) {
+      return FieldValue({std::to_string(*static_cast<const UA_Int16*>(value))});
+    }
+    if(type->typeKind == UA_DATATYPEKIND_UINT16) {
+      return FieldValue({std::to_string(*static_cast<const UA_UInt16*>(value))});
+    }
+    if(type->typeKind == UA_DATATYPEKIND_INT32) {
+      return FieldValue({std::to_string(*static_cast<const UA_Int32*>(value))});
+    }
+    if(type->typeKind == UA_DATATYPEKIND_UINT32) {
+      return FieldValue({std::to_string(*static_cast<const UA_UInt32*>(value))});
+    }
+    if(type->typeKind == UA_DATATYPEKIND_INT64) {
+      return FieldValue({std::to_string(*static_cast<const UA_Int64*>(value))});
+    }
+    if(type->typeKind == UA_DATATYPEKIND_UINT64) {
+      return FieldValue({std::to_string(*static_cast<const UA_UInt64*>(value))});
+    }
+    if(type->typeKind == UA_DATATYPEKIND_FLOAT) {
+      std::ostringstream out;
+      out << std::setprecision(std::numeric_limits<double>::max_digits10)
+          << static_cast<double>(*static_cast<const UA_Float*>(value));
+      return FieldValue({out.str()});
+    }
+    if(type->typeKind == UA_DATATYPEKIND_DOUBLE) {
+      std::ostringstream out;
+      out << std::setprecision(std::numeric_limits<double>::max_digits10) << *static_cast<const UA_Double*>(value);
+      return FieldValue({out.str()});
+    }
+    if(type->typeKind == UA_DATATYPEKIND_DATETIME) {
+      return FieldValue({std::to_string(static_cast<std::int64_t>(*static_cast<const UA_DateTime*>(value)))});
+    }
+
+    UA_String encoded = UA_STRING_NULL;
+    if(UA_print(value, type, &encoded) != UA_STATUSCODE_GOOD || encoded.data == nullptr) {
+      return FieldValue({"", true});
+    }
+
+    std::string result;
+    result.assign(encoded.data, encoded.data + encoded.length);
+    UA_String_clear(&encoded);
+    return FieldValue({result, true});
   }
 
-  bool variantToArrayDouble(const UA_Variant* variant, std::vector<double>& outValue) {
-    if(variant == nullptr || variant->arrayLength == 0) {
+  bool variantToStrings(const UA_Variant* variant, std::vector<FieldValue>& outValues) {
+    if(variant == nullptr || variant->type == nullptr) {
       return false;
     }
-    outValue.resize(variant->arrayLength);
-    for(size_t i = 0; i < variant->arrayLength; ++i) {
-      if(variant->type == &UA_TYPES[UA_TYPES_DOUBLE]) {
-        const auto* tmp = static_cast<const UA_Double*>(variant->data);
-        outValue[i] = tmp[i];
-        continue;
-      }
-      if(variant->type == &UA_TYPES[UA_TYPES_FLOAT]) {
-        const auto* tmp = static_cast<const UA_Float*>(variant->data);
-        outValue[i] = static_cast<double>(tmp[i]);
-        continue;
-      }
-      if(variant->type == &UA_TYPES[UA_TYPES_INT64]) {
-        const auto* tmp = static_cast<const UA_Int64*>(variant->data);
-        outValue[i] = static_cast<double>(tmp[i]);
-        continue;
-      }
-      if(variant->type == &UA_TYPES[UA_TYPES_UINT64]) {
-        const auto* tmp = static_cast<const UA_UInt64*>(variant->data);
-        outValue[i] = static_cast<double>(tmp[i]);
-        continue;
-      }
-      if(variant->type == &UA_TYPES[UA_TYPES_INT32]) {
-        const auto* tmp = static_cast<const UA_Int32*>(variant->data);
-        outValue[i] = static_cast<double>(tmp[i]);
-        continue;
-      }
-      if(variant->type == &UA_TYPES[UA_TYPES_UINT32]) {
-        const auto* tmp = static_cast<const UA_UInt32*>(variant->data);
-        outValue[i] = static_cast<double>(tmp[i]);
-        continue;
-      }
+
+    outValues.clear();
+
+    if(UA_Variant_isScalar(variant)) {
+      outValues.emplace_back(uaValueToString(variant->data, variant->type));
+      return true;
+    }
+
+    if(variant->arrayLength == 0 || variant->data == nullptr) {
       return false;
+    }
+
+    outValues.reserve(variant->arrayLength);
+    for(size_t i = 0; i < variant->arrayLength; ++i) {
+      const auto* element = static_cast<const UA_Byte*>(variant->data) + (i * variant->type->memSize);
+      outValues.emplace_back(uaValueToString(element, variant->type));
     }
     return true;
   }
@@ -213,39 +235,67 @@ namespace {
     tags.emplace_back("application", ctx->applicationName);
     tags.emplace_back("port", std::to_string(ctx->port));
 
-    double numericValue = 0.0;
-    if(variantToScalarDouble(&value->value, &numericValue)) {
+    std::vector<FieldValue> fieldValues;
+    if(!variantToStrings(&value->value, fieldValues)) {
+      UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
+          "Influx history write failed: Unsupported data type for node %s", nodeIdToString(nodeId).c_str());
+      return UA_STATUSCODE_BADTYPEMISMATCH;
+    }
+
+    if(fieldValues.size() == 1) {
       std::string writeError;
       const bool ok =
-          ctx->client->writePoint(ctx->influxFieldName, numericValue, tags, timestampNanoseconds, &writeError);
+          ctx->client->writePoint(ctx->influxFieldName, fieldValues.front(), tags, timestampNanoseconds, &writeError);
       if(!ok) {
         UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
         return UA_STATUSCODE_BADINTERNALERROR;
       }
     }
     else {
-      std::vector<double> numericArray;
-      if(variantToArrayDouble(&value->value, numericArray)) {
-        tags.emplace_back("index");
-        for(size_t i = 0; i < numericArray.size(); ++i) {
-          std::string writeError;
-          tags.back().tagValue = std::to_string(i);
-          const bool ok =
-              ctx->client->writePoint(ctx->influxFieldName, numericArray[i], tags, timestampNanoseconds, &writeError);
-          if(!ok) {
-            UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
-            return UA_STATUSCODE_BADINTERNALERROR;
-          }
+      tags.emplace_back("index");
+      for(size_t i = 0; i < fieldValues.size(); ++i) {
+        std::string writeError;
+        tags.back().tagValue = std::to_string(i);
+        const bool ok =
+            ctx->client->writePoint(ctx->influxFieldName, fieldValues[i], tags, timestampNanoseconds, &writeError);
+        if(!ok) {
+          UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
+          return UA_STATUSCODE_BADINTERNALERROR;
         }
-      }
-      else {
-        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
-            "Influx history write failed: Unsupported data type for node %s", nodeIdToString(nodeId).c_str());
-        return UA_STATUSCODE_BADTYPEMISMATCH;
       }
     }
 
     return UA_STATUSCODE_GOOD;
+  }
+  /**
+   * Parses a string into a numeric value.
+   *
+   * Parsing will succeed if the string represents a valid number and contains no other non-whitespace characters.
+   * @param value The string to parse.
+   * @param outValue The parsed numeric value.
+   * @return True if the parsing was successful, false otherwise.
+   */
+  bool parseNumberValue(const std::string& value, double& outValue) {
+    const std::string trimmed = trim(value);
+    if(trimmed.empty()) {
+      return false;
+    }
+
+    char* endPtr = nullptr;
+    // try to convert the trimmed string to a double using std::strtod
+    // E.g. the string "42.5 val" will be converted to 42.5 and endPtr will point to the space before " val"
+    outValue = std::strtod(trimmed.c_str(), &endPtr);
+    if(endPtr == trimmed.c_str()) {
+      // no conversion was performed, the string is not a valid number
+      return false;
+    }
+
+    // check if there are any non-whitespace characters after the number
+    while(endPtr != nullptr && *endPtr != '\0' && std::isspace(static_cast<unsigned char>(*endPtr))) {
+      ++endPtr;
+    }
+    // if endPtr points to the null terminator, the entire string was a valid number
+    return endPtr != nullptr && *endPtr == '\0';
   }
 
   UA_StatusCode getHistoryDataInflux(UA_Server* /*server*/, const UA_NodeId* /*sessionId*/, void* /*sessionContext*/,
@@ -346,10 +396,16 @@ namespace {
       UA_DataValue_init(&result->dataValues[i]);
 
       const InfluxRecord& record = records[skip + i];
-      const double value = std::strtod(record.value.c_str(), nullptr);
-
       result->dataValues[i].hasValue = true;
-      UA_Variant_setScalarCopy(&result->dataValues[i].value, &value, &UA_TYPES[UA_TYPES_DOUBLE]);
+      double numericValue = 0.0;
+      if(parseNumberValue(record.value, numericValue)) {
+        UA_Variant_setScalarCopy(&result->dataValues[i].value, &numericValue, &UA_TYPES[UA_TYPES_DOUBLE]);
+      }
+      else {
+        UA_String stringValue = UA_String_fromChars(record.value.c_str());
+        UA_Variant_setScalarCopy(&result->dataValues[i].value, &stringValue, &UA_TYPES[UA_TYPES_STRING]);
+        UA_String_clear(&stringValue);
+      }
 
       const UA_DateTime sourceTime = unixNanosecondsToUaDateTime(record.timestampNanoseconds);
       result->dataValues[i].hasSourceTimestamp = true;
@@ -371,26 +427,27 @@ namespace {
 
     return UA_STATUSCODE_GOOD;
   }
-} // namespace
 
-UA_HistoryDataBackend UA_HistoryDataBackend_Influx(InfluxClient* client, const std::string& influxFieldName,
-    const std::string& nodeIdTagName, const std::string& hostname, const std::string& applicationName, uint16_t port) {
-  UA_HistoryDataBackend backend;
-  std::memset(&backend, 0, sizeof(UA_HistoryDataBackend));
+  UA_HistoryDataBackend UA_HistoryDataBackend_Influx(InfluxClient* client, const std::string& influxFieldName,
+      const std::string& nodeIdTagName, const std::string& hostname, const std::string& applicationName,
+      uint16_t port) {
+    UA_HistoryDataBackend backend;
+    std::memset(&backend, 0, sizeof(UA_HistoryDataBackend));
 
-  auto* ctx = new InfluxHistoryBackendContext();
-  ctx->client = client;
-  ctx->influxFieldName = influxFieldName;
-  ctx->nodeIdTagName = nodeIdTagName;
-  ctx->host = hostname;
-  ctx->applicationName = applicationName;
-  ctx->port = port;
-  backend.context = ctx;
-  backend.deleteMembers = deleteMembersInflux;
-  backend.serverSetHistoryData = serverSetHistoryDataInflux;
-  backend.getHistoryData = getHistoryDataInflux;
-  backend.boundSupported = boundSupportedInflux;
-  backend.timestampsToReturnSupported = timestampsToReturnSupportedInflux;
+    auto* ctx = new InfluxHistoryBackendContext();
+    ctx->client = client;
+    ctx->influxFieldName = influxFieldName;
+    ctx->nodeIdTagName = nodeIdTagName;
+    ctx->host = hostname;
+    ctx->applicationName = applicationName;
+    ctx->port = port;
+    backend.context = ctx;
+    backend.deleteMembers = deleteMembersInflux;
+    backend.serverSetHistoryData = serverSetHistoryDataInflux;
+    backend.getHistoryData = getHistoryDataInflux;
+    backend.boundSupported = boundSupportedInflux;
+    backend.timestampsToReturnSupported = timestampsToReturnSupportedInflux;
 
-  return backend;
-}
+    return backend;
+  }
+} // namespace influxdb

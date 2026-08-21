@@ -98,7 +98,7 @@ namespace ChimeraTK {
      *  Will be initialized if HistorizingBackend::InfluxDB is used in the configuration.
      *  The InfluxDB client is used to store historical data in an InfluxDB
      */
-    std::unique_ptr<InfluxClient> influxClient{nullptr};
+    std::unique_ptr<influxdb::InfluxClient> influxClient{nullptr};
 
     /** @brief This method construct the parameter for the opcua server, depending of the <serverConfig> struct
      */

@@ -19,7 +19,7 @@ namespace ChimeraTK {
 
   UA_HistoryDataGathering add_historizing_nodes(std::vector<UA_NodeId>& historizing_nodes,
       std::vector<std::string>& historizing_setup, UA_Server* mappedServer, UA_ServerConfig* server_config,
-      const ServerConfig& config, std::unique_ptr<InfluxClient>& influxClient);
+      const ServerConfig& config, std::unique_ptr<influxdb::InfluxClient>& influxClient);
 
   void clear_history(UA_HistoryDataGathering gathering, std::vector<UA_NodeId>& historizing_nodes,
       std::vector<std::string>& historizing_setup, UA_Server* mappedServer,
