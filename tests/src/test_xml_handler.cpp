@@ -27,7 +27,9 @@ void XMLFileHandlerTest::readDocFile() {
   // Set a document
   xml_file_handler xmlHandlerTwo("uamapping_test_2.xml");
   BOOST_CHECK(xmlHandlerTwo.isDocSetted() == true);
-  BOOST_CHECK(xmlHandlerTwo.getNodeSet("//process_variable") != NULL);
+  xmlXPathObjectPtr result = xmlHandlerTwo.getNodeSet("//process_variable");
+  BOOST_CHECK(result != NULL);
+  xmlXPathFreeObject(result);
 }
 
 void XMLFileHandlerTest::getContent() {
@@ -65,6 +67,7 @@ void XMLFileHandlerTest::getContent() {
     vector<string> path =
         xmlHandler.parseVariablePath(sourceVariableName, xmlHandler.getAttributeValueFromNode(nodeList[0], "name"));
     BOOST_CHECK(path.size() == 1);
+    xmlXPathFreeObject(result);
   }
   else {
     BOOST_CHECK(false);
