@@ -159,6 +159,13 @@
           is: ApplicationName </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="registerPeriod" type="csa:nonEmptyString">
+      <xsd:annotation>
+        <xsd:documentation> The period in minutes after which the server will re-register itself
+          with the LDS. Default is 10 minutes. This needs to match settings of the LDS server.
+          Usually the LDS drops registrations after a defined time of e.g 1h. </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
   <xsd:complexType name="voidType">
     <xsd:attribute name="useBool" type="xsd:boolean">

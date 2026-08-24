@@ -432,16 +432,37 @@ namespace ChimeraTK {
               "No lds 'registryName'-Attribute in config file is set. Will use application name '%s' to register.",
               this->serverConfig.applicationName.c_str());
         }
+        std::string ldsRegisterPeriod =
+            xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "registerPeriod");
+        if(!ldsRegisterPeriod.empty()) {
+          try {
+            this->serverConfig.ldsRegisterPeriod = std::stoull(ldsRegisterPeriod);
+            UA_LOG_DEBUG(&logger, UA_LOGCATEGORY_USERLAND,
+                "LDS re-register period is set to %llu minutes as configured in the config file.",
+                this->serverConfig.ldsRegisterPeriod);
+          }
+          catch(const std::exception& e) {
+            UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
+                "Invalid 'registerPeriod' attribute in config file: %s. Default value will be used: %llu",
+                ldsRegisterPeriod.c_str(), this->serverConfig.ldsRegisterPeriod);
+          }
+        }
         string registerLDS = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "register");
         if(!registerLDS.empty()) {
           transform(registerLDS.begin(), registerLDS.end(), registerLDS.begin(), ::toupper);
           this->serverConfig.registerLDS = registerLDS == "TRUE";
+          UA_LOG_INFO(&logger, UA_LOGCATEGORY_USERLAND,
+              "LDS registration enabled. Will register to %s as '%s' and re-register every %llu minutes as configured "
+              "in the config file.",
+              this->serverConfig.ldsAddress.c_str(), this->serverConfig.ldsRegistryName.c_str(),
+              this->serverConfig.ldsRegisterPeriod);
         }
         else {
           this->serverConfig.registerLDS = false;
           UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
               "No LDS 'register'-Attribute in config file is set. LDS registration is disabled.");
         }
+        xmlXPathFreeObject(sub_result);
       }
 
       sub_result = this->fileHandler->getNodeSet(xpath + "//voidHandling");
@@ -457,6 +478,7 @@ namespace ChimeraTK {
           UA_LOG_INFO(&logger, UA_LOGCATEGORY_USERLAND,
               "Bool process variables will be used forChimeraTK::Void input as set in the config file.");
         }
+        xmlXPathFreeObject(sub_result);
       }
 
       // check if historizing is configured
@@ -564,6 +586,7 @@ namespace ChimeraTK {
               }
             }
           }
+          xmlXPathFreeObject(sub_sub_result);
         }
       }
 
@@ -758,23 +781,32 @@ namespace ChimeraTK {
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Starting the server worker thread");
     UA_Server_run_startup(this->mappedServer);
 
-    if(this->serverConfig.registerLDS) {
-      // register with lds server
-      UA_ClientConfig cc;
-      memset(&cc, 0, sizeof(UA_ClientConfig));
-      UA_ClientConfig_setDefault(&cc);
-      cc.securityMode = UA_MESSAGESECURITYMODE_NONE;
-      UA_StatusCode retval = UA_Server_registerDiscovery(
-          this->mappedServer, &cc, UA_STRING(const_cast<char*>(this->serverConfig.ldsAddress.c_str())), UA_STRING_NULL);
-      if(retval != UA_STATUSCODE_GOOD) {
-        UA_LOG_ERROR(server_config->logging, UA_LOGCATEGORY_SERVER,
-            "Could not register server with discovery server. StatusCode %s", UA_StatusCode_name(retval));
-      }
-      UA_ClientConfig_clear(&cc);
-    }
+    // settings used for manual reregistration of the server with the lds server, if the registration is enabled in the config file
+    auto REREGISTER_INTERVAL_SEC = this->serverConfig.ldsRegisterPeriod * 60;
+    UA_DateTime nextReregister = UA_DateTime_now();
+
     this->running = true;
     while(this->running) {
       UA_Server_run_iterate(this->mappedServer, true);
+
+      if(this->serverConfig.registerLDS) {
+        const UA_DateTime now = UA_DateTime_now();
+        if(now >= nextReregister) {
+          // register with lds server
+          UA_ClientConfig cc;
+          memset(&cc, 0, sizeof(UA_ClientConfig));
+          UA_ClientConfig_setDefault(&cc);
+          cc.securityMode = UA_MESSAGESECURITYMODE_NONE;
+          UA_StatusCode retval = UA_Server_registerDiscovery(this->mappedServer, &cc,
+              UA_STRING(const_cast<char*>(this->serverConfig.ldsAddress.c_str())), UA_STRING_NULL);
+          if(retval != UA_STATUSCODE_GOOD) {
+            UA_LOG_ERROR(server_config->logging, UA_LOGCATEGORY_SERVER,
+                "Could not register server with discovery server. StatusCode %s", UA_StatusCode_name(retval));
+          }
+
+          nextReregister = now + REREGISTER_INTERVAL_SEC * UA_DATETIME_SEC;
+        }
+      }
     }
     clear_history(gathering, historizing_nodes, historizing_setup, this->mappedServer,
         this->serverConfig.historyfolders, this->serverConfig.historyvariables, this->server_config);

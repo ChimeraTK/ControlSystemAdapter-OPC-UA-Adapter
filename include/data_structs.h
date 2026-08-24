@@ -41,6 +41,7 @@ namespace ChimeraTK {
     bool enableSecurity = false;
     bool unsecure = false;
     bool registerLDS = false;
+    uint64_t ldsRegisterPeriod = 10; ///< Interval in minutes for re-registering with the LDS. Default is 10 minutes.
     bool useBoolAsVoid = false;
     std::string ldsAddress = "opc.tcp://localhost:4840";
     std::string ldsRegistryName;
