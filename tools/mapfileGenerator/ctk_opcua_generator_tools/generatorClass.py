@@ -126,6 +126,7 @@ class Config(EncryptionSettings):
     self.registerLDS: bool = False
     self.ldsAddress: str|None = None
     self.ldsRegistryName: str|None = None
+    self.ldsRegisterPeriod: int = 10
   
   def createConfig(self, root:ET._Element):
     '''
@@ -158,6 +159,8 @@ class Config(EncryptionSettings):
         raise RuntimeError("No lds address set but LDS  registration is enabled!")
       if self.ldsRegistryName:
         lds.set("registryName", self.ldsRegistryName)
+      if self.ldsRegisterPeriod:
+        lds.set("registerPeriod", str(self.ldsRegisterPeriod))
     if self.enableLogin == True:
       login = ET.SubElement(config, "login")
       if self.username:
@@ -219,6 +222,11 @@ class Config(EncryptionSettings):
           self.ldsAddress = lds.attrib['address']
         if 'registryName' in lds.attrib:
           self.ldsRegistryName = lds.attrib['registryName']
+        if 'registerPeriod' in lds.attrib:
+          try:
+            self.ldsRegisterPeriod = int(lds.attrib['registerPeriod'])
+          except ValueError:
+            logging.warning("Failed to read registerPeriod. {} is not a valid integer. Using default value of 10 minutes instead.".format(lds.attrib['registerPeriod']))
       useBoolAsVoid = config.find('voidHandling')
       if useBoolAsVoid is not None:
         if 'useBool' in useBoolAsVoid.attrib:

@@ -146,13 +146,17 @@ class LDSSettingsDialog(QDialog, Ui_LDSDialog):
     self.ldsAddress.setText(self.data.ldsAddress)
     self.ldsRegistryName.setText(self.data.ldsRegistryName)
     self.registerLDS.setChecked(self.data.registerLDS)
+    self.ldsRegisterPeriod.setValue(self.data.ldsRegisterPeriod)
     self.ldsAddress.textChanged.connect(self.updateData)
     self.ldsRegistryName.textChanged.connect(self.updateData)
     self.registerLDS.stateChanged.connect(self.updateData)
+    self.ldsRegisterPeriod.valueChanged.connect(self.updateData)
+
   def updateData(self):
     self.data.ldsAddress = self.ldsAddress.text()
     self.data.ldsRegistryName = self.ldsRegistryName.text()
     self.data.registerLDS = self.registerLDS.isChecked()
+    self.data.ldsRegisterPeriod = self.ldsRegisterPeriod.value()
       
 class MapGeneratorForm(QMainWindow, Ui_MainWindow):
   def _createMapGenerator(self, fileName: str|None):
