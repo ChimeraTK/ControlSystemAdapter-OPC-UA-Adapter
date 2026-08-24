@@ -22,6 +22,17 @@ namespace influxdb {
       UA_NodeId retryAttemptsNodeId{};
       UA_NodeId asyncErrorNodeId{};
       UA_NodeId asyncErrorActiveNodeId{};
+      ~InfluxHealthContext() {
+        UA_NodeId_clear(&queuedPointsNodeId);
+        UA_NodeId_clear(&queuedPointsDroppedNodeId);
+        UA_NodeId_clear(&pointsWrittenNodeId);
+        UA_NodeId_clear(&pointsDroppedNodeId);
+        UA_NodeId_clear(&batchesWrittenNodeId);
+        UA_NodeId_clear(&batchFailuresNodeId);
+        UA_NodeId_clear(&retryAttemptsNodeId);
+        UA_NodeId_clear(&asyncErrorNodeId);
+        UA_NodeId_clear(&asyncErrorActiveNodeId);
+      }
     };
 
     void writeUInt64Node(UA_Server* server, const UA_NodeId& nodeId, UA_UInt64 value);

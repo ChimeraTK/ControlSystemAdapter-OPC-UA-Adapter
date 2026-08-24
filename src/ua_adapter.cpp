@@ -283,6 +283,7 @@ namespace ChimeraTK {
     if(result) {
       xmlNodeSetPtr nodeset = result->nodesetval;
       if(nodeset->nodeNr > 1) {
+        xmlXPathFreeObject(result);
         throw std::runtime_error("To many <config>-Tags in config file");
       }
 
@@ -725,8 +726,8 @@ namespace ChimeraTK {
           this->exclude.insert(this->exclude.begin(), "/" + exclude_string);
         }
       }
+      xmlXPathFreeObject(result_exclude);
     }
-    xmlXPathFreeObject(result_exclude);
 
     xmlXPathObjectPtr folder_with_his = this->fileHandler->getNodeSet("//folder");
     xmlNodeSetPtr nodeset_folder_with_history;
@@ -741,8 +742,8 @@ namespace ChimeraTK {
           this->folder_with_history.insert(this->folder_with_history.begin(), "/" + folder);
         }
       }
+      xmlXPathFreeObject(folder_with_his);
     }
-    xmlXPathFreeObject(folder_with_his);
   }
 
   ServerConfig ua_uaadapter::get_server_config() {
@@ -808,8 +809,6 @@ namespace ChimeraTK {
         }
       }
     }
-    clear_history(gathering, historizing_nodes, historizing_setup, this->mappedServer,
-        this->serverConfig.historyfolders, this->serverConfig.historyvariables, this->server_config);
     if(this->influxClient) {
       this->influxClient->removeHealthNodesCallback(this->mappedServer);
     }
@@ -837,6 +836,8 @@ namespace ChimeraTK {
     }
     UA_Server_run_shutdown(this->mappedServer);
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Stopped the server worker thread");
+    clear_history(gathering, historizing_nodes, historizing_setup, this->mappedServer,
+        this->serverConfig.historyfolders, this->serverConfig.historyvariables, this->server_config);
   }
 
   UA_NodeId ua_uaadapter::enrollFolderPathFromString(const string& path, const string& separator) {

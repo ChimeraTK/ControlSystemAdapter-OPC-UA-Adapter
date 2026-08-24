@@ -27,9 +27,12 @@ namespace ChimeraTK {
     UA_NodeClass_init(&outNodeClass);
     UA_Server_readNodeClass(handler->server, childId, &outNodeClass);
     if(outNodeClass == UA_NODECLASS_VARIABLE) {
-      UA_NodeId* temp = UA_NodeId_new();
-      UA_NodeId_copy(&childId, temp);
-      handler->historizing_nodes->insert(handler->historizing_nodes->end(), *temp);
+      UA_NodeId temp = UA_NODEID_NULL;
+      UA_Server_readNodeId(handler->server, childId, &temp);
+      UA_NodeId copy = UA_NODEID_NULL;
+      UA_NodeId_copy(&temp, &copy);
+      UA_NodeId_clear(&temp);
+      handler->historizing_nodes->insert(handler->historizing_nodes->end(), copy);
       handler->historizing_setup->insert(handler->historizing_setup->end(), handler->history);
     }
     return UA_STATUSCODE_GOOD;
@@ -39,9 +42,9 @@ namespace ChimeraTK {
       const vector<AdapterFolderHistorySetup>& historyfolders, UA_Server* mappedServer,
       UA_ServerConfig* server_config) {
     for(const auto& folder : historyfolders) {
-      UA_NodeId* temp = UA_NodeId_new();
-      UA_StatusCode retval = UA_Server_readNodeId(mappedServer, folder.folder_id, temp);
-      UA_NodeId_clear(temp);
+      UA_NodeId temp = UA_NODEID_NULL;
+      UA_StatusCode retval = UA_Server_readNodeId(mappedServer, folder.folder_id, &temp);
+      UA_NodeId_clear(&temp);
       if(retval == UA_STATUSCODE_GOOD) {
         HandleFolderVariables handle;
         handle.server = mappedServer;
@@ -60,27 +63,28 @@ namespace ChimeraTK {
   void add_variable_historizing(vector<UA_NodeId>* historizing_nodes, vector<string>* historizing_setup,
       const vector<AdapterPVHistorySetup>& historyvariables, UA_Server* mappedServer, UA_ServerConfig* server_config) {
     for(const auto& histVar : historyvariables) {
-      UA_NodeId* temp = UA_NodeId_new();
-      UA_NodeId id = histVar.variable_id;
-      UA_StatusCode retval = UA_Server_readNodeId(mappedServer, id, temp);
+      UA_NodeId temp = UA_NODEID_NULL;
+      UA_StatusCode retval = UA_Server_readNodeId(mappedServer, histVar.variable_id, &temp);
+      UA_NodeId_clear(&temp);
       if(retval == UA_STATUSCODE_GOOD) {
         UA_String out = UA_STRING_NULL;
-        UA_print(&id, &UA_TYPES[UA_TYPES_NODEID], &out);
+        UA_print(&histVar.variable_id, &UA_TYPES[UA_TYPES_NODEID], &out);
         UA_LOG_DEBUG(
             server_config->logging, UA_LOGCATEGORY_USERLAND, "Add history for node %.*s ", (int)out.length, out.data);
         UA_String_clear(&out);
-        historizing_nodes->insert(historizing_nodes->end(), histVar.variable_id);
+        UA_NodeId variableIdCopy = UA_NODEID_NULL;
+        UA_NodeId_copy(&histVar.variable_id, &variableIdCopy);
+        historizing_nodes->insert(historizing_nodes->end(), variableIdCopy);
         historizing_setup->insert(historizing_setup->end(), histVar.variable_historizing);
       }
       else {
         UA_String out = UA_STRING_NULL;
-        UA_print(&id, &UA_TYPES[UA_TYPES_NODEID], &out);
+        UA_print(&histVar.variable_id, &UA_TYPES[UA_TYPES_NODEID], &out);
         UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
             "Warning! Node %.*s has a history configuration but is not mapped to the server. StatusCode: %s ",
             (int)out.length, out.data, UA_StatusCode_name(retval));
         UA_String_clear(&out);
       }
-      UA_NodeId_clear(temp);
     }
     UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_USERLAND, "Added %ld nodes to the historizing.",
         historizing_nodes->size());
@@ -149,7 +153,6 @@ namespace ChimeraTK {
               "Warning! Remove node %.*s from historizing because the setup %s is missing.", (int)out.length, out.data,
               historizing_setup[i].c_str());
           UA_String_clear(&out);
-          // UA_NodeId_clear(&historizing_nodes[j]);
           historizing_nodes.erase(historizing_nodes.begin() + i);
           historizing_setup.erase(historizing_setup.begin() + i);
           repeat = true;
@@ -229,14 +232,27 @@ namespace ChimeraTK {
   void clear_history(UA_HistoryDataGathering gathering, vector<UA_NodeId>& historizing_nodes,
       vector<string>& historizing_setup, UA_Server* mappedServer, vector<AdapterFolderHistorySetup> historyfolders,
       vector<AdapterPVHistorySetup> historyvariables, UA_ServerConfig* server_config) {
-    // stop the poll for all historizing variables
+    // stop the poll for all historizing variables and release any per-node backend memory
     for(auto& historizing_node : historizing_nodes) {
       UA_StatusCode retval = gathering.stopPoll(mappedServer, gathering.context, &historizing_node);
       UA_LOG_INFO(server_config->logging, UA_LOGCATEGORY_SERVER,
           "Stopping polling thread used by the historizing -> %s", UA_StatusCode_name(retval));
+
+      if(gathering.getHistorizingSetting != nullptr) {
+        const UA_HistorizingNodeIdSettings* setting =
+            gathering.getHistorizingSetting(mappedServer, gathering.context, &historizing_node);
+        if(setting != nullptr && setting->historizingBackend.deleteMembers != nullptr) {
+          UA_HistoryDataBackend backend = setting->historizingBackend;
+          backend.deleteMembers(&backend);
+        }
+      }
     }
+
     // clear the list of valid historizing nodes
-    historizing_nodes.clear();
+    for(auto& node : historizing_nodes) {
+      UA_NodeId_clear(&node);
+    }
+    // historizing_nodes.clear();
     historizing_setup.clear();
     // clear the nodeis lists (variables + server from the xml config)
     for(auto& historyfolder : historyfolders) {

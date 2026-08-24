@@ -20,4 +20,6 @@ foreach( testSourceFile ${testSources})
 	add_test(${executableName} ${executableName})
 endforeach(testSourceFile)
 
+target_link_libraries(test_xml_handler ${LIBXML2_LIBRARIES})
+
 add_custom_target(test-verbose COMMAND ${CMAKE_CTEST_COMMAND} --verbose)
