@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csa:influxdb xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
+  xsi:schemaLocation="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter influx_config.xsd">
+  <csa:url>http://127.0.0.1:44888</csa:url>
+  <csa:token> TOKEN</csa:token>
+  <csa:org>ELBE </csa:org>
+  <csa:bucket> testing</csa:bucket>
+  <csa:measurement>demo_measurement</csa:measurement>
+  <csa:precision>ns</csa:precision>
+  <csa:extra_tags>
+    <csa:tag name="unittest">influx</csa:tag>
+    <csa:tag name="extra" sourceName="floatWithExtraTag">special</csa:tag>
+  </csa:extra_tags>
+  <csa:write_batching>
+    <csa:enabled>true</csa:enabled>
+    <csa:max_batch_points>250</csa:max_batch_points>
+    <csa:max_queue_points>10000</csa:max_queue_points>
+    <csa:flush_interval_ms>500</csa:flush_interval_ms>
+    <csa:max_retries>2</csa:max_retries>
+    <csa:retry_backoff_ms>200</csa:retry_backoff_ms>
+    <csa:fail_fast_on_async_error>false</csa:fail_fast_on_async_error>
+  </csa:write_batching>
+</csa:influxdb>

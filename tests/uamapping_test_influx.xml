@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csa:uamapping xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter">
+  <config rootFolder="influx_test" description="Server used to test influx history">
+    <server applicationName="Test Influx History" port="16660" logLevel="ERROR" />
+    <historizing>
+      <setup name="influxHistory" buffer_length="100" entries_per_response="10" interval="500"
+        useInfluxBackend="True" />
+    </historizing>
+  </config>
+  <process_variable sourceName="dev/float" history="influxHistory" copy="False" />
+  <process_variable sourceName="dev/floatWithExtraTag" history="influxHistory" copy="False" />
+</csa:uamapping>
