@@ -120,6 +120,7 @@ if(ENABLE_UNIT_TESTS)
         file(COPY ${testFile} DESTINATION ${PROJECT_BINARY_DIR}/tests)
         message("Copy ${testFile}")
     endforeach(testFile)
+    file(COPY ${CMAKE_SOURCE_DIR}/tests/influx_config.xml DESTINATION ${PROJECT_BINARY_DIR}/tests)
 
     enable_testing()
     add_subdirectory(tests)
