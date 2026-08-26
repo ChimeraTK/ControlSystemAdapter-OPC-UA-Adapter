@@ -15,6 +15,7 @@ namespace influxdb {
 
     void reset();
 
+    int port() const;
     std::string waitForRequest();
     std::string url() const;
 
