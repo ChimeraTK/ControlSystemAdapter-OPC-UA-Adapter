@@ -207,6 +207,7 @@ namespace ChimeraTK {
     if(this->adapter_thread.joinable()) {
       adapter->running = false;
       this->adapter_thread.join();
+      workerFinished = true;
     }
     if(this->observer_thread.joinable()) {
       this->observer_thread.join();
@@ -218,6 +219,10 @@ namespace ChimeraTK {
   }
   const std::set<std::string>& csa_opcua_adapter::getUnusedVariables() const {
     return unusedVariables;
+  }
+
+  bool csa_opcua_adapter::isWorkerFinished() {
+    return this->workerFinished;
   }
 
   const UA_Logger* csa_opcua_adapter::getLogger() {

@@ -21,7 +21,7 @@ namespace influxdb {
    private:
     void acceptAndCapture();
 
-    int serverFd_{-1};
+    std::atomic<int> serverFd_{-1};
     int port_{0};
     std::thread worker_;
     std::mutex mutex_;

@@ -23,13 +23,11 @@ using namespace ChimeraTK;
 runtime_value_generator* valGen;
 csa_opcua_adapter* csaOPCUA;
 
+std::atomic<bool> terminateMain;
+
 /* FUNCTIONS */
 static void SigHandler_Int(int /*sign*/) {
-  cout << "Received SIGINT... terminating" << endl;
-  valGen->~runtime_value_generator();
-  csaOPCUA->stop();
-  csaOPCUA->~csa_opcua_adapter();
-  cout << "terminated threads" << endl;
+  terminateMain = true;
 }
 
 int main() {
@@ -223,9 +221,14 @@ int main() {
 
   // Server is running
   std::cout << "server is running..." << std::endl;
-  while(csaOPCUA->isRunning()) {
+  while(csaOPCUA->isRunning() && !terminateMain) {
     sleep(2);
   }
+  cout << "Received SIGINT... terminating" << endl;
+  valGen->~runtime_value_generator();
+  csaOPCUA->stop();
+  csaOPCUA->~csa_opcua_adapter();
+  cout << "terminated threads" << endl;
 
   return 0;
 }
