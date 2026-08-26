@@ -135,7 +135,7 @@ namespace ChimeraTK {
         }*/
       group.finalise();
 
-      while(data->adapter->isRunning()) {
+      while(!data->adapter->isWorkerFinished()) {
         // wait for next event
         auto id = group.readAny();
         fireVoidEvent(data, idToNameMap.at(id), logger);

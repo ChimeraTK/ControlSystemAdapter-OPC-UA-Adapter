@@ -31,6 +31,7 @@ namespace ChimeraTK {
     std::shared_ptr<ua_uaadapter> adapter;
     boost::shared_ptr<ControlSystemPVManager> csManager;
     std::set<std::string> unusedVariables;
+    std::atomic<bool> workerFinished{false}; ///< Flag to indicate if the adapter workerThread is running
 
    public:
     /**
@@ -75,9 +76,25 @@ namespace ChimeraTK {
     /**
      * @brief Checks if the opcua server is still running and return the suitable bool value
      *
+     * This checks if the adapter worker thread is still running and returns true if it is, otherwise false.
+     *
      * @return The current running state in form of true/false
      */
     bool isRunning();
+
+    /**
+     * @brief Checks if the adapter worker thread has finished.
+     *
+     * This checks if the adapter worker thread has finished in stop() and returns true if it has, otherwise false.
+     * It does not check if the thread is still running, for that use isRunning() instead.
+     * This is used in the void observer thread to wait for the adapter worker thread to finish before exiting.
+     * It is threadsave while calling isRunning() is not threadsave and can lead to a race condition if the adapter
+     * worker is joined while the void observer thread is still running and checks isRunning() at the same time.
+     *
+     *
+     * @return The current state of the worker thread in form of true/false
+     */
+    bool isWorkerFinished();
 
     /**
      * @brief Get the adapter logger.
