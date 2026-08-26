@@ -15,12 +15,66 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
-#include <mutex>
+#include <filesystem>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 
 using namespace std;
 
 namespace detail {
+
+  namespace {
+    class ScopedInfluxConfig {
+     public:
+      explicit ScopedInfluxConfig(const std::string& serverUrl)
+      : configPath_(std::filesystem::current_path() / "influx_config.xml") {
+        originalContent_ = readFile(configPath_);
+
+        const std::string startTag = "<csa:url>";
+        const std::string endTag = "</csa:url>";
+        const std::size_t startPos = originalContent_.find(startTag);
+        const std::size_t endPos = originalContent_.find(endTag, startPos == std::string::npos ? 0 : startPos);
+        if(startPos == std::string::npos || endPos == std::string::npos) {
+          throw std::runtime_error("Failed to locate <csa:url> in influx_config.xml");
+        }
+
+        std::string updatedContent = originalContent_;
+        updatedContent.replace(startPos + startTag.size(), endPos - (startPos + startTag.size()), serverUrl);
+        writeFile(updatedContent);
+      }
+
+      ~ScopedInfluxConfig() {
+        if(!originalContent_.empty()) {
+          writeFile(originalContent_);
+        }
+      }
+
+     private:
+      static std::string readFile(const std::filesystem::path& path) {
+        std::ifstream input(path);
+        if(!input.is_open()) {
+          throw std::runtime_error("Failed to open influx_config.xml for reading");
+        }
+
+        std::ostringstream buffer;
+        buffer << input.rdbuf();
+        return buffer.str();
+      }
+
+      void writeFile(const std::string& content) const {
+        std::ofstream output(configPath_, std::ios::trunc);
+        if(!output.is_open()) {
+          throw std::runtime_error("Failed to open influx_config.xml for writing");
+        }
+        output << content;
+      }
+
+      std::filesystem::path configPath_;
+      std::string originalContent_;
+    };
+  } // namespace
 
   std::pair<std::string, std::string> splitInfluxRequest(const std::string& request) {
     for(std::size_t i = 0; i < request.size(); ++i) {
@@ -43,8 +97,9 @@ namespace detail {
 } // namespace detail
 
 void detail::InfluxClientTest::testLocalServer() {
-  influxdb::LocalHttpServer server(44888);
-  std::cout << "Local HTTP server running at: " << server.url() << std::endl;
+  influxdb::LocalHttpServer server;
+  ScopedInfluxConfig scopedInfluxConfig(server.url());
+  std::cout << "Local HTTP server running at: " << server.url() << " (port " << server.port() << ")" << std::endl;
 
   std::pair<boost::shared_ptr<ChimeraTK::ControlSystemPVManager>, boost::shared_ptr<ChimeraTK::DevicePVManager>>
       pvManagers = ChimeraTK::createPVManager();

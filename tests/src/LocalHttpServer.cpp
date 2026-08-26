@@ -62,6 +62,10 @@ namespace influxdb {
     worker_ = std::thread([this]() { acceptAndCapture(); });
   }
 
+  int LocalHttpServer::port() const {
+    return port_;
+  }
+
   std::string LocalHttpServer::url() const {
     return "http://127.0.0.1:" + std::to_string(port_);
   }
