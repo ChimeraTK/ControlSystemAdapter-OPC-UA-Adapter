@@ -1,0 +1,3 @@
+# Suppress known lock-order-inversion warning triggered inside open62541 interaction.
+# Keep this suppression scoped to test_influx_client via CTest environment.
+deadlock:ChimeraTK::ua_uaadapter::workerThread()
