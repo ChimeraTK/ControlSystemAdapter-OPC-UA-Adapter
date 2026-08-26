@@ -659,7 +659,7 @@ namespace influxdb {
     if(!config_.writeBatching.enabled) {
       return;
     }
-    auto config = UA_ServerConfig(server);
+    auto* config = UA_Server_getConfig(server);
     UA_ObjectAttributes healthAttr = UA_ObjectAttributes_default;
     healthAttr.displayName = UA_LOCALIZEDTEXT(const_cast<char*>("en-US"), const_cast<char*>("InfluxHealth"));
     const UA_NodeId healthObjectNodeId = UA_NODEID_STRING(1, const_cast<char*>("InfluxHealth"));
@@ -668,7 +668,7 @@ namespace influxdb {
         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEOBJECTTYPE), healthAttr, nullptr, nullptr);
     if(rc != UA_STATUSCODE_GOOD) {
       UA_LOG_ERROR(
-          config.logging, UA_LOGCATEGORY_USERLAND, "Failed to add InfluxHealth object: %s", UA_StatusCode_name(rc));
+          config->logging, UA_LOGCATEGORY_USERLAND, "Failed to add InfluxHealth object: %s", UA_StatusCode_name(rc));
       return;
     }
 
@@ -694,7 +694,7 @@ namespace influxdb {
             &healthContext_->asyncErrorActiveNodeId) ||
         !HealthMonitoring::addReadOnlyNodeString(server, healthObjectNodeId, "InfluxHealth.LastAsyncError",
             "LastAsyncError", "Last asynchronous write error text", &healthContext_->asyncErrorNodeId)) {
-      UA_LOG_ERROR(config.logging, UA_LOGCATEGORY_USERLAND, "Failed to add Influx health variable nodes");
+      UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_USERLAND, "Failed to add Influx health variable nodes");
       return;
     }
 
@@ -703,7 +703,7 @@ namespace influxdb {
         server, HealthMonitoring::updateInfluxHealth, healthContext_.get(), 1000.0, &healthCallbackId);
     if(rc != UA_STATUSCODE_GOOD) {
       UA_LOG_ERROR(
-          config.logging, UA_LOGCATEGORY_USERLAND, "Failed to add health callback: %s", UA_StatusCode_name(rc));
+          config->logging, UA_LOGCATEGORY_USERLAND, "Failed to add health callback: %s", UA_StatusCode_name(rc));
       return;
     }
     healthNodesAdded_ = true;
