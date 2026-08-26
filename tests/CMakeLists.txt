@@ -34,5 +34,7 @@ target_link_libraries(test_influx_client
 	${Boost_CHRONO_LIBRARY}
 )
 add_test(test_influx_client test_influx_client)
-
+set_tests_properties(test_influx_client PROPERTIES
+	ENVIRONMENT "TSAN_OPTIONS=$ENV{TSAN_OPTIONS}:suppressions=${CMAKE_SOURCE_DIR}/tests/tsan_test_influx_client.supp"
+)
 add_custom_target(test-verbose COMMAND ${CMAKE_CTEST_COMMAND} --verbose)
