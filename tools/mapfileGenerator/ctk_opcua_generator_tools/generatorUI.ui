@@ -342,16 +342,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="addUnsecureEndpoint">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Add non-encrypted Endpoint</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="configureEncryptionButton">
         <property name="enabled">
          <bool>false</bool>

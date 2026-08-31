@@ -205,6 +205,12 @@
           only encrypted endpoints are created. </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="allowAnyCertificate" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"> If true the server will accept any client certificate.
+          This is not secure. </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="certificate"
       type="csa:nonEmptyString">
       <xsd:annotation>
