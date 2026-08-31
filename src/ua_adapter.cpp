@@ -6,6 +6,7 @@
 
 #include <open62541/client.h>
 #include <open62541/client_config_default.h>
+#include <open62541/plugin/certificategroup_default.h>
 #include <open62541/plugin/historydata/history_data_backend_memory.h>
 #include <open62541/plugin/historydata/history_data_gathering_default.h>
 #include <open62541/plugin/historydata/history_database_default.h>
@@ -167,7 +168,7 @@ namespace ChimeraTK {
       privateKey = loadFile(this->serverConfig.keyPath.c_str());
       if(UA_ByteString_equal(&certificate, &UA_BYTESTRING_NULL) ||
           UA_ByteString_equal(&privateKey, &UA_BYTESTRING_NULL)) {
-        UA_LOG_WARNING(server_config->logging, UA_LOGCATEGORY_USERLAND,
+        UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_USERLAND,
             "Invalid security configuration. Can't load private key or certificate.");
       }
 
@@ -182,7 +183,7 @@ namespace ChimeraTK {
           trustList = (UA_ByteString*)UA_realloc(trustList, sizeof(UA_ByteString) * trustListSize);
           char sbuf[1024];
           sprintf(sbuf, "%s/%s", this->serverConfig.allowListFolder.c_str(), entry->d_name);
-          printf("Trust List entry:  %s\n", entry->d_name);
+          UA_LOG_INFO(config->logging, UA_LOGCATEGORY_USERLAND, "Trust List entry:  %s\n", entry->d_name);
           trustList[trustListSize - 1] = loadFile(sbuf);
         }
       }
@@ -198,7 +199,7 @@ namespace ChimeraTK {
           issuerList = (UA_ByteString*)UA_realloc(issuerList, sizeof(UA_ByteString) * issuerListSize);
           char sbuf[1024];
           sprintf(sbuf, "%s/%s", this->serverConfig.issuerListFolder.c_str(), entry->d_name);
-          printf("Issuer List entry:  %s\n", entry->d_name);
+          UA_LOG_INFO(config->logging, UA_LOGCATEGORY_USERLAND, "Issuer List entry:  %s\n", entry->d_name);
           issuerList[issuerListSize - 1] = loadFile(sbuf);
         }
       }
@@ -214,7 +215,7 @@ namespace ChimeraTK {
           blockList = (UA_ByteString*)UA_realloc(blockList, sizeof(UA_ByteString) * blockListSize);
           char sbuf[1024];
           sprintf(sbuf, "%s/%s", this->serverConfig.blockListFolder.c_str(), entry->d_name);
-          printf("Block List entry:  %s\n", entry->d_name);
+          UA_LOG_INFO(config->logging, UA_LOGCATEGORY_USERLAND, "Block List entry:  %s\n", entry->d_name);
           blockList[blockListSize - 1] = loadFile(sbuf);
         }
       }
@@ -242,6 +243,17 @@ namespace ChimeraTK {
       UA_ByteString_clear(&certificate);
       UA_ByteString_clear(&privateKey);
       for(size_t i = 0; i < trustListSize; i++) UA_ByteString_clear(&trustList[i]);
+
+      /* Accept all certificates */
+      if(this->serverConfig.allowAnyCertificate) {
+        UA_LOG_WARNING(config->logging, UA_LOGCATEGORY_USERLAND,
+            "The server is configured to accept any client certificate. This is not secure!");
+        config->secureChannelPKI.clear(&config->secureChannelPKI);
+        UA_CertificateGroup_AcceptAll(&config->secureChannelPKI);
+
+        config->sessionPKI.clear(&config->sessionPKI);
+        UA_CertificateGroup_AcceptAll(&config->sessionPKI);
+      }
     }
     config->eventLoop->logger = &logger;
     fillBuildInfo(config);
@@ -650,6 +662,12 @@ namespace ChimeraTK {
         this->serverConfig.unsecure = false;
         UA_LOG_WARNING(&logger, UA_LOGCATEGORY_USERLAND,
             "No 'unsecure'-Attribute in config file is set. Disable unsecure endpoints");
+      }
+      string allowAnyCertificate =
+          xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "allowAnyCertificate");
+      if(!allowAnyCertificate.empty()) {
+        std::ranges::transform(allowAnyCertificate, allowAnyCertificate.begin(), ::toupper);
+        this->serverConfig.allowAnyCertificate = (allowAnyCertificate == "TRUE");
       }
       string certPath = xml_file_handler::getAttributeValueFromNode(nodeset->nodeTab[0], "certificate");
       if(!certPath.empty()) {

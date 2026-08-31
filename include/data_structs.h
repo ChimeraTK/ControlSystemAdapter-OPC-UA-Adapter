@@ -40,6 +40,7 @@ namespace ChimeraTK {
     uint16_t opcuaPort = 16664;
     bool enableSecurity = false;
     bool unsecure = false;
+    bool allowAnyCertificate = false;
     bool registerLDS = false;
     uint64_t ldsRegisterPeriod = 10; ///< Interval in minutes for re-registering with the LDS. Default is 10 minutes.
     bool useBoolAsVoid = false;

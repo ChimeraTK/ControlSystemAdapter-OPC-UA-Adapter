@@ -61,7 +61,10 @@ class EncryptionDialog(QDialog, Ui_EncryptionDialog):
     if directory:
       self.settings.issuerList = directory
       self.issuerList.setText(directory)
-    
+
+  def updateEncryptionConfiguration(self, state):
+    self.settings.addUnsecureEndpoint = self.addUnsecureEndpoint.isChecked()
+    self.settings.allowAnyCertificate = self.allowAnyCertificate.isChecked()
   
   def __init__(self, data:EncryptionSettings, parent=None):
     super(EncryptionDialog, self).__init__(parent)
@@ -78,12 +81,16 @@ class EncryptionDialog(QDialog, Ui_EncryptionDialog):
       self.blockList.setText(data.blockList)
     if data.issuerList:
       self.issuerList.setText(data.issuerList)
+    self.addUnsecureEndpoint.setChecked(data.addUnsecureEndpoint)
+    self.allowAnyCertificate.setChecked(data.allowAnyCertificate)
     
     self.setUserCert.clicked.connect(self.openUserCert)
     self.setPrivateKey.clicked.connect(self.openPrivateKey)
     self.setBlockList.clicked.connect(self.openBlockList)
     self.setTrustList.clicked.connect(self.openTrustList)
     self.setIssuerList.clicked.connect(self.openIssuerList)
+    self.addUnsecureEndpoint.stateChanged.connect(self.updateEncryptionConfiguration)
+    self.allowAnyCertificate.stateChanged.connect(self.updateEncryptionConfiguration)
     
 class HistorySettingsDialog(QDialog, Ui_HistoryDialog):
   def __init__(self, data:QComboBox, histories: List[HistorySetting], edit:bool, parent=None):
@@ -198,11 +205,9 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     '''
     Fill config information to the GUI fields.
     '''
-    self._blockAndSetCheckbox(self.MapGenerator.addUnsecureEndpoint, self.addUnsecureEndpoint)
     self._blockAndSetCheckbox(self.MapGenerator.encryptionEnabled, self.enableEncryptionButton)
     self._blockAndSetCheckbox(self.MapGenerator.enableLogin, self.enableLoginSwitch)
     self.configureEncryptionButton.setEnabled(self.MapGenerator.encryptionEnabled)
-    self.addUnsecureEndpoint.setEnabled(self.MapGenerator.encryptionEnabled)
     self.userName.setEnabled(self.MapGenerator.enableLogin)
     self.password.setEnabled(self.MapGenerator.enableLogin)
     self._blockAndSetTextBox(self.MapGenerator.username, self.userName)
@@ -530,12 +535,9 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     dlg.exec()
     
   def updateEncryptionConfiguration(self, state):
-    states = [self.enableEncryptionButton.isChecked(),
-              self.addUnsecureEndpoint.isChecked()]
-    self.addUnsecureEndpoint.setEnabled(states[0])
-    self.configureEncryptionButton.setEnabled(states[0])
-    self.MapGenerator.encryptionEnabled = states[0]
-    self.MapGenerator.addUnsecureEndpoint = states[1]
+    self.configureEncryptionButton.setEnabled(self.enableEncryptionButton.isChecked())
+    self.MapGenerator.encryptionEnabled = self.enableEncryptionButton.isChecked()
+
   
   def prepareNewHistorySetting(self):
     histName = 'historySetting'
@@ -711,7 +713,6 @@ class MapGeneratorForm(QMainWindow, Ui_MainWindow):
     self.applicationDescription.textChanged.connect(self.updateConfig)
     self.logLevelComboBox.currentTextChanged.connect(self.updateConfig)
     self.enableEncryptionButton.stateChanged.connect(self.updateEncryptionConfiguration)
-    self.addUnsecureEndpoint.stateChanged.connect(self.updateEncryptionConfiguration)
     self.configureEncryptionButton.clicked.connect(self.configureEncryption)
     self.editHistorySettingButton.clicked.connect(self.editHistorySetting)
     self.addHistorySettingButton.clicked.connect(self.prepareNewHistorySetting)

@@ -59,6 +59,7 @@ class HistorySetting():
       
 class EncryptionSettings():
   def __init__(self):
+    self.allowAnyCertificate:bool = False
     self.encryptionEnabled:bool = False
     self.addUnsecureEndpoint:bool = False
     self.certificate:str|None = None
@@ -85,6 +86,10 @@ class EncryptionSettings():
       security.set("unsecure", "True")
     else:
       security.set("unsecure", "False")
+    if self.allowAnyCertificate:
+      security.set("allowAnyCertificate", "True")
+    else:
+      security.set("allowAnyCertificate", "False")
     if self.key:
       security.set("privatekey", self.key)
     if self.certificate:
@@ -99,6 +104,8 @@ class EncryptionSettings():
   def readEncryption(self, data: ET._Element):
     if 'unsecure' in data.attrib and data.attrib['unsecure'] == 'True':
       self.addUnsecureEndpoint = True
+    if 'allowAnyCertificate' in data.attrib and data.attrib['allowAnyCertificate'] == 'True':
+      self.allowAnyCertificate = True
     if 'privatekey' in data.attrib:
       self.key = str(data.attrib['privatekey'])
     if 'certificate' in data.attrib:
