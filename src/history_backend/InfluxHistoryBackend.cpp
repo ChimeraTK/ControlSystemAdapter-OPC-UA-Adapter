@@ -211,7 +211,7 @@ namespace influxdb {
     backend->context = nullptr;
   }
 
-  UA_StatusCode serverSetHistoryDataInflux(UA_Server* /*server*/, void* hdbContext, const UA_NodeId* /*sessionId*/,
+  UA_StatusCode serverSetHistoryDataInflux(UA_Server* server, void* hdbContext, const UA_NodeId* /*sessionId*/,
       void* /*sessionContext*/, const UA_NodeId* nodeId, UA_Boolean historizing, const UA_DataValue* value) {
     if(!historizing || hdbContext == nullptr || nodeId == nullptr || value == nullptr || !value->hasValue) {
       return UA_STATUSCODE_GOOD;
@@ -243,7 +243,8 @@ namespace influxdb {
 
     std::vector<FieldValue> fieldValues;
     if(!variantToStrings(&value->value, fieldValues)) {
-      UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER,
+      auto* config = UA_Server_getConfig(server);
+      UA_LOG_WARNING(config->logging, UA_LOGCATEGORY_SERVER,
           "Influx history write failed: Unsupported data type for node %s", nodeIdToString(nodeId).c_str());
       return UA_STATUSCODE_BADTYPEMISMATCH;
     }
@@ -253,7 +254,8 @@ namespace influxdb {
       const bool ok =
           ctx->client->writePoint(ctx->influxFieldName, fieldValues.front(), tags, timestampNanoseconds, &writeError);
       if(!ok) {
-        UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
+        auto* config = UA_Server_getConfig(server);
+        UA_LOG_WARNING(config->logging, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
         return UA_STATUSCODE_BADINTERNALERROR;
       }
     }
@@ -265,7 +267,8 @@ namespace influxdb {
         const bool ok =
             ctx->client->writePoint(ctx->influxFieldName, fieldValues[i], tags, timestampNanoseconds, &writeError);
         if(!ok) {
-          UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
+          auto* config = UA_Server_getConfig(server);
+          UA_LOG_WARNING(config->logging, UA_LOGCATEGORY_SERVER, "Influx history write failed: %s", writeError.c_str());
           return UA_STATUSCODE_BADINTERNALERROR;
         }
       }
@@ -304,7 +307,7 @@ namespace influxdb {
     return endPtr != nullptr && *endPtr == '\0';
   }
 
-  UA_StatusCode getHistoryDataInflux(UA_Server* /*server*/, const UA_NodeId* /*sessionId*/, void* /*sessionContext*/,
+  UA_StatusCode getHistoryDataInflux(UA_Server* server, const UA_NodeId* /*sessionId*/, void* /*sessionContext*/,
       const UA_HistoryDataBackend* backend, const UA_DateTime start, const UA_DateTime end, const UA_NodeId* nodeId,
       size_t maxSizePerResponse, UA_UInt32 numValuesPerNode, UA_Boolean /*returnBounds*/,
       UA_TimestampsToReturn /*timestampsToReturn*/, UA_NumericRange /*range*/, UA_Boolean releaseContinuationPoints,
@@ -364,7 +367,8 @@ namespace influxdb {
     std::vector<InfluxRecord> records =
         ctx->client->readRangeUnixNanoseconds(startNanoseconds, endNanoseconds, ctx->influxFieldName, tags, &readError);
     if(!readError.empty()) {
-      UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_SERVER, "Influx history read failed: %s", readError.c_str());
+      auto* config = UA_Server_getConfig(server);
+      UA_LOG_WARNING(config->logging, UA_LOGCATEGORY_SERVER, "Influx history read failed: %s", readError.c_str());
       return UA_STATUSCODE_BADINTERNALERROR;
     }
 
