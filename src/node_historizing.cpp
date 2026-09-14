@@ -101,6 +101,32 @@ namespace ChimeraTK {
     UA_Server_writeHistorizing(mappedServer, id, true);
     UA_Byte_clear(&temp);
   }
+  // Read the EngineeringUnit field of the corresponding PV and return it as a string. If the field is not found, return "".
+  std::string readEngineeringUnit(UA_Server* mappedServer, const UA_NodeId& pvNodeId) {
+    if(pvNodeId.identifierType != UA_NODEIDTYPE_STRING) {
+      return "";
+    }
+
+    std::string pvNodeName = std::string((char*)pvNodeId.identifier.string.data, pvNodeId.identifier.string.length);
+    std::string unitNodeName = pvNodeName + "/EngineeringUnit";
+
+    UA_NodeId unitNodeId = UA_NODEID_STRING_ALLOC(pvNodeId.namespaceIndex, unitNodeName.c_str());
+    UA_Variant value;
+    UA_Variant_init(&value);
+    UA_StatusCode retval = UA_Server_readValue(mappedServer, unitNodeId, &value);
+
+    std::string unit;
+    if(retval == UA_STATUSCODE_GOOD && UA_Variant_hasScalarType(&value, &UA_TYPES[UA_TYPES_STRING])) {
+      const UA_String* uaUnit = static_cast<const UA_String*>(value.data);
+      if(uaUnit != nullptr && uaUnit->data != nullptr && uaUnit->length > 0) {
+        unit = std::string((char*)uaUnit->data, uaUnit->length);
+      }
+    }
+
+    UA_Variant_clear(&value);
+    UA_NodeId_clear(&unitNodeId);
+    return unit;
+  }
 
   void check_historizing_nodes(
       vector<UA_NodeId>& historizing_nodes, vector<string>& historizing_setup, UA_ServerConfig* server_config) {
@@ -190,6 +216,7 @@ namespace ChimeraTK {
       }
       else if(hist.backend == HistorizingBackend::InfluxDB) {
         std::string shortNodeName;
+        std::string engineeringUnit = readEngineeringUnit(mappedServer, historizing_nodes[i]);
         // there are only string node IDs used in the adapter. However for completeness, we also check for numeric node IDs here
         if(historizing_nodes[i].identifierType == UA_NODEIDTYPE_STRING) {
           shortNodeName = std::string(
@@ -202,8 +229,8 @@ namespace ChimeraTK {
           shortNodeName = shortNodeName.substr(shortNodeName.find_last_of('/') + 1, shortNodeName.size() - 1);
         }
 
-        setting.historizingBackend = UA_HistoryDataBackend_Influx(
-            influxClient.get(), shortNodeName, "nodeId", config.hostname, config.applicationName, config.opcuaPort);
+        setting.historizingBackend = UA_HistoryDataBackend_Influx(influxClient.get(), shortNodeName, "nodeId",
+            engineeringUnit, config.hostname, config.applicationName, config.opcuaPort);
       }
       setting.maxHistoryDataResponseSize = hist.entries_per_response;
       setting.pollingInterval = hist.interval;
