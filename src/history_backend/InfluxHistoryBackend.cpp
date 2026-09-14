@@ -20,6 +20,7 @@ namespace influxdb {
     InfluxClient* client{nullptr};
     std::string influxFieldName;
     std::string nodeIdTagName;
+    std::string engineeringUnit;
     std::string host;
     std::string applicationName;
     uint16_t port{0};
@@ -233,6 +234,7 @@ namespace influxdb {
     tags.emplace_back("host", ctx->host);
     tags.emplace_back("application", ctx->applicationName);
     tags.emplace_back("port", std::to_string(ctx->port));
+    tags.emplace_back("unit", ctx->engineeringUnit);
 
     std::vector<FieldValue> fieldValues;
     if(!variantToStrings(&value->value, fieldValues)) {
@@ -428,8 +430,8 @@ namespace influxdb {
   }
 
   UA_HistoryDataBackend UA_HistoryDataBackend_Influx(InfluxClient* client, const std::string& influxFieldName,
-      const std::string& nodeIdTagName, const std::string& hostname, const std::string& applicationName,
-      uint16_t port) {
+      const std::string& nodeIdTagName, const std::string& engineeringUnit, const std::string& hostname,
+      const std::string& applicationName, uint16_t port) {
     UA_HistoryDataBackend backend;
     std::memset(&backend, 0, sizeof(UA_HistoryDataBackend));
 
@@ -440,6 +442,7 @@ namespace influxdb {
     ctx->host = hostname;
     ctx->applicationName = applicationName;
     ctx->port = port;
+    ctx->engineeringUnit = engineeringUnit;
     backend.context = ctx;
     backend.deleteMembers = deleteMembersInflux;
     backend.serverSetHistoryData = serverSetHistoryDataInflux;
