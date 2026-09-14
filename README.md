@@ -56,7 +56,10 @@ Two history backend types are supported:
 <csa:influxdb xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:csa="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter"
   xsi:schemaLocation="https://github.com/ChimeraTK/ControlSystemAdapter-OPC-UA-Adapter influx_config.xsd">
+  <!-- Encrypted communication to influx -->
   <csa:url>https://influx.de</csa:url>
+  <!-- unencrypted communication with influx -->
+  <!-- csa:url>http://influx.de:8086</csa:url -->
   <csa:token>TOKEN</csa:token>
   <csa:org>Organization</csa:org>
   <csa:bucket>testing</csa:bucket>
