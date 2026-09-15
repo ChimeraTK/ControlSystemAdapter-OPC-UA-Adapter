@@ -106,9 +106,9 @@ void detail::InfluxClientTest::testLocalServer() {
   boost::shared_ptr<ChimeraTK::DevicePVManager> devManager = pvManagers.second;
   boost::shared_ptr<ChimeraTK::ControlSystemPVManager> csManager = pvManagers.first;
   ChimeraTK::ProcessArray<float>::SharedPtr pvFloat1 = devManager->createProcessArray<float>(
-      ChimeraTK::SynchronizationDirection::deviceToControlSystem, "dev/float", 1, "my description", "desc");
+      ChimeraTK::SynchronizationDirection::deviceToControlSystem, "dev/float", 1, "unit1", "desc");
   ChimeraTK::ProcessArray<float>::SharedPtr pvFloat2 = devManager->createProcessArray<float>(
-      ChimeraTK::SynchronizationDirection::deviceToControlSystem, "dev/floatWithExtraTag", 1, "my description", "desc");
+      ChimeraTK::SynchronizationDirection::deviceToControlSystem, "dev/floatWithExtraTag", 1, "unit2", "desc");
 
   std::string pathToConfig = "uamapping_test_influx.xml";
   std::unique_ptr<ChimeraTK::csa_opcua_adapter> csaOPCUA(new ChimeraTK::csa_opcua_adapter(csManager, pathToConfig));
@@ -149,6 +149,7 @@ void detail::InfluxClientTest::testLocalServer() {
     BOOST_REQUIRE(!requestValue.empty());
     BOOST_CHECK(requestMetadata.find("demo_measurement") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("unittest=influx") != std::string::npos);
+    BOOST_CHECK(requestMetadata.find("unit=unit1") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("extra=special") == std::string::npos);
     BOOST_CHECK(requestValue.find("float=") != std::string::npos);
 
@@ -167,6 +168,7 @@ void detail::InfluxClientTest::testLocalServer() {
     BOOST_CHECK(requestMetadata.find("demo_measurement") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("unittest=influx") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("extra=special") != std::string::npos);
+    BOOST_CHECK(requestMetadata.find("unit=unit2") != std::string::npos);
     BOOST_CHECK(requestValue.find("floatWithExtraTag=") != std::string::npos);
     server.reset();
     i++;
