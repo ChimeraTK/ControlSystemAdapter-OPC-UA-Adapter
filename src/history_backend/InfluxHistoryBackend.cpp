@@ -234,7 +234,12 @@ namespace influxdb {
     tags.emplace_back("host", ctx->host);
     tags.emplace_back("application", ctx->applicationName);
     tags.emplace_back("port", std::to_string(ctx->port));
-    tags.emplace_back("unit", ctx->engineeringUnit);
+    if(!ctx->engineeringUnit.empty()) {
+      tags.emplace_back("unit", ctx->engineeringUnit);
+    }
+    if(ctx->client->addExtraTags()) {
+      tags.emplace_back("name", ctx->influxFieldName);
+    }
 
     std::vector<FieldValue> fieldValues;
     if(!variantToStrings(&value->value, fieldValues)) {
