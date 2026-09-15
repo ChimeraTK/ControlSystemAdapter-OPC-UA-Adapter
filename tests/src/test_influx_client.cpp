@@ -150,6 +150,7 @@ void detail::InfluxClientTest::testLocalServer() {
     BOOST_CHECK(requestMetadata.find("demo_measurement") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("unittest=influx") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("unit=unit1") != std::string::npos);
+    BOOST_CHECK(requestMetadata.find("name=float") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("extra=special") == std::string::npos);
     BOOST_CHECK(requestValue.find("float=") != std::string::npos);
 
@@ -169,6 +170,7 @@ void detail::InfluxClientTest::testLocalServer() {
     BOOST_CHECK(requestMetadata.find("unittest=influx") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("extra=special") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("unit=unit2") != std::string::npos);
+    BOOST_CHECK(requestMetadata.find("name=floatWithExtraTag") != std::string::npos);
     BOOST_CHECK(requestValue.find("floatWithExtraTag=") != std::string::npos);
     server.reset();
     i++;

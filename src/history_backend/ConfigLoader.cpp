@@ -67,7 +67,9 @@ namespace {
     return "";
   }
 
-  std::vector<TagInformation> parseExtraTags(xmlNodePtr root) {
+  std::vector<TagInformation> parseExtraTags(xmlNodePtr root, bool& addNameTags) {
+    addNameTags = false;
+
     for(xmlNodePtr child = root->children; child != nullptr; child = child->next) {
       if(child->type != XML_ELEMENT_NODE) {
         continue;
@@ -75,6 +77,18 @@ namespace {
 
       if(xmlStrcmp(child->name, BAD_CAST "extra_tags") != 0) {
         continue;
+      }
+
+      xmlChar* addNameTagsAttr = xmlGetProp(child, BAD_CAST "addNameTags");
+      if(addNameTagsAttr != nullptr) {
+        if(xmlStrcasecmp(addNameTagsAttr, BAD_CAST "true") == 0 || xmlStrcmp(addNameTagsAttr, BAD_CAST "1") == 0) {
+          addNameTags = true;
+        }
+        else if(xmlStrcasecmp(addNameTagsAttr, BAD_CAST "false") == 0 ||
+            xmlStrcmp(addNameTagsAttr, BAD_CAST "0") == 0) {
+          addNameTags = false;
+        }
+        xmlFree(addNameTagsAttr);
       }
 
       std::vector<TagInformation> tags;
@@ -217,7 +231,7 @@ InfluxConfig ConfigLoader::loadFromXmlFile(const std::string& path) {
   config.bucket = requireChildContent(root, "bucket");
   config.measurement = requireChildContent(root, "measurement");
   config.precision = requireChildContent(root, "precision");
-  config.extraTags = parseExtraTags(root);
+  config.extraTags = parseExtraTags(root, config.addNameTags);
   config.writeBatching = parseWriteBatching(root);
 
   xmlFreeDoc(document);
