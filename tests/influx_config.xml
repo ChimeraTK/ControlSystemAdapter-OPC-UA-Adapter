@@ -8,7 +8,7 @@
   <csa:bucket> testing</csa:bucket>
   <csa:measurement>demo_measurement</csa:measurement>
   <csa:precision>ns</csa:precision>
-  <csa:extra_tags>
+  <csa:extra_tags addNameTags="true">
     <csa:tag name="unittest">influx</csa:tag>
     <csa:tag name="extra" sourceName="floatWithExtraTag">special</csa:tag>
   </csa:extra_tags>

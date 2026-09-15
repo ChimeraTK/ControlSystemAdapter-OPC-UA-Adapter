@@ -77,6 +77,7 @@ namespace influxdb {
      */
     void addHealthMonitoringNodes(UA_Server* server);
     void removeHealthNodesCallback(UA_Server* server);
+    bool addExtraTags() const { return config_.addNameTags; }
 
    private:
     InfluxConfig config_;

@@ -34,6 +34,7 @@ struct InfluxConfig {
   std::string precision;
   std::vector<TagInformation> extraTags;
   InfluxWriteBatchingConfig writeBatching;
+  bool addNameTags{false}; ///< If true, adds tag with short name to each measurement.
 };
 
 class ConfigLoader {

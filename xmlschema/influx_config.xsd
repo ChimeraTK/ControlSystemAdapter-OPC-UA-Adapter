@@ -64,6 +64,12 @@
         </xs:complexType>
       </xs:element>
     </xs:sequence>
+    <xs:attribute name="addNameTags" type="xs:boolean" use="required">
+      <xs:annotation>
+        <xs:documentation> If true the process variable names will be added as tags to each write
+          operation. This can be useful when using Grafana and can be used as DisplayName. </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="writeBatchingType">
