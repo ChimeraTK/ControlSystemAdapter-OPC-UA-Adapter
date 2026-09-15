@@ -452,21 +452,22 @@ class XMLDirectory(MapOption):
       folder.set("copy", "False")
       if self.historizing and not historiszingActive:
         folder.set("history", self.historizing)
-      if self.newDescription and not descriptionAlreadySet:
-        dest = ET.SubElement(folder, "description")
-        dest.text = self.newDescription
-      if self.newName:
-        name = ET.SubElement(folder, "name")
-        name.text = self.newName
-      else:
-        name = ET.SubElement(folder, "name")
-        name.text = self.name
-      dest = ET.SubElement(folder, "destination")
-      if self.newDestination:
-        # If folder is moved to root the new destination is '/root' -> that is why the '/' is removed in an extra call
-        dest.text = self.newDestination.removeprefix('/root').removeprefix('/')
-      else:
-        dest.text = destText.removeprefix('/').removesuffix('/')
+      if self.newName or self.newDestination:
+        if self.newDescription and not descriptionAlreadySet:
+          dest = ET.SubElement(folder, "description")
+          dest.text = self.newDescription
+        if self.newName:
+          name = ET.SubElement(folder, "name")
+          name.text = self.newName
+        else:
+          name = ET.SubElement(folder, "name")
+          name.text = self.name
+        dest = ET.SubElement(folder, "destination")
+        if self.newDestination:
+          # If folder is moved to root the new destination is '/root' -> that is why the '/' is removed in an extra call
+          dest.text = self.newDestination.removeprefix('/root').removeprefix('/')
+        else:
+          dest.text = destText.removeprefix('/').removesuffix('/')
 
   def reset(self):
     '''
@@ -546,19 +547,21 @@ class MapGenerator(Config):
             tmpPath = "/root/"
             if 'history' in folder.attrib:
               directory.historizing = str(folder.attrib["history"])
-            if folder.find('description', namespaces=folder.nsmap) != None and folder.find('description', namespaces=folder.nsmap).text != None:
-              directory.newDescription = folder.find('description', namespaces=folder.nsmap).text 
-            if folder.find('destination', namespaces=folder.nsmap) != None and folder.find('destination', namespaces=folder.nsmap).text != None:
-              tmpDestination = directory.path.removeprefix("/root").removeprefix("/").removesuffix(directory.name).removesuffix("/")
-              tmpPath = tmpPath + folder.find('destination', namespaces=folder.nsmap).text
-              if tmpDestination != folder.find('destination', namespaces=folder.nsmap).text:
-                directory.newDestination = "/root/"+folder.find('destination', namespaces=folder.nsmap).text
-            if folder.find('name', namespaces=folder.nsmap) != None and directory.name != folder.find('name', namespaces=folder.nsmap).text:
-              directory.newName = folder.find('name', namespaces=folder.nsmap).text
-            # first remove "/" avoids resulting "//" when no destination was added
-            tmpPath = tmpPath.removesuffix("/") + "/" + folder.find('name', namespaces=folder.nsmap).text
-            if directory.newDestination == None and tmpPath != directory.path:
-              directory.newDestination = "/root"
+            # only if the folder is not plain and just used for history setting
+            if not (folder.find('name', namespaces=folder.nsmap) == None and folder.find('destination', namespaces=folder.nsmap) == None and folder.find('description', namespaces=folder.nsmap) == None):
+              if folder.find('description', namespaces=folder.nsmap) != None and folder.find('description', namespaces=folder.nsmap).text != None:
+                directory.newDescription = folder.find('description', namespaces=folder.nsmap).text 
+              if folder.find('destination', namespaces=folder.nsmap) != None and folder.find('destination', namespaces=folder.nsmap).text != None:
+                tmpDestination = directory.path.removeprefix("/root").removeprefix("/").removesuffix(directory.name).removesuffix("/")
+                tmpPath = tmpPath + folder.find('destination', namespaces=folder.nsmap).text
+                if tmpDestination != folder.find('destination', namespaces=folder.nsmap).text:
+                  directory.newDestination = "/root/"+folder.find('destination', namespaces=folder.nsmap).text
+              if folder.find('name', namespaces=folder.nsmap) != None and directory.name != folder.find('name', namespaces=folder.nsmap).text:
+                directory.newName = folder.find('name', namespaces=folder.nsmap).text
+                # first remove "/" avoids resulting "//" when no destination was added
+                tmpPath = tmpPath.removesuffix("/") + "/" + folder.find('name', namespaces=folder.nsmap).text
+              if directory.newDestination == None and tmpPath != directory.path:
+                directory.newDestination = "/root"
           else:
             logging.warning("Failed to find source folder path {} in the application variable tree!".format("/root/" + str(folder.attrib["sourceName"])))
             nSkipped[0] =  nSkipped[0] + 1
