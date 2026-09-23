@@ -186,8 +186,7 @@ namespace influxdb {
     }
 
     for(const auto& tag : tags) {
-      flux << " |> filter(fn: (r) => r[\"" << escapeJson(tag.tagName) << "\"] == \"" << escapeJson(tag.tagValue)
-           << "\")";
+      flux << " |> filter(fn: (r) => r[\"" << escapeJson(tag.key) << "\"] == \"" << escapeJson(tag.value) << "\")";
     }
 
     return flux.str();
@@ -246,22 +245,31 @@ namespace influxdb {
 
     std::vector<TagInformation> mergedTags = tags;
     for(const auto& tagInfo : config_.extraTags) {
-      if(std::ranges::find(mergedTags, tagInfo) == mergedTags.end()) {
-        if(tagInfo.sourceName.empty()) {
+      bool update{false};
+      if(tagInfo.sourceName.empty()) {
+        update = true;
+      }
+      else {
+        // get NodeID from the 'nodeId' tag and check if it contains the sourceName
+        auto sourceId = std::ranges::find_if(tags, [](const TagInformation& tag) { return tag.key == "nodeId"; });
+        if(sourceId != tags.end() && sourceId->value.find(tagInfo.sourceName) != std::string::npos) {
+          update = true;
+        }
+      }
+      if(update) {
+        auto match = std::ranges::find(mergedTags, tagInfo);
+        if(match == mergedTags.end()) {
           mergedTags.emplace_back(tagInfo);
         }
         else {
-          auto sourceId = std::ranges::find_if(tags, [](const TagInformation& tag) { return tag.tagName == "nodeId"; });
-          if(sourceId != tags.end() && sourceId->tagValue.find(tagInfo.sourceName) != std::string::npos) {
-            mergedTags.emplace_back(tagInfo);
-          }
+          match->value = tagInfo.value;
         }
       }
     }
 
     for(const auto& tagInfo : mergedTags) {
-      lineProtocol << "," << escapeLineProtocolIdentifier(tagInfo.tagName) << "="
-                   << escapeLineProtocolIdentifier(tagInfo.tagValue);
+      lineProtocol << "," << escapeLineProtocolIdentifier(tagInfo.key) << "="
+                   << escapeLineProtocolIdentifier(tagInfo.value);
     }
 
     lineProtocol << " " << escapeLineProtocolIdentifier(influxFieldName) << "=";
