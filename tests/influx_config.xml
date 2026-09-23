@@ -10,7 +10,8 @@
   <csa:precision>ns</csa:precision>
   <csa:extra_tags addNameTags="true">
     <csa:tag name="unittest">influx</csa:tag>
-    <csa:tag name="extra" sourceName="floatWithExtraTag">special</csa:tag>
+    <csa:tag name="extra" sourceName="float">special1</csa:tag>
+    <csa:tag name="extra" sourceName="floatWithExtraTag">special2</csa:tag>
   </csa:extra_tags>
   <csa:write_batching>
     <csa:enabled>true</csa:enabled>
