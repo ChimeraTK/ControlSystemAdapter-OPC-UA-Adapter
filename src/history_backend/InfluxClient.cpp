@@ -318,6 +318,7 @@ namespace influxdb {
 
     if(status < 200 || status >= 300) {
       if(error != nullptr) {
+        errorCode_.store(status);
         *error = "Write failed with HTTP " + std::to_string(status) + ": " + response;
       }
       return false;
@@ -501,12 +502,17 @@ namespace influxdb {
     stats.batchesWritten = batchesWritten_.load();
     stats.batchWriteFailures = batchWriteFailures_.load();
     stats.retryAttempts = retryAttempts_.load();
+    stats.errorCode = errorCode_.load();
     return stats;
   }
 
   std::string InfluxClient::getLastAsyncWriteError() const {
     std::lock_guard<std::mutex> lock(asyncErrorMutex_);
     return lastAsyncWriteError_;
+  }
+
+  std::size_t InfluxClient::getLastErrorCode() const {
+    return errorCode_.load();
   }
 
   bool InfluxClient::hasAsyncWriteError() const {
@@ -544,7 +550,7 @@ namespace influxdb {
   }
 
   void InfluxClient::writeWorkerLoop() {
-    while(true) {
+    while(true && errorCode_.load() != 401) {
       std::vector<PendingWritePoint> batch;
 
       {
@@ -701,7 +707,9 @@ namespace influxdb {
             "AsyncErrorActive", "Indicates whether an async write error is active",
             &healthContext_->asyncErrorActiveNodeId) ||
         !HealthMonitoring::addReadOnlyNodeString(server, healthObjectNodeId, "InfluxHealth.LastAsyncError",
-            "LastAsyncError", "Last asynchronous write error text", &healthContext_->asyncErrorNodeId)) {
+            "LastAsyncError", "Last asynchronous write error text", &healthContext_->asyncErrorNodeId) ||
+        !HealthMonitoring::addReadOnlyNodeUInt64(server, healthObjectNodeId, "InfluxHealth.ErrorCode", "ErrorCode",
+            "Last HTTP error code from InfluxDB write operation", &healthContext_->errorCodeNodeId)) {
       UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_USERLAND, "Failed to add Influx health variable nodes");
       return;
     }
