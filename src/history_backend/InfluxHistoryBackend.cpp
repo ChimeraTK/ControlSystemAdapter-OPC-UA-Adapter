@@ -263,7 +263,7 @@ namespace influxdb {
       tags.emplace_back("index");
       for(size_t i = 0; i < fieldValues.size(); ++i) {
         std::string writeError;
-        tags.back().tagValue = std::to_string(i);
+        tags.back().value = std::to_string(i);
         const bool ok =
             ctx->client->writePoint(ctx->influxFieldName, fieldValues[i], tags, timestampNanoseconds, &writeError);
         if(!ok) {
