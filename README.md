@@ -68,6 +68,8 @@ Two history backend types are supported:
   <csa:extra_tags>
     <csa:tag name="extra_tag">my_tag</csa:tag>
     <csa:tag name="special_tag" sourceName="special_folder/pv_with_special_tag">my_other_tag</csa:tag>
+    <!-- last tag value will override previous tag value for equal tag names. This avoids the same tag with different values. -->
+    <csa:tag name="special_tag" sourceName="special_folder/pv_with_special_tag">my_other_tag_last</csa:tag>
   </csa:extra_tags>
   <csa:write_batching>
     <csa:enabled>true</csa:enabled>
