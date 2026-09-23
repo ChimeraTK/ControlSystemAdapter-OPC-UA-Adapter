@@ -23,6 +23,7 @@ namespace influxdb {
       UA_NodeId asyncErrorNodeId{};
       UA_NodeId asyncErrorActiveNodeId{};
       UA_NodeId errorCodeNodeId{};
+      UA_NodeId fundamentalErrorNodeId{};
       ~InfluxHealthContext() {
         UA_NodeId_clear(&queuedPointsNodeId);
         UA_NodeId_clear(&queuedPointsDroppedNodeId);
@@ -34,6 +35,7 @@ namespace influxdb {
         UA_NodeId_clear(&asyncErrorNodeId);
         UA_NodeId_clear(&asyncErrorActiveNodeId);
         UA_NodeId_clear(&errorCodeNodeId);
+        UA_NodeId_clear(&fundamentalErrorNodeId);
       }
     };
 

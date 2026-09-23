@@ -96,10 +96,6 @@ namespace influxdb {
   }
 
   FieldValue uaValueToString(const void* value, const UA_DataType* type) {
-    if(value == nullptr || type == nullptr) {
-      return FieldValue({"", true});
-    }
-
     if(type->typeKind == UA_DATATYPEKIND_STRING) {
       const auto* stringValue = static_cast<const UA_String*>(value);
       if(stringValue->data == nullptr || stringValue->length == 0) {
@@ -164,28 +160,49 @@ namespace influxdb {
     return FieldValue({result, true});
   }
 
+  bool checkValue(const std::string& value) {
+    if(value.empty()) {
+      return false;
+    }
+
+    if(value == "NaN" || value == "nan" || value == "inf" || value == "-inf") {
+      return false;
+    }
+
+    return true;
+  }
+
   bool variantToStrings(const UA_Variant* variant, std::vector<FieldValue>& outValues) {
-    if(variant == nullptr || variant->type == nullptr) {
+    if(variant == nullptr || variant->type == nullptr || variant->data == nullptr) {
       return false;
     }
 
     outValues.clear();
 
     if(UA_Variant_isScalar(variant)) {
-      outValues.emplace_back(uaValueToString(variant->data, variant->type));
-      return true;
+      auto value = uaValueToString(variant->data, variant->type);
+      if(checkValue(value.value)) {
+        outValues.emplace_back(value);
+        return true;
+      }
+      return false;
     }
 
-    if(variant->arrayLength == 0 || variant->data == nullptr) {
+    if(variant->arrayLength == 0) {
       return false;
     }
 
     outValues.reserve(variant->arrayLength);
     for(size_t i = 0; i < variant->arrayLength; ++i) {
       const auto* element = static_cast<const UA_Byte*>(variant->data) + (i * variant->type->memSize);
-      outValues.emplace_back(uaValueToString(element, variant->type));
+      auto value = uaValueToString(element, variant->type);
+      if(checkValue(value.value)) {
+        outValues.emplace_back(value);
+        return true;
+      }
+      return false;
     }
-    return true;
+    return false;
   }
 
   UA_Boolean boundSupportedInflux(UA_Server* /*server*/, void* /*hdbContext*/, const UA_NodeId* /*sessionId*/,
@@ -221,11 +238,11 @@ namespace influxdb {
     if(ctx->client == nullptr) {
       return UA_STATUSCODE_BADINTERNALERROR;
     }
-    if(ctx->client->getLastErrorCode() == 401) {
+    if(ctx->client->hasFundamentalError()) {
       // If the last error was an authentication error, we don't attempt to write further points
       auto* config = UA_Server_getConfig(server);
       UA_LOG_DEBUG(config->logging, UA_LOGCATEGORY_SERVER,
-          "Influx history write failed: Authentication error. Not trying to write further points for node %s",
+          "Influx configuration is wrong: Not trying to write further points for node %s",
           nodeIdToString(nodeId).c_str());
       return UA_STATUSCODE_BADCOMMUNICATIONERROR;
     }
@@ -256,7 +273,8 @@ namespace influxdb {
     if(!variantToStrings(&value->value, fieldValues)) {
       auto* config = UA_Server_getConfig(server);
       UA_LOG_WARNING(config->logging, UA_LOGCATEGORY_SERVER,
-          "Influx history write failed: Unsupported data type for node %s", nodeIdToString(nodeId).c_str());
+          "Influx history write failed: Unsupported data type/invalid value for node %s",
+          nodeIdToString(nodeId).c_str());
       return UA_STATUSCODE_BADTYPEMISMATCH;
     }
 
