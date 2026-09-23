@@ -35,6 +35,7 @@ namespace influxdb {
     std::size_t batchesWritten = 0;
     std::size_t batchWriteFailures = 0;
     std::size_t retryAttempts = 0;
+    std::size_t errorCode = 0;
   };
 
   /**
@@ -68,6 +69,7 @@ namespace influxdb {
     // batch write support related publicmethods
     [[nodiscard]] InfluxWriteStats getWriteStats() const;
     [[nodiscard]] std::string getLastAsyncWriteError() const;
+    [[nodiscard]] size_t getLastErrorCode() const;
     [[nodiscard]] bool hasAsyncWriteError() const;
     void clearAsyncWriteError();
     /**
@@ -111,6 +113,7 @@ namespace influxdb {
     std::atomic<std::size_t> batchesWritten_{0};
     std::atomic<std::size_t> batchWriteFailures_{0};
     std::atomic<std::size_t> retryAttempts_{0};
+    std::atomic<std::size_t> errorCode_{0};
     mutable std::mutex asyncErrorMutex_;
     std::string lastAsyncWriteError_;
 

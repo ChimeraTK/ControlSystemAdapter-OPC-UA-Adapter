@@ -218,6 +218,17 @@ namespace influxdb {
     }
 
     auto* ctx = static_cast<InfluxHistoryBackendContext*>(hdbContext);
+    if(ctx->client == nullptr) {
+      return UA_STATUSCODE_BADINTERNALERROR;
+    }
+    if(ctx->client->getLastErrorCode() == 401) {
+      // If the last error was an authentication error, we don't attempt to write further points
+      auto* config = UA_Server_getConfig(server);
+      UA_LOG_DEBUG(config->logging, UA_LOGCATEGORY_SERVER,
+          "Influx history write failed: Authentication error. Not trying to write further points for node %s",
+          nodeIdToString(nodeId).c_str());
+      return UA_STATUSCODE_BADCOMMUNICATIONERROR;
+    }
 
     UA_DateTime ts = UA_DateTime_now();
     if(value->hasSourceTimestamp) {

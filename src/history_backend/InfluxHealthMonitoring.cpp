@@ -39,10 +39,19 @@ namespace influxdb::HealthMonitoring {
     writeUInt64Node(server, ctx->batchesWrittenNodeId, static_cast<UA_UInt64>(stats.batchesWritten));
     writeUInt64Node(server, ctx->batchFailuresNodeId, static_cast<UA_UInt64>(stats.batchWriteFailures));
     writeUInt64Node(server, ctx->retryAttemptsNodeId, static_cast<UA_UInt64>(stats.retryAttempts));
-
+    writeUInt64Node(server, ctx->errorCodeNodeId, static_cast<UA_UInt64>(stats.errorCode));
     const bool hasError = ctx->client->hasAsyncWriteError();
     writeBooleanNode(server, ctx->asyncErrorActiveNodeId, hasError ? UA_TRUE : UA_FALSE);
     writeStringNode(server, ctx->asyncErrorNodeId, hasError ? ctx->client->getLastAsyncWriteError() : "");
+    if(stats.errorCode == 401) {
+      auto config = UA_Server_getConfig(server);
+      if(config != nullptr) {
+        UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_SERVER,
+            "Influx write failed: Authentication error. Not trying to write further points. Your need to check your "
+            "InfluxDB token and restart the application.");
+      }
+      ctx->client->removeHealthNodesCallback(server);
+    }
   }
 
   bool addReadOnlyNodeUInt64(UA_Server* server, const UA_NodeId& parentNodeId, const char* nodeIdText,

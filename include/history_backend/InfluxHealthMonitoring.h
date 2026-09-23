@@ -22,6 +22,7 @@ namespace influxdb {
       UA_NodeId retryAttemptsNodeId{};
       UA_NodeId asyncErrorNodeId{};
       UA_NodeId asyncErrorActiveNodeId{};
+      UA_NodeId errorCodeNodeId{};
       ~InfluxHealthContext() {
         UA_NodeId_clear(&queuedPointsNodeId);
         UA_NodeId_clear(&queuedPointsDroppedNodeId);
@@ -32,6 +33,7 @@ namespace influxdb {
         UA_NodeId_clear(&retryAttemptsNodeId);
         UA_NodeId_clear(&asyncErrorNodeId);
         UA_NodeId_clear(&asyncErrorActiveNodeId);
+        UA_NodeId_clear(&errorCodeNodeId);
       }
     };
 
