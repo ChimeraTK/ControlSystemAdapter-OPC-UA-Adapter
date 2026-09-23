@@ -40,15 +40,35 @@ namespace influxdb::HealthMonitoring {
     writeUInt64Node(server, ctx->batchFailuresNodeId, static_cast<UA_UInt64>(stats.batchWriteFailures));
     writeUInt64Node(server, ctx->retryAttemptsNodeId, static_cast<UA_UInt64>(stats.retryAttempts));
     writeUInt64Node(server, ctx->errorCodeNodeId, static_cast<UA_UInt64>(stats.errorCode));
+    writeBooleanNode(server, ctx->fundamentalErrorNodeId, ctx->client->hasFundamentalError() ? UA_TRUE : UA_FALSE);
     const bool hasError = ctx->client->hasAsyncWriteError();
     writeBooleanNode(server, ctx->asyncErrorActiveNodeId, hasError ? UA_TRUE : UA_FALSE);
     writeStringNode(server, ctx->asyncErrorNodeId, hasError ? ctx->client->getLastAsyncWriteError() : "");
-    if(stats.errorCode == 401) {
+    if(stats.fundamentalErrorOccurred) {
       auto config = UA_Server_getConfig(server);
       if(config != nullptr) {
-        UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_SERVER,
-            "Influx write failed: Authentication error. Not trying to write further points. Your need to check your "
-            "InfluxDB token and restart the application.");
+        if(stats.errorCode == 401) {
+          UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_SERVER,
+              "Influx write failed: Authentication error. Not trying to write further points. Your need to check your "
+              "InfluxDB token and restart the application.");
+        }
+        else if(stats.errorCode == 404) {
+          UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_SERVER,
+              "Influx write failed: InfluxDB not found error returned. Check bucket and organization name. Not trying "
+              "to write further points. Fix the issue andrestart the application.");
+        }
+        else if(stats.errorCode == 400) {
+          UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_SERVER,
+              "Influx write failed: InfluxDB bad request error returned. Check your InfluxDB organisation. Not trying "
+              "to "
+              "write further points. Fix the issue and restart the application.");
+        }
+        else {
+          UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_SERVER,
+              "Influx write failed: Fundamental error occurred. Check influx server address and port. Not trying to "
+              "write further points. Fix the issue and "
+              "restart the application.");
+        }
       }
       ctx->client->removeHealthNodesCallback(server);
     }

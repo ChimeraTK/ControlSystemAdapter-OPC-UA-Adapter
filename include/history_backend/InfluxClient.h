@@ -36,6 +36,7 @@ namespace influxdb {
     std::size_t batchWriteFailures = 0;
     std::size_t retryAttempts = 0;
     std::size_t errorCode = 0;
+    bool fundamentalErrorOccurred = false;
   };
 
   /**
@@ -71,6 +72,7 @@ namespace influxdb {
     [[nodiscard]] std::string getLastAsyncWriteError() const;
     [[nodiscard]] size_t getLastErrorCode() const;
     [[nodiscard]] bool hasAsyncWriteError() const;
+    [[nodiscard]] bool hasFundamentalError() const;
     void clearAsyncWriteError();
     /**
      * @brief Adds health monitoring nodes to the OPC UA server if batch writing is enabled. If successful
@@ -88,7 +90,7 @@ namespace influxdb {
 
     bool sendRequest(const std::string& endpoint, const std::string& queryParameters, const std::string& method,
         const std::string& body, const std::string& contentType, const std::string& accept, int64_t* httpStatus,
-        std::string* responseBody, std::string* error) const;
+        std::string* responseBody, std::string* error);
 
     // batch write support related struct
     struct PendingWritePoint {
@@ -114,6 +116,7 @@ namespace influxdb {
     std::atomic<std::size_t> batchWriteFailures_{0};
     std::atomic<std::size_t> retryAttempts_{0};
     std::atomic<std::size_t> errorCode_{0};
+    std::atomic<bool> fundamentalErrorOccurred_{false};
     mutable std::mutex asyncErrorMutex_;
     std::string lastAsyncWriteError_;
 

@@ -319,6 +319,9 @@ namespace influxdb {
     if(status < 200 || status >= 300) {
       if(error != nullptr) {
         errorCode_.store(status);
+        if(status == 401 || status == 404 || status == 400) {
+          fundamentalErrorOccurred_.store(true);
+        }
         *error = "Write failed with HTTP " + std::to_string(status) + ": " + response;
       }
       return false;
@@ -437,7 +440,7 @@ namespace influxdb {
 
   bool InfluxClient::sendRequest(const std::string& endpoint, const std::string& queryParameters,
       const std::string& method, const std::string& body, const std::string& contentType, const std::string& accept,
-      int64_t* httpStatus, std::string* responseBody, std::string* error) const {
+      int64_t* httpStatus, std::string* responseBody, std::string* error) {
     CURL* curl = curl_easy_init();
     if(curl == nullptr) {
       if(error != nullptr) {
@@ -468,6 +471,7 @@ namespace influxdb {
     if(rc != CURLE_OK) {
       if(error != nullptr) {
         *error = std::string("HTTP request failed: ") + curl_easy_strerror(rc);
+        fundamentalErrorOccurred_.store(true);
       }
       curl_slist_free_all(headers);
       curl_easy_cleanup(curl);
@@ -503,6 +507,7 @@ namespace influxdb {
     stats.batchWriteFailures = batchWriteFailures_.load();
     stats.retryAttempts = retryAttempts_.load();
     stats.errorCode = errorCode_.load();
+    stats.fundamentalErrorOccurred = fundamentalErrorOccurred_.load();
     return stats;
   }
 
@@ -518,6 +523,10 @@ namespace influxdb {
   bool InfluxClient::hasAsyncWriteError() const {
     std::lock_guard<std::mutex> lock(asyncErrorMutex_);
     return !lastAsyncWriteError_.empty();
+  }
+
+  bool InfluxClient::hasFundamentalError() const {
+    return fundamentalErrorOccurred_.load();
   }
 
   void InfluxClient::clearAsyncWriteError() {
@@ -550,7 +559,7 @@ namespace influxdb {
   }
 
   void InfluxClient::writeWorkerLoop() {
-    while(true && errorCode_.load() != 401) {
+    while(!fundamentalErrorOccurred_.load()) {
       std::vector<PendingWritePoint> batch;
 
       {
@@ -709,7 +718,10 @@ namespace influxdb {
         !HealthMonitoring::addReadOnlyNodeString(server, healthObjectNodeId, "InfluxHealth.LastAsyncError",
             "LastAsyncError", "Last asynchronous write error text", &healthContext_->asyncErrorNodeId) ||
         !HealthMonitoring::addReadOnlyNodeUInt64(server, healthObjectNodeId, "InfluxHealth.ErrorCode", "ErrorCode",
-            "Last HTTP error code from InfluxDB write operation", &healthContext_->errorCodeNodeId)) {
+            "Last HTTP error code from InfluxDB write operation", &healthContext_->errorCodeNodeId) ||
+        !HealthMonitoring::addReadOnlyNodeBoolean(server, healthObjectNodeId, "InfluxHealth.FundamentalError",
+            "FundamentalError", "Indicates whether a fundamental error has occurred",
+            &healthContext_->fundamentalErrorNodeId)) {
       UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_USERLAND, "Failed to add Influx health variable nodes");
       return;
     }
