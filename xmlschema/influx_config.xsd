@@ -37,7 +37,8 @@
   <xs:complexType name="extraTagsType">
     <xs:annotation>
       <xs:documentation> Optional list of additional tag key/value pairs that are appended to each
-        write operation. </xs:documentation>
+        write operation. If a tag with the same key already exists, it will be overridden. This
+        avoids data base errors, because each tag can only occur once in a measurement. </xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:element name="tag" minOccurs="1" maxOccurs="unbounded">
