@@ -160,8 +160,8 @@ namespace influxdb {
     return FieldValue({result, true});
   }
 
-  bool checkValue(const std::string& value) {
-    if(value.empty()) {
+  bool checkValue(const std::string& value, const bool& isString) {
+    if(!isString && value.empty()) {
       return false;
     }
 
@@ -181,7 +181,7 @@ namespace influxdb {
 
     if(UA_Variant_isScalar(variant)) {
       auto value = uaValueToString(variant->data, variant->type);
-      if(checkValue(value.value)) {
+      if(checkValue(value.value, value.isString)) {
         outValues.emplace_back(value);
         return true;
       }
@@ -196,7 +196,7 @@ namespace influxdb {
     for(size_t i = 0; i < variant->arrayLength; ++i) {
       const auto* element = static_cast<const UA_Byte*>(variant->data) + (i * variant->type->memSize);
       auto value = uaValueToString(element, variant->type);
-      if(checkValue(value.value)) {
+      if(checkValue(value.value, value.isString)) {
         outValues.emplace_back(value);
         return true;
       }

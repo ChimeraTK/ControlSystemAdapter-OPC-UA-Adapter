@@ -8,6 +8,8 @@
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
 
+#include <boost/algorithm/string/classification.hpp> // Include boost::for is_any_of
+#include <boost/algorithm/string/split.hpp>          // Include for boost::split
 #include <boost/test/included/unit_test.hpp>
 
 #include <unistd.h>
@@ -109,7 +111,10 @@ void detail::InfluxClientTest::testLocalServer() {
       ChimeraTK::SynchronizationDirection::deviceToControlSystem, "dev/float", 1, "unit1", "desc");
   ChimeraTK::ProcessArray<float>::SharedPtr pvFloat2 = devManager->createProcessArray<float>(
       ChimeraTK::SynchronizationDirection::deviceToControlSystem, "dev/floatWithExtraTag", 1, "unit2", "desc");
-
+  ChimeraTK::ProcessArray<std::string>::SharedPtr pvStr1 = devManager->createProcessArray<std::string>(
+      ChimeraTK::SynchronizationDirection::deviceToControlSystem, "dev/testString1", 1, "unit2", "empty string");
+  ChimeraTK::ProcessArray<std::string>::SharedPtr pvStr2 = devManager->createProcessArray<std::string>(
+      ChimeraTK::SynchronizationDirection::deviceToControlSystem, "dev/testString2", 1, "", "");
   std::string pathToConfig = "uamapping_test_influx.xml";
   std::unique_ptr<ChimeraTK::csa_opcua_adapter> csaOPCUA(new ChimeraTK::csa_opcua_adapter(csManager, pathToConfig));
   csaOPCUA->start();
@@ -118,26 +123,39 @@ void detail::InfluxClientTest::testLocalServer() {
 
   // Server is running
   std::cout << "server is running..." << std::endl;
-  size_t i = 0;
+  size_t i = 1;
   UA_Server* uaserver = csaOPCUA->getUAAdapter()->getMappedServer();
   UA_ServerConfig* config = UA_Server_getConfig(uaserver);
   // Write data twice and check the response from the local HTTP server aka InfluxDB server
-  while(csaOPCUA->isRunning() && i < 2) {
+  while(csaOPCUA->isRunning() && i < 3) {
     sleep(2);
     devManager->getProcessArray<float>("dev/float")->accessChannel(0) = std::vector<float>{static_cast<float>(i)};
     devManager->getProcessArray<float>("dev/float")->write();
     devManager->getProcessArray<float>("dev/floatWithExtraTag")->accessChannel(0) =
         std::vector<float>{static_cast<float>(i)};
     devManager->getProcessArray<float>("dev/floatWithExtraTag")->write();
-    const std::string request = server.waitForRequest();
-    auto pos = request.find('\n');
-    BOOST_REQUIRE(pos != std::string::npos);
+    if(i % 1 == 1) {
+      // writing always "" would not trigger a history update
+      devManager->getProcessArray<std::string>("dev/testString1")->accessChannel(0) = std::vector<std::string>{""};
+    }
+    else {
+      devManager->getProcessArray<std::string>("dev/testString1")->accessChannel(0) =
+          std::vector<std::string>{std::to_string(i)};
+    }
+    devManager->getProcessArray<std::string>("dev/testString1")->write();
+    devManager->getProcessArray<std::string>("dev/testString2")->accessChannel(0) =
+        std::vector<std::string>{std::to_string(i)};
+    devManager->getProcessArray<std::string>("dev/testString2")->write();
 
-    std::string first = request.substr(0, pos);
-    std::string second = request.substr(pos + 1);
+    const std::string request = server.waitForRequest();
+    std::vector<std::string> requests;
+    std::cout << "Received request from InfluxClient: " << request << std::endl;
+    boost::split(requests, request, boost::is_any_of("\n"), boost::token_compress_on);
+    auto pos = request.find('\n');
+    BOOST_CHECK(requests.size() == 4);
 
     // check float
-    const auto splitRequest1 = splitInfluxRequest(first);
+    const auto splitRequest1 = splitInfluxRequest(requests.at(0));
     std::string requestMetadata = splitRequest1.first;
     std::string requestValue = splitRequest1.second;
 
@@ -155,7 +173,7 @@ void detail::InfluxClientTest::testLocalServer() {
     BOOST_CHECK(requestValue.find("float=") != std::string::npos);
 
     // now check floatWithExtraTag
-    const auto splitRequest2 = splitInfluxRequest(second);
+    const auto splitRequest2 = splitInfluxRequest(requests.at(1));
     requestMetadata = splitRequest2.first;
     requestValue = splitRequest2.second;
 
@@ -173,6 +191,45 @@ void detail::InfluxClientTest::testLocalServer() {
     BOOST_CHECK(requestMetadata.find("unit=unit2") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("name=floatWithExtraTag") != std::string::npos);
     BOOST_CHECK(requestValue.find("floatWithExtraTag=") != std::string::npos);
+
+    const auto splitRequest3 = splitInfluxRequest(requests.at(2));
+    requestMetadata = splitRequest3.first;
+    requestValue = splitRequest3.second;
+
+    UA_LOG_INFO(
+        config->logging, UA_LOGCATEGORY_USERLAND, "Received request for string1 metadata: %s", requestMetadata.c_str());
+    UA_LOG_INFO(
+        config->logging, UA_LOGCATEGORY_USERLAND, "Received request for string1 value: %s", requestValue.c_str());
+
+    BOOST_REQUIRE(!requestMetadata.empty());
+    BOOST_REQUIRE(!requestValue.empty());
+    BOOST_CHECK(requestMetadata.find("demo_measurement") != std::string::npos);
+    BOOST_CHECK(requestMetadata.find("unittest=influx") != std::string::npos);
+    BOOST_CHECK(requestMetadata.find("extra=special1") == std::string::npos);
+    BOOST_CHECK(requestMetadata.find("extra=special2") == std::string::npos);
+    BOOST_CHECK(requestMetadata.find("unit=unit2") != std::string::npos);
+    BOOST_CHECK(requestMetadata.find("name=floatWithExtraTag") == std::string::npos);
+    BOOST_CHECK(requestValue.find("floatWithExtraTag=") == std::string::npos);
+
+    const auto splitRequest4 = splitInfluxRequest(requests.at(3));
+    requestMetadata = splitRequest4.first;
+    requestValue = splitRequest4.second;
+
+    UA_LOG_INFO(
+        config->logging, UA_LOGCATEGORY_USERLAND, "Received request for string2 metadata: %s", requestMetadata.c_str());
+    UA_LOG_INFO(
+        config->logging, UA_LOGCATEGORY_USERLAND, "Received request for string2 value: %s", requestValue.c_str());
+
+    BOOST_REQUIRE(!requestMetadata.empty());
+    BOOST_REQUIRE(!requestValue.empty());
+    BOOST_CHECK(requestMetadata.find("demo_measurement") != std::string::npos);
+    BOOST_CHECK(requestMetadata.find("unittest=influx") != std::string::npos);
+    BOOST_CHECK(requestMetadata.find("extra=special1") == std::string::npos);
+    BOOST_CHECK(requestMetadata.find("extra=special2") == std::string::npos);
+    BOOST_CHECK(requestMetadata.find("unit=") == std::string::npos);
+    BOOST_CHECK(requestMetadata.find("name=floatWithExtraTag") == std::string::npos);
+    BOOST_CHECK(requestValue.find("floatWithExtraTag=") == std::string::npos);
+
     server.reset();
     i++;
   }
