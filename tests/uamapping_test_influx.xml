@@ -9,4 +9,6 @@
   </config>
   <process_variable sourceName="dev/float" history="influxHistory" copy="False" />
   <process_variable sourceName="dev/floatWithExtraTag" history="influxHistory" copy="False" />
+  <process_variable sourceName="dev/testString1" history="influxHistory" copy="False" />
+  <process_variable sourceName="dev/testString2" history="influxHistory" copy="False" />
 </csa:uamapping>
