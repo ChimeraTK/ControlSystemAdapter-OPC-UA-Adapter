@@ -53,6 +53,13 @@ namespace influxdb {
 
   class InfluxClient {
    public:
+    /**
+     * @brief Constructor for the InfluxClient.
+     * @param config The configuration for the InfluxClient.
+     * @remark At the time the InfluxClient is constructed the server is not yet available. Therefore the health
+     * monitoring nodes are not added to the server at this point. The user has to call addHealthMonitoringNodes() after
+     * the server is available. This will store the server pointer in the InfluxClient instance.
+     */
     explicit InfluxClient(InfluxConfig config);
     ~InfluxClient();
 
@@ -74,6 +81,7 @@ namespace influxdb {
     [[nodiscard]] bool hasAsyncWriteError() const;
     [[nodiscard]] bool hasFundamentalError() const;
     void clearAsyncWriteError();
+    bool reset();
     /**
      * @brief Adds health monitoring nodes to the OPC UA server if batch writing is enabled. If successful
      * healthNodesAdded_ will be set to true.

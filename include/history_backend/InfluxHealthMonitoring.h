@@ -47,6 +47,10 @@ namespace influxdb {
 
     void updateInfluxHealth(UA_Server* server, void* data);
 
+    UA_StatusCode resetInfluxClientCallback(UA_Server* server, const UA_NodeId* sessionId, void* sessionHandle,
+        const UA_NodeId* methodId, void* methodContext, const UA_NodeId* objectId, void* objectContext,
+        size_t inputSize, const UA_Variant* input, size_t outputSize, UA_Variant* output);
+
     bool addReadOnlyNodeUInt64(UA_Server* server, const UA_NodeId& parentNodeId, const char* nodeIdText,
         const char* browseName, const char* description, UA_NodeId* outNodeId);
 

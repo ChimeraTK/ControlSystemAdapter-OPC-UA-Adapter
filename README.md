@@ -98,7 +98,7 @@ Meaning of settings:
 - `max_queue_points`: maximum buffered points waiting to be sent.
 - `flush_interval_ms`: maximum time to wait before flushing a partial batch.
 - `max_retries`: retry attempts after a failed batch write.
-- `retry_backoff_ms`: base retry wait time. Retries use exponential backoff.
+- `retry_backoff_ms`: base retry wait time. Retries use exponential backoff. Minimum is 200ms, which is used as default.
 - `fail_fast_on_async_error`: when `true`, new writes are rejected while an async error is active.
 
 
