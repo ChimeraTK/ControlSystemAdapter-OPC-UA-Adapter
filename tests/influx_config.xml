@@ -15,9 +15,9 @@
   </csa:extra_tags>
   <csa:write_batching>
     <csa:enabled>true</csa:enabled>
-    <csa:max_batch_points>250</csa:max_batch_points>
+    <csa:max_batch_points>4</csa:max_batch_points>
     <csa:max_queue_points>10000</csa:max_queue_points>
-    <csa:flush_interval_ms>500</csa:flush_interval_ms>
+    <csa:flush_interval_ms>20000</csa:flush_interval_ms>
     <csa:max_retries>2</csa:max_retries>
     <csa:retry_backoff_ms>200</csa:retry_backoff_ms>
     <csa:fail_fast_on_async_error>false</csa:fail_fast_on_async_error>

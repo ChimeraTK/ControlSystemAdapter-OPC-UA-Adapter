@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 #include "ChimeraTK/ControlSystemAdapter/ControlSystemPVManager.h"
 #include "csa_opcua_adapter.h"
+#include "history_backend/InfluxClient.h"
 #include "LocalHttpServer.h"
 
+#include <open62541/client_highlevel.h>
 #include <open62541/plugin/historydata/history_data_gathering_default.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
+#include <open62541/util.h>
 
 #include <boost/algorithm/string/classification.hpp> // Include boost::for is_any_of
 #include <boost/algorithm/string/split.hpp>          // Include for boost::split
@@ -94,9 +97,69 @@ namespace detail {
   class InfluxClientTest {
    public:
     static void testLocalServer();
+    static void testResetWorker();
   };
 
 } // namespace detail
+
+void detail::InfluxClientTest::testResetWorker() {
+  InfluxConfig config;
+  config.url = "http://127.0.0.1:1";
+  config.token = "token";
+  config.org = "org";
+  config.bucket = "bucket";
+  config.measurement = "measurement";
+  config.precision = "ns";
+  config.writeBatching.enabled = true;
+  config.writeBatching.maxBatchPoints = 10;
+  config.writeBatching.maxQueuePoints = 8;
+  config.writeBatching.flushIntervalMs = 1000;
+  config.writeBatching.maxRetries = 1;
+  config.writeBatching.retryBackoffMs = 5;
+
+  influxdb::InfluxClient client(config);
+  std::string error;
+  BOOST_REQUIRE(client.writePoint("pv", {"1", false}, {}, std::nullopt, &error));
+  BOOST_REQUIRE(client.writePoint("pv", {"2", false}, {}, std::nullopt, &error));
+
+  std::size_t queuedPoints = 0;
+  for(int i = 0; i < 50; ++i) {
+    queuedPoints = client.getWriteStats().queuedPoints;
+    if(queuedPoints == 2) {
+      break;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+  BOOST_REQUIRE_EQUAL(queuedPoints, 2);
+
+  BOOST_REQUIRE(client.reset());
+  const auto statsAfterReset = client.getWriteStats();
+  BOOST_CHECK_EQUAL(statsAfterReset.queuedPoints, 0);
+  BOOST_CHECK_EQUAL(statsAfterReset.pointsDropped, 0);
+  BOOST_CHECK(!client.hasAsyncWriteError());
+
+  BOOST_REQUIRE(client.writePoint("pv", {"3", false}, {}, std::nullopt, &error));
+  const auto statsAfterRequeue = client.getWriteStats();
+  BOOST_CHECK_EQUAL(statsAfterRequeue.queuedPoints, 1);
+}
+
+//**
+//  Check the number of queued points using the OPC UA server PV InfluxHealth.QueuedPoints.
+//
+//  @param expectedValue The expected value.
+//  @param server The OPC UA server.
+//  @return true if the value is read, false otherwise.
+// */
+bool checkQueuedPoints(const uint64_t& expectedValue, UA_Server* server) {
+  UA_Variant var;
+  UA_Variant_init(&var);
+  auto rt = UA_Server_readValue(server, UA_NODEID_STRING(1, const_cast<char*>("InfluxHealth.QueuedPoints")), &var);
+  if(rt == UA_STATUSCODE_GOOD && UA_Variant_hasScalarType(&var, &UA_TYPES[UA_TYPES_UINT64])) {
+    const UA_UInt64 val = *(const UA_UInt64*)var.data;
+    return val == expectedValue;
+  }
+  return false;
+}
 
 void detail::InfluxClientTest::testLocalServer() {
   influxdb::LocalHttpServer server;
@@ -126,15 +189,24 @@ void detail::InfluxClientTest::testLocalServer() {
   size_t i = 1;
   UA_Server* uaserver = csaOPCUA->getUAAdapter()->getMappedServer();
   UA_ServerConfig* config = UA_Server_getConfig(uaserver);
+  // read initial values
+  const std::string request = server.waitForRequest();
+  server.reset();
+
   // Write data twice and check the response from the local HTTP server aka InfluxDB server
   while(csaOPCUA->isRunning() && i < 3) {
-    sleep(2);
     devManager->getProcessArray<float>("dev/float")->accessChannel(0) = std::vector<float>{static_cast<float>(i)};
     devManager->getProcessArray<float>("dev/float")->write();
+    while(!checkQueuedPoints(1, uaserver)) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
     devManager->getProcessArray<float>("dev/floatWithExtraTag")->accessChannel(0) =
         std::vector<float>{static_cast<float>(i)};
     devManager->getProcessArray<float>("dev/floatWithExtraTag")->write();
-    if(i % 1 == 1) {
+    while(!checkQueuedPoints(2, uaserver)) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    if(i == 2) {
       // writing always "" would not trigger a history update
       devManager->getProcessArray<std::string>("dev/testString1")->accessChannel(0) = std::vector<std::string>{""};
     }
@@ -143,13 +215,17 @@ void detail::InfluxClientTest::testLocalServer() {
           std::vector<std::string>{std::to_string(i)};
     }
     devManager->getProcessArray<std::string>("dev/testString1")->write();
+    while(!checkQueuedPoints(3, uaserver)) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
     devManager->getProcessArray<std::string>("dev/testString2")->accessChannel(0) =
         std::vector<std::string>{std::to_string(i)};
     devManager->getProcessArray<std::string>("dev/testString2")->write();
 
     const std::string request = server.waitForRequest();
     std::vector<std::string> requests;
-    std::cout << "Received request from InfluxClient: " << request << std::endl;
+    UA_LOG_INFO(config->logging, UA_LOGCATEGORY_USERLAND, "Received request from InfluxClient: %s", request.c_str());
     boost::split(requests, request, boost::is_any_of("\n"), boost::token_compress_on);
     auto pos = request.find('\n');
     BOOST_CHECK(requests.size() == 4);
@@ -170,7 +246,7 @@ void detail::InfluxClientTest::testLocalServer() {
     BOOST_CHECK(requestMetadata.find("unit=unit1") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("name=float") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("extra=special1") != std::string::npos);
-    BOOST_CHECK(requestValue.find("float=") != std::string::npos);
+    BOOST_CHECK(requestValue.find(std::string("float=") + std::to_string(i)) != std::string::npos);
 
     // now check floatWithExtraTag
     const auto splitRequest2 = splitInfluxRequest(requests.at(1));
@@ -190,7 +266,7 @@ void detail::InfluxClientTest::testLocalServer() {
     BOOST_CHECK(requestMetadata.find("extra=special2") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("unit=unit2") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("name=floatWithExtraTag") != std::string::npos);
-    BOOST_CHECK(requestValue.find("floatWithExtraTag=") != std::string::npos);
+    BOOST_CHECK(requestValue.find(std::string("floatWithExtraTag=") + std::to_string(i)) != std::string::npos);
 
     const auto splitRequest3 = splitInfluxRequest(requests.at(2));
     requestMetadata = splitRequest3.first;
@@ -210,6 +286,7 @@ void detail::InfluxClientTest::testLocalServer() {
     BOOST_CHECK(requestMetadata.find("unit=unit2") != std::string::npos);
     BOOST_CHECK(requestMetadata.find("name=floatWithExtraTag") == std::string::npos);
     BOOST_CHECK(requestValue.find("floatWithExtraTag=") == std::string::npos);
+    BOOST_CHECK(requestValue.find(std::string("testString1=")) != std::string::npos);
 
     const auto splitRequest4 = splitInfluxRequest(requests.at(3));
     requestMetadata = splitRequest4.first;
@@ -229,6 +306,8 @@ void detail::InfluxClientTest::testLocalServer() {
     BOOST_CHECK(requestMetadata.find("unit=") == std::string::npos);
     BOOST_CHECK(requestMetadata.find("name=floatWithExtraTag") == std::string::npos);
     BOOST_CHECK(requestValue.find("floatWithExtraTag=") == std::string::npos);
+    BOOST_CHECK(
+        requestValue.find(std::string("testString2=\"") + std::to_string(i) + std::string("\"")) != std::string::npos);
 
     server.reset();
     i++;
@@ -241,6 +320,7 @@ void detail::InfluxClientTest::testLocalServer() {
 class InfluxClientTestSuite : public boost::unit_test::test_suite {
  public:
   InfluxClientTestSuite() : boost::unit_test::test_suite("InfluxClient Test Suite") {
+    add(BOOST_TEST_CASE(&detail::InfluxClientTest::testResetWorker));
     add(BOOST_TEST_CASE(&detail::InfluxClientTest::testLocalServer));
   }
 };

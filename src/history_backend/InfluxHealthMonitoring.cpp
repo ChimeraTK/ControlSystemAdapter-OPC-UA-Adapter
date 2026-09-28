@@ -28,6 +28,19 @@ namespace influxdb::HealthMonitoring {
     UA_String_clear(&uaText);
   }
 
+  UA_StatusCode resetInfluxClientCallback(UA_Server* server, const UA_NodeId* sessionId, void* sessionHandle,
+      const UA_NodeId* methodId, void* methodContext, const UA_NodeId* objectId, void* objectContext, size_t inputSize,
+      const UA_Variant* input, size_t outputSize, UA_Variant* output) {
+    auto* ctx = static_cast<InfluxHealthContext*>(methodContext);
+    if(ctx == nullptr || ctx->client == nullptr) {
+      return UA_STATUSCODE_BADINTERNALERROR;
+    }
+
+    const bool ok = ctx->client->reset();
+    updateInfluxHealth(server, ctx);
+    return ok ? UA_STATUSCODE_GOOD : UA_STATUSCODE_BADINTERNALERROR;
+  }
+
   void updateInfluxHealth(UA_Server* server, void* data) {
     InfluxHealthContext* ctx = static_cast<InfluxHealthContext*>(data);
     const InfluxWriteStats stats = ctx->client->getWriteStats();

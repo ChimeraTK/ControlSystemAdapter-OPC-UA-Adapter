@@ -74,6 +74,7 @@ namespace influxdb {
     [[nodiscard]] bool hasAsyncWriteError() const;
     [[nodiscard]] bool hasFundamentalError() const;
     void clearAsyncWriteError();
+    bool reset();
     /**
      * @brief Adds health monitoring nodes to the OPC UA server if batch writing is enabled. If successful
      * healthNodesAdded_ will be set to true.

@@ -466,6 +466,7 @@ namespace influxdb {
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, static_cast<long>(body.size()));
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
 
     CURLcode rc = curl_easy_perform(curl);
     if(rc != CURLE_OK) {
@@ -631,6 +632,46 @@ namespace influxdb {
     }
   }
 
+  bool InfluxClient::reset() {
+    if(!config_.writeBatching.enabled) {
+      clearAsyncWriteError();
+      errorCode_.store(0);
+      fundamentalErrorOccurred_.store(false);
+      return true;
+    }
+
+    {
+      std::lock_guard<std::mutex> lock(writeQueueMutex_);
+      stopWriteWorker_ = true;
+      writeQueue_.clear();
+    }
+    writeQueueCv_.notify_one();
+
+    if(writeWorkerThread_.joinable()) {
+      writeWorkerThread_.join();
+    }
+
+    {
+      std::lock_guard<std::mutex> lock(writeQueueMutex_);
+      stopWriteWorker_ = false;
+      writeQueue_.clear();
+    }
+    writeQueueCv_.notify_one();
+
+    clearAsyncWriteError();
+    queuedPointsDropped_.store(0);
+    pointsWritten_.store(0);
+    pointsDropped_.store(0);
+    batchesWritten_.store(0);
+    batchWriteFailures_.store(0);
+    retryAttempts_.store(0);
+    errorCode_.store(0);
+    fundamentalErrorOccurred_.store(false);
+
+    writeWorkerThread_ = std::thread([this]() { writeWorkerLoop(); });
+    return writeWorkerThread_.joinable();
+  }
+
   bool InfluxClient::writePoint(const std::string& influxFieldName, const FieldValue& fieldValue,
       const std::vector<TagInformation>& tags, std::optional<int64_t> timestampNanoseconds, std::string* error) {
     if(!config_.writeBatching.enabled) {
@@ -724,6 +765,22 @@ namespace influxdb {
             &healthContext_->fundamentalErrorNodeId)) {
       UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_USERLAND, "Failed to add Influx health variable nodes");
       return;
+    }
+
+    UA_MethodAttributes methodAttr = UA_MethodAttributes_default;
+    methodAttr.description = UA_LOCALIZEDTEXT_ALLOC("en-US", "Reset the Influx write worker and clear queued points");
+    methodAttr.displayName = UA_LOCALIZEDTEXT_ALLOC("en-US", "Reset");
+    methodAttr.executable = true;
+    methodAttr.userExecutable = true;
+    UA_NodeId resetMethodNodeId = UA_NODEID_STRING_ALLOC(1, "InfluxHealth.Reset");
+    UA_StatusCode methodRc = UA_Server_addMethodNode(server, resetMethodNodeId, healthObjectNodeId,
+        UA_NS0ID(HASCOMPONENT), UA_QUALIFIEDNAME(1, const_cast<char*>("Reset")), methodAttr,
+        &HealthMonitoring::resetInfluxClientCallback, 0, nullptr, 0, nullptr, healthContext_.get(), nullptr);
+    UA_MethodAttributes_clear(&methodAttr);
+    UA_NodeId_clear(&resetMethodNodeId);
+    if(methodRc != UA_STATUSCODE_GOOD) {
+      UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_USERLAND, "Failed to add Influx health reset method: %s",
+          UA_StatusCode_name(methodRc));
     }
 
     HealthMonitoring::updateInfluxHealth(server, healthContext_.get());
