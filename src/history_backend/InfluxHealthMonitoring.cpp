@@ -78,8 +78,7 @@ namespace influxdb::HealthMonitoring {
         }
         else {
           UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_SERVER,
-              "Influx write failed: Fundamental error occurred. Check influx server address and port. Not trying to "
-              "write further points. Fix the issue and "
+              "Influx write failed: Fundamental error occurred.  Not trying to write further points. Fix the issue and "
               "restart the application.");
         }
       }

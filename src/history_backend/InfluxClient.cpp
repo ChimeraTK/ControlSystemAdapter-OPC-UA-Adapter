@@ -472,7 +472,8 @@ namespace influxdb {
     if(rc != CURLE_OK) {
       if(error != nullptr) {
         *error = std::string("HTTP request failed: ") + curl_easy_strerror(rc);
-        fundamentalErrorOccurred_.store(true);
+        // This could be a fundamental error but the same happens if the connection is temporarily down. So we don't set
+        // fundamentalErrorOccurred_ here.
       }
       curl_slist_free_all(headers);
       curl_easy_cleanup(curl);
