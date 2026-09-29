@@ -339,7 +339,7 @@ namespace influxdb {
 
   std::vector<InfluxRecord> InfluxClient::executeFluxReadQuery(const std::string& fluxQuery, std::string* error) {
     std::ostringstream body;
-    body << "{\"query\":\"" << escapeJson(fluxQuery) << "\",\"type\":\"flux\"}";
+    body << R"({"query":")" << escapeJson(fluxQuery) << R"(","type":"flux"})";
 
     int64_t status = 0;
     std::string response;
