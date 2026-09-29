@@ -9,6 +9,7 @@
 #include <open62541/plugin/historydata/history_data_gathering_default.h>
 #include <open62541/server.h>
 #include <open62541/server_config_default.h>
+#include <open62541/types.h>
 #include <open62541/util.h>
 
 #include <boost/algorithm/string/classification.hpp> // Include boost::for is_any_of
@@ -153,12 +154,14 @@ void detail::InfluxClientTest::testResetWorker() {
 bool checkQueuedPoints(const uint64_t& expectedValue, UA_Server* server) {
   UA_Variant var;
   UA_Variant_init(&var);
+  bool result = false;
   auto rt = UA_Server_readValue(server, UA_NODEID_STRING(1, const_cast<char*>("InfluxHealth.QueuedPoints")), &var);
   if(rt == UA_STATUSCODE_GOOD && UA_Variant_hasScalarType(&var, &UA_TYPES[UA_TYPES_UINT64])) {
     const UA_UInt64 val = *(const UA_UInt64*)var.data;
-    return val == expectedValue;
+    result = (val == expectedValue);
   }
-  return false;
+  UA_Variant_clear(&var);
+  return result;
 }
 
 void detail::InfluxClientTest::testLocalServer() {
