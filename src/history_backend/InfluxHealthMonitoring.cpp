@@ -85,7 +85,7 @@ namespace influxdb::HealthMonitoring {
               "restart the application.");
         }
       }
-      ctx->client->removeHealthNodesCallback(server);
+      ctx->client->removeHealthNodesCallback();
     }
   }
 

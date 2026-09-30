@@ -86,9 +86,12 @@ namespace influxdb {
      * @brief Adds health monitoring nodes to the OPC UA server if batch writing is enabled. If successful
      * healthNodesAdded_ will be set to true.
      * @param server The OPC UA server to add nodes to.
+     *
+     *    @remark This method stores the server pointer in the InfluxClient instance for use in the health monitoring callback.
      */
     void addHealthMonitoringNodes(UA_Server* server);
-    void removeHealthNodesCallback(UA_Server* server);
+    void addHealthNodesCallback();
+    void removeHealthNodesCallback();
     bool addExtraTags() const { return config_.addNameTags; }
 
    private:
@@ -127,6 +130,7 @@ namespace influxdb {
     std::atomic<bool> fundamentalErrorOccurred_{false};
     mutable std::mutex asyncErrorMutex_;
     std::string lastAsyncWriteError_;
+    UA_Server* server_ = nullptr;
 
     // batch write support related methods
     /**
