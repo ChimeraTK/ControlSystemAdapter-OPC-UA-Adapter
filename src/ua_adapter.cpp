@@ -829,7 +829,7 @@ namespace ChimeraTK {
       }
     }
     if(this->influxClient) {
-      this->influxClient->removeHealthNodesCallback(this->mappedServer);
+      this->influxClient->removeHealthNodesCallback();
     }
 
     if(this->serverConfig.registerLDS) {
