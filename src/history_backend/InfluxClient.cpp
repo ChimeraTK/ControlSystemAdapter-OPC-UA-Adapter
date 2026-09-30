@@ -323,6 +323,14 @@ namespace influxdb {
           fundamentalErrorOccurred_.store(true);
         }
         *error = "Write failed with HTTP " + std::to_string(status) + ": " + response;
+        if(server_ != nullptr) {
+          auto config = UA_Server_getConfig(server_);
+          if(config != nullptr) {
+            UA_LOG_WARNING(config->logging, UA_LOGCATEGORY_SERVER,
+                "Failed to write the payload %s to InfluxDB. HTTP %d: %s", payload.c_str(), static_cast<int>(status),
+                response.c_str());
+          }
+        }
       }
       return false;
     }
@@ -472,8 +480,9 @@ namespace influxdb {
     if(rc != CURLE_OK) {
       if(error != nullptr) {
         *error = std::string("HTTP request failed: ") + curl_easy_strerror(rc);
-        // This could be a fundamental error but the same happens if the connection is temporarily down. So we don't set
-        // fundamentalErrorOccurred_ here.
+        // This could be a fundamental error but the same happens if the connection is temporarily down. So we don't
+        // set fundamentalErrorOccurred_ here.
+        // fundamentalErrorOccurred_.store(true);
       }
       curl_slist_free_all(headers);
       curl_easy_cleanup(curl);
@@ -669,6 +678,8 @@ namespace influxdb {
     errorCode_.store(0);
     fundamentalErrorOccurred_.store(false);
 
+    addHealthNodesCallback();
+
     writeWorkerThread_ = std::thread([this]() { writeWorkerLoop(); });
     return writeWorkerThread_.joinable();
   }
@@ -721,6 +732,7 @@ namespace influxdb {
   }
 
   void InfluxClient::addHealthMonitoringNodes(UA_Server* server) {
+    server_ = server;
     if(!config_.writeBatching.enabled) {
       return;
     }
@@ -785,19 +797,25 @@ namespace influxdb {
     }
 
     HealthMonitoring::updateInfluxHealth(server, healthContext_.get());
-    rc = UA_Server_addRepeatedCallback(
-        server, HealthMonitoring::updateInfluxHealth, healthContext_.get(), 1000.0, &healthCallbackId);
-    if(rc != UA_STATUSCODE_GOOD) {
-      UA_LOG_ERROR(
-          config->logging, UA_LOGCATEGORY_USERLAND, "Failed to add health callback: %s", UA_StatusCode_name(rc));
-      return;
-    }
-    healthNodesAdded_ = true;
+    addHealthNodesCallback();
   }
 
-  void InfluxClient::removeHealthNodesCallback(UA_Server* server) {
+  void InfluxClient::addHealthNodesCallback() {
+    if(!healthNodesAdded_) {
+      UA_StatusCode rc = UA_Server_addRepeatedCallback(
+          server_, HealthMonitoring::updateInfluxHealth, healthContext_.get(), 1000.0, &healthCallbackId);
+      if(rc != UA_STATUSCODE_GOOD) {
+        UA_LOG_ERROR(UA_Server_getConfig(server_)->logging, UA_LOGCATEGORY_USERLAND,
+            "Failed to add health callback: %s", UA_StatusCode_name(rc));
+        return;
+      }
+      healthNodesAdded_ = true;
+    }
+  }
+
+  void InfluxClient::removeHealthNodesCallback() {
     if(healthNodesAdded_) {
-      UA_Server_removeRepeatedCallback(server, healthCallbackId);
+      UA_Server_removeRepeatedCallback(server_, healthCallbackId);
       healthNodesAdded_ = false;
     }
   }
