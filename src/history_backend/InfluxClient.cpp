@@ -319,7 +319,7 @@ namespace influxdb {
     if(status < 200 || status >= 300) {
       if(error != nullptr) {
         errorCode_.store(status);
-        if(status == 401 || status == 404 || status == 400) {
+        if(status == 401 || status == 404 /*|| status == 400*/) {
           fundamentalErrorOccurred_.store(true);
         }
         *error = "Write failed with HTTP " + std::to_string(status) + ": " + response;

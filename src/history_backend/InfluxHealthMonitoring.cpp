@@ -70,12 +70,11 @@ namespace influxdb::HealthMonitoring {
               "Influx write failed: InfluxDB not found error returned. Check bucket and organization name. Not trying "
               "to write further points. Fix the issue andrestart the application.");
         }
-        else if(stats.errorCode == 400) {
-          UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_SERVER,
-              "Influx write failed: InfluxDB bad request error returned. Check your InfluxDB organisation. Not trying "
-              "to "
-              "write further points. Fix the issue and restart the application.");
-        }
+        // else if(stats.errorCode == 400) {
+        //   UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_SERVER,
+        //       "Influx write failed: InfluxDB bad request error returned. Check your InfluxDB organisation. Not trying
+        //       " "to " "write further points. Fix the issue and restart the application.");
+        // }
         else {
           UA_LOG_ERROR(config->logging, UA_LOGCATEGORY_SERVER,
               "Influx write failed: Fundamental error occurred.  Not trying to write further points. Fix the issue and "
