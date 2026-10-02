@@ -323,14 +323,6 @@ namespace influxdb {
           fundamentalErrorOccurred_.store(true);
         }
         *error = "Write failed with HTTP " + std::to_string(status) + ": " + response;
-        if(server_ != nullptr) {
-          auto config = UA_Server_getConfig(server_);
-          if(config != nullptr) {
-            UA_LOG_WARNING(config->logging, UA_LOGCATEGORY_SERVER,
-                "Failed to write the payload %s to InfluxDB. HTTP %d: %s", payload.c_str(), static_cast<int>(status),
-                response.c_str());
-          }
-        }
       }
       return false;
     }
@@ -801,7 +793,7 @@ namespace influxdb {
   }
 
   void InfluxClient::addHealthNodesCallback() {
-    if(!healthNodesAdded_) {
+    if(!healthNodesAdded_ && server_ && healthContext_) {
       UA_StatusCode rc = UA_Server_addRepeatedCallback(
           server_, HealthMonitoring::updateInfluxHealth, healthContext_.get(), 1000.0, &healthCallbackId);
       if(rc != UA_STATUSCODE_GOOD) {
@@ -814,7 +806,7 @@ namespace influxdb {
   }
 
   void InfluxClient::removeHealthNodesCallback() {
-    if(healthNodesAdded_) {
+    if(healthNodesAdded_ && server_) {
       UA_Server_removeRepeatedCallback(server_, healthCallbackId);
       healthNodesAdded_ = false;
     }
