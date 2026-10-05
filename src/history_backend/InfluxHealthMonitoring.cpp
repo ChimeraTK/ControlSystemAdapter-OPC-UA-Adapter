@@ -52,11 +52,18 @@ namespace influxdb::HealthMonitoring {
     writeUInt64Node(server, ctx->batchesWrittenNodeId, static_cast<UA_UInt64>(stats.batchesWritten));
     writeUInt64Node(server, ctx->batchFailuresNodeId, static_cast<UA_UInt64>(stats.batchWriteFailures));
     writeUInt64Node(server, ctx->retryAttemptsNodeId, static_cast<UA_UInt64>(stats.retryAttempts));
+    // The error code will not be reset automatically, so it will always show the last error code
+    // It can be reset by the user via the reset method
     writeUInt64Node(server, ctx->errorCodeNodeId, static_cast<UA_UInt64>(stats.errorCode));
     writeBooleanNode(server, ctx->fundamentalErrorNodeId, ctx->client->hasFundamentalError() ? UA_TRUE : UA_FALSE);
     const bool hasError = ctx->client->hasAsyncWriteError();
     writeBooleanNode(server, ctx->asyncErrorActiveNodeId, hasError ? UA_TRUE : UA_FALSE);
-    writeStringNode(server, ctx->asyncErrorNodeId, hasError ? ctx->client->getLastAsyncWriteError() : "");
+    if(hasError) {
+      // Only update the last async error node if there is an active error
+      // This avoids overwriting the last error message with an empty string when the error is cleared
+      // Overriding can be done by the user via reset
+      writeStringNode(server, ctx->asyncErrorNodeId, ctx->client->getLastAsyncWriteError());
+    }
     if(stats.fundamentalErrorOccurred) {
       auto config = UA_Server_getConfig(server);
       if(config != nullptr) {
