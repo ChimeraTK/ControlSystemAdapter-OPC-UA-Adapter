@@ -5,6 +5,7 @@
 #include <open62541/plugin/log_stdout.h>
 
 #include <algorithm>
+#include <cctype> // Required for std::toupper
 #include <climits>
 #include <cmath>
 #include <cstdlib>
@@ -161,14 +162,15 @@ namespace influxdb {
   }
 
   bool checkValue(const std::string& value, const bool& isString) {
-    if(!isString && value.empty()) {
-      return false;
-    }
+    if(!isString) {
+      if(value.empty()) {
+        return false;
+      }
 
-    if(value == "NaN" || value == "nan" || value == "inf" || value == "-inf") {
-      return false;
+      std::string valueCopy = value;
+      std::ranges::transform(valueCopy, valueCopy.begin(), [](unsigned char c) { return std::toupper(c); });
+      return !(valueCopy.contains("NAN") || valueCopy.contains("INF"));
     }
-
     return true;
   }
 
