@@ -67,12 +67,13 @@ int main() {
   devManager = pvManagers.second;
   csManager = pvManagers.first;
 
-  csManager->enablePersistentDataStorage();
   ChimeraTK::ApplicationBase::getInstance().setPVManager(devManager);
   ChimeraTK::ApplicationBase::getInstance().initialise();
 
   string pathToConfig = ChimeraTK::ApplicationBase::getInstance().getName() + "_mapping.xml";
   csaOPCUA = new ChimeraTK::csa_opcua_adapter(csManager, pathToConfig);
+
+  csManager->enablePersistentDataStorage(csaOPCUA->getUnusedVariables());
 
   UA_LOG_INFO(csaOPCUA->getLogger(), UA_LOGCATEGORY_USERLAND, "Optimize unmapped variables in the application base");
   ChimeraTK::ApplicationBase::getInstance().optimiseUnmappedVariables(csaOPCUA->getUnusedVariables());
