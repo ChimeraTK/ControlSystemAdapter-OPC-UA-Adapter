@@ -35,7 +35,11 @@ namespace influxdb::HealthMonitoring {
     if(ctx == nullptr || ctx->client == nullptr) {
       return UA_STATUSCODE_BADINTERNALERROR;
     }
-
+    // \ToDo: If a curl call is in progress, this will not stop it. It will only reset the client after the current call
+    // is finished. Can take up to 10s and will block the server thread. Consider using a separate thread for the reset
+    // or using a more advanced approach to cancel the ongoing request.
+    // However this is a rare case and should not happen in normal operation. It is only relevant if the InfluxDB server
+    // is not reachable or the network is down.
     const bool ok = ctx->client->reset();
     if(ok) {
       writeStringNode(server, ctx->asyncErrorNodeId, "");

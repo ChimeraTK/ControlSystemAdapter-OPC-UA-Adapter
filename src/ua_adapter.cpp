@@ -814,8 +814,7 @@ namespace ChimeraTK {
           // register with lds server
           UA_ClientConfig cc;
           memset(&cc, 0, sizeof(UA_ClientConfig));
-          auto config = (UA_ServerConfig*)UA_calloc(1, sizeof(UA_ServerConfig));
-          config.logging = this->server_config->logging;
+          cc.logging = this->server_config->logging;
           UA_ClientConfig_setDefault(&cc);
           cc.securityMode = UA_MESSAGESECURITYMODE_NONE;
           UA_StatusCode retval = UA_Server_registerDiscovery(this->mappedServer, &cc,
