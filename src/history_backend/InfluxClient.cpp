@@ -228,7 +228,7 @@ namespace influxdb {
     if(config_.writeBatching.enabled) {
       {
         std::lock_guard<std::mutex> lock(writeQueueMutex_);
-        stopWriteWorker_ = true;
+        finishWriteWorker_.store(true);
       }
       writeQueueCv_.notify_one();
       if(writeWorkerThread_.joinable()) {
@@ -545,9 +545,10 @@ namespace influxdb {
   bool InfluxClient::attemptSendBatch(const std::string& payload, std::string* error) {
     const std::size_t maxAttempts = config_.writeBatching.maxRetries + 1;
     for(std::size_t attempt = 1; attempt <= maxAttempts; ++attempt) {
+      // Check if the write worker is requested to stop before sending the batch
       if(stopWriteWorker_.load()) {
         if(error != nullptr) {
-          *error = "Batch write canceled due to reset or shutdown";
+          *error = "Batch write canceled due to reset";
         }
         return false;
       }
@@ -563,7 +564,15 @@ namespace influxdb {
 
         // Make sleep cancellable
         std::unique_lock<std::mutex> lock(writeQueueMutex_);
-        writeQueueCv_.wait_for(lock, std::chrono::milliseconds(waitMs), [this]() { return stopWriteWorker_.load(); });
+        writeQueueCv_.wait_for(lock, std::chrono::milliseconds(waitMs),
+            [this]() { return stopWriteWorker_.load() || finishWriteWorker_.load(); });
+      }
+      // Check if the write worker is requested to finish -> do not retry if the worker is finishing
+      if(finishWriteWorker_.load()) {
+        if(error != nullptr) {
+          *error = "Batch write canceled due to shutdown";
+        }
+        return false;
       }
       // If maxAttempts is 1, we still want to wait for the backoff time before returning false, unless the worker is
       // stopping or finishing
@@ -585,16 +594,20 @@ namespace influxdb {
       {
         std::unique_lock<std::mutex> lock(writeQueueMutex_);
         // Wait until there are points to write or the worker is stopped
-        writeQueueCv_.wait(lock, [this]() { return stopWriteWorker_ || !writeQueue_.empty(); });
+        writeQueueCv_.wait(
+            lock, [this]() { return stopWriteWorker_.load() || finishWriteWorker_.load() || !writeQueue_.empty(); });
 
         // Collect more points, respecting the maxBatchPoints limit
-        if(!stopWriteWorker_ && writeQueue_.size() < config_.writeBatching.maxBatchPoints) {
-          writeQueueCv_.wait_for(lock, std::chrono::milliseconds(config_.writeBatching.flushIntervalMs),
-              [this]() { return stopWriteWorker_ || writeQueue_.size() >= config_.writeBatching.maxBatchPoints; });
+        if(!stopWriteWorker_.load() && !finishWriteWorker_.load() &&
+            writeQueue_.size() < config_.writeBatching.maxBatchPoints) {
+          writeQueueCv_.wait_for(lock, std::chrono::milliseconds(config_.writeBatching.flushIntervalMs), [this]() {
+            return stopWriteWorker_.load() || finishWriteWorker_.load() ||
+                writeQueue_.size() >= config_.writeBatching.maxBatchPoints;
+          });
         }
 
         // stop here if the worker is stopped and there are no points to write
-        if(writeQueue_.empty() && stopWriteWorker_) {
+        if(writeQueue_.empty() && (stopWriteWorker_.load() || finishWriteWorker_.load())) {
           return;
         }
 
@@ -633,7 +646,8 @@ namespace influxdb {
       bool requeued = false;
       {
         std::lock_guard<std::mutex> lock(writeQueueMutex_);
-        if(!stopWriteWorker_ && writeQueue_.size() + batch.size() <= config_.writeBatching.maxQueuePoints) {
+        if(!stopWriteWorker_.load() && !finishWriteWorker_.load() &&
+            writeQueue_.size() + batch.size() <= config_.writeBatching.maxQueuePoints) {
           for(auto it = batch.rbegin(); it != batch.rend(); ++it) {
             writeQueue_.push_front(std::move(*it));
           }
@@ -693,8 +707,15 @@ namespace influxdb {
 
     addHealthNodesCallback();
 
-    writeWorkerThread_ = std::thread([this]() { writeWorkerLoop(); });
-    return writeWorkerThread_.joinable();
+    try {
+      writeWorkerThread_ = std::thread([this]() { writeWorkerLoop(); });
+    }
+    catch(...) {
+      fundamentalErrorOccurred_.store(true);
+      setLastAsyncWriteError("Failed to restart write worker thread after reset");
+      return false;
+    }
+    return true;
   }
 
   bool InfluxClient::writePoint(const std::string& influxFieldName, const FieldValue& fieldValue,

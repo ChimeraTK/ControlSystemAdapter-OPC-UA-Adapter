@@ -119,7 +119,9 @@ namespace influxdb {
     std::condition_variable writeQueueCv_;
     std::deque<PendingWritePoint> writeQueue_;
     std::thread writeWorkerThread_;
-    std::atomic<bool> stopWriteWorker_ = false;
+    std::atomic<bool> stopWriteWorker_ = false; ///< writer thread will stop immediately and exit
+    std::atomic<bool> finishWriteWorker_ =
+        false; ///< writer thread will finish writing all points in the queue and then exit
     std::atomic<std::size_t> queuedPointsDropped_{0};
     std::atomic<std::size_t> pointsWritten_{0};
     std::atomic<std::size_t> pointsDropped_{0};
